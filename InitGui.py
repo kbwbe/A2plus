@@ -42,7 +42,7 @@ class a2pWorkbench (Workbench):
         import a2p_planesParallelConstraint
         import a2p_planeConstraint
         import a2p_AxialConnection
-        #import a2p_angleConnection
+        import a2p_angleConnection
         import a2p_pointIdentityConnection
         import a2p_pointOnLineConstraint
         import a2p_pointOnPlaneConstraint
@@ -63,8 +63,8 @@ class a2pWorkbench (Workbench):
             'a2p_PlanesParallelConnectionCommand',
             'a2p_PlaneConnection',
             'a2p_AxialConnection',
-            #'a2p_AngleConnection', #not implemented yet
-            'a2p_SphericalConnection', #not implemented yet
+            'a2p_AngledPlanesCommand',
+            'a2p_SphericalConnection',
             'a2p_SolverCommand',
             'a2p_DeleteConnectionsCommand',
             'a2p_ViewConnectionsCommand',

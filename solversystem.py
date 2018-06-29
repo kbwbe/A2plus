@@ -28,7 +28,17 @@ import copy
 import FreeCAD, FreeCADGui, Part
 from PySide import QtGui, QtCore
 from  FreeCAD import Base
-from a2plib import drawVector, path_a2p
+from a2plib import (
+    drawVector, 
+    path_a2p,
+    getObjectVertexFromName,
+    getObjectEdgeFromName,
+    getObjectFaceFromName,
+    isLine,
+    getPos,
+    getAxis,
+    appVersionStr
+    )
 
 
 SOLVER_STEPS_BEFORE_ACCURACYCHECK = 100
@@ -38,86 +48,12 @@ SOLVER_SPIN_ACCURACY = 1.0e-2
 
 
 #------------------------------------------------------------------------------
-# Some small helper tools analog to hamish's assembly2
-#------------------------------------------------------------------------------
-def appVersionStr():
-    version = int(FreeCAD.Version()[0])
-    subVersion = int(FreeCAD.Version()[1])
-    return "%03d.%03d" %(version,subVersion)
-#------------------------------------------------------------------------------
-def getObjectEdgeFromName( obj, name ):
-    assert name.startswith('Edge')
-    ind = int( name[4:]) -1 
-    return obj.Shape.Edges[ind]
-#------------------------------------------------------------------------------
-def getObjectFaceFromName( obj, faceName ):
-    assert faceName.startswith('Face')
-    ind = int( faceName[4:]) -1 
-    return obj.Shape.Faces[ind]
-#------------------------------------------------------------------------------
-def getObjectVertexFromName( obj, name ):
-    assert name.startswith('Vertex')
-    ind = int( name[6:]) -1 
-    return obj.Shape.Vertexes[ind]
-#------------------------------------------------------------------------------
-def isLine(param):
-    if hasattr(Part,"LineSegment"):
-        return isinstance(param,(Part.Line,Part.LineSegment))
-    else:
-        return isinstance(param,Part.Line)
-#------------------------------------------------------------------------------
-def getPos(obj, subElementName):
-    pos = None
-    if subElementName.startswith('Face'):
-        face = getObjectFaceFromName(obj, subElementName)
-        surface = face.Surface
-        if str(surface) == '<Plane object>':
-            pos = getObjectFaceFromName(obj, subElementName).Faces[0].BoundBox.Center
-            # axial constraint for Planes
-            # pos = surface.Position
-        elif all( hasattr(surface,a) for a in ['Axis','Center','Radius'] ):
-            pos = surface.Center
-        elif str(surface).startswith('<SurfaceOfRevolution'):
-            pos = getObjectFaceFromName(obj, subElementName).Edges[0].Curve.Center
-    elif subElementName.startswith('Edge'):
-        edge = getObjectEdgeFromName(obj, subElementName)
-        if isLine(edge.Curve):
-            if appVersionStr() <= "000.016":
-                pos = edge.Curve.StartPoint
-            else:
-                pos = edge.firstVertex(True).Point
-        elif hasattr( edge.Curve, 'Center'): #circular curve
-            pos = edge.Curve.Center
-    elif subElementName.startswith('Vertex'):
-        return  getObjectVertexFromName(obj, subElementName).Point
-    return pos # maybe none !!
-#------------------------------------------------------------------------------
-def getAxis(obj, subElementName):
-    axis = None
-    if subElementName.startswith('Face'):
-        face = getObjectFaceFromName(obj, subElementName)
-        surface = face.Surface
-        if hasattr(surface,'Axis'):
-            axis = surface.Axis
-        elif str(surface).startswith('<SurfaceOfRevolution'):
-            axis = face.Edges[0].Curve.Axis
-    elif subElementName.startswith('Edge'):
-        edge = getObjectEdgeFromName(obj, subElementName)
-        if isLine(edge.Curve):
-            axis = edge.Curve.tangent(0)[0]
-        elif hasattr( edge.Curve, 'Axis'): #circular curve
-            axis =  edge.Curve.Axis
-    return axis # may be none!
-#------------------------------------------------------------------------------
-# End of helper-tools
-#------------------------------------------------------------------------------
-
-
-
-
-
-#------------------------------------------------------------------------------
 class SolverSystem():
+    '''
+    class Solversystem():
+    A new iterative solver, inspired by physics.
+    Using "attraction" of parts by constraints
+    '''
     def __init__(self):
         self.doc = None
         self.stepCount = 0
