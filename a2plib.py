@@ -255,7 +255,7 @@ class SelectionTaskDialogForm(QtGui.QWidget):
         
 #------------------------------------------------------------------------------
 class SelectionExObject:
-    'allows for selection gate funtions to interface with classification functions below'
+    'allows for selection gate functions to interface with classification functions below'
     def __init__(self, doc, Object, subElementName):
         self.doc = doc
         self.Object = Object

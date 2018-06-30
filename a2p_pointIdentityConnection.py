@@ -44,7 +44,7 @@ def parseSelection(selection, objectToUpdate=None):
                            [s2.ObjectName, s2.SubElementNames[0], s2.Object.Label ] ]
     if not validSelection:
         msg = '''
-              To add an point Identity constraint select excact two vertexes! 
+              To add a point Identity constraint select exactly two vertexes! 
               '''
         QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Incorrect Usage", msg)
         return 

@@ -96,7 +96,7 @@ def importPartFromFile(_doc, filename, importToCache=False):
                        if hasattr(obj,'ViewObject') and obj.ViewObject.isVisible()
                        and hasattr(obj,'Shape') and len(obj.Shape.Faces) > 0 and 'Body' not in obj.Name]
     #-------------------------------------------
-    # Discover wether we are importing a subassembly or a single part
+    # Discover whether we are importing a subassembly or a single part
     #-------------------------------------------
     if any([ 'importPart' in obj.Content for obj in importDoc.Objects]) and not len(visibleObjects) == 1:
         subAssemblyImport = True
@@ -609,7 +609,7 @@ def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
     return
 
     #-------------------------------------------------
-    # Following stuff unsed at moment...
+    # Following stuff unused at the moment...
     #-------------------------------------------------
 
     '''
@@ -617,7 +617,7 @@ def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
     if len([c for c in doc.Objects if  'ConstraintInfo' in c.Content and oldObject.Name in [c.Object1, c.Object2] ]) == 0:
         return
 
-    # check, wether object is an assembly with muxInformations.
+    # check, whether object is an assembly with muxInformations.
     # Then find edgenames with mapping in muxinfo...
     deletionList = [] #for broken constraints
     if hasattr(oldObject, 'muxInfo'):
