@@ -27,7 +27,7 @@ from PySide import QtGui, QtCore
 import os, copy, time
 import a2plib
 from a2p_MuxAssembly import muxObjectsWithKeys, createTopoInfo, Proxy_muxAssemblyObj
-from viewProviderProxies import *
+from a2p_viewProviderProxies import *
 from a2p_versionmanagement import SubAssemblyWalk, ASSEMBLY3_VERSION
 import solversystem
 from a2plib import appVersionStr

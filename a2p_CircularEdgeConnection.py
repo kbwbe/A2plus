@@ -29,7 +29,7 @@ from pivy import coin
 from PySide import QtGui
 from FreeCAD import Base
 
-from viewProviderProxies import *
+from a2p_viewProviderProxies import *
 
 
 class CircularEdgeSelectionGate:

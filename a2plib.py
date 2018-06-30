@@ -25,7 +25,7 @@
 import FreeCAD, FreeCADGui, Part
 from PySide import QtGui, QtCore
 import numpy, os
-from viewProviderProxies import *
+from a2p_viewProviderProxies import *
 from  FreeCAD import Base
 
 
