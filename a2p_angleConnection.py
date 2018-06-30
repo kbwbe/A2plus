@@ -25,13 +25,15 @@
 from a2plib import *
 from pivy import coin
 from PySide import QtGui
+import math
+from a2p_viewProviderProxies import *
 
-class PlanesAngleSelectionGate:
+class PlanesAngleSelectionGate():
     def allow(self, doc, obj, sub):
         s1 = SelectionExObject(doc, obj, sub)
         return planeSelected(s1)
 
-class PlanesAngleSelectionGate2:
+class PlanesAngleSelectionGate2():
     def allow(self, doc, obj, sub):
         s2 = SelectionExObject(doc, obj, sub)
         return planeSelected(s2)
@@ -54,8 +56,14 @@ def parseSelection(selection, objectToUpdate=None):
         QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Incorrect Usage", msg)
         return 
     
-    # FIXME: calulate recent angle here to be stored in property "angle"
-    
+    # calulate recent angle here to be stored in property "angle"
+    ob1 = FreeCAD.activeDocument().getObject(s1.ObjectName)
+    ob2 = FreeCAD.activeDocument().getObject(s2.ObjectName)
+    plane1 = getObjectFaceFromName(ob1, s1.SubElementNames[0])
+    plane2 = getObjectFaceFromName(ob2, s2.SubElementNames[0])
+    normal1 = plane1.Surface.Axis
+    normal2 = plane2.Surface.Axis
+    angle = normal2.getAngle(normal1) / 2.0 / math.pi * 360.0
     
     if objectToUpdate == None:
         cName = findUnusedObjectName('angledPlanesContraint')
@@ -65,7 +73,7 @@ def parseSelection(selection, objectToUpdate=None):
         c.addProperty("App::PropertyString","SubElement1","ConstraintInfo").SubElement1 = cParms[0][1]
         c.addProperty("App::PropertyString","Object2","ConstraintInfo").Object2 = cParms[1][0]
         c.addProperty("App::PropertyString","SubElement2","ConstraintInfo").SubElement2 = cParms[1][1]
-        c.addProperty("App::PropertyAngle","angle","ConstraintInfo")
+        c.addProperty("App::PropertyAngle","angle","ConstraintInfo").angle = angle
         c.Object1 = cParms[0][0]
         c.SubElement1 = cParms[0][1]
         c.Object2 = cParms[1][0]

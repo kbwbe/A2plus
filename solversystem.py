@@ -39,12 +39,13 @@ from a2plib import (
     getAxis,
     appVersionStr
     )
+from Units import Unit, Quantity
 
 
 SOLVER_STEPS_BEFORE_ACCURACYCHECK = 100
 SOLVER_MAXSTEPS = 10000
-SOLVER_POS_ACCURACY = 1.0e-2
-SOLVER_SPIN_ACCURACY = 1.0e-2
+SOLVER_POS_ACCURACY = 1.0e-2 #Need to implement variable stepwith calculation to improve this..
+SOLVER_SPIN_ACCURACY = 1.0e-2 #Sorry for that at moment...
 
 
 #------------------------------------------------------------------------------
@@ -64,6 +65,7 @@ class SolverSystem():
     def clear(self):
         for r in self.rigids:
             r.clear()
+        self.stepCount = 0
         self.rigids = []
         self.constraints = []
         self.objectNames = []
@@ -115,6 +117,10 @@ class SolverSystem():
                 dep1.offset = c.offset 
             except:
                 pass # not all constraints do have offset-Property
+            try:
+                dep1.angle = c.angle 
+            except:
+                pass # not all constraints do have angle-Property
             
             rig2 = self.getRigid(c.Object2)
             dep2 = Dependency()
@@ -127,6 +133,10 @@ class SolverSystem():
                 dep2.offset = c.offset 
             except:
                 pass # not all constraints do have offset-Property
+            try:
+                dep2.angle = c.angle 
+            except:
+                pass # not all constraints do have angle-Property
 
             if c.Type == "pointIdentity":
                 dep1.refType = "point"
@@ -261,6 +271,25 @@ class SolverSystem():
                 rig1.dependencies.append(dep1)
                 rig2.dependencies.append(dep2)
                 
+            if c.Type == "angledPlanes":
+                dep1.refType = "pointNormal"
+                dep2.refType = "pointNormal"
+                ob1 = doc.getObject(c.Object1)
+                ob2 = doc.getObject(c.Object2)
+                plane1 = getObjectFaceFromName(ob1, c.SubElement1)
+                plane2 = getObjectFaceFromName(ob2, c.SubElement2)
+                dep1.refPoint = plane1.Faces[0].BoundBox.Center
+                dep2.refPoint = plane2.Faces[0].BoundBox.Center
+                normal1 = plane1.Surface.Axis
+                normal2 = plane2.Surface.Axis
+                dep1.refAxisEnd = dep1.refPoint.add(normal1)
+                dep2.refAxisEnd = dep2.refPoint.add(normal2)
+                #
+                dep1.foreignDependency = dep2
+                dep2.foreignDependency = dep1
+                rig1.dependencies.append(dep1)
+                rig2.dependencies.append(dep2)
+                
             if c.Type == "plane":
                 dep1.refType = "pointNormal"
                 dep2.refType = "pointNormal"
@@ -375,6 +404,10 @@ class SolverSystem():
                     depRefPoints.append(dep.refPoint)
                     depMoveVectors.append(Base.Vector(0,0,0))
 
+                if dep.Type == "angledPlanes":
+                    depRefPoints.append(dep.refPoint)
+                    depMoveVectors.append(Base.Vector(0,0,0))
+
                 if dep.Type == "plane":
                     depRefPoints.append(dep.refPoint)
                     vec1 = dep.foreignDependency.refPoint.sub(dep.refPoint)
@@ -423,6 +456,25 @@ class SolverSystem():
                 #adjust axis' of the dependencies //FIXME (align,opposed,none)
                 rig.maxAxisError = 0.0
                 for dep in rig.dependencies:
+
+                    if (
+                        dep.Type == "angledPlanes"
+                        ):
+                        rigAxis = dep.refAxisEnd.sub(dep.refPoint)
+                        foreignAxis = dep.foreignDependency.refAxisEnd.sub(
+                            dep.foreignDependency.refPoint
+                            )
+                        recentAngle = foreignAxis.getAngle(rigAxis) / 2.0/ math.pi *360
+                        deltaAngle = dep.angle.Value - recentAngle
+                        if abs(deltaAngle) < 1e-6:
+                            # do not change spin, not necessary..
+                            pass
+                        else:
+                            axis = rigAxis.cross(foreignAxis)
+                            axis.normalize()
+                            axis.multiply(-deltaAngle*57.296)
+                            rig.spin = rig.spin.add(axis)
+
                     if (
                         dep.Type == "circularEdge" or
                         dep.Type == "plane" or
@@ -619,6 +671,7 @@ class Dependency():
         self.refAxisEnd = None
         self.direction = None
         self.offset = None
+        self.angle = None
         self.foreignDependency = None
         self.rotationAxis = None
         self.moveVector = None
@@ -630,6 +683,7 @@ class Dependency():
         self.refAxisEnd = None
         self.direction = None
         self.offset = None
+        self.angle = None
         self.foreignDependency = None
         self.rotationAxis = None
         self.moveVector = None
