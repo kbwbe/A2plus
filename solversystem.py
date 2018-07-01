@@ -465,15 +465,21 @@ class SolverSystem():
                             dep.foreignDependency.refPoint
                             )
                         recentAngle = foreignAxis.getAngle(rigAxis) / 2.0/ math.pi *360
-                        deltaAngle = dep.angle.Value - recentAngle
+                        deltaAngle = abs(dep.angle.Value) - recentAngle
                         if abs(deltaAngle) < 1e-6:
                             # do not change spin, not necessary..
                             pass
                         else:
-                            axis = rigAxis.cross(foreignAxis)
-                            axis.normalize()
-                            axis.multiply(-deltaAngle*57.296)
-                            rig.spin = rig.spin.add(axis)
+                            try: 
+                                axis = rigAxis.cross(foreignAxis)
+                                axis.normalize()
+                                axis.multiply(-deltaAngle*57.296)
+                                rig.spin = rig.spin.add(axis)
+                            except: #axis = Vector(0,0,0) and cannot be normalized...
+                                x = random.uniform(-1e-3,1e-3)
+                                y = random.uniform(-1e-3,1e-3)
+                                z = random.uniform(-1e-3,1e-3)
+                                rig.spin = rig.spin.add(Base.Vector(x,y,z))
 
                     if (
                         dep.Type == "circularEdge" or
