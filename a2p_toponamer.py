@@ -86,7 +86,7 @@ class TopoNamer():
         rotatedNormal = normalRotPlacement.multVec(normal)
         rotatedNormal.normalize()
     
-        absolutePointOnPlane = prevPlacement.multVec(pointOnPlane) #asolute Coordinates
+        absolutePointOnPlane = prevPlacement.multVec(pointOnPlane) #absolute Coordinates
         dot = absolutePointOnPlane.dot(rotatedNormal)
         copyOfNormal = App.Vector(rotatedNormal)
         closestPointVec = copyOfNormal.multiply(dot) #multiply modifies underlaying vec
@@ -108,7 +108,7 @@ class TopoNamer():
         rotatedAxis = axisRotPlacement.multVec(axis)
         rotatedAxis.normalize()
     
-        absolutePointOnAxis = prevPlacement.multVec(pointOnAxis) #asolute Coordinates
+        absolutePointOnAxis = prevPlacement.multVec(pointOnAxis) #absolute Coordinates
         dot = absolutePointOnAxis.dot(rotatedAxis)
         copyOfAxis = App.Vector(rotatedAxis)
         projection = copyOfAxis.multiply(dot)
@@ -119,7 +119,7 @@ class TopoNamer():
     
     def generateSphereFaceKey(self,face,prevPlacement):
         center = face.Surface.Center
-        absoluteCenter = prevPlacement.multVec(center) #asolute Coordinates
+        absoluteCenter = prevPlacement.multVec(center) #absolute Coordinates
         key = 'SPER#AT'
         x = ("#%011.2f" % absoluteCenter.x)
         y = ("#%011.2f" % absoluteCenter.y)
@@ -171,7 +171,7 @@ class TopoNamer():
     def generatePlaneFaceKeyFromPosNormal(self,pos,normal):
         rotatedNormal = normal
     
-        absolutePointOnPlane = pos #asolute Coordinates
+        absolutePointOnPlane = pos #absolute Coordinates
         dot = absolutePointOnPlane.dot(rotatedNormal)
         copyOfNormal = App.Vector(rotatedNormal)
         closestPointVec = copyOfNormal.multiply(dot) #multiply modifies underlaying vec
@@ -315,7 +315,7 @@ class TopoNamer():
         rotatedDirection = directionRotPlacement.multVec(direction)
         rotatedDirection.normalize()
     
-        absolutePointOnLine = prevPlacement.multVec(pointOnLine) #asolute Coordinates
+        absolutePointOnLine = prevPlacement.multVec(pointOnLine) #absolute Coordinates
         dot = absolutePointOnLine.dot(rotatedDirection)
         copyOfDirection = App.Vector(rotatedDirection)
         projection = copyOfDirection.multiply(dot) #multiply modifies underlaying vec
@@ -339,7 +339,7 @@ class TopoNamer():
         rotatedAxis = axisRotPlacement.multVec(axis)
         rotatedAxis.normalize()
     
-        absolutePointOnAxis = prevPlacement.multVec(pointOnAxis) #asolute Coordinates
+        absolutePointOnAxis = prevPlacement.multVec(pointOnAxis) #absolute Coordinates
         key = 'CIRC'+self.dirAndPosToString(rotatedAxis,absolutePointOnAxis)
         return key
     

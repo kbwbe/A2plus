@@ -158,7 +158,7 @@ class ViewProviderSimpleAssemblyShape:
         obj.Proxy = self
 
     def onDelete(self, viewObject, subelements):
-        #return False # Dont delete PartInformation !
+        #return False # Don't delete PartInformation !
         return True
         
     def __getstate__(self):

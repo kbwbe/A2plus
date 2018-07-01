@@ -499,7 +499,7 @@ class SolverSystem():
                                 dep.foreignDependency.refPoint
                                 )
                             #
-                            #do we have wrong alignement of axes ??
+                            #do we have wrong alignment of axes ??
                             dot = rigAxis.dot(foreignAxis)
                             if abs(dot+1.0) < 1e-3: #both axes nearly aligned but false orientation...
                                 x = random.uniform(-1e-3,1e-3)
