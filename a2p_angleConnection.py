@@ -23,43 +23,57 @@
 #***************************************************************************
 
 from a2plib import *
-#from lib3D import *
 from pivy import coin
 from PySide import QtGui
+import math
+from a2p_viewProviderProxies import *
 
-class PlaneSelectionGate:
+class PlanesAngleSelectionGate():
     def allow(self, doc, obj, sub):
-        s = SelectionExObject(doc, obj, sub)
-        return planeSelected(s) or LinearEdgeSelected(s)
+        s1 = SelectionExObject(doc, obj, sub)
+        return planeSelected(s1)
+
+class PlanesAngleSelectionGate2():
+    def allow(self, doc, obj, sub):
+        s2 = SelectionExObject(doc, obj, sub)
+        return planeSelected(s2)
 
 def parseSelection(selection, objectToUpdate=None):
     validSelection = False
     if len(selection) == 2:
         s1, s2 = selection
         if s1.ObjectName <> s2.ObjectName:
-            if ( planeSelected(s1) or LinearEdgeSelected(s1)) \
-                     and ( planeSelected(s2) or LinearEdgeSelected(s2)):
+            if ( planeSelected(s1) and planeSelected(s2)):
                 validSelection = True
                 cParms = [ [s1.ObjectName, s1.SubElementNames[0], s1.Object.Label ],
                            [s2.ObjectName, s2.SubElementNames[0], s2.Object.Label ] ]
     if not validSelection:
         msg = '''
-              Angle constraint requires a selection of 2 planes or two 
-              straight lines, each from different objects.Selection made:
+              Angle constraint requires a selection of 2 planes 
+              each on different objects. Selection made:
               %s
               '''  % printSelection(selection)
         QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Incorrect Usage", msg)
         return 
     
+    # calulate recent angle here to be stored in property "angle"
+    ob1 = FreeCAD.activeDocument().getObject(s1.ObjectName)
+    ob2 = FreeCAD.activeDocument().getObject(s2.ObjectName)
+    plane1 = getObjectFaceFromName(ob1, s1.SubElementNames[0])
+    plane2 = getObjectFaceFromName(ob2, s2.SubElementNames[0])
+    normal1 = plane1.Surface.Axis
+    normal2 = plane2.Surface.Axis
+    angle = normal2.getAngle(normal1) / 2.0 / math.pi * 360.0
+    
     if objectToUpdate == None:
-        cName = findUnusedObjectName('angleConstraint')
+        cName = findUnusedObjectName('angledPlanesContraint')
         c = FreeCAD.ActiveDocument.addObject("App::FeaturePython", cName)
-        c.addProperty("App::PropertyString","Type","ConstraintInfo").Type = 'angle_between_planes'
+        c.addProperty("App::PropertyString","Type","ConstraintInfo").Type = 'angledPlanes'
         c.addProperty("App::PropertyString","Object1","ConstraintInfo").Object1 = cParms[0][0]
         c.addProperty("App::PropertyString","SubElement1","ConstraintInfo").SubElement1 = cParms[0][1]
         c.addProperty("App::PropertyString","Object2","ConstraintInfo").Object2 = cParms[1][0]
         c.addProperty("App::PropertyString","SubElement2","ConstraintInfo").SubElement2 = cParms[1][1]
-        c.addProperty("App::PropertyAngle","angle","ConstraintInfo")
+        c.addProperty("App::PropertyAngle","angle","ConstraintInfo").angle = angle
         c.Object1 = cParms[0][0]
         c.SubElement1 = cParms[0][1]
         c.Object2 = cParms[1][0]
@@ -79,7 +93,7 @@ def parseSelection(selection, objectToUpdate=None):
         c.Proxy = ConstraintObjectProxy()
         c.ViewObject.Proxy = ConstraintViewProviderProxy( 
             c, 
-            ':/assembly2/icons/angleConstraint.svg', 
+            path_a2p +'/icons/a2p_angleConstraint.svg', 
             True, 
             cParms[1][2], 
             cParms[0][2]
@@ -97,13 +111,35 @@ def parseSelection(selection, objectToUpdate=None):
          
 
 selection_text = \
-  '''
-  Selection options:
-  - plane surface
-  - edge
-  '''
+'''
+Selection options:
+1) select a plane surface
+2) select second plane surface
+'''
 
-class a2p_AngleConnectionCommand:
+toolTipText = \
+'''
+Creates an angleBetweenPlanes constraint.
+
+1) select first plane object
+2) select second plane object on another part
+
+After setting this constraint at first
+the actual angle between both planes is
+been calculated and stored to entry "angle" in
+object editor.
+
+After creating this constraint you can change
+entry "angle" in object editor to desired value.
+
+Avoid use of angle 0 degrees and 180 degrees.
+You could get strange results.
+
+Better for that is using planesParallelConstraint.
+
+'''
+
+class a2p_AngledPlanesCommand:
     def Activated(self):
         selection = FreeCADGui.Selection.getSelectionEx()
         if len(selection) == 2:
@@ -111,22 +147,22 @@ class a2p_AngleConnectionCommand:
         else:
             FreeCADGui.Selection.clearSelection()
             ConstraintSelectionObserver( 
-                 PlaneSelectionGate(), 
+                 PlanesAngleSelectionGate(), 
                  parseSelection,
-                 taskDialog_title ='add angular constraint', 
+                 taskDialog_title ='add angle between planes constraint', 
                  taskDialog_iconPath = self.GetResources()['Pixmap'], 
-                 taskDialog_text = selection_text 
+                 taskDialog_text = selection_text,
+                 secondSelectionGate = PlanesAngleSelectionGate2() 
                  )
               
     def GetResources(self): 
-        msg = 'Create an angular constraint between two planes'
         return {
-             'Pixmap' : path_a2p + '/icons/angleConstraint.svg', 
-             'MenuText': msg, 
-             'ToolTip': msg,
+             'Pixmap' : path_a2p + '/icons/a2p_angleConstraint.svg', 
+             'MenuText': 'angle between planes constraint', 
+             'ToolTip': toolTipText,
              } 
 
-FreeCADGui.addCommand('a2p_AngleConnection', a2p_AngleConnectionCommand())
+FreeCADGui.addCommand('a2p_AngledPlanesCommand', a2p_AngledPlanesCommand())
 
 
 

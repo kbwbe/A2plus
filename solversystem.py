@@ -28,96 +28,33 @@ import copy
 import FreeCAD, FreeCADGui, Part
 from PySide import QtGui, QtCore
 from  FreeCAD import Base
-from a2plib import drawVector, path_a2p
+from a2plib import (
+    drawVector, 
+    path_a2p,
+    getObjectVertexFromName,
+    getObjectEdgeFromName,
+    getObjectFaceFromName,
+    isLine,
+    getPos,
+    getAxis,
+    appVersionStr
+    )
+from Units import Unit, Quantity
 
 
 SOLVER_STEPS_BEFORE_ACCURACYCHECK = 100
 SOLVER_MAXSTEPS = 10000
-SOLVER_POS_ACCURACY = 1.0e-2
-SOLVER_SPIN_ACCURACY = 1.0e-2
-
-
-#------------------------------------------------------------------------------
-# Some small helper tools analog to hamish's assembly2
-#------------------------------------------------------------------------------
-def appVersionStr():
-    version = int(FreeCAD.Version()[0])
-    subVersion = int(FreeCAD.Version()[1])
-    return "%03d.%03d" %(version,subVersion)
-#------------------------------------------------------------------------------
-def getObjectEdgeFromName( obj, name ):
-    assert name.startswith('Edge')
-    ind = int( name[4:]) -1 
-    return obj.Shape.Edges[ind]
-#------------------------------------------------------------------------------
-def getObjectFaceFromName( obj, faceName ):
-    assert faceName.startswith('Face')
-    ind = int( faceName[4:]) -1 
-    return obj.Shape.Faces[ind]
-#------------------------------------------------------------------------------
-def getObjectVertexFromName( obj, name ):
-    assert name.startswith('Vertex')
-    ind = int( name[6:]) -1 
-    return obj.Shape.Vertexes[ind]
-#------------------------------------------------------------------------------
-def isLine(param):
-    if hasattr(Part,"LineSegment"):
-        return isinstance(param,(Part.Line,Part.LineSegment))
-    else:
-        return isinstance(param,Part.Line)
-#------------------------------------------------------------------------------
-def getPos(obj, subElementName):
-    pos = None
-    if subElementName.startswith('Face'):
-        face = getObjectFaceFromName(obj, subElementName)
-        surface = face.Surface
-        if str(surface) == '<Plane object>':
-            pos = getObjectFaceFromName(obj, subElementName).Faces[0].BoundBox.Center
-            # axial constraint for Planes
-            # pos = surface.Position
-        elif all( hasattr(surface,a) for a in ['Axis','Center','Radius'] ):
-            pos = surface.Center
-        elif str(surface).startswith('<SurfaceOfRevolution'):
-            pos = getObjectFaceFromName(obj, subElementName).Edges[0].Curve.Center
-    elif subElementName.startswith('Edge'):
-        edge = getObjectEdgeFromName(obj, subElementName)
-        if isLine(edge.Curve):
-            if appVersionStr() <= "000.016":
-                pos = edge.Curve.StartPoint
-            else:
-                pos = edge.firstVertex(True).Point
-        elif hasattr( edge.Curve, 'Center'): #circular curve
-            pos = edge.Curve.Center
-    elif subElementName.startswith('Vertex'):
-        return  getObjectVertexFromName(obj, subElementName).Point
-    return pos # maybe none !!
-#------------------------------------------------------------------------------
-def getAxis(obj, subElementName):
-    axis = None
-    if subElementName.startswith('Face'):
-        face = getObjectFaceFromName(obj, subElementName)
-        surface = face.Surface
-        if hasattr(surface,'Axis'):
-            axis = surface.Axis
-        elif str(surface).startswith('<SurfaceOfRevolution'):
-            axis = face.Edges[0].Curve.Axis
-    elif subElementName.startswith('Edge'):
-        edge = getObjectEdgeFromName(obj, subElementName)
-        if isLine(edge.Curve):
-            axis = edge.Curve.tangent(0)[0]
-        elif hasattr( edge.Curve, 'Axis'): #circular curve
-            axis =  edge.Curve.Axis
-    return axis # may be none!
-#------------------------------------------------------------------------------
-# End of helper-tools
-#------------------------------------------------------------------------------
-
-
-
+SOLVER_POS_ACCURACY = 1.0e-2 #Need to implement variable stepwith calculation to improve this..
+SOLVER_SPIN_ACCURACY = 1.0e-2 #Sorry for that at moment...
 
 
 #------------------------------------------------------------------------------
 class SolverSystem():
+    '''
+    class Solversystem():
+    A new iterative solver, inspired by physics.
+    Using "attraction" of parts by constraints
+    '''
     def __init__(self):
         self.doc = None
         self.stepCount = 0
@@ -128,6 +65,7 @@ class SolverSystem():
     def clear(self):
         for r in self.rigids:
             r.clear()
+        self.stepCount = 0
         self.rigids = []
         self.constraints = []
         self.objectNames = []
@@ -179,6 +117,10 @@ class SolverSystem():
                 dep1.offset = c.offset 
             except:
                 pass # not all constraints do have offset-Property
+            try:
+                dep1.angle = c.angle 
+            except:
+                pass # not all constraints do have angle-Property
             
             rig2 = self.getRigid(c.Object2)
             dep2 = Dependency()
@@ -191,6 +133,10 @@ class SolverSystem():
                 dep2.offset = c.offset 
             except:
                 pass # not all constraints do have offset-Property
+            try:
+                dep2.angle = c.angle 
+            except:
+                pass # not all constraints do have angle-Property
 
             if c.Type == "pointIdentity":
                 dep1.refType = "point"
@@ -325,6 +271,25 @@ class SolverSystem():
                 rig1.dependencies.append(dep1)
                 rig2.dependencies.append(dep2)
                 
+            if c.Type == "angledPlanes":
+                dep1.refType = "pointNormal"
+                dep2.refType = "pointNormal"
+                ob1 = doc.getObject(c.Object1)
+                ob2 = doc.getObject(c.Object2)
+                plane1 = getObjectFaceFromName(ob1, c.SubElement1)
+                plane2 = getObjectFaceFromName(ob2, c.SubElement2)
+                dep1.refPoint = plane1.Faces[0].BoundBox.Center
+                dep2.refPoint = plane2.Faces[0].BoundBox.Center
+                normal1 = plane1.Surface.Axis
+                normal2 = plane2.Surface.Axis
+                dep1.refAxisEnd = dep1.refPoint.add(normal1)
+                dep2.refAxisEnd = dep2.refPoint.add(normal2)
+                #
+                dep1.foreignDependency = dep2
+                dep2.foreignDependency = dep1
+                rig1.dependencies.append(dep1)
+                rig2.dependencies.append(dep2)
+                
             if c.Type == "plane":
                 dep1.refType = "pointNormal"
                 dep2.refType = "pointNormal"
@@ -439,6 +404,10 @@ class SolverSystem():
                     depRefPoints.append(dep.refPoint)
                     depMoveVectors.append(Base.Vector(0,0,0))
 
+                if dep.Type == "angledPlanes":
+                    depRefPoints.append(dep.refPoint)
+                    depMoveVectors.append(Base.Vector(0,0,0))
+
                 if dep.Type == "plane":
                     depRefPoints.append(dep.refPoint)
                     vec1 = dep.foreignDependency.refPoint.sub(dep.refPoint)
@@ -487,6 +456,31 @@ class SolverSystem():
                 #adjust axis' of the dependencies //FIXME (align,opposed,none)
                 rig.maxAxisError = 0.0
                 for dep in rig.dependencies:
+
+                    if (
+                        dep.Type == "angledPlanes"
+                        ):
+                        rigAxis = dep.refAxisEnd.sub(dep.refPoint)
+                        foreignAxis = dep.foreignDependency.refAxisEnd.sub(
+                            dep.foreignDependency.refPoint
+                            )
+                        recentAngle = foreignAxis.getAngle(rigAxis) / 2.0/ math.pi *360
+                        deltaAngle = abs(dep.angle.Value) - recentAngle
+                        if abs(deltaAngle) < 1e-6:
+                            # do not change spin, not necessary..
+                            pass
+                        else:
+                            try: 
+                                axis = rigAxis.cross(foreignAxis)
+                                axis.normalize()
+                                axis.multiply(-deltaAngle*57.296)
+                                rig.spin = rig.spin.add(axis)
+                            except: #axis = Vector(0,0,0) and cannot be normalized...
+                                x = random.uniform(-1e-3,1e-3)
+                                y = random.uniform(-1e-3,1e-3)
+                                z = random.uniform(-1e-3,1e-3)
+                                rig.spin = rig.spin.add(Base.Vector(x,y,z))
+
                     if (
                         dep.Type == "circularEdge" or
                         dep.Type == "plane" or
@@ -683,6 +677,7 @@ class Dependency():
         self.refAxisEnd = None
         self.direction = None
         self.offset = None
+        self.angle = None
         self.foreignDependency = None
         self.rotationAxis = None
         self.moveVector = None
@@ -694,6 +689,7 @@ class Dependency():
         self.refAxisEnd = None
         self.direction = None
         self.offset = None
+        self.angle = None
         self.foreignDependency = None
         self.rotationAxis = None
         self.moveVector = None

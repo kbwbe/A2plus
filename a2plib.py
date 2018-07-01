@@ -25,7 +25,7 @@
 import FreeCAD, FreeCADGui, Part
 from PySide import QtGui, QtCore
 import numpy, os
-from viewProviderProxies import *
+from a2p_viewProviderProxies import *
 from  FreeCAD import Base
 
 
@@ -361,6 +361,49 @@ def removeConstraint( constraint ):
     if constraint.ViewObject != None: #do not this check is actually nessary ...
         constraint.ViewObject.Proxy.onDelete( constraint.ViewObject, None )
     doc.removeObject( constraint.Name )
+#------------------------------------------------------------------------------
+def getPos(obj, subElementName):
+    pos = None
+    if subElementName.startswith('Face'):
+        face = getObjectFaceFromName(obj, subElementName)
+        surface = face.Surface
+        if str(surface) == '<Plane object>':
+            pos = getObjectFaceFromName(obj, subElementName).Faces[0].BoundBox.Center
+            # axial constraint for Planes
+            # pos = surface.Position
+        elif all( hasattr(surface,a) for a in ['Axis','Center','Radius'] ):
+            pos = surface.Center
+        elif str(surface).startswith('<SurfaceOfRevolution'):
+            pos = getObjectFaceFromName(obj, subElementName).Edges[0].Curve.Center
+    elif subElementName.startswith('Edge'):
+        edge = getObjectEdgeFromName(obj, subElementName)
+        if isLine(edge.Curve):
+            if appVersionStr() <= "000.016":
+                pos = edge.Curve.StartPoint
+            else:
+                pos = edge.firstVertex(True).Point
+        elif hasattr( edge.Curve, 'Center'): #circular curve
+            pos = edge.Curve.Center
+    elif subElementName.startswith('Vertex'):
+        return  getObjectVertexFromName(obj, subElementName).Point
+    return pos # maybe none !!
+#------------------------------------------------------------------------------
+def getAxis(obj, subElementName):
+    axis = None
+    if subElementName.startswith('Face'):
+        face = getObjectFaceFromName(obj, subElementName)
+        surface = face.Surface
+        if hasattr(surface,'Axis'):
+            axis = surface.Axis
+        elif str(surface).startswith('<SurfaceOfRevolution'):
+            axis = face.Edges[0].Curve.Axis
+    elif subElementName.startswith('Edge'):
+        edge = getObjectEdgeFromName(obj, subElementName)
+        if isLine(edge.Curve):
+            axis = edge.Curve.tangent(0)[0]
+        elif hasattr( edge.Curve, 'Axis'): #circular curve
+            axis =  edge.Curve.Axis
+    return axis # may be none!
 #------------------------------------------------------------------------------
 
 
