@@ -30,7 +30,10 @@ from a2p_MuxAssembly import muxObjectsWithKeys, createTopoInfo, Proxy_muxAssembl
 from a2p_viewProviderProxies import *
 from a2p_versionmanagement import SubAssemblyWalk, ASSEMBLY3_VERSION
 import solversystem
-from a2plib import appVersionStr
+from a2plib import (
+    appVersionStr,
+    AUTOSOLVE_ENABLED
+    )
 
 
 
@@ -359,7 +362,7 @@ class a2p_EditPartCommand:
         if fileNameWithinProjectFile == None:
             QtGui.QMessageBox.critical(  QtGui.QApplication.activeWindow(), 
                                          "Source file not found in project ! ", 
-                                         "Editor aborted!\nUnable to find %s" % (
+                                         "Editor aborted!\nUnable to find {}".format(
                                              fileNameWithinProjectFile
                                              ) 
                                        )
@@ -601,6 +604,46 @@ class a2p_ToggleTransparencyCommand:
             }
 FreeCADGui.addCommand('a2p_ToggleTransparencyCommand', a2p_ToggleTransparencyCommand())
 
+
+
+toolTipMessage = \
+'''
+toggle AutoSolve
+
+By pressing this button you can
+enable or disable automatic solving
+after a constraint has been edited
+
+If automatic solving is disabled
+you have to start it manually
+by hitting the solvebutton
+
+'''
+
+class a2p_ToggleAutoSolveCommand:
+
+    def Activated(self):
+        a2plib.toggleAutoSolve()
+        if a2plib.getAutoSolveState():
+            stat = "ON"
+        else:
+            stat = "OFF"
+        QtGui.QMessageBox.information(  
+                        QtGui.QApplication.activeWindow(), 
+                        "Changed state of AutoSolve ! ", 
+                        "AutoSolve State is {}".format(
+                            stat
+                            ) 
+                       )
+
+        
+    def GetResources(self):
+        return {
+            #'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_glasses.svg',
+            'MenuText': 'toggle AutoSolve',
+            'ToolTip': toolTipMessage
+            }
+FreeCADGui.addCommand('a2p_ToggleAutoSolveCommand', a2p_ToggleAutoSolveCommand())
 
 
 

@@ -30,6 +30,7 @@ from  FreeCAD import Base
 
 
 USE_PROJECTFILE = False
+AUTOSOLVE_ENABLED = True
 
 DEBUGPROGRAM = 1
 
@@ -46,6 +47,14 @@ RED = (1.0,0.0,0.0)
 GREEN = (0.0,1.0,0.0)
 BLUE = (0.0,0.0,1.0)
 
+#------------------------------------------------------------------------------
+def toggleAutoSolve():
+    global AUTOSOLVE_ENABLED
+    if AUTOSOLVE_ENABLED: AUTOSOLVE_ENABLED = False
+    else: AUTOSOLVE_ENABLED = True
+#------------------------------------------------------------------------------
+def getAutoSolveState():
+    return AUTOSOLVE_ENABLED
 #------------------------------------------------------------------------------
 def appVersionStr():
     version = int(FreeCAD.Version()[0])
