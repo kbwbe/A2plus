@@ -28,6 +28,7 @@ import copy
 import FreeCAD, FreeCADGui, Part
 from PySide import QtGui, QtCore
 from  FreeCAD import Base
+import a2plib
 from a2plib import (
     drawVector, 
     path_a2p,
@@ -700,6 +701,12 @@ class Dependency():
 
 #------------------------------------------------------------------------------
 def solveConstraints( doc, cache=None ): #cache because of compatibility to hamish...
+    ss = SolverSystem()
+    ss.solveSystem(doc)
+
+def autoSolveConstraints( doc, cache=None):
+    if not a2plib.getAutoSolveState():
+        return
     ss = SolverSystem()
     ss.solveSystem(doc)
 

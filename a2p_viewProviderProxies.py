@@ -216,8 +216,8 @@ class ConstraintObjectProxy:
         obj.directionConstraint = value
         
     def callSolveConstraints(self):
-        from solversystem import solveConstraints
-        solveConstraints( FreeCAD.activeDocument(), cache = None )
+        from solversystem import autoSolveConstraints
+        autoSolveConstraints( FreeCAD.activeDocument(), cache = None )
  
  
 class ConstraintMirrorObjectProxy:
