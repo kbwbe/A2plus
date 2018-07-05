@@ -98,17 +98,24 @@ def importPartFromFile(_doc, filename, importToCache=False):
     visibleObjects = [ obj for obj in importDoc.Objects
                        if hasattr(obj,'ViewObject') and obj.ViewObject.isVisible()
                        and hasattr(obj,'Shape') and len(obj.Shape.Faces) > 0 and 'Body' not in obj.Name]
+    
+    if visibleObjects == None or len(visibleObjects) == 0:
+        msg = "No visible Part to import found. Aborting operation"
+        QtGui.QMessageBox.information(
+            QtGui.QApplication.activeWindow(), 
+            "Import Error", 
+            msg
+            )
+        return
+        
     #-------------------------------------------
     # Discover whether we are importing a subassembly or a single part
     #-------------------------------------------
-    if any([ 'importPart' in obj.Content for obj in importDoc.Objects]) and not len(visibleObjects) == 1:
+    #if any([ 'importPart' in obj.Content for obj in importDoc.Objects]) and not len(visibleObjects) == 1:
+    subAssemblyImport = False
+    if len(visibleObjects) > 1:
         subAssemblyImport = True
-    else:
-        subAssemblyImport = False
-        if len(visibleObjects) <> 1:
-            msg = "A part can only be imported from a FreeCAD document with exactly one visible part. Aborting operation"
-            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Value Error", msg )
-            return
+        
     #-------------------------------------------
     # create new object
     #-------------------------------------------
@@ -651,96 +658,6 @@ def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
     ''' updating constraints, deactivated at moment'''
     return
 
-    #-------------------------------------------------
-    # Following stuff unused at the moment...
-    #-------------------------------------------------
-
-    '''
-    # return if there are no constraints linked to the object 
-    if len([c for c in doc.Objects if  'ConstraintInfo' in c.Content and oldObject.Name in [c.Object1, c.Object2] ]) == 0:
-        return
-
-    # check, whether object is an assembly with muxInformations.
-    # Then find edgenames with mapping in muxinfo...
-    deletionList = [] #for broken constraints
-    if hasattr(oldObject, 'muxInfo'):
-        if hasattr(newObject, 'muxInfo'):
-            #
-            oldEdgeNames = []
-            oldFaceNames = []
-            for item in oldObject.muxInfo:
-                if item[:4] == 'EDGE':
-                    oldEdgeNames.append(item)
-                if item[:4] == 'FACE':
-                    oldFaceNames.append(item)
-            #
-            newEdgeNames = []
-            newFaceNames = []
-            for item in newObject.muxInfo:
-                if item[:4] == 'EDGE':
-                    newEdgeNames.append(item)
-                if item[:4] == 'FACE':
-                    newFaceNames.append(item)
-            #
-            partName = oldObject.Name
-            for c in doc.Objects:
-                if 'ConstraintInfo' in c.Content:
-                    if partName == c.Object1:
-                        SubElement = "SubElement1"
-                    elif partName == c.Object2:
-                        SubElement = "SubElement2"
-                    else:
-                        SubElement = None
-                        
-                    if SubElement: #same as subElement <> None
-                        
-                        subElementName = getattr(c, SubElement)
-                        if subElementName[:4] == 'Face':
-                            try:
-                                oldIndex = int(subElementName[4:])-1
-                                oldConstraintString = oldFaceNames[oldIndex]
-                                newIndex = newFaceNames.index(oldConstraintString)
-                                newSubElementName = 'Face'+str(newIndex+1)
-                            except:
-                                newIndex = -1
-                                newSubElementName = 'INVALID'
-                                
-                        elif subElementName[:4] == 'Edge':
-                            try:
-                                oldIndex = int(subElementName[4:])-1
-                                oldConstraintString = oldEdgeNames[oldIndex]
-                                newIndex = newEdgeNames.index(oldConstraintString)
-                                newSubElementName = 'Edge'+str(newIndex+1)
-                            except:
-                                newIndex = -1
-                                newSubElementName = 'INVALID'
-                                
-                        else:
-                            newIndex = -1
-                            newSubElementName = 'INVALID'
-                        
-                        if newIndex >= 0:
-                            setattr(c, SubElement, newSubElementName )
-                            print "oldConstraintString (KEY) : ",oldConstraintString
-                            print "Updating by SubElement-Map: ",subElementName,' => ',newSubElementName
-                            continue
-                        #
-                        # if code coming here, constraint is broken
-                        if c.Name not in deletionList:
-                            deletionList.append(c.Name)
-                            
-    
-    if len(deletionList) > 0: # there are broken constraints..
-        for cName in deletionList:
-        
-            flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.Abort
-            message = "constraint %s is broken. Delete constraint? otherwise check for wrong linkage." % cName
-            response = QtGui.QMessageBox.critical(QtGui.QApplication.activeWindow(), "Broken Constraint", message, flags )
-        
-            if response == QtGui.QMessageBox.Yes:
-                FreeCAD.Console.PrintError("removing constraint %s" % cName)
-                doc.removeObject(cName)
-    '''
 
 
 
