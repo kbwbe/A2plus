@@ -40,7 +40,7 @@ def parseSelection(selection, objectToUpdate=None):
     validSelection = False
     if len(selection) == 2:
         s1, s2 = selection
-        if s1.ObjectName <> s2.ObjectName:
+        if s1.ObjectName != s2.ObjectName:
             if vertexSelected(s1) and planeSelected(s2):
                 validSelection = True
                 cParms = [ [s1.ObjectName, s1.SubElementNames[0], s1.Object.Label ],

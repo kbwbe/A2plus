@@ -244,7 +244,7 @@ class ConstraintMirrorObjectProxy:
                 try:
                     if getattr(constraintObj, prop) != getattr( obj, prop):
                         setattr( constraintObj, prop, getattr( obj, prop) )
-                except AttributeError, msg:
+                except:
                     pass #loading issues...
 
 

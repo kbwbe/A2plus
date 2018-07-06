@@ -29,7 +29,7 @@ from a2plib import *
 App=FreeCAD
 Gui=FreeCADGui
 
-ASSEMBLY3_VERSION = 'V0.1'
+A2P_VERSION = 'V0.1'
 
 
 class SubAssemblyWalk():
@@ -48,7 +48,9 @@ class SubAssemblyWalk():
     def checkForSubAssembly(self,subFileName):
         filename = findSourceFileInProject(subFileName) # path within subfile will be ignored..
         if filename == None:
-            print "SubassemblyCheck failed for %s " % subFileName
+            FreeCAD.Console.PrintMessage(
+                "SubassemblyCheck failed for {} ".format( subFileName ) 
+                )
             return False
 
         doc_already_open = filename in [ d.FileName for d in FreeCAD.listDocuments().values() ]
@@ -70,7 +72,7 @@ class SubAssemblyWalk():
     def openSubAssembly(self,subFile): #recursive func!! This can consumpt the total memory of your computer
         filename = findSourceFileInProject(subFile) # path within subfile will be ignored..
         if filename == None:
-            print "Missing file %s ignored" % subFile
+            FreeCAD.Console.PrintMessage( "Missing file {} ignored".format(subFile) )
             return False
         
         doc_already_open = filename in [ d.FileName for d in FreeCAD.listDocuments().values() ]
@@ -85,9 +87,9 @@ class SubAssemblyWalk():
             if hasattr(obj, 'sourceFile'):
                 
                 # This Section: Add missing but necessary properties of this Version
-                if not hasattr( obj, 'assembly2Version'):
-                    obj.addProperty("App::PropertyString", "assembly2Version","importPart").assembly2Version = 'V0.0'
-                    obj.setEditorMode("assembly2Version",1)
+                if not hasattr( obj, 'a2p_Version'):
+                    obj.addProperty("App::PropertyString", "a2p_Version","importPart").a2p_Version = 'V0.0'
+                    obj.setEditorMode("a2p_Version",1)
                     needUpdate = True
                     
                 if not hasattr( obj, 'muxInfo'):
@@ -118,7 +120,7 @@ class SubAssemblyWalk():
                         if result == True:
                             needUpdate = True
                             
-                if obj.assembly2Version != ASSEMBLY3_VERSION:
+                if obj.a2p_Version != A2P_VERSION:
                     needUpdate = True
                     
                 if os.path.getmtime( obj.sourceFile ) > obj.timeLastImport:

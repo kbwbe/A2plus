@@ -216,7 +216,7 @@ class ConstraintSelectionObserver:
         if len(self.selections) == 2:
             self.stopSelectionObservation()
             self.parseSelectionFunction( self.selections)
-        elif self.secondSelectionGate <> None and len(self.selections) == 1:
+        elif self.secondSelectionGate != None and len(self.selections) == 1:
             FreeCADGui.Selection.removeSelectionGate()
             FreeCADGui.Selection.addSelectionGate( self.secondSelectionGate )
             
@@ -240,7 +240,7 @@ class SelectionTaskDialog:
     def __init__(self, title, iconPath, textLines ):
         self.form = SelectionTaskDialogForm( textLines )
         self.form.setWindowTitle( title )    
-        if iconPath <> None:
+        if iconPath != None:
             self.form.setWindowIcon( QtGui.QIcon( iconPath ) )
             
     def reject(self):

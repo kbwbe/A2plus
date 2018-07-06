@@ -28,7 +28,7 @@ import os, copy, time
 import a2plib
 from a2p_MuxAssembly import muxObjectsWithKeys, createTopoInfo, Proxy_muxAssemblyObj
 from a2p_viewProviderProxies import *
-from a2p_versionmanagement import SubAssemblyWalk, ASSEMBLY3_VERSION
+from a2p_versionmanagement import SubAssemblyWalk, A2P_VERSION
 import solversystem
 from a2plib import (
     appVersionStr,
@@ -130,7 +130,7 @@ def importPartFromFile(_doc, filename, importToCache=False):
         newObj.Label = partLabel
         
     
-    newObj.addProperty("App::PropertyString", "assembly2Version","importPart").assembly2Version = ASSEMBLY3_VERSION
+    newObj.addProperty("App::PropertyString", "a2p_Version","importPart").a2p_Version = A2P_VERSION
     newObj.addProperty("App::PropertyFile",    "sourceFile",    "importPart").sourceFile = filename
     newObj.addProperty("App::PropertyStringList","muxInfo","importPart")
     newObj.addProperty("App::PropertyFloat", "timeLastImport","importPart")
@@ -234,9 +234,9 @@ def updateImportedParts(doc):
             if not hasattr( obj, 'timeLastImport'):
                 obj.addProperty("App::PropertyFloat", "timeLastImport","importPart") #should default to zero which will force update.
                 obj.setEditorMode("timeLastImport",1)
-            if not hasattr( obj, 'assembly2Version'):
-                obj.addProperty("App::PropertyString", "assembly2Version","importPart").assembly2Version = 'V0.0'
-                obj.setEditorMode("assembly2Version",1)
+            if not hasattr( obj, 'a2p_Version'):
+                obj.addProperty("App::PropertyString", "a2p_Version","importPart").a2p_Version = 'V0.0'
+                obj.setEditorMode("a2p_Version",1)
             if not hasattr( obj, 'muxInfo'):
                 obj.addProperty("App::PropertyStringList","muxInfo","importPart").muxInfo = []
                 
@@ -259,14 +259,14 @@ def updateImportedParts(doc):
             if os.path.exists( obj.sourceFile ):
                 newPartCreationTime = os.path.getmtime( obj.sourceFile )
                 if ( newPartCreationTime > obj.timeLastImport or
-                    obj.assembly2Version != ASSEMBLY3_VERSION
+                    obj.a2p_Version != A2P_VERSION
                     ):
                     if not objectCache.isCached(obj.sourceFile): # Load every changed object one time to cache
                         importPartFromFile(doc, obj.sourceFile, importToCache=True) # the version is now in the cache
                     newObject = objectCache.get(obj.sourceFile)
                     obj.timeLastImport = newPartCreationTime
-                    if hasattr(newObject, 'assembly2Version'):
-                        obj.assembly2Version = newObject.assembly2Version
+                    if hasattr(newObject, 'a2p_Version'):
+                        obj.a2p_Version = newObject.a2p_Version
                     importUpdateConstraintSubobjects( doc, obj, newObject )# do this before changing shape and mux
                     if hasattr(newObject, 'muxInfo'):
                         obj.muxInfo = newObject.muxInfo
@@ -319,8 +319,8 @@ def duplicateImportedPart( part ):
     newObj = doc.addObject("Part::FeaturePython", partName)
     newObj.Label = partLabel
     #
-    if hasattr(part,'assembly2Version'):
-        newObj.addProperty("App::PropertyString", "assembly2Version","importPart").assembly2Version = part.assembly2Version
+    if hasattr(part,'a2p_Version'):
+        newObj.addProperty("App::PropertyString", "a2p_Version","importPart").a2p_Version = part.a2p_Version
     newObj.addProperty("App::PropertyFile",    "sourceFile",    "importPart").sourceFile = part.sourceFile
     newObj.addProperty("App::PropertyFloat", "timeLastImport","importPart").timeLastImport =  part.timeLastImport
     newObj.setEditorMode("timeLastImport",1)

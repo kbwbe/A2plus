@@ -41,7 +41,7 @@ def parseSelection(selection, objectToUpdate=None):
     validSelection = False
     if len(selection) == 2:
         s1, s2 = selection
-        if s1.ObjectName <> s2.ObjectName:
+        if s1.ObjectName != s2.ObjectName:
             if not planeSelected(s1):
                 s2, s1 = s1, s2
             if planeSelected(s1) and planeSelected(s2):
