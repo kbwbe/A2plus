@@ -42,7 +42,7 @@ def parseSelection(selection, objectToUpdate=None):
     validSelection = False
     if len(selection) == 2:
         s1, s2 = selection
-        if s1.ObjectName <> s2.ObjectName:
+        if s1.ObjectName != s2.ObjectName:
             if ( vertexSelected(s1) or sphericalSurfaceSelected(s1)) \
                     and ( vertexSelected(s2) or sphericalSurfaceSelected(s2)):
                     validSelection = True

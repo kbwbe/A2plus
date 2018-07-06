@@ -46,7 +46,7 @@ def parseSelection(selection, objectToUpdate=None, callSolveConstraints=True, lo
     validSelection = False
     if len(selection) == 2:
         s1, s2 = selection
-        if s1.ObjectName <> s2.ObjectName:
+        if s1.ObjectName != s2.ObjectName:
             if CircularEdgeSelected(s1) and CircularEdgeSelected(s2):
                 validSelection = True
                 cParms = [ [s1.ObjectName, s1.SubElementNames[0], s1.Object.Label ],

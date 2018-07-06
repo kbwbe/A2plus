@@ -40,7 +40,7 @@ from a2plib import (
     getAxis,
     appVersionStr
     )
-from Units import Unit, Quantity
+#from Units import Unit, Quantity
 
 
 SOLVER_STEPS_BEFORE_ACCURACYCHECK = 100
@@ -87,7 +87,7 @@ class SolverSystem():
         for c in self.constraints:
             for attr in ['Object1','Object2']:
                 objectName = getattr(c, attr, None)
-                if objectName <> None and not objectName in self.objectNames:
+                if objectName != None and not objectName in self.objectNames:
                     self.objectNames.append( objectName )
         #
         # create a Rigid() dataStructure for each of these objectnames...
