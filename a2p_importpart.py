@@ -332,7 +332,7 @@ def duplicateImportedPart( part ):
         newObj.addProperty("App::PropertyBool","subassemblyImport","importPart").subassemblyImport = part.subassemblyImport
     newObj.Shape = part.Shape.copy()
     for p in part.ViewObject.PropertiesList: #assuming that the user may change the appearance of parts differently depending on their role in the assembly.
-        if hasattr(newObj.ViewObject, p) and p not in ['DiffuseColor','Proxy']:
+        if hasattr(newObj.ViewObject, p) and p not in ['DiffuseColor','Proxy','MappedColors']:
             setattr(newObj.ViewObject, p, getattr( part.ViewObject, p))
     newObj.ViewObject.DiffuseColor = copy.copy( part.ViewObject.DiffuseColor )
     newObj.Proxy = Proxy_importPart()

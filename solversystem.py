@@ -44,9 +44,9 @@ from a2plib import (
 
 SOLVER_STEPS_BEFORE_ACCURACYCHECK = 100
 SOLVER_MAXSTEPS = 30000
-SOLVER_POS_ACCURACY = 1.0e-4 #Need to implement variable stepwith calculation to improve this..
-SOLVER_AXISSPIN_ACCURACY = 1.0e-4 #Sorry for that at moment...
-SOLVER_POINTSPIN_ACCURACY = 1.0e-4
+SOLVER_POS_ACCURACY = 1.0e-3 #reachable at moment...
+SOLVER_AXISSPIN_ACCURACY = 1.0e-3
+SOLVER_POINTSPIN_ACCURACY = 1.0e-3
 
 #------------------------------------------------------------------------------
 class SolverSystem():
@@ -560,7 +560,7 @@ class SolverSystem():
             #Linear move of a rigid
             if rig.moveVectorSum != None:
                 mov = rig.moveVectorSum
-                #mov.multiply(0.5)  # stabilize computation, adjust if needed...
+                mov.multiply(0.85)  # stabilize computation, adjust if needed...
                                     # seems not to be recessary 
                 if mov.Length > 1e-9:
                     pl = FreeCAD.Placement()
