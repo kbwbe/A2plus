@@ -40,11 +40,10 @@ from a2plib import (
     getAxis,
     appVersionStr
     )
-#from Units import Unit, Quantity
 
 
 SOLVER_STEPS_BEFORE_ACCURACYCHECK = 100
-SOLVER_MAXSTEPS = 10000
+SOLVER_MAXSTEPS = 30000
 SOLVER_POS_ACCURACY = 1.0e-4 #Need to implement variable stepwith calculation to improve this..
 SOLVER_AXISSPIN_ACCURACY = 1.0e-4 #Sorry for that at moment...
 SOLVER_POINTSPIN_ACCURACY = 1.0e-4
@@ -558,14 +557,15 @@ class SolverSystem():
         for rig in self.rigids:
             if rig.fixed: continue
             #
-            #Linear moving of a rigid
+            #Linear move of a rigid
             if rig.moveVectorSum != None:
                 mov = rig.moveVectorSum
-                mov.multiply(1.25) # stabilize computation, adjust if needed...
-                rot = FreeCAD.Rotation()
-                center = rig.spinCenter
-                pl = FreeCAD.Placement(mov,rot,center)
-                rig.applyPlacementStep(pl)
+                #mov.multiply(0.5)  # stabilize computation, adjust if needed...
+                                    # seems not to be recessary 
+                if mov.Length > 1e-9:
+                    pl = FreeCAD.Placement()
+                    pl.move(mov)
+                    rig.applyPlacementStep(pl)
             #    
             #Rotate the rigid...
             spinSum = Base.Vector(0,0,0)
@@ -580,15 +580,16 @@ class SolverSystem():
                 
                 spin = spinSum.Length
                 if spin>5.0: spin=5.0 # Never spin more than this degrees per step
-                if spin>1e-9:
+                if spin>1e-7:
                     try:
                         spinStep = abs(spin)
                         if spinStep > rig.maxAxisSpinError * 0.015: #Weight 0.015
                             spinStep = rig.maxAxisSpinError * 0.015
                         
                         spinSum.normalize()
-                        spinSum.multiply(spinStep)
-                        rot = FreeCAD.Rotation(spinSum,spinSum.Length)
+                        axis = spinSum.copy()
+                        #spinSum.multiply(spinStep)
+                        rot = FreeCAD.Rotation(axis,spinStep)
                         cent = rig.spinCenter
                         pl = FreeCAD.Placement(mov,rot,cent)
                         rig.applyPlacementStep(pl)
@@ -634,6 +635,7 @@ class SolverSystem():
         FreeCAD.Console.PrintMessage( "Total steps used: %d\n" %  self.stepCount )
 
         if systemSolved:
+            #self.printSolution(doc)
             self.solutionToParts(doc)
             FreeCAD.Console.PrintMessage( "===== System solved ! ====== \n" )
         else:
@@ -648,10 +650,22 @@ Please delete your last created constraint !
             
     
     def solutionToParts(self,doc):
+        '''restores newly calculated placements 
+           from system to constrainted parts'''
         for rig in self.rigids:
             if rig.fixed: continue
             ob1 = doc.getObject(rig.objectName)
             ob1.Placement = rig.placement
+            
+    def printSolution(self,doc):
+        '''Show objects/new calculated Solver-Placements 
+           for debug purposes'''
+        for rig in self.rigids:
+            if rig.fixed: continue
+            print(  
+                "Rigid Name {}, new placement: ".format(rig.objectName),
+                rig.placement
+                )
         
     def doSolverStep(self,doc):
         self.calcMoveData(doc)
