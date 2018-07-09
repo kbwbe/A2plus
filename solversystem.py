@@ -44,7 +44,7 @@ from a2plib import (
 
 
 SOLVER_STEPS_BEFORE_ACCURACYCHECK = 100
-SOLVER_MAXSTEPS = 30000
+SOLVER_MAXSTEPS = 60000
 SOLVER_POS_ACCURACY = 1.0e-2 #Need to implement variable stepwith calculation to improve this..
 SOLVER_SPIN_ACCURACY = 1.0e-2 #Sorry for that at moment...
 
@@ -476,6 +476,8 @@ class SolverSystem():
                                 axis.normalize()
                                 axis.multiply(-deltaAngle*57.296)
                                 rig.spin = rig.spin.add(axis)
+                                axisErr = rig.spin.Length
+                                if axisErr > rig.maxAxisError : rig.maxAxisError = axisErr
                             except: #axis = Vector(0,0,0) and cannot be normalized...
                                 x = random.uniform(-1e-3,1e-3)
                                 y = random.uniform(-1e-3,1e-3)
@@ -508,7 +510,7 @@ class SolverSystem():
                             try:
                                 axis.normalize()
                                 angle = foreignAxis.getAngle(rigAxis)
-                                axis.multiply(angle*57.296*6) #57.296 = 360/2/pi
+                                axis.multiply(math.degrees(angle)*6)
                                 rig.spin = rig.spin.add(axis)
                                 axisErr = rig.spin.Length
                                 if axisErr > rig.maxAxisError : rig.maxAxisError = axisErr
@@ -535,14 +537,12 @@ class SolverSystem():
                             try:
                                 axis.normalize()
                                 angle = foreignAxis.getAngle(rigAxis)
-                                axis.multiply(angle*57.296*6)
+                                axis.multiply(math.degrees(angle)*6)
                                 rig.spin = rig.spin.add(axis)
                                 axisErr = rig.spin.Length
                                 if axisErr > rig.maxAxisError : rig.maxAxisError = axisErr
                             except:
                                 pass
-                    #drawVector(rig.spinCenter,rig.spinCenter.add(rig.spin))
-                    #print "len of spin: ",rig.spin.Length
                 
     def moveRigids(self,doc):
         for rig in self.rigids:
@@ -552,27 +552,25 @@ class SolverSystem():
             if rig.moveVectorSum != None:
                 mov = rig.moveVectorSum
                 #mov.multiply(1.0) # stabilize computation, adjust if needed...
-                rot = FreeCAD.Rotation()
-                center = rig.spinCenter
-                pl = FreeCAD.Placement(mov,rot,center)
-                rig.applyPlacementStep(pl)
+                if mov.Length > 1e-8:
+                    pl = FreeCAD.Placement()
+                    pl.move(mov)
+                    rig.applyPlacementStep(pl)
             #    
             #Rotate the rigid...
             if (
                 rig.spin != None and
                 rig.spin.Length != 0.0
                 ):
-                mov = Base.Vector(0,0,0) # weitere Verschiebung ist null
                 
-                # Spinning of more than 360.0 degrees is useless...
-                orig = rig.spin.Length
-                if orig>359.0: orig=359.0
-                if orig>1e-9:
+                spinAngle = rig.spin.Length
+                if spinAngle>15.0: spinAngle=15.0 # do not accept more degrees
+                if spinAngle>1e-6:
                     try:
-                        sq=abs(orig)/300
+                        spinStep = spinAngle/250.0
                         rig.spin.normalize()
-                        rig.spin.multiply(sq)
-                        rot = FreeCAD.Rotation(rig.spin,rig.spin.Length)
+                        mov = Base.Vector(0,0,0) # no further moving
+                        rot = FreeCAD.Rotation(rig.spin,spinStep)
                         cent = rig.spinCenter
                         pl = FreeCAD.Placement(mov,rot,cent)
                         rig.applyPlacementStep(pl)
@@ -723,7 +721,6 @@ class a2p_SolverCommand:
 
 FreeCADGui.addCommand('a2p_SolverCommand', a2p_SolverCommand())
 #------------------------------------------------------------------------------
-
 
 
 
