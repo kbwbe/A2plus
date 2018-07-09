@@ -40,13 +40,14 @@ from a2plib import (
     getAxis,
     appVersionStr
     )
+#from Units import Unit, Quantity
 
 
 SOLVER_STEPS_BEFORE_ACCURACYCHECK = 100
 SOLVER_MAXSTEPS = 30000
-SOLVER_POS_ACCURACY = 1.0e-3 #reachable at moment...
-SOLVER_AXISSPIN_ACCURACY = 1.0e-3
-SOLVER_POINTSPIN_ACCURACY = 1.0e-3
+SOLVER_POS_ACCURACY = 1.0e-2 #Need to implement variable stepwith calculation to improve this..
+SOLVER_SPIN_ACCURACY = 1.0e-2 #Sorry for that at moment...
+
 
 #------------------------------------------------------------------------------
 class SolverSystem():
@@ -345,26 +346,25 @@ class SolverSystem():
             #
             rig.maxPosError = 0.0
             for dep in rig.dependencies:
-                fdep = dep.foreignDependency # let python interpret this once, saves time
                 
                 if dep.Type == "pointIdentity" or dep.Type == "sphereCenterIdent":
                     depRefPoints.append(dep.refPoint)
-                    dep.moveVector = fdep.refPoint.sub(dep.refPoint)
+                    dep.moveVector = dep.foreignDependency.refPoint.sub(dep.refPoint)
                     depMoveVectors.append(dep.moveVector)
                     
-                elif dep.Type == "pointOnLine":
+                if dep.Type == "pointOnLine":
                     # two possibilities, dep.refType can be a point or be a line
                     if dep.refType == "point":
                         depRefPoints.append(dep.refPoint)
-                        vec1 = fdep.refPoint.sub(dep.refPoint)
-                        axis1 = fdep.refAxisEnd.sub(fdep.refPoint)
+                        vec1 = dep.foreignDependency.refPoint.sub(dep.refPoint)
+                        axis1 = dep.foreignDependency.refAxisEnd.sub(dep.foreignDependency.refPoint)
                         dot = vec1.dot(axis1)
                         axis1.multiply(dot) #projection of vec1 on axis1
                         dep.moveVector = vec1.sub(axis1)
                         depMoveVectors.append(dep.moveVector)
                     if dep.refType == "pointAxis":
                         #depRefPoints.append(dep.refPoint) #is done in special way below
-                        vec1 = fdep.refPoint.sub(dep.refPoint)
+                        vec1 = dep.foreignDependency.refPoint.sub(dep.refPoint)
                         axis1 = dep.refAxisEnd.sub(dep.refPoint)
                         dot = vec1.dot(axis1)
                         axis1.multiply(dot) #projection of vec1 on axis1
@@ -374,20 +374,20 @@ class SolverSystem():
                         depRefPoints.append(verticalRefOnLine) #makes spinning around possible
                         
                     
-                elif dep.Type == "pointOnPlane":
+                if dep.Type == "pointOnPlane":
                     # two possibilities, dep.refType can be a point or be a plane
                     if dep.refType == "point":
                         depRefPoints.append(dep.refPoint)
-                        vec1 = fdep.refPoint.sub(dep.refPoint)
+                        vec1 = dep.foreignDependency.refPoint.sub(dep.refPoint)
                         # Now move along foreign axis
-                        normal1 = fdep.refAxisEnd.sub(fdep.refPoint)
+                        normal1 = dep.foreignDependency.refAxisEnd.sub(dep.foreignDependency.refPoint)
                         dot = vec1.dot(normal1)
                         normal1.multiply(dot)
                         dep.moveVector = normal1
                         depMoveVectors.append(dep.moveVector)
                     if dep.refType == "plane":
                         #depRefPoints.append(dep.refPoint) #is done in special way below
-                        vec1 = fdep.refPoint.sub(dep.refPoint)
+                        vec1 = dep.foreignDependency.refPoint.sub(dep.refPoint)
                         normal1 = dep.refAxisEnd.sub(dep.refPoint) # move along own axis
                         dot = vec1.dot(normal1)
                         normal1.multiply(dot)
@@ -396,33 +396,33 @@ class SolverSystem():
                         verticalRefPointOnPlane = vec1.sub(dep.moveVector)                    
                         depRefPoints.append(verticalRefPointOnPlane) #makes spinning around possible
                     
-                elif dep.Type == "circularEdge":
+                if dep.Type == "circularEdge":
                     depRefPoints.append(dep.refPoint)
-                    dep.moveVector = fdep.refPoint.sub(dep.refPoint)
+                    dep.moveVector = dep.foreignDependency.refPoint.sub(dep.refPoint)
                     depMoveVectors.append(dep.moveVector)
 
-                elif dep.Type == "planesParallel":
+                if dep.Type == "planesParallel":
                     depRefPoints.append(dep.refPoint)
                     depMoveVectors.append(Base.Vector(0,0,0))
 
-                elif dep.Type == "angledPlanes":
+                if dep.Type == "angledPlanes":
                     depRefPoints.append(dep.refPoint)
                     depMoveVectors.append(Base.Vector(0,0,0))
 
-                elif dep.Type == "plane":
+                if dep.Type == "plane":
                     depRefPoints.append(dep.refPoint)
-                    vec1 = fdep.refPoint.sub(dep.refPoint)
+                    vec1 = dep.foreignDependency.refPoint.sub(dep.refPoint)
                     # move along foreign axis...
-                    normal1 = fdep.refAxisEnd.sub(fdep.refPoint)
+                    normal1 = dep.foreignDependency.refAxisEnd.sub(dep.foreignDependency.refPoint)
                     dot = vec1.dot(normal1)
                     normal1.multiply(dot)
                     dep.moveVector = normal1
                     depMoveVectors.append(dep.moveVector)
 
-                elif dep.Type == "axial":
+                if dep.Type == "axial":
                     depRefPoints.append(dep.refPoint)
-                    vec1 = fdep.refPoint.sub(dep.refPoint)
-                    destinationAxis = fdep.refAxisEnd.sub(fdep.refPoint)
+                    vec1 = dep.foreignDependency.refPoint.sub(dep.refPoint)
+                    destinationAxis = dep.foreignDependency.refAxisEnd.sub(dep.foreignDependency.refPoint)
                     dot = vec1.dot(destinationAxis)
                     parallelToAxisVec = destinationAxis.normalize().multiply(dot)
                     dep.moveVector = vec1.sub(parallelToAxisVec)
@@ -443,51 +443,44 @@ class SolverSystem():
                 rig.moveVectorSum = Base.Vector(0,0,0)
             #
             #compute rotation caused by refPoint-attractions and axes mismatch
-            rig.maxPointSpinError = 0.0
-            rig.maxAxisSpinError = 0.0
             if (
                 len(depMoveVectors) > 0 and
                 rig.spinCenter != None
                 ):
-                rig.spin_pointAttractions = Base.Vector(0,0,0)
-                rig.spin_axisAlignment = Base.Vector(0,0,0)
-                #
+                rig.spin = Base.Vector(0,0,0)
                 for i in range(0,len(depRefPoints)):
                     vec1 = depRefPoints[i].sub(rig.spinCenter) # 'aka Radius'
                     vec2 = depMoveVectors[i].sub(rig.moveVectorSum) # 'aka Force'
                     axis = vec1.cross(vec2) #torque-vector
-                    rig.spin_pointAttractions = rig.spin_pointAttractions.add(axis)
-                if axis.Length > rig.maxPointSpinError: rig.maxPointSpinError = axis.Length
+                    rig.spin = rig.spin.add(axis)
                     
                 #adjust axis' of the dependencies //FIXME (align,opposed,none)
+                rig.maxAxisError = 0.0
                 for dep in rig.dependencies:
-                    fdep = dep.foreignDependency # let python interpret this once, saves time
 
                     if (
                         dep.Type == "angledPlanes"
                         ):
                         rigAxis = dep.refAxisEnd.sub(dep.refPoint)
-                        foreignAxis = fdep.refAxisEnd.sub(
-                            fdep.refPoint
+                        foreignAxis = dep.foreignDependency.refAxisEnd.sub(
+                            dep.foreignDependency.refPoint
                             )
                         recentAngle = foreignAxis.getAngle(rigAxis) / 2.0/ math.pi *360
                         deltaAngle = abs(dep.angle.Value) - recentAngle
-                        if abs(deltaAngle) < 1e-9:
+                        if abs(deltaAngle) < 1e-6:
                             # do not change spin, not necessary..
                             pass
                         else:
                             try: 
                                 axis = rigAxis.cross(foreignAxis)
                                 axis.normalize()
-                                axis.multiply(-math.degrees(deltaAngle) )
-                                rig.spin_axisAlignment = rig.spin_axisAlignment.add(axis)
+                                axis.multiply(-deltaAngle*57.296)
+                                rig.spin = rig.spin.add(axis)
                             except: #axis = Vector(0,0,0) and cannot be normalized...
                                 x = random.uniform(-1e-3,1e-3)
                                 y = random.uniform(-1e-3,1e-3)
                                 z = random.uniform(-1e-3,1e-3)
-                                rig.spin_axisAlignment = rig.spin_axisAlignment.add(Base.Vector(x,y,z))
-                            axisErr = rig.spin_axisAlignment.Length
-                            if axisErr > rig.maxAxisSpinError : rig.maxAxisSpinError = axisErr
+                                rig.spin = rig.spin.add(Base.Vector(x,y,z))
 
                     if (
                         dep.Type == "circularEdge" or
@@ -497,8 +490,8 @@ class SolverSystem():
                         ):
                         if dep.direction != "none":
                             rigAxis = dep.refAxisEnd.sub(dep.refPoint)
-                            foreignAxis = fdep.refAxisEnd.sub(
-                                fdep.refPoint
+                            foreignAxis = dep.foreignDependency.refAxisEnd.sub(
+                                dep.foreignDependency.refPoint
                                 )
                             #
                             #do we have wrong alignment of axes ??
@@ -515,21 +508,20 @@ class SolverSystem():
                             try:
                                 axis.normalize()
                                 angle = foreignAxis.getAngle(rigAxis)
-                                #axis.multiply(math.degrees(angle)*6) 
-                                axis.multiply(math.degrees(angle)) 
-                                rig.spin_axisAlignment = rig.spin_axisAlignment.add(axis)
-                                axisErr = rig.spin_axisAlignment.Length
-                                if axisErr > rig.maxAxisSpinError : rig.maxAxisSpinError = axisErr
+                                axis.multiply(angle*57.296*6) #57.296 = 360/2/pi
+                                rig.spin = rig.spin.add(axis)
+                                axisErr = rig.spin.Length
+                                if axisErr > rig.maxAxisError : rig.maxAxisError = axisErr
                             except:
                                 pass
                             
                         else: #if dep.direction... (== none)
                             rigAxis = dep.refAxisEnd.sub(dep.refPoint)
-                            foreignAxis1 = fdep.refAxisEnd.sub(
-                                fdep.refPoint
+                            foreignAxis1 = dep.foreignDependency.refAxisEnd.sub(
+                                dep.foreignDependency.refPoint
                                 )
-                            foreignAxis2 = fdep.refPoint.sub(
-                                fdep.refAxisEnd
+                            foreignAxis2 = dep.foreignDependency.refPoint.sub(
+                                dep.foreignDependency.refAxisEnd
                                 )
                             angle1 = abs(foreignAxis1.getAngle(rigAxis))
                             angle2 = abs(foreignAxis2.getAngle(rigAxis))
@@ -543,11 +535,10 @@ class SolverSystem():
                             try:
                                 axis.normalize()
                                 angle = foreignAxis.getAngle(rigAxis)
-                                #axis.multiply(math.degrees(angle)*6)
-                                axis.multiply(math.degrees(angle))
-                                rig.spin_axisAlignment = rig.spin_axisAlignment.add(axis)
-                                axisErr = rig.spin_axisAlignment.Length
-                                if axisErr > rig.maxAxisSpinError : rig.maxAxisSpinError = axisErr
+                                axis.multiply(angle*57.296*6)
+                                rig.spin = rig.spin.add(axis)
+                                axisErr = rig.spin.Length
+                                if axisErr > rig.maxAxisError : rig.maxAxisError = axisErr
                             except:
                                 pass
                     #drawVector(rig.spinCenter,rig.spinCenter.add(rig.spin))
@@ -557,39 +548,31 @@ class SolverSystem():
         for rig in self.rigids:
             if rig.fixed: continue
             #
-            #Linear move of a rigid
+            #Linear moving of a rigid
             if rig.moveVectorSum != None:
                 mov = rig.moveVectorSum
-                mov.multiply(0.85)  # stabilize computation, adjust if needed...
-                                    # seems not to be recessary 
-                if mov.Length > 1e-9:
-                    pl = FreeCAD.Placement()
-                    pl.move(mov)
-                    rig.applyPlacementStep(pl)
+                #mov.multiply(1.0) # stabilize computation, adjust if needed...
+                rot = FreeCAD.Rotation()
+                center = rig.spinCenter
+                pl = FreeCAD.Placement(mov,rot,center)
+                rig.applyPlacementStep(pl)
             #    
             #Rotate the rigid...
-            spinSum = Base.Vector(0,0,0)
-            if rig.spin_pointAttractions != None:
-                spinSum = spinSum + rig.spin_pointAttractions
-            if rig.spin_axisAlignment != None:
-                spinSum = spinSum + (rig.spin_axisAlignment.multiply(6.0)) #Weight 6.0
             if (
-                spinSum.Length != 0.0
+                rig.spin != None and
+                rig.spin.Length != 0.0
                 ):
                 mov = Base.Vector(0,0,0) # weitere Verschiebung ist null
                 
-                spin = spinSum.Length
-                if spin>5.0: spin=5.0 # Never spin more than this degrees per step
-                if spin>1e-7:
+                # Spinning of more than 360.0 degrees is useless...
+                orig = rig.spin.Length
+                if orig>359.0: orig=359.0
+                if orig>1e-9:
                     try:
-                        spinStep = abs(spin)
-                        if spinStep > rig.maxAxisSpinError * 0.015: #Weight 0.015
-                            spinStep = rig.maxAxisSpinError * 0.015
-                        
-                        spinSum.normalize()
-                        axis = spinSum.copy()
-                        #spinSum.multiply(spinStep)
-                        rot = FreeCAD.Rotation(axis,spinStep)
+                        sq=abs(orig)/300
+                        rig.spin.normalize()
+                        rig.spin.multiply(sq)
+                        rot = FreeCAD.Rotation(rig.spin,rig.spin.Length)
                         cent = rig.spinCenter
                         pl = FreeCAD.Placement(mov,rot,cent)
                         rig.applyPlacementStep(pl)
@@ -597,19 +580,16 @@ class SolverSystem():
                         pass
                 
     def getAccuracy(self,doc):  
-        '''returns maxPosError and maxSpinErrors of worst rigid'''
+        '''returns maxPosError and maxSpinError of worst rigid'''
         self.calcMoveData(doc) 
         maxPosError = 0.0
-        maxAxisSpinError = 0.0
-        maxPointSpinError = 0.0
+        maxSpinError = 0.0
         for rig in self.rigids:
-            if rig.maxPointSpinError > maxPointSpinError:
-                maxPointSpinError = rig.maxPointSpinError
-            if rig.maxAxisSpinError > maxAxisSpinError:
-                maxAxisSpinError = rig.maxAxisSpinError
+            if rig.maxAxisError > maxSpinError:
+                maxSpinError = rig.maxAxisError
             if rig.maxPosError > maxPosError:
                 maxPosError = rig.maxPosError
-        return maxPosError, maxAxisSpinError, maxPointSpinError 
+        return maxPosError, maxSpinError
                 
     def solveSystem(self,doc):
         self.loadSystem(doc)
@@ -619,23 +599,20 @@ class SolverSystem():
             for i in range(0,SOLVER_STEPS_BEFORE_ACCURACYCHECK):
                 self.doSolverStep(doc)
             self.stepCount += SOLVER_STEPS_BEFORE_ACCURACYCHECK
-            poserror, axisspinerror, pointspinerror = self.getAccuracy(doc)
+            poserror, spinerror = self.getAccuracy(doc)
             if (
                 poserror <= SOLVER_POS_ACCURACY and
-                axisspinerror <= SOLVER_AXISSPIN_ACCURACY and
-                pointspinerror <= SOLVER_POINTSPIN_ACCURACY
+                spinerror <= SOLVER_SPIN_ACCURACY
                 ): 
                 systemSolved = True
                 break
             if (self.stepCount >= SOLVER_MAXSTEPS):
                 break
         FreeCAD.Console.PrintMessage( "Max positionerror: %f\n" %  poserror )
-        FreeCAD.Console.PrintMessage( "Max axis spinerror: %f\n" %  axisspinerror )
-        FreeCAD.Console.PrintMessage( "Max point spinerror: %f\n" %  pointspinerror )
+        FreeCAD.Console.PrintMessage( "Max spinerror: %f\n" %  spinerror )
         FreeCAD.Console.PrintMessage( "Total steps used: %d\n" %  self.stepCount )
 
         if systemSolved:
-            #self.printSolution(doc)
             self.solutionToParts(doc)
             FreeCAD.Console.PrintMessage( "===== System solved ! ====== \n" )
         else:
@@ -650,22 +627,10 @@ Please delete your last created constraint !
             
     
     def solutionToParts(self,doc):
-        '''restores newly calculated placements 
-           from system to constrainted parts'''
         for rig in self.rigids:
             if rig.fixed: continue
             ob1 = doc.getObject(rig.objectName)
             ob1.Placement = rig.placement
-            
-    def printSolution(self,doc):
-        '''Show objects/new calculated Solver-Placements 
-           for debug purposes'''
-        for rig in self.rigids:
-            if rig.fixed: continue
-            print(  
-                "Rigid Name {}, new placement: ".format(rig.objectName),
-                rig.placement
-                )
         
     def doSolverStep(self,doc):
         self.calcMoveData(doc)
@@ -685,12 +650,10 @@ class Rigid():
         self.savedPlacement = placement
         self.dependencies = []
         self.spinCenter = None
-        self.spin_pointAttractions = None
-        self.spin_axisAlignment = None
+        self.spin = None
         self.moveVectorSum = None
         self.maxPosError = 0.0
-        self.maxAxisSpinError = 0.0
-        self.maxPointSpinError = 0.0
+        self.maxAxisError = 0.0
         
     def applyPlacementStep(self,pl):
         self.placement = pl.multiply(self.placement)
@@ -737,38 +700,9 @@ class Dependency():
         
 
 #------------------------------------------------------------------------------
-# Variables to control testmode of solver
-# SOLVER_TEST = True: func solveConstraints switches to testmode and solver
-#                     is only doing some steps. You can view results on screen..
-# SOLVER_TEST = False: The whole System will be solved with full number of steps
-#
-# SOLVER_NUM_TESTSTEPS = 10: The number of steps the solver shall perform for
-#                            testing.
-#------------------------------------------------------------------------------
-SOLVER_TEST = False
-SOLVER_NUM_TESTSTEPS = 100
-
-#------------------------------------------------------------------------------
 def solveConstraints( doc, cache=None ): #cache because of compatibility to hamish...
-    if not SOLVER_TEST:
-        ss = SolverSystem()
-        ss.solveSystem(doc)
-    else:
-        ss = SolverSystem()
-        ss.loadSystem(doc)
-        for i in range(0,SOLVER_NUM_TESTSTEPS):
-            ss.doSolverStep(doc)
-        poserror, axisspinerror, pointspinerror = ss.getAccuracy(doc)
-        ss.solutionToParts(doc)
-
-        FreeCAD.Console.PrintMessage( "\n")
-        FreeCAD.Console.PrintMessage( "===== Number of test steps done ====== \n" )
-        FreeCAD.Console.PrintMessage( "Max positionerror: %f\n" %  poserror )
-        FreeCAD.Console.PrintMessage( "Max axis spinerror: %f\n" %  axisspinerror )
-        FreeCAD.Console.PrintMessage( "Max point spinerror: %f\n" %  pointspinerror )
-        FreeCAD.Console.PrintMessage( "Test steps used: %d\n" %  SOLVER_NUM_TESTSTEPS )
-        FreeCAD.Console.PrintMessage( "\n")
-            
+    ss = SolverSystem()
+    ss.solveSystem(doc)
 
 def autoSolveConstraints( doc, cache=None):
     if not a2plib.getAutoSolveState():
@@ -789,18 +723,6 @@ class a2p_SolverCommand:
 
 FreeCADGui.addCommand('a2p_SolverCommand', a2p_SolverCommand())
 #------------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
