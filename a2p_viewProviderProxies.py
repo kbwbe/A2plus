@@ -27,6 +27,12 @@ from PySide import QtGui, QtCore
 from pivy import coin
 import traceback
 
+#---------------------------------------------------------------------------
+# Modul global vars, automaticaly managed, hands off !!
+#---------------------------------------------------------------------------
+a2p_NeedToSolveSystem = False
+#---------------------------------------------------------------------------
+
 def group_constraints_under_parts():
     return True
 
@@ -195,9 +201,13 @@ def create_constraint_mirror( constraintObj, iconPath, origLabel= '', mirrorLabe
  
 class ConstraintObjectProxy:
     def execute(self, obj):
-        self.callSolveConstraints()
+        global a2p_NeedToSolveSystem
+        if a2p_NeedToSolveSystem:
+            a2p_NeedToSolveSystem = False # Solve only once after editing a constraints property
+            self.callSolveConstraints()
             
     def onChanged(self, obj, prop):
+        global a2p_NeedToSolveSystem
         if hasattr(self, 'mirror_name'):
             cMirror = obj.Document.getObject( self.mirror_name )
             if cMirror == None: return #catch issues during deleting...
@@ -206,6 +216,7 @@ class ConstraintObjectProxy:
             if obj.getGroupOfProperty( prop ) == 'ConstraintInfo':
                 cMirror.Proxy.disable_onChanged = True
                 setattr( cMirror, prop, getattr( obj, prop) )
+                a2p_NeedToSolveSystem = True
                 cMirror.Proxy.disable_onChanged = False
 
     def reduceDirectionChoices( self, obj, value):
