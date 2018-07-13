@@ -623,12 +623,23 @@ Please delete your last created constraint !
 '''
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Constraint mismatch", msg )
             
-    
+        
     def solutionToParts(self,doc):
         for rig in self.rigids:
             if rig.fixed: continue
-            ob1 = doc.getObject(rig.objectName)
-            ob1.Placement = rig.placement
+            
+            # Update FreeCAD's placements if deltaPlacement above Tolerances
+            base1 = rig.placement.Base
+            base2 = rig.savedPlacement.Base
+            absPosMove = base1.sub(base2).Length
+            
+            axis1 = rig.placement.Rotation.Axis
+            axis2 = rig.savedPlacement.Rotation.Axis
+            angle = math.degrees(axis2.getAngle(axis1))
+            
+            if absPosMove >= 1e-4 or angle >= 1e-3:
+                ob1 = doc.getObject(rig.objectName)
+                ob1.Placement = rig.placement
         
     def doSolverStep(self,doc):
         self.calcMoveData(doc)
