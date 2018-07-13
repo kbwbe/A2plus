@@ -124,7 +124,8 @@ Current Features like shown in the workbench's toolbar:
 * Add a point-on-plane match {pointOnPlaneConstraint} - 
     Fix a point vertex to be on a plane
 * Add a circular-to-circular edge match {circularEdgeConstraint} - 
-    Fix one circular edge to another. You can choose a special direction (aligned, opposed or none)
+    Fix one circular edge to another. You can choose a special direction (aligned, opposed or none). 
+    An offset can be applied
 * Add a plane-to-plane parallelism {planeParallel} - 
     Adjust selected planes to be parallel. You can choose a special direction (aligned, opposed)
 * Add a plane-to-plane offset {planeConstraint} - 
