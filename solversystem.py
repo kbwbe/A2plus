@@ -44,9 +44,9 @@ from a2plib import (
 
 
 SOLVER_STEPS_BEFORE_ACCURACYCHECK = 100
-SOLVER_MAXSTEPS = 60000
-SOLVER_POS_ACCURACY = 1.0e-2 #Need to implement variable stepwith calculation to improve this..
-SOLVER_SPIN_ACCURACY = 1.0e-2 #Sorry for that at moment...
+SOLVER_MAXSTEPS = 150000
+SOLVER_POS_ACCURACY = 1.0e-1 #Need to implement variable stepwith calculation to improve this..
+SOLVER_SPIN_ACCURACY = 1.0e-1 #Sorry for that at moment...
 
 
 #------------------------------------------------------------------------------
@@ -62,6 +62,8 @@ class SolverSystem():
         self.rigids = []        # list of rigid bodies
         self.constraints = []
         self.objectNames = []
+        self.mySOLVER_SPIN_ACCURACY = SOLVER_SPIN_ACCURACY
+        self.mySOLVER_POS_ACCURACY = SOLVER_POS_ACCURACY
         
     def clear(self):
         for r in self.rigids:
@@ -240,7 +242,7 @@ class SolverSystem():
                 dep1.refAxisEnd = dep1.refPoint.add(axis1)
                 dep2.refAxisEnd = dep2.refPoint.add(axis2)
                 #
-                if abs(dep2.offset) > 1e-6:
+                if abs(dep2.offset) > self.mySOLVER_SPIN_ACCURACY * 1e-1:
                     offsetAdjustVec = Base.Vector(axis2.x,axis2.y,axis2.z)
                     offsetAdjustVec.multiply(dep2.offset)
                     dep2.refPoint = dep2.refPoint.add(offsetAdjustVec)
@@ -307,7 +309,7 @@ class SolverSystem():
                 dep1.refAxisEnd = dep1.refPoint.add(normal1)
                 dep2.refAxisEnd = dep2.refPoint.add(normal2)
                 #
-                if abs(dep2.offset) > 1e-6:
+                if abs(dep2.offset) >self.mySOLVER_SPIN_ACCURACY * 1e-1:
                     offsetAdjustVec = Base.Vector(normal2.x,normal2.y,normal2.z)
                     offsetAdjustVec.multiply(dep2.offset)
                     dep2.refPoint = dep2.refPoint.add(offsetAdjustVec)
@@ -479,9 +481,9 @@ class SolverSystem():
                                 axisErr = rig.spin.Length
                                 if axisErr > rig.maxAxisError : rig.maxAxisError = axisErr
                             except: #axis = Vector(0,0,0) and cannot be normalized...
-                                x = random.uniform(-1e-3,1e-3)
-                                y = random.uniform(-1e-3,1e-3)
-                                z = random.uniform(-1e-3,1e-3)
+                                x = random.uniform(-self.mySOLVER_SPIN_ACCURACY*1e-1,self.mySOLVER_SPIN_ACCURACY*1e-1)
+                                y = random.uniform(-self.mySOLVER_SPIN_ACCURACY*1e-1,self.mySOLVER_SPIN_ACCURACY*1e-1)
+                                z = random.uniform(-self.mySOLVER_SPIN_ACCURACY*1e-1,self.mySOLVER_SPIN_ACCURACY*1e-1)
                                 rig.spin = rig.spin.add(Base.Vector(x,y,z))
 
                     if (
@@ -498,10 +500,10 @@ class SolverSystem():
                             #
                             #do we have wrong alignment of axes ??
                             dot = rigAxis.dot(foreignAxis)
-                            if abs(dot+1.0) < 1e-3: #both axes nearly aligned but false orientation...
-                                x = random.uniform(-1e-3,1e-3)
-                                y = random.uniform(-1e-3,1e-3)
-                                z = random.uniform(-1e-3,1e-3)
+                            if abs(dot+1.0) < self.mySOLVER_SPIN_ACCURACY*1e-1: #both axes nearly aligned but false orientation...
+                                x = random.uniform(-self.mySOLVER_SPIN_ACCURACY*1e-1,self.mySOLVER_SPIN_ACCURACY*1e-1)
+                                y = random.uniform(-self.mySOLVER_SPIN_ACCURACY*1e-1,self.mySOLVER_SPIN_ACCURACY*1e-1)
+                                z = random.uniform(-self.mySOLVER_SPIN_ACCURACY*1e-1,self.mySOLVER_SPIN_ACCURACY*1e-1)
                                 disturbVector = Base.Vector(x,y,z)
                                 foreignAxis = foreignAxis.add(disturbVector)
                                 
@@ -565,9 +567,9 @@ class SolverSystem():
                 
                 spinAngle = rig.spin.Length
                 if spinAngle>15.0: spinAngle=15.0 # do not accept more degrees
-                if spinAngle>1e-6:
+                if spinAngle> 1e-6:
                     try:
-                        spinStep = spinAngle/250.0
+                        spinStep = spinAngle/(125.0) #it was 250.0
                         rig.spin.normalize()
                         mov = Base.Vector(0,0,0) # no further moving
                         rot = FreeCAD.Rotation(rig.spin,spinStep)
@@ -590,39 +592,56 @@ class SolverSystem():
         return maxPosError, maxSpinError
                 
     def solveSystem(self,doc):
-        self.loadSystem(doc)
-        self.stepCount = 0
-        systemSolved = False
+        self.level_of_accuracy=1
+        FreeCAD.Console.PrintMessage( "\n===== Start Solving System ====== \n" )
         while True:
-            for i in range(0,SOLVER_STEPS_BEFORE_ACCURACYCHECK):
-                self.doSolverStep(doc)
-            self.stepCount += SOLVER_STEPS_BEFORE_ACCURACYCHECK
-            poserror, spinerror = self.getAccuracy(doc)
-            if (
-                poserror <= SOLVER_POS_ACCURACY and
-                spinerror <= SOLVER_SPIN_ACCURACY
-                ): 
-                systemSolved = True
-                break
-            if (self.stepCount >= SOLVER_MAXSTEPS):
-                break
-        FreeCAD.Console.PrintMessage( "Max positionerror: %f\n" %  poserror )
-        FreeCAD.Console.PrintMessage( "Max spinerror: %f\n" %  spinerror )
-        FreeCAD.Console.PrintMessage( "Total steps used: %d\n" %  self.stepCount )
+            
+            self.loadSystem(doc)
+            self.stepCount = 0
+            systemSolved = False
+            while True:
+                for i in range(0,SOLVER_STEPS_BEFORE_ACCURACYCHECK):
+                    self.doSolverStep(doc)
+                self.stepCount += SOLVER_STEPS_BEFORE_ACCURACYCHECK
+                poserror, spinerror = self.getAccuracy(doc)
+                if (
+                    poserror <= self.mySOLVER_POS_ACCURACY and
+                    spinerror <= self.mySOLVER_SPIN_ACCURACY
+                    ): 
+                    systemSolved = True
+                    
+                    break
+                if (self.stepCount >= SOLVER_MAXSTEPS):
+                    break
+            FreeCAD.Console.PrintMessage( "Position Accuracy: %f\n" %  self.mySOLVER_POS_ACCURACY )
+            FreeCAD.Console.PrintMessage( "Max positionerror: %f\n" %  poserror )
+            FreeCAD.Console.PrintMessage( "Spin Accuracy: %f\n" %  self.mySOLVER_SPIN_ACCURACY )
+            FreeCAD.Console.PrintMessage( "Max spinerror: %f\n" %  spinerror )
+            FreeCAD.Console.PrintMessage( "Total steps used: %d\n" %  self.stepCount )
 
-        if systemSolved:
-            self.solutionToParts(doc)
-            FreeCAD.Console.PrintMessage( "===== System solved ! ====== \n" )
-        else:
-            FreeCAD.Console.PrintMessage( "===== Could not solve system ====== \n" )
-            
-            msg = \
-'''
-Constraints inconsistent. Cannot solve System. 
-Please delete your last created constraint !
-'''
-            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Constraint mismatch", msg )
-            
+            if systemSolved:
+                
+                FreeCAD.Console.PrintMessage( "===== System solved ! ====== \n" )
+                self.mySOLVER_SPIN_ACCURACY *= 1e-1
+                self.mySOLVER_POS_ACCURACY *= 1e-1
+                self.solutionToParts(doc)
+                self.level_of_accuracy+=1
+                if self.level_of_accuracy == 4:
+                    
+                    break
+            else:
+                FreeCAD.Console.PrintMessage( "===== Could not solve system ====== \n" )
+                
+                msg = \
+    '''
+    Constraints inconsistent. Cannot solve System. 
+    Please delete your last created constraint !
+    '''
+                QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Constraint mismatch", msg )
+                break
+        self.mySOLVER_SPIN_ACCURACY = SOLVER_SPIN_ACCURACY
+        self.mySOLVER_POS_ACCURACY = SOLVER_POS_ACCURACY
+        
         
     def solutionToParts(self,doc):
         for rig in self.rigids:
@@ -637,7 +656,7 @@ Please delete your last created constraint !
             axis2 = rig.savedPlacement.Rotation.Axis
             angle = math.degrees(axis2.getAngle(axis1))
             
-            if absPosMove >= 1e-4 or angle >= 1e-3:
+            if absPosMove >= self.mySOLVER_POS_ACCURACY*1e-2 or angle >= self.mySOLVER_SPIN_ACCURACY*1e-1:
                 ob1 = doc.getObject(rig.objectName)
                 ob1.Placement = rig.placement
         
@@ -732,6 +751,28 @@ class a2p_SolverCommand:
 
 FreeCADGui.addCommand('a2p_SolverCommand', a2p_SolverCommand())
 #------------------------------------------------------------------------------
+
+
+
+
+if __name__ == "__main__":
+    doc = FreeCAD.activeDocument()
+    solveConstraints(doc)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 if __name__ == "__main__":
