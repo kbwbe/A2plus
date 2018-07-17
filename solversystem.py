@@ -734,6 +734,9 @@ FreeCADGui.addCommand('a2p_SolverCommand', a2p_SolverCommand())
 #------------------------------------------------------------------------------
 
 
+if __name__ == "__main__":
+    doc = FreeCAD.activeDocument()
+    solveConstraints(doc)
 
 
 
