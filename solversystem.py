@@ -44,7 +44,7 @@ from a2plib import (
 
 
 SOLVER_STEPS_BEFORE_ACCURACYCHECK = 100
-SOLVER_MAXSTEPS = 10000 #150000
+SOLVER_MAXSTEPS = 150000
 SOLVER_POS_ACCURACY = 1.0e-1 #Need to implement variable stepwith calculation to improve this..
 SOLVER_SPIN_ACCURACY = 1.0e-1 #Sorry for that at moment...
 
@@ -142,29 +142,17 @@ class SolverSystem():
                     haveMore = rig.assignParentship(distance)
                     distance += 1
 
+        FreeCAD.Console.PrintMessage(20*"=" + "\n")
+        FreeCAD.Console.PrintMessage("Hierarchy:\n")
+        FreeCAD.Console.PrintMessage(20*"=" + "\n")
         for rig in self.rigids:
             if rig.fixed: rig.printHierarchy(0)
+        FreeCAD.Console.PrintMessage(20*"=" + "\n")
 
     def calcMoveData(self,doc):
         for rig in self.rigids:
             rig.calcMoveData(doc, self)
-                
-    def moveRigids(self,doc):
-        for rig in self.rigids:
-            rig.move(doc)
-                
-    def getAccuracy(self,doc):  
-        '''returns maxPosError and maxSpinError of worst rigid'''
-        self.calcMoveData(doc, self) 
-        maxPosError = 0.0
-        maxSpinError = 0.0
-        for rig in self.rigids:
-            if rig.maxAxisError > maxSpinError:
-                maxSpinError = rig.maxAxisError
-            if rig.maxPosError > maxPosError:
-                maxPosError = rig.maxPosError
-        return maxPosError, maxSpinError
-                
+
     def solveSystem(self,doc):
         self.level_of_accuracy=1
         FreeCAD.Console.PrintMessage( "\n===== Start Solving System ====== \n" )
@@ -220,10 +208,11 @@ class SolverSystem():
         workList = []
 
         # start from fixed rigids and its children
-        for rig in self.rigids:
-            if rig.fixed:
-                workList.append(rig);
-                rig.getCandidates(workList)
+        #for rig in self.rigids:
+        #    if rig.fixed:
+        #        workList.append(rig);
+        #        rig.getCandidates(workList)
+        workList.extend(self.rigids)
 
         while haveMore:
             solutionFound = self.calculateWorkList(doc, workList)
@@ -277,15 +266,11 @@ class SolverSystem():
                 FreeCAD.Console.PrintMessage( "Reached max calculations count ({})\n".format(SOLVER_MAXSTEPS) )
                 return False
         return True
-    
+
     def solutionToParts(self,doc):
         for rig in self.rigids:
             rig.applySolution(doc, self);
-        
-    def doSolverStep(self,doc):
-        self.calcMoveData(doc, self)
-        self.moveRigids(doc)
-        
+
 #------------------------------------------------------------------------------
 class Rigid():
     ''' All data necessary for one rigid body'''
@@ -316,34 +301,34 @@ class Rigid():
             # Already initialized
             #TODO:if dep.Type is not None: continue
             # Depended rigid is not int working list yet
-            FreeCAD.Console.PrintMessage("Init dependency for {}, depended: {} ".format(self.label, dep.dependedRigid.label))
+            #FreeCAD.Console.PrintMessage("Init dependency for {}, depended: {} ".format(self.label, dep.dependedRigid.label))
             if dep.dependedRigid not in workList:
-                FreeCAD.Console.PrintMessage("- not in working list\n")
+                #FreeCAD.Console.PrintMessage("- not in working list\n")
                 continue
             dep.initData(doc, solver)
             dep.Enabled = True
             dep.foreignDependency.initData(doc, solver)
             dep.foreignDependency.Enabled = True
-            FreeCAD.Console.PrintMessage("- enabled\n")
+            #FreeCAD.Console.PrintMessage("- enabled\n")
 
     # The function only sets parentship for childrens that are distant+1 from fixed rigid
     # The function should be called in a loop with increased distance until it return False
     def assignParentship(self, distance):
-        FreeCAD.Console.PrintMessage((self.disatanceFromFixed*3)*" ")
-        FreeCAD.Console.PrintMessage("In {}:{}, distance {}\n".format(self.label, self.disatanceFromFixed, distance))
+        #FreeCAD.Console.PrintMessage((self.disatanceFromFixed*3)*" ")
+        #FreeCAD.Console.PrintMessage("In {}:{}, distance {}\n".format(self.label, self.disatanceFromFixed, distance))
         # Current rigid was already set, pass the call to childrens
         if self.disatanceFromFixed < distance:
             haveMore = False
             for rig in self.childRigids:
-                FreeCAD.Console.PrintMessage((self.disatanceFromFixed*3)*" ")
-                FreeCAD.Console.PrintMessage("   passing to {}:{}, distance {}\n".format(rig.label, rig.disatanceFromFixed, distance))
+                #FreeCAD.Console.PrintMessage((self.disatanceFromFixed*3)*" ")
+                #FreeCAD.Console.PrintMessage("   passing to {}:{}, distance {}\n".format(rig.label, rig.disatanceFromFixed, distance))
                 if rig.assignParentship(distance):
                     haveMore = True
             return haveMore
         elif self.disatanceFromFixed == distance:
             for rig in self.childRigids:
-                FreeCAD.Console.PrintMessage((self.disatanceFromFixed*3)*" ")
-                FreeCAD.Console.PrintMessage("   setting {}:{} with distance {}\n".format(rig.label, rig.disatanceFromFixed, distance+1))
+                #FreeCAD.Console.PrintMessage((self.disatanceFromFixed*3)*" ")
+                #FreeCAD.Console.PrintMessage("   setting {}:{} with distance {}\n".format(rig.label, rig.disatanceFromFixed, distance+1))
                 rig.parentRigids.append(self)
                 if self in rig.childRigids: rig.childRigids.remove(self)
                 rig.disatanceFromFixed = distance+1
