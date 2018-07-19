@@ -151,6 +151,35 @@ class SolverSystem():
         for rig in self.rigids:
             if rig.fixed: rig.printHierarchy(0)
         FreeCAD.Console.PrintMessage(20*"=" + "\n")
+        self.visualizeHierarchy()
+
+    def write(self, str):
+        FreeCAD.Console.PrintMessage(str + "\n")
+
+    def visualizeHierarchy(self):
+        FreeCAD.Console.PrintMessage(20*"=" + "\n")
+        FreeCAD.Console.PrintMessage("Visual hierarcy, copy that section to:\n")
+        FreeCAD.Console.PrintMessage("https://mermaidjs.github.io/mermaid-live-editor\n")
+        FreeCAD.Console.PrintMessage(20*"=" + "\n")
+
+        self.write("graph TD")
+        for rig in self.rigids:
+            if len(rig.childRigids) == 0:
+                self.write("{}".format(rig.label))
+            else:
+                for c in rig.childRigids:
+                    # find dependency with those rigids
+                    dep = "?"
+                    for d in rig.dependencies:
+                        if(d.currentRigid == rig and d.dependedRigid == c):
+                            dep = d.Type
+                            break
+                    if rig.fixed:
+                        self.write("{}({}<br>*FIXED*) -- {} --> {}".format(rig.label, rig.label, dep, c.label))
+                    else:
+                        self.write("{} -- {} --> {}".format(rig.label, dep, c.label))
+
+        FreeCAD.Console.PrintMessage(20*"=" + "\n")
 
     def calcMoveData(self,doc):
         for rig in self.rigids:
@@ -361,7 +390,7 @@ class Rigid():
         FreeCAD.Console.PrintMessage("{} - distance {}\n".format(self.label, self.disatanceFromFixed))
         for rig in self.childRigids:
             rig.printHierarchy(level+1)
-
+    
     def getCandidates(self, addList):
         for rig in self.childRigids:
             if not rig.tempfixed and rig.isAllParentTempFixed(): 
