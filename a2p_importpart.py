@@ -486,74 +486,59 @@ FreeCADGui.addCommand('a2p_DeleteConnectionsCommand', DeleteConnectionsCommand()
 
 class ViewConnectionsCommand:
     def Activated(self):
-        selection = [s for s in FreeCADGui.Selection.getSelection() if s.Document == FreeCAD.ActiveDocument ]
-        if len(selection) == 0: return
-        FreeCADGui.Selection.clearSelection()
-        
         doc = FreeCAD.ActiveDocument
-        connectionToView = selection[0]
-        
-        if not 'ConstraintInfo' in connectionToView.Content and not 'ConstraintNfo' in connectionToView.Content: 
-            return # Selected Object is not a connection/constraint
-        
-        # Save Transparency of Objects and make all transparent
-        transparencyList = []
-        for obj in doc.Objects:
-            if hasattr(obj,'ViewObject'):
-                if hasattr(obj.ViewObject,'Transparency'):
-                    transparencyList.append(obj.ViewObject.Transparency) 
-                    obj.ViewObject.Transparency = 80 
-        
-        FreeCADGui.Selection.addSelection(
-            doc.getObject(connectionToView.Object1),
-            connectionToView.SubElement1
-            )
-        FreeCADGui.Selection.addSelection(
-            doc.getObject(connectionToView.Object2),
-            connectionToView.SubElement2
-            )
-        
-        #FreeCADGui.SendMsgToActiveView("ViewSelection") # not good enough
-        
-        flags = QtGui.QMessageBox.StandardButton.Yes
-        msg = "Close Connection ViewMode ?"
-        response = QtGui.QMessageBox.information(QtGui.QApplication.activeWindow(), "Highlighting ready", msg, flags )
-        
-        # restore transparency of objects...
-        i=0
-        for obj in doc.Objects:
-            if hasattr(obj,'ViewObject'):
-                if hasattr(obj.ViewObject,'Transparency'):
-                    obj.ViewObject.Transparency = transparencyList[i]
-                    i+=1
-        
+
+        selected = a2plib.getSelectedConstraint()
+        if selected is None:
+            return
+
+        if not a2plib.isTransparancyEnabled():
+            a2plib.setTransparency()
+
         FreeCADGui.Selection.clearSelection()
-        FreeCADGui.Selection.addSelection(selection[0])
+        FreeCADGui.Selection.addSelection(
+            doc.getObject(selected.Object1), selected.SubElement1)
+
+        FreeCADGui.Selection.addSelection(
+            doc.getObject(selected.Object2), selected.SubElement2)
+
+        # Add observer to remove the transparancy when the selection is chaning or removing
+        FreeCADGui.Selection.addObserver(ViewConnectionsObserver())
 
     def IsActive(self):
-        # Check that constraint is selected
-        selection = [s for s in FreeCADGui.Selection.getSelection() if s.Document == FreeCAD.ActiveDocument ]
-        if len(selection) == 0: return False
-
-        doc = FreeCAD.ActiveDocument
-        connectionToView = selection[0]
-
-        if not 'ConstraintInfo' in connectionToView.Content and not 'ConstraintNfo' in connectionToView.Content: 
-            return False
-
-        return True
+        return (a2plib.getSelectedConstraint() is not None and a2plib.isTransparancyEnabled() == False)
 
     def GetResources(self):
         return {
-            'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_viewConnection.svg',
-            'MenuText': 'show connected elements',
-            'ToolTip': 'show connected elements'
+            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_viewConnection.svg',
+            'MenuText':     'show connected elements',
+            'ToolTip':      'show connected elements',
             }
         
 FreeCADGui.addCommand('a2p_ViewConnectionsCommand', ViewConnectionsCommand())
     
+class ViewConnectionsObserver:
+    def __init__(self):
+        self.ignoreClear = False
 
+    def clearSelection(self, doc):
+        if self.ignoreClear:
+            self.ignoreClear = False
+        else:
+            if a2plib.isTransparancyEnabled():
+                a2plib.restoreTransparancy()
+                FreeCADGui.Selection.removeObserver(self)
 
+    def setSelection(self, doc):
+        selected = a2plib.getSelectedConstraint()
+        if selected is not None:
+            self.ignoreClear = True
+            FreeCADGui.Selection.clearSelection()
+            FreeCADGui.Selection.addSelection(
+                FreeCAD.ActiveDocument.getObject(selected.Object1), selected.SubElement1)
+
+            FreeCADGui.Selection.addSelection(
+                FreeCAD.ActiveDocument.getObject(selected.Object2), selected.SubElement2)
 
 class a2p_isolateCommand:
     def Activated(self):
@@ -595,33 +580,22 @@ FreeCADGui.addCommand('a2p_isolateCommand', a2p_isolateCommand())
 
 
 class a2p_ToggleTransparencyCommand:
+    def Activated(self, checked):
+        if a2plib.isTransparancyEnabled():
+            a2plib.restoreTransparancy()
+        else:
+            a2plib.setTransparency()
 
-    def Activated(self):
-        doc = FreeCAD.ActiveDocument
-        
-        NONTRANSPARENT = 0
-        TRANSPARENT = 80
-        
-        desiredTransparency = NONTRANSPARENT
-        # Get transparency of first visible object
-        for obj in doc.Objects:
-            if hasattr(obj,'ViewObject'):
-                if hasattr(obj.ViewObject,'Transparency'):
-                    if (obj.ViewObject.Transparency == NONTRANSPARENT):
-                        desiredTransparency = TRANSPARENT 
-                break
-        # set transparency of objects...
-        for obj in doc.Objects:
-            if hasattr(obj,'ViewObject'):
-                if hasattr(obj.ViewObject,'Transparency'):
-                    obj.ViewObject.Transparency = desiredTransparency
-        
+    def IsChecked(self):
+        return a2plib.isTransparancyEnabled()
+
     def GetResources(self):
         return {
-            'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_glasses.svg',
-            'MenuText': 'toggle transparency of assembly',
-            'ToolTip': 'toggle transparency of assembly'
-            }
+            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_glasses.svg',
+            'MenuText':     'toggle transparency of assembly',
+            'ToolTip':      'toggle transparency of assembly',
+            'Checkable':    self.IsChecked()
+        }
 FreeCADGui.addCommand('a2p_ToggleTransparencyCommand', a2p_ToggleTransparencyCommand())
 
 

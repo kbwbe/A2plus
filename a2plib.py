@@ -31,6 +31,7 @@ from  FreeCAD import Base
 
 USE_PROJECTFILE = False
 AUTOSOLVE_ENABLED = True
+SAVED_TRANSPARENCY = []
 
 DEBUGPROGRAM = 1
 
@@ -54,6 +55,49 @@ def setAutoSolve(enabled):
 #------------------------------------------------------------------------------
 def getAutoSolveState():
     return AUTOSOLVE_ENABLED
+#------------------------------------------------------------------------------
+def setTransparency():
+    global SAVED_TRANSPARENCY
+    # Save Transparency of Objects and make all transparent
+    doc = FreeCAD.ActiveDocument
+
+    if len(SAVED_TRANSPARENCY) > 0:
+        # Transparancy is already saved, no need to set transparancy again
+        return
+
+    for obj in doc.Objects:
+        if hasattr(obj,'ViewObject'):
+            if hasattr(obj.ViewObject,'Transparency'):
+                SAVED_TRANSPARENCY.append((obj.Name, obj.ViewObject.Transparency))
+                obj.ViewObject.Transparency = 80 
+#------------------------------------------------------------------------------
+def restoreTransparancy():
+    global SAVED_TRANSPARENCY
+    # restore transparency of objects...
+    doc = FreeCAD.ActiveDocument
+
+    for setting in SAVED_TRANSPARENCY:
+        obj = doc.getObject(setting[0])
+        if obj is not None:
+            obj.ViewObject.Transparency = setting[1]
+    SAVED_TRANSPARENCY = []
+#------------------------------------------------------------------------------
+def isTransparancyEnabled():
+    global SAVED_TRANSPARENCY
+    return (len(SAVED_TRANSPARENCY) > 0)
+#------------------------------------------------------------------------------
+def getSelectedConstraint():
+    # Check that constraint is selected
+    selection = [s for s in FreeCADGui.Selection.getSelection() if s.Document == FreeCAD.ActiveDocument ]
+    if len(selection) == 0: return None
+
+    doc = FreeCAD.ActiveDocument
+    connectionToView = selection[0]
+
+    if not 'ConstraintInfo' in connectionToView.Content and not 'ConstraintNfo' in connectionToView.Content: 
+        return None
+
+    return connectionToView
 #------------------------------------------------------------------------------
 def appVersionStr():
     version = int(FreeCAD.Version()[0])
@@ -208,7 +252,7 @@ class ConstraintSelectionObserver:
         wb_globals['selectionObserver'] = self
         self.taskDialog = SelectionTaskDialog(taskDialog_title, taskDialog_iconPath, taskDialog_text)
         FreeCADGui.Control.showDialog( self.taskDialog )
-        
+
     def addSelection( self, docName, objName, sub, pnt ):
         obj = FreeCAD.ActiveDocument.getObject(objName)
         self.selections.append( SelectionRecord( docName, objName, sub ))
@@ -218,13 +262,13 @@ class ConstraintSelectionObserver:
         elif self.secondSelectionGate != None and len(self.selections) == 1:
             FreeCADGui.Selection.removeSelectionGate()
             FreeCADGui.Selection.addSelectionGate( self.secondSelectionGate )
-            
+
     def stopSelectionObservation(self):
         FreeCADGui.Selection.removeObserver(self) 
         del wb_globals['selectionObserver']
         FreeCADGui.Selection.removeSelectionGate()
         FreeCADGui.Control.closeDialog()
-        
+
 #------------------------------------------------------------------------------
 class SelectionRecord:
     def __init__(self, docName, objName, sub):
