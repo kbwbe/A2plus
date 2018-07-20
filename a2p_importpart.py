@@ -96,8 +96,8 @@ def importPartFromFile(_doc, filename, importToCache=False):
     # Get a list of the visible Objects
     #-------------------------------------------
     visibleObjects = [ obj for obj in importDoc.Objects
-                       if hasattr(obj,'ViewObject') and obj.ViewObject.isVisible()
-                       and hasattr(obj,'Shape') and len(obj.Shape.Faces) > 0 and 'Body' not in obj.Name]
+                    if hasattr(obj,'ViewObject') and obj.ViewObject.isVisible()
+                    and hasattr(obj,'Shape') and len(obj.Shape.Faces) > 0 and 'Body' not in obj.Name]
     
     if visibleObjects == None or len(visibleObjects) == 0:
         msg = "No visible Part to import found. Aborting operation"
@@ -247,12 +247,12 @@ def updateImportedParts(doc):
                 
             if replacement == None:
                 QtGui.QMessageBox.critical(  QtGui.QApplication.activeWindow(), 
-                                             "Source file not found", 
-                                             "update of %s aborted!\nUnable to find %s" % (
-                                                 obj.Name, 
-                                                 obj.sourceFile
-                                                 ) 
-                                           )
+                                            "Source file not found", 
+                                            "update of %s aborted!\nUnable to find %s" % (
+                                                obj.Name, 
+                                                obj.sourceFile
+                                                ) 
+                                        )
             else:
                 obj.sourceFile = replacement # update Filepath, perhaps location changed !
 
@@ -368,11 +368,11 @@ class a2p_EditPartCommand:
         fileNameWithinProjectFile = a2plib.findSourceFileInProject(obj.sourceFile)
         if fileNameWithinProjectFile == None:
             QtGui.QMessageBox.critical(  QtGui.QApplication.activeWindow(), 
-                                         "Source file not found in project ! ", 
-                                         "Editor aborted!\nUnable to find {}".format(
-                                             fileNameWithinProjectFile
-                                             ) 
-                                       )
+                                        "Source file not found in project ! ", 
+                                        "Editor aborted!\nUnable to find {}".format(
+                                            fileNameWithinProjectFile
+                                            ) 
+                                    )
             return
         docs = FreeCAD.listDocuments().values()
         docFilenames = [ d.FileName for d in docs ]
@@ -530,6 +530,19 @@ class ViewConnectionsCommand:
         FreeCADGui.Selection.clearSelection()
         FreeCADGui.Selection.addSelection(selection[0])
 
+    def IsActive(self):
+        # Check that constraint is selected
+        selection = [s for s in FreeCADGui.Selection.getSelection() if s.Document == FreeCAD.ActiveDocument ]
+        if len(selection) == 0: return False
+
+        doc = FreeCAD.ActiveDocument
+        connectionToView = selection[0]
+
+        if not 'ConstraintInfo' in connectionToView.Content and not 'ConstraintNfo' in connectionToView.Content: 
+            return False
+
+        return True
+
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_viewConnection.svg',
@@ -629,26 +642,18 @@ by hitting the solvebutton
 
 class a2p_ToggleAutoSolveCommand:
 
-    def Activated(self):
-        a2plib.toggleAutoSolve()
-        if a2plib.getAutoSolveState():
-            stat = "ON"
-        else:
-            stat = "OFF"
-        QtGui.QMessageBox.information(  
-                        QtGui.QApplication.activeWindow(), 
-                        "Changed state of AutoSolve ! ", 
-                        "AutoSolve State is {}".format(
-                            stat
-                            ) 
-                       )
+    def Activated(self, checked):
+        a2plib.setAutoSolve(checked)
 
-        
+    def IsChecked(self):
+        return a2plib.getAutoSolveState()
+
     def GetResources(self):
         return {
             #'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_glasses.svg',
-            'MenuText': 'toggle AutoSolve',
-            'ToolTip': toolTipMessage
+            'MenuText':     'toggle AutoSolve',
+            'ToolTip':      toolTipMessage,
+            'Checkable':    self.IsChecked()
             }
 FreeCADGui.addCommand('a2p_ToggleAutoSolveCommand', a2p_ToggleAutoSolveCommand())
 

@@ -48,10 +48,9 @@ GREEN = (0.0,1.0,0.0)
 BLUE = (0.0,0.0,1.0)
 
 #------------------------------------------------------------------------------
-def toggleAutoSolve():
+def setAutoSolve(enabled):
     global AUTOSOLVE_ENABLED
-    if AUTOSOLVE_ENABLED: AUTOSOLVE_ENABLED = False
-    else: AUTOSOLVE_ENABLED = True
+    AUTOSOLVE_ENABLED = enabled
 #------------------------------------------------------------------------------
 def getAutoSolveState():
     return AUTOSOLVE_ENABLED
