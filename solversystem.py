@@ -318,14 +318,14 @@ class Rigid():
     # The function only sets parentship for childrens that are distant+1 from fixed rigid
     # The function should be called in a loop with increased distance until it return False
     def assignParentship(self, distance):
-        FreeCAD.Console.PrintMessage((self.disatanceFromFixed*3)*" ")
-        FreeCAD.Console.PrintMessage("In {}:{}, distance {}\n".format(self.label, self.disatanceFromFixed, distance))
+        #FreeCAD.Console.PrintMessage((self.disatanceFromFixed*3)*" ")
+        #FreeCAD.Console.PrintMessage("In {}:{}, distance {}\n".format(self.label, self.disatanceFromFixed, distance))
         # Current rigid was already set, pass the call to childrens
         if self.disatanceFromFixed < distance:
             haveMore = False
             for rig in self.childRigids:
-                FreeCAD.Console.PrintMessage((self.disatanceFromFixed*3)*" ")
-                FreeCAD.Console.PrintMessage("   passing to {}:{}, distance {}\n".format(rig.label, rig.disatanceFromFixed, distance))
+                #FreeCAD.Console.PrintMessage((self.disatanceFromFixed*3)*" ")
+                #FreeCAD.Console.PrintMessage("   passing to {}:{}, distance {}\n".format(rig.label, rig.disatanceFromFixed, distance))
                 if rig.assignParentship(distance):
                     haveMore = True
             return haveMore
@@ -334,8 +334,8 @@ class Rigid():
                 rig = self.linkedRigids[0]
                 # Got to a new rigid, set current as it's father
                 if rig.disatanceFromFixed is None:
-                    FreeCAD.Console.PrintMessage((self.disatanceFromFixed*3)*" ")
-                    FreeCAD.Console.PrintMessage("   setting {}:{} with distance {}\n".format(rig.label, rig.disatanceFromFixed, distance+1))
+                    #FreeCAD.Console.PrintMessage((self.disatanceFromFixed*3)*" ")
+                    #FreeCAD.Console.PrintMessage("   setting {}:{} with distance {}\n".format(rig.label, rig.disatanceFromFixed, distance+1))
                     rig.parentRigids.append(self)
                     self.childRigids.append(rig)
                     rig.linkedRigids.remove(self)
@@ -344,8 +344,8 @@ class Rigid():
                 # That child was already assigned by another (and closer to fixed) father
                 # Leave only child relationship, but don't add current as a father
                 else:
-                    FreeCAD.Console.PrintMessage((self.disatanceFromFixed*3)*" ")
-                    FreeCAD.Console.PrintMessage("   the {}:{} was already set, ignore\n".format(rig.label, rig.disatanceFromFixed))
+                    #FreeCAD.Console.PrintMessage((self.disatanceFromFixed*3)*" ")
+                    #FreeCAD.Console.PrintMessage("   the {}:{} was already set, ignore\n".format(rig.label, rig.disatanceFromFixed))
                     self.childRigids.append(rig)
                     rig.linkedRigids.remove(self)
                     self.linkedRigids.remove(rig)
