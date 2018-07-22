@@ -338,7 +338,37 @@ class SolverSystem():
                 rig1.dependencies.append(dep1)
                 rig2.dependencies.append(dep2)
                 
+        self.calcSpinCenter()
+        self.calcRefPointsBoundBoxSize()
                 
+    def calcSpinCenter(self):
+        for rig in self.rigids:
+            newSpinCenter = Base.Vector(0,0,0)
+            countRefPoints = 0
+            for dep in rig.dependencies:
+                if dep.refPoint != None:
+                    newSpinCenter.add(dep.refPoint)
+                    countRefPoints += 1
+            if countRefPoints > 0:
+                newSpinCenter.multiply(1.0/countRefPoints)
+                rig.spinCenter = newSpinCenter
+                
+    def calcRefPointsBoundBoxSize(self):
+        xmin = 0
+        xmax = 0
+        ymin = 0
+        ymax = 0
+        zmin = 0
+        zmax = 0
+        for rig in self.rigids:
+            for dep in rig.dependencies:
+                if dep.refPoint.x < xmin: xmin =dep.refPoint.x
+                if dep.refPoint.x > xmax: xmax =dep.refPoint.x
+                if dep.refPoint.y < ymin: ymin =dep.refPoint.y
+                if dep.refPoint.y > ymax: ymax =dep.refPoint.y
+                if dep.refPoint.z < zmin: zmin =dep.refPoint.z
+                if dep.refPoint.z > zmax: zmax =dep.refPoint.z
+            rig.refPointsBoundBoxSize = math.sqrt( (xmax-xmin)**2 + (ymax-ymin)**2 + (zmax-zmin)**2 ) 
                 
     def calcMoveData(self,doc):
         for rig in self.rigids:
@@ -446,15 +476,35 @@ class SolverSystem():
             #
             #compute rotation caused by refPoint-attractions and axes mismatch
             if (
-                len(depMoveVectors) > 0 and
+                len(depMoveVectors) > 1 and
                 rig.spinCenter != None
                 ):
                 rig.spin = Base.Vector(0,0,0)
+                tmpSpin = Base.Vector(0,0,0)
+                count = 0
+                
                 for i in range(0,len(depRefPoints)):
-                    vec1 = depRefPoints[i].sub(rig.spinCenter) # 'aka Radius'
-                    vec2 = depMoveVectors[i].sub(rig.moveVectorSum) # 'aka Force'
-                    axis = vec1.cross(vec2) #torque-vector
-                    rig.spin = rig.spin.add(axis)
+                    try:
+                        vec1 = depRefPoints[i].sub(rig.spinCenter) # 'aka Radius'
+                        vec2 = depMoveVectors[i].sub(rig.moveVectorSum) # 'aka Force'
+                        axis = vec1.cross(vec2) #torque-vector
+    
+                        vec3 = vec1.add(vec2)
+                        alpha = math.degrees(vec3.getAngle(vec1))
+                        displacement = vec1.Length * math.sin(alpha)
+                        beta = math.atan(
+                            displacement / rig.refPointsBoundBoxSize
+                            )
+                        axis.normalize()
+                        axis.multiply(beta) #Weight-Factor perhaps needed...
+                        tmpSpin = tmpSpin.add(axis*6.0)
+                        count += 1
+                    except:
+                        pass #numerical exception above, no spin !
+                    
+                if count >= 2:
+                    tmpSpin.multiply(1.0/count)
+                    rig.spin = tmpSpin
                     
                 #adjust axis' of the dependencies //FIXME (align,opposed,none)
                 rig.maxAxisError = 0.0
@@ -512,7 +562,7 @@ class SolverSystem():
                             try:
                                 axis.normalize()
                                 angle = foreignAxis.getAngle(rigAxis)
-                                axis.multiply(math.degrees(angle)*6)
+                                axis.multiply(math.degrees(angle))
                                 rig.spin = rig.spin.add(axis)
                                 axisErr = rig.spin.Length
                                 if axisErr > rig.maxAxisError : rig.maxAxisError = axisErr
@@ -539,7 +589,7 @@ class SolverSystem():
                             try:
                                 axis.normalize()
                                 angle = foreignAxis.getAngle(rigAxis)
-                                axis.multiply(math.degrees(angle)*6)
+                                axis.multiply(math.degrees(angle))
                                 rig.spin = rig.spin.add(axis)
                                 axisErr = rig.spin.Length
                                 if axisErr > rig.maxAxisError : rig.maxAxisError = axisErr
@@ -569,7 +619,7 @@ class SolverSystem():
                 if spinAngle>15.0: spinAngle=15.0 # do not accept more degrees
                 if spinAngle> 1e-6:
                     try:
-                        spinStep = spinAngle/(125.0) #it was 250.0
+                        spinStep = spinAngle/(120.0) #it was 250.0
                         rig.spin.normalize()
                         mov = Base.Vector(0,0,0) # no further moving
                         rot = FreeCAD.Rotation(rig.spin,spinStep)
@@ -637,7 +687,7 @@ class SolverSystem():
     Constraints inconsistent. Cannot solve System. 
     Please delete your last created constraint !
     '''
-                QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Constraint mismatch", msg )
+                #QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Constraint mismatch", msg )
                 break
         self.mySOLVER_SPIN_ACCURACY = SOLVER_SPIN_ACCURACY
         self.mySOLVER_POS_ACCURACY = SOLVER_POS_ACCURACY
@@ -682,6 +732,7 @@ class Rigid():
         self.moveVectorSum = None
         self.maxPosError = 0.0
         self.maxAxisError = 0.0
+        self.refPointsBoundBoxSize = 0.0
         
     def applyPlacementStep(self,pl):
         self.placement = pl.multiply(self.placement)
@@ -778,7 +829,6 @@ if __name__ == "__main__":
 if __name__ == "__main__":
     doc = FreeCAD.activeDocument()
     solveConstraints(doc)
-
 
 
 
