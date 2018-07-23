@@ -483,7 +483,6 @@ class SolverSystem():
                 rig.spinCenter != None
                 ):
                 rig.spin = Base.Vector(0,0,0)
-                count = 0
                 
                 if (len(depMoveVectors)) > 1: # rotate by refpoint attraction only if there are more than 1
                     for i in range(0,len(depRefPoints)):
@@ -491,13 +490,12 @@ class SolverSystem():
                             vec1 = depRefPoints[i].sub(rig.spinCenter) # 'aka Radius'
                             vec2 = depMoveVectors[i].sub(rig.moveVectorSum) # 'aka Force'
                             axis = vec1.cross(vec2) #torque-vector
-        
+                            
+                            vec1.normalize()
+                            vec1.multiply(rig.refPointsBoundBoxSize)
                             vec3 = vec1.add(vec2)
-                            alpha = vec3.getAngle(vec1) # do not calculate with degrees
-                            displacement = vec1.Length * math.sin(alpha)
-                            beta = math.atan(
-                                displacement / rig.refPointsBoundBoxSize
-                                )
+                            beta = vec3.getAngle(vec1)
+                                    
                             axis.normalize()
                             axis.multiply(math.degrees(beta)) #here use degrees
                             rig.spin = rig.spin.add(axis)
@@ -606,7 +604,7 @@ class SolverSystem():
             #Linear moving of a rigid
             if rig.moveVectorSum != None:
                 mov = rig.moveVectorSum
-                mov.multiply(0.5) # stabilize computation, adjust if needed...
+                #mov.multiply(0.5) # stabilize computation, adjust if needed...
                 if mov.Length > 1e-8:
                     pl = FreeCAD.Placement()
                     pl.move(mov)
@@ -822,17 +820,6 @@ if __name__ == "__main__":
 
 
 
-
-
-
-
-
-
-
-
-if __name__ == "__main__":
-    doc = FreeCAD.activeDocument()
-    solveConstraints(doc)
 
 
 
