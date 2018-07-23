@@ -479,30 +479,31 @@ class SolverSystem():
             #
             #compute rotation caused by refPoint-attractions and axes mismatch
             if (
-                len(depMoveVectors) > 1 and
+                len(depMoveVectors) != 0 and
                 rig.spinCenter != None
                 ):
                 rig.spin = Base.Vector(0,0,0)
                 count = 0
                 
-                for i in range(0,len(depRefPoints)):
-                    try:
-                        vec1 = depRefPoints[i].sub(rig.spinCenter) # 'aka Radius'
-                        vec2 = depMoveVectors[i].sub(rig.moveVectorSum) # 'aka Force'
-                        axis = vec1.cross(vec2) #torque-vector
-    
-                        vec3 = vec1.add(vec2)
-                        alpha = math.degrees(vec3.getAngle(vec1))
-                        displacement = vec1.Length * math.sin(alpha)
-                        beta = math.atan(
-                            displacement / rig.refPointsBoundBoxSize
-                            )
-                        axis.normalize()
-                        axis.multiply(beta) #Weight-Factor perhaps needed...
-                        rig.spin = rig.spin.add(axis)
-                        rig.countSpinVectors += 1
-                    except:
-                        pass #numerical exception above, no spin !
+                if (len(depMoveVectors)) > 1: # rotate by refpoint attraction only if there are more than 1
+                    for i in range(0,len(depRefPoints)):
+                        try:
+                            vec1 = depRefPoints[i].sub(rig.spinCenter) # 'aka Radius'
+                            vec2 = depMoveVectors[i].sub(rig.moveVectorSum) # 'aka Force'
+                            axis = vec1.cross(vec2) #torque-vector
+        
+                            vec3 = vec1.add(vec2)
+                            alpha = math.degrees(vec3.getAngle(vec1))
+                            displacement = vec1.Length * math.sin(alpha)
+                            beta = math.atan(
+                                displacement / rig.refPointsBoundBoxSize
+                                )
+                            axis.normalize()
+                            axis.multiply(beta) #Weight-Factor perhaps needed...
+                            rig.spin = rig.spin.add(axis)
+                            rig.countSpinVectors += 1
+                        except:
+                            pass #numerical exception above, no spin !
                     
                 #adjust axis' of the dependencies //FIXME (align,opposed,none)
                 rig.maxAxisError = 0.0
