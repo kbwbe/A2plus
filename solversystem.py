@@ -48,7 +48,7 @@ SOLVER_MAXSTEPS = 150000
 SOLVER_POS_ACCURACY = 1.0e-1 #Need to implement variable stepwith calculation to improve this..
 SOLVER_SPIN_ACCURACY = 1.0e-1 #Sorry for that at moment...
 
-SPINSTEP_DIVISOR = 10.0
+SPINSTEP_DIVISOR = 12.0
 
 #------------------------------------------------------------------------------
 class SolverSystem():
@@ -355,13 +355,13 @@ class SolverSystem():
                 rig.spinCenter = newSpinCenter
                 
     def calcRefPointsBoundBoxSize(self):
-        xmin = 0
-        xmax = 0
-        ymin = 0
-        ymax = 0
-        zmin = 0
-        zmax = 0
         for rig in self.rigids:
+            xmin = 0
+            xmax = 0
+            ymin = 0
+            ymax = 0
+            zmin = 0
+            zmax = 0
             for dep in rig.dependencies:
                 if dep.refPoint.x < xmin: xmin =dep.refPoint.x
                 if dep.refPoint.x > xmax: xmax =dep.refPoint.x
@@ -493,13 +493,13 @@ class SolverSystem():
                             axis = vec1.cross(vec2) #torque-vector
         
                             vec3 = vec1.add(vec2)
-                            alpha = math.degrees(vec3.getAngle(vec1))
+                            alpha = vec3.getAngle(vec1) # do not calculate with degrees
                             displacement = vec1.Length * math.sin(alpha)
                             beta = math.atan(
                                 displacement / rig.refPointsBoundBoxSize
                                 )
                             axis.normalize()
-                            axis.multiply(beta) #Weight-Factor perhaps needed...
+                            axis.multiply(math.degrees(beta)) #here use degrees
                             rig.spin = rig.spin.add(axis)
                             rig.countSpinVectors += 1
                         except:
@@ -606,7 +606,7 @@ class SolverSystem():
             #Linear moving of a rigid
             if rig.moveVectorSum != None:
                 mov = rig.moveVectorSum
-                #mov.multiply(1.0) # stabilize computation, adjust if needed...
+                mov.multiply(0.5) # stabilize computation, adjust if needed...
                 if mov.Length > 1e-8:
                     pl = FreeCAD.Placement()
                     pl.move(mov)
@@ -685,13 +685,12 @@ class SolverSystem():
                     break
             else:
                 FreeCAD.Console.PrintMessage( "===== Could not solve system ====== \n" )
-                
                 msg = \
     '''
     Constraints inconsistent. Cannot solve System. 
     Please delete your last created constraint !
     '''
-                #QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Constraint mismatch", msg )
+                QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Constraint mismatch", msg )
                 break
         self.mySOLVER_SPIN_ACCURACY = SOLVER_SPIN_ACCURACY
         self.mySOLVER_POS_ACCURACY = SOLVER_POS_ACCURACY
