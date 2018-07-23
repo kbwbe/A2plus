@@ -48,6 +48,7 @@ SOLVER_MAXSTEPS = 150000
 SOLVER_POS_ACCURACY = 1.0e-1 #Need to implement variable stepwith calculation to improve this..
 SOLVER_SPIN_ACCURACY = 1.0e-1 #Sorry for that at moment...
 
+SPINSTEP_DIVISOR = 10.0
 
 #------------------------------------------------------------------------------
 class SolverSystem():
@@ -377,6 +378,8 @@ class SolverSystem():
             depMoveVectors = [] #collect Data to compute central movement of rigid
             #
             rig.maxPosError = 0.0
+            rig.countSpinVectors = 0
+            #
             for dep in rig.dependencies:
                 
                 if dep.Type == "pointIdentity" or dep.Type == "sphereCenterIdent":
@@ -480,7 +483,6 @@ class SolverSystem():
                 rig.spinCenter != None
                 ):
                 rig.spin = Base.Vector(0,0,0)
-                tmpSpin = Base.Vector(0,0,0)
                 count = 0
                 
                 for i in range(0,len(depRefPoints)):
@@ -497,14 +499,10 @@ class SolverSystem():
                             )
                         axis.normalize()
                         axis.multiply(beta) #Weight-Factor perhaps needed...
-                        tmpSpin = tmpSpin.add(axis*6.0)
-                        count += 1
+                        rig.spin = rig.spin.add(axis)
+                        rig.countSpinVectors += 1
                     except:
                         pass #numerical exception above, no spin !
-                    
-                if count >= 2:
-                    tmpSpin.multiply(1.0/count)
-                    rig.spin = tmpSpin
                     
                 #adjust axis' of the dependencies //FIXME (align,opposed,none)
                 rig.maxAxisError = 0.0
@@ -528,6 +526,7 @@ class SolverSystem():
                                 axis.normalize()
                                 axis.multiply(-deltaAngle*57.296)
                                 rig.spin = rig.spin.add(axis)
+                                rig.countSpinVectors +=1
                                 axisErr = rig.spin.Length
                                 if axisErr > rig.maxAxisError : rig.maxAxisError = axisErr
                             except: #axis = Vector(0,0,0) and cannot be normalized...
@@ -535,6 +534,7 @@ class SolverSystem():
                                 y = random.uniform(-self.mySOLVER_SPIN_ACCURACY*1e-1,self.mySOLVER_SPIN_ACCURACY*1e-1)
                                 z = random.uniform(-self.mySOLVER_SPIN_ACCURACY*1e-1,self.mySOLVER_SPIN_ACCURACY*1e-1)
                                 rig.spin = rig.spin.add(Base.Vector(x,y,z))
+                                rig.countSpinVectors +=1
 
                     if (
                         dep.Type == "circularEdge" or
@@ -564,6 +564,7 @@ class SolverSystem():
                                 angle = foreignAxis.getAngle(rigAxis)
                                 axis.multiply(math.degrees(angle))
                                 rig.spin = rig.spin.add(axis)
+                                rig.countSpinVectors +=1
                                 axisErr = rig.spin.Length
                                 if axisErr > rig.maxAxisError : rig.maxAxisError = axisErr
                             except:
@@ -591,6 +592,7 @@ class SolverSystem():
                                 angle = foreignAxis.getAngle(rigAxis)
                                 axis.multiply(math.degrees(angle))
                                 rig.spin = rig.spin.add(axis)
+                                rig.countSpinVectors +=1
                                 axisErr = rig.spin.Length
                                 if axisErr > rig.maxAxisError : rig.maxAxisError = axisErr
                             except:
@@ -612,14 +614,15 @@ class SolverSystem():
             #Rotate the rigid...
             if (
                 rig.spin != None and
-                rig.spin.Length != 0.0
+                rig.spin.Length != 0.0 and
+                rig.countSpinVectors != 0
                 ):
                 
-                spinAngle = rig.spin.Length
+                spinAngle = rig.spin.Length / rig.countSpinVectors
                 if spinAngle>15.0: spinAngle=15.0 # do not accept more degrees
                 if spinAngle> 1e-6:
                     try:
-                        spinStep = spinAngle/(120.0) #it was 250.0
+                        spinStep = spinAngle/(SPINSTEP_DIVISOR) #it was 250.0
                         rig.spin.normalize()
                         mov = Base.Vector(0,0,0) # no further moving
                         rot = FreeCAD.Rotation(rig.spin,spinStep)
@@ -733,6 +736,7 @@ class Rigid():
         self.maxPosError = 0.0
         self.maxAxisError = 0.0
         self.refPointsBoundBoxSize = 0.0
+        self.countSpinVectors = 0
         
     def applyPlacementStep(self,pl):
         self.placement = pl.multiply(self.placement)
