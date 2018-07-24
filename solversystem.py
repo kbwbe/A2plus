@@ -514,7 +514,7 @@ class SolverSystem():
                         foreignAxis = dep.foreignDependency.refAxisEnd.sub(
                             dep.foreignDependency.refPoint
                             )
-                        recentAngle = foreignAxis.getAngle(rigAxis) / 2.0/ math.pi *360
+                        recentAngle = math.degrees(foreignAxis.getAngle(rigAxis))
                         deltaAngle = abs(dep.angle.Value) - recentAngle
                         if abs(deltaAngle) < 1e-6:
                             # do not change spin, not necessary..
@@ -523,7 +523,7 @@ class SolverSystem():
                             try: 
                                 axis = rigAxis.cross(foreignAxis)
                                 axis.normalize()
-                                axis.multiply(-deltaAngle*57.296)
+                                axis.multiply(math.degrees(-deltaAngle))
                                 rig.spin = rig.spin.add(axis)
                                 rig.countSpinVectors +=1
                                 axisErr = rig.spin.Length
@@ -571,21 +571,17 @@ class SolverSystem():
                             
                         else: #if dep.direction... (== none)
                             rigAxis = dep.refAxisEnd.sub(dep.refPoint)
-                            foreignAxis1 = dep.foreignDependency.refAxisEnd.sub(
+                            foreignAxis = dep.foreignDependency.refAxisEnd.sub(
                                 dep.foreignDependency.refPoint
                                 )
-                            foreignAxis2 = dep.foreignDependency.refPoint.sub(
-                                dep.foreignDependency.refAxisEnd
-                                )
-                            angle1 = abs(foreignAxis1.getAngle(rigAxis))
-                            angle2 = abs(foreignAxis2.getAngle(rigAxis))
+                            angle1 = abs(foreignAxis.getAngle(rigAxis))
+                            angle2 = math.pi-angle1
                             #
                             if angle1<=angle2:
-                                axis = rigAxis.cross(foreignAxis1)
-                                foreignAxis = foreignAxis1
+                                axis = rigAxis.cross(foreignAxis)
                             else:
-                                axis = rigAxis.cross(foreignAxis2)
-                                foreignAxis = foreignAxis2
+                                foreignAxis.multiply(-1.0)
+                                axis = rigAxis.cross(foreignAxis)
                             try:
                                 axis.normalize()
                                 angle = foreignAxis.getAngle(rigAxis)
@@ -596,6 +592,8 @@ class SolverSystem():
                                 if axisErr > rig.maxAxisError : rig.maxAxisError = axisErr
                             except:
                                 pass
+                            
+                            
                 
     def moveRigids(self,doc):
         for rig in self.rigids:
@@ -679,7 +677,7 @@ class SolverSystem():
                 self.solutionToParts(doc)
                 self.level_of_accuracy+=1
                 if self.level_of_accuracy == 4:
-                    
+                    #self.solutionToParts(doc)
                     break
             else:
                 FreeCAD.Console.PrintMessage( "===== Could not solve system ====== \n" )
