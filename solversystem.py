@@ -44,9 +44,9 @@ from a2plib import (
 
 
 SOLVER_STEPS_BEFORE_ACCURACYCHECK = 100
-SOLVER_MAXSTEPS = 60000
-SOLVER_POS_ACCURACY = 1.0e-2 #Need to implement variable stepwith calculation to improve this..
-SOLVER_SPIN_ACCURACY = 1.0e-2 #Sorry for that at moment...
+SOLVER_MAXSTEPS = 150000
+SOLVER_POS_ACCURACY = 1.0e-1 #Need to implement variable stepwith calculation to improve this..
+SOLVER_SPIN_ACCURACY = 1.0e-1 #Sorry for that at moment...
 
 
 #------------------------------------------------------------------------------
@@ -62,6 +62,8 @@ class SolverSystem():
         self.rigids = []        # list of rigid bodies
         self.constraints = []
         self.objectNames = []
+        self.mySOLVER_SPIN_ACCURACY = SOLVER_SPIN_ACCURACY
+        self.mySOLVER_POS_ACCURACY = SOLVER_POS_ACCURACY
         
     def clear(self):
         for r in self.rigids:
@@ -99,6 +101,7 @@ class SolverSystem():
                 fx = False
             rig = Rigid(
                 o,
+                ob1.Label,
                 fx,
                 ob1.Placement
                 )
@@ -108,566 +111,288 @@ class SolverSystem():
         #link constraints to rigids
         for c in self.constraints:
             rig1 = self.getRigid(c.Object1)
-            dep1 = Dependency()
-            dep1.Type = c.Type
-            try:
-                dep1.direction = c.directionConstraint
-            except:
-                pass # not all constraints do have direction-Property
-            try:
-                dep1.offset = c.offset 
-            except:
-                pass # not all constraints do have offset-Property
-            try:
-                dep1.angle = c.angle 
-            except:
-                pass # not all constraints do have angle-Property
-            
             rig2 = self.getRigid(c.Object2)
-            dep2 = Dependency()
-            dep2.Type = c.Type
-            try:
-                dep2.direction = c.directionConstraint
-            except:
-                pass # not all constraints do have direction-Property
-            try:
-                dep2.offset = c.offset 
-            except:
-                pass # not all constraints do have offset-Property
-            try:
-                dep2.angle = c.angle 
-            except:
-                pass # not all constraints do have angle-Property
+            dep1 = Dependency(c)
+            dep2 = Dependency(c)
 
-            if c.Type == "pointIdentity":
-                dep1.refType = "point"
-                dep2.refType = "point"
-                ob1 = doc.getObject(c.Object1)
-                ob2 = doc.getObject(c.Object2)
-                
-                vert1 = getObjectVertexFromName(ob1, c.SubElement1)
-                vert2 = getObjectVertexFromName(ob2, c.SubElement2)
-                dep1.refPoint = vert1.Point
-                dep2.refPoint = vert2.Point
-                
-                axis1 = None
-                axis2 = None
-                dep1.refAxisEnd = None
-                dep2.refAxisEnd = None
-                #
-                dep1.foreignDependency = dep2
-                dep2.foreignDependency = dep1
-                rig1.dependencies.append(dep1)
-                rig2.dependencies.append(dep2)
-                
-            if c.Type == "sphereCenterIdent":
-                dep1.refType = "point"
-                dep2.refType = "point"
-                ob1 = doc.getObject(c.Object1)
-                ob2 = doc.getObject(c.Object2)
-                
-                
-                vert1 = getPos(ob1, c.SubElement1)
-                vert2 = getPos(ob2, c.SubElement2)
-                dep1.refPoint = vert1
-                dep2.refPoint = vert2
-                
-                axis1 = None
-                axis2 = None
-                dep1.refAxisEnd = None
-                dep2.refAxisEnd = None
-                #
-                dep1.foreignDependency = dep2
-                dep2.foreignDependency = dep1
-                rig1.dependencies.append(dep1)
-                rig2.dependencies.append(dep2)
-                
-            if c.Type == "pointOnLine":
-                dep1.refType = "point"
-                dep2.refType = "pointAxis"
-                ob1 = doc.getObject(c.Object1)
-                ob2 = doc.getObject(c.Object2)
-                
-                vert1 = getObjectVertexFromName(ob1, c.SubElement1)
-                line2 = getObjectEdgeFromName(ob2, c.SubElement2)
-                dep1.refPoint = vert1.Point
-                dep2.refPoint = getPos(ob2,c.SubElement2)
-                
-                axis1 = None
-                axis2 = getAxis(ob2, c.SubElement2)
-                dep1.refAxisEnd = None
-                dep2.refAxisEnd = dep2.refPoint.add(axis2)
-                #
-                dep1.foreignDependency = dep2
-                dep2.foreignDependency = dep1
-                rig1.dependencies.append(dep1)
-                rig2.dependencies.append(dep2)
-                
-            if c.Type == "pointOnPlane":
-                dep1.refType = "point"
-                dep2.refType = "plane"
-                ob1 = doc.getObject(c.Object1)
-                ob2 = doc.getObject(c.Object2)
-                
-                vert1 = getObjectVertexFromName(ob1, c.SubElement1)
-                plane2 = getObjectFaceFromName(ob2, c.SubElement2)
-                dep1.refPoint = vert1.Point
-                dep2.refPoint = plane2.Faces[0].BoundBox.Center
-                
-                axis1 = None
-                normal2 = plane2.Surface.Axis
-                dep1.refAxisEnd = None
-                dep2.refAxisEnd = dep2.refPoint.add(normal2)
-                #
-                dep1.foreignDependency = dep2
-                dep2.foreignDependency = dep1
-                rig1.dependencies.append(dep1)
-                rig2.dependencies.append(dep2)
-                
-            if c.Type == "circularEdge":
-                dep1.refType = "pointAxis"
-                dep2.refType = "pointAxis"
-                ob1 = doc.getObject(c.Object1)
-                ob2 = doc.getObject(c.Object2)
-                circleEdge1 = getObjectEdgeFromName(ob1, c.SubElement1)
-                circleEdge2 = getObjectEdgeFromName(ob2, c.SubElement2)
-                dep1.refPoint = circleEdge1.Curve.Center
-                dep2.refPoint = circleEdge2.Curve.Center
-                axis1 = circleEdge1.Curve.Axis
-                axis2 = circleEdge2.Curve.Axis
-                if dep2.direction == "opposed":
-                    axis2.multiply(-1.0)
-                dep1.refAxisEnd = dep1.refPoint.add(axis1)
-                dep2.refAxisEnd = dep2.refPoint.add(axis2)
-                #
-                if abs(dep2.offset) > 1e-6:
-                    offsetAdjustVec = Base.Vector(axis2.x,axis2.y,axis2.z)
-                    offsetAdjustVec.multiply(dep2.offset)
-                    dep2.refPoint = dep2.refPoint.add(offsetAdjustVec)
-                    dep2.refAxisEnd = dep2.refAxisEnd.add(offsetAdjustVec)
-                #
-                dep1.foreignDependency = dep2
-                dep2.foreignDependency = dep1
-                rig1.dependencies.append(dep1)
-                rig2.dependencies.append(dep2)
-                
-            if c.Type == "planesParallel":
-                dep1.refType = "pointNormal"
-                dep2.refType = "pointNormal"
-                ob1 = doc.getObject(c.Object1)
-                ob2 = doc.getObject(c.Object2)
-                plane1 = getObjectFaceFromName(ob1, c.SubElement1)
-                plane2 = getObjectFaceFromName(ob2, c.SubElement2)
-                dep1.refPoint = plane1.Faces[0].BoundBox.Center
-                dep2.refPoint = plane2.Faces[0].BoundBox.Center
-                normal1 = plane1.Surface.Axis
-                normal2 = plane2.Surface.Axis
-                if dep2.direction == "opposed":
-                    normal2.multiply(-1.0)
-                dep1.refAxisEnd = dep1.refPoint.add(normal1)
-                dep2.refAxisEnd = dep2.refPoint.add(normal2)
-                #
-                dep1.foreignDependency = dep2
-                dep2.foreignDependency = dep1
-                rig1.dependencies.append(dep1)
-                rig2.dependencies.append(dep2)
-                
-            if c.Type == "angledPlanes":
-                dep1.refType = "pointNormal"
-                dep2.refType = "pointNormal"
-                ob1 = doc.getObject(c.Object1)
-                ob2 = doc.getObject(c.Object2)
-                plane1 = getObjectFaceFromName(ob1, c.SubElement1)
-                plane2 = getObjectFaceFromName(ob2, c.SubElement2)
-                dep1.refPoint = plane1.Faces[0].BoundBox.Center
-                dep2.refPoint = plane2.Faces[0].BoundBox.Center
-                normal1 = plane1.Surface.Axis
-                normal2 = plane2.Surface.Axis
-                dep1.refAxisEnd = dep1.refPoint.add(normal1)
-                dep2.refAxisEnd = dep2.refPoint.add(normal2)
-                #
-                dep1.foreignDependency = dep2
-                dep2.foreignDependency = dep1
-                rig1.dependencies.append(dep1)
-                rig2.dependencies.append(dep2)
-                
-            if c.Type == "plane":
-                dep1.refType = "pointNormal"
-                dep2.refType = "pointNormal"
-                ob1 = doc.getObject(c.Object1)
-                ob2 = doc.getObject(c.Object2)
-                plane1 = getObjectFaceFromName(ob1, c.SubElement1)
-                plane2 = getObjectFaceFromName(ob2, c.SubElement2)
-                dep1.refPoint = plane1.Faces[0].BoundBox.Center
-                dep2.refPoint = plane2.Faces[0].BoundBox.Center
-                normal1 = plane1.Surface.Axis
-                normal2 = plane2.Surface.Axis
-                if dep2.direction == "opposed":
-                    normal2.multiply(-1.0)
-                dep1.refAxisEnd = dep1.refPoint.add(normal1)
-                dep2.refAxisEnd = dep2.refPoint.add(normal2)
-                #
-                if abs(dep2.offset) > 1e-6:
-                    offsetAdjustVec = Base.Vector(normal2.x,normal2.y,normal2.z)
-                    offsetAdjustVec.multiply(dep2.offset)
-                    dep2.refPoint = dep2.refPoint.add(offsetAdjustVec)
-                    dep2.refAxisEnd = dep2.refAxisEnd.add(offsetAdjustVec)
-                #
-                dep1.foreignDependency = dep2
-                dep2.foreignDependency = dep1
-                rig1.dependencies.append(dep1)
-                rig2.dependencies.append(dep2)
-                
-            if c.Type == "axial":
-                dep1.refType = "pointAxis"
-                dep2.refType = "pointAxis"
-                ob1 = doc.getObject(c.Object1)
-                ob2 = doc.getObject(c.Object2)
-                dep1.refPoint = getPos(ob1,c.SubElement1)
-                dep2.refPoint = getPos(ob2,c.SubElement2)
-                axis1 = getAxis(ob1, c.SubElement1)
-                axis2 = getAxis(ob2, c.SubElement2)
-                if dep2.direction == "opposed":
-                    axis2.multiply(-1.0)
-                dep1.refAxisEnd = dep1.refPoint.add(axis1)
-                dep2.refAxisEnd = dep2.refPoint.add(axis2)
-                dep1.foreignDependency = dep2
-                dep2.foreignDependency = dep1
-                rig1.dependencies.append(dep1)
-                rig2.dependencies.append(dep2)
-                
-                
-                
+            rig1.linkedRigids.append(rig2);
+            rig2.linkedRigids.append(rig1);
+            dep1.currentRigid = rig1
+            dep2.currentRigid = rig2
+            dep1.dependedRigid = rig2
+            dep2.dependedRigid = rig1
+            
+            dep1.foreignDependency = dep2
+            dep2.foreignDependency = dep1
+            rig1.dependencies.append(dep1)
+            rig2.dependencies.append(dep2)
+            
+            dep1.initData(doc, self)
+            dep2.initData(doc, self)
+            FreeCAD.Console.PrintMessage("Load connecting between {} and {}\n".format(rig1.label, rig2.label))
+
+
+    # TODO: maybe instead of traversing from the root every time, save a list of objects on current distance
+    # and use them to propagate next distance to their children
+    def assignParentship(self, doc):
+        # Start from fixed parts
+        for rig in self.rigids:
+            if rig.fixed:
+                rig.disatanceFromFixed = 0
+                haveMore = True
+                distance = 0
+                while haveMore:
+                    haveMore = rig.assignParentship(distance)
+                    distance += 1
+
+        FreeCAD.Console.PrintMessage(20*"=" + "\n")
+        FreeCAD.Console.PrintMessage("Hierarchy:\n")
+        FreeCAD.Console.PrintMessage(20*"=" + "\n")
+        for rig in self.rigids:
+            if rig.fixed: rig.printHierarchy(0)
+        FreeCAD.Console.PrintMessage(20*"=" + "\n")
+
     def calcMoveData(self,doc):
         for rig in self.rigids:
-            if rig.fixed: continue
-            depRefPoints = [] 
-            depMoveVectors = [] #collect Data to compute central movement of rigid
-            #
-            rig.maxPosError = 0.0
-            for dep in rig.dependencies:
-                
-                if dep.Type == "pointIdentity" or dep.Type == "sphereCenterIdent":
-                    depRefPoints.append(dep.refPoint)
-                    dep.moveVector = dep.foreignDependency.refPoint.sub(dep.refPoint)
-                    depMoveVectors.append(dep.moveVector)
-                    
-                if dep.Type == "pointOnLine":
-                    # two possibilities, dep.refType can be a point or be a line
-                    if dep.refType == "point":
-                        depRefPoints.append(dep.refPoint)
-                        vec1 = dep.foreignDependency.refPoint.sub(dep.refPoint)
-                        axis1 = dep.foreignDependency.refAxisEnd.sub(dep.foreignDependency.refPoint)
-                        dot = vec1.dot(axis1)
-                        axis1.multiply(dot) #projection of vec1 on axis1
-                        dep.moveVector = vec1.sub(axis1)
-                        depMoveVectors.append(dep.moveVector)
-                    if dep.refType == "pointAxis":
-                        #depRefPoints.append(dep.refPoint) #is done in special way below
-                        vec1 = dep.foreignDependency.refPoint.sub(dep.refPoint)
-                        axis1 = dep.refAxisEnd.sub(dep.refPoint)
-                        dot = vec1.dot(axis1)
-                        axis1.multiply(dot) #projection of vec1 on axis1
-                        verticalRefOnLine = dep.refPoint.add(axis1)
-                        dep.moveVector = vec1.sub(axis1)
-                        depMoveVectors.append(dep.moveVector)
-                        depRefPoints.append(verticalRefOnLine) #makes spinning around possible
-                        
-                    
-                if dep.Type == "pointOnPlane":
-                    # two possibilities, dep.refType can be a point or be a plane
-                    if dep.refType == "point":
-                        depRefPoints.append(dep.refPoint)
-                        vec1 = dep.foreignDependency.refPoint.sub(dep.refPoint)
-                        # Now move along foreign axis
-                        normal1 = dep.foreignDependency.refAxisEnd.sub(dep.foreignDependency.refPoint)
-                        dot = vec1.dot(normal1)
-                        normal1.multiply(dot)
-                        dep.moveVector = normal1
-                        depMoveVectors.append(dep.moveVector)
-                    if dep.refType == "plane":
-                        #depRefPoints.append(dep.refPoint) #is done in special way below
-                        vec1 = dep.foreignDependency.refPoint.sub(dep.refPoint)
-                        normal1 = dep.refAxisEnd.sub(dep.refPoint) # move along own axis
-                        dot = vec1.dot(normal1)
-                        normal1.multiply(dot)
-                        dep.moveVector = normal1
-                        depMoveVectors.append(dep.moveVector)
-                        verticalRefPointOnPlane = vec1.sub(dep.moveVector)                    
-                        depRefPoints.append(verticalRefPointOnPlane) #makes spinning around possible
-                    
-                if dep.Type == "circularEdge":
-                    depRefPoints.append(dep.refPoint)
-                    dep.moveVector = dep.foreignDependency.refPoint.sub(dep.refPoint)
-                    depMoveVectors.append(dep.moveVector)
+            rig.calcMoveData(doc, self)
 
-                if dep.Type == "planesParallel":
-                    depRefPoints.append(dep.refPoint)
-                    depMoveVectors.append(Base.Vector(0,0,0))
-
-                if dep.Type == "angledPlanes":
-                    depRefPoints.append(dep.refPoint)
-                    depMoveVectors.append(Base.Vector(0,0,0))
-
-                if dep.Type == "plane":
-                    depRefPoints.append(dep.refPoint)
-                    vec1 = dep.foreignDependency.refPoint.sub(dep.refPoint)
-                    # move along foreign axis...
-                    normal1 = dep.foreignDependency.refAxisEnd.sub(dep.foreignDependency.refPoint)
-                    dot = vec1.dot(normal1)
-                    normal1.multiply(dot)
-                    dep.moveVector = normal1
-                    depMoveVectors.append(dep.moveVector)
-
-                if dep.Type == "axial":
-                    depRefPoints.append(dep.refPoint)
-                    vec1 = dep.foreignDependency.refPoint.sub(dep.refPoint)
-                    destinationAxis = dep.foreignDependency.refAxisEnd.sub(dep.foreignDependency.refPoint)
-                    dot = vec1.dot(destinationAxis)
-                    parallelToAxisVec = destinationAxis.normalize().multiply(dot)
-                    dep.moveVector = vec1.sub(parallelToAxisVec)
-                    depMoveVectors.append(dep.moveVector)
-
-            #
-            #compute rigid.moveVectorSum
-            rig.maxPosError = 0.0
-            if ( len(depMoveVectors) > 0 ):
-                vec = Base.Vector(0,0,0)
-                for mv in depMoveVectors:
-                    mvl = mv.Length
-                    if mvl > rig.maxPosError: rig.maxPosError = mvl
-                    vec = vec.add(mv)
-                vec.multiply(1.0/len(depMoveVectors)) #the average of all movings
-                rig.moveVectorSum = vec
-            else:
-                rig.moveVectorSum = Base.Vector(0,0,0)
-            #
-            #compute rotation caused by refPoint-attractions and axes mismatch
-            if (
-                len(depMoveVectors) > 0 and
-                rig.spinCenter != None
-                ):
-                rig.spin = Base.Vector(0,0,0)
-                for i in range(0,len(depRefPoints)):
-                    vec1 = depRefPoints[i].sub(rig.spinCenter) # 'aka Radius'
-                    vec2 = depMoveVectors[i].sub(rig.moveVectorSum) # 'aka Force'
-                    axis = vec1.cross(vec2) #torque-vector
-                    rig.spin = rig.spin.add(axis)
-                    
-                #adjust axis' of the dependencies //FIXME (align,opposed,none)
-                rig.maxAxisError = 0.0
-                for dep in rig.dependencies:
-
-                    if (
-                        dep.Type == "angledPlanes"
-                        ):
-                        rigAxis = dep.refAxisEnd.sub(dep.refPoint)
-                        foreignAxis = dep.foreignDependency.refAxisEnd.sub(
-                            dep.foreignDependency.refPoint
-                            )
-                        recentAngle = foreignAxis.getAngle(rigAxis) / 2.0/ math.pi *360
-                        deltaAngle = abs(dep.angle.Value) - recentAngle
-                        if abs(deltaAngle) < 1e-6:
-                            # do not change spin, not necessary..
-                            pass
-                        else:
-                            try: 
-                                axis = rigAxis.cross(foreignAxis)
-                                axis.normalize()
-                                axis.multiply(-deltaAngle*57.296)
-                                rig.spin = rig.spin.add(axis)
-                                axisErr = rig.spin.Length
-                                if axisErr > rig.maxAxisError : rig.maxAxisError = axisErr
-                            except: #axis = Vector(0,0,0) and cannot be normalized...
-                                x = random.uniform(-1e-3,1e-3)
-                                y = random.uniform(-1e-3,1e-3)
-                                z = random.uniform(-1e-3,1e-3)
-                                rig.spin = rig.spin.add(Base.Vector(x,y,z))
-
-                    if (
-                        dep.Type == "circularEdge" or
-                        dep.Type == "plane" or
-                        dep.Type == "planesParallel" or
-                        dep.Type == "axial"
-                        ):
-                        if dep.direction != "none":
-                            rigAxis = dep.refAxisEnd.sub(dep.refPoint)
-                            foreignAxis = dep.foreignDependency.refAxisEnd.sub(
-                                dep.foreignDependency.refPoint
-                                )
-                            #
-                            #do we have wrong alignment of axes ??
-                            dot = rigAxis.dot(foreignAxis)
-                            if abs(dot+1.0) < 1e-3: #both axes nearly aligned but false orientation...
-                                x = random.uniform(-1e-3,1e-3)
-                                y = random.uniform(-1e-3,1e-3)
-                                z = random.uniform(-1e-3,1e-3)
-                                disturbVector = Base.Vector(x,y,z)
-                                foreignAxis = foreignAxis.add(disturbVector)
-                                
-                            #axis = foreignAxis.cross(rigAxis)
-                            axis = rigAxis.cross(foreignAxis)
-                            try:
-                                axis.normalize()
-                                angle = foreignAxis.getAngle(rigAxis)
-                                axis.multiply(math.degrees(angle)*6)
-                                rig.spin = rig.spin.add(axis)
-                                axisErr = rig.spin.Length
-                                if axisErr > rig.maxAxisError : rig.maxAxisError = axisErr
-                            except:
-                                pass
-                            
-                        else: #if dep.direction... (== none)
-                            rigAxis = dep.refAxisEnd.sub(dep.refPoint)
-                            foreignAxis1 = dep.foreignDependency.refAxisEnd.sub(
-                                dep.foreignDependency.refPoint
-                                )
-                            foreignAxis2 = dep.foreignDependency.refPoint.sub(
-                                dep.foreignDependency.refAxisEnd
-                                )
-                            angle1 = abs(foreignAxis1.getAngle(rigAxis))
-                            angle2 = abs(foreignAxis2.getAngle(rigAxis))
-                            #
-                            if angle1<=angle2:
-                                axis = rigAxis.cross(foreignAxis1)
-                                foreignAxis = foreignAxis1
-                            else:
-                                axis = rigAxis.cross(foreignAxis2)
-                                foreignAxis = foreignAxis2
-                            try:
-                                axis.normalize()
-                                angle = foreignAxis.getAngle(rigAxis)
-                                axis.multiply(math.degrees(angle)*6)
-                                rig.spin = rig.spin.add(axis)
-                                axisErr = rig.spin.Length
-                                if axisErr > rig.maxAxisError : rig.maxAxisError = axisErr
-                            except:
-                                pass
-                
-    def moveRigids(self,doc):
-        for rig in self.rigids:
-            if rig.fixed: continue
-            #
-            #Linear moving of a rigid
-            if rig.moveVectorSum != None:
-                mov = rig.moveVectorSum
-                #mov.multiply(1.0) # stabilize computation, adjust if needed...
-                if mov.Length > 1e-8:
-                    pl = FreeCAD.Placement()
-                    pl.move(mov)
-                    rig.applyPlacementStep(pl)
-            #    
-            #Rotate the rigid...
-            if (
-                rig.spin != None and
-                rig.spin.Length != 0.0
-                ):
-                
-                spinAngle = rig.spin.Length
-                if spinAngle>15.0: spinAngle=15.0 # do not accept more degrees
-                if spinAngle>1e-6:
-                    try:
-                        spinStep = spinAngle/250.0
-                        rig.spin.normalize()
-                        mov = Base.Vector(0,0,0) # no further moving
-                        rot = FreeCAD.Rotation(rig.spin,spinStep)
-                        cent = rig.spinCenter
-                        pl = FreeCAD.Placement(mov,rot,cent)
-                        rig.applyPlacementStep(pl)
-                    except:
-                        pass
-                
-    def getAccuracy(self,doc):  
-        '''returns maxPosError and maxSpinError of worst rigid'''
-        self.calcMoveData(doc) 
-        maxPosError = 0.0
-        maxSpinError = 0.0
-        for rig in self.rigids:
-            if rig.maxAxisError > maxSpinError:
-                maxSpinError = rig.maxAxisError
-            if rig.maxPosError > maxPosError:
-                maxPosError = rig.maxPosError
-        return maxPosError, maxSpinError
-                
     def solveSystem(self,doc):
-        self.loadSystem(doc)
-        self.stepCount = 0
-        systemSolved = False
+        self.level_of_accuracy=1
+        FreeCAD.Console.PrintMessage( "\n===== Start Solving System ====== \n" )
         while True:
-            for i in range(0,SOLVER_STEPS_BEFORE_ACCURACYCHECK):
-                self.doSolverStep(doc)
-            self.stepCount += SOLVER_STEPS_BEFORE_ACCURACYCHECK
-            poserror, spinerror = self.getAccuracy(doc)
-            if (
-                poserror <= SOLVER_POS_ACCURACY and
-                spinerror <= SOLVER_SPIN_ACCURACY
-                ): 
-                systemSolved = True
-                break
-            if (self.stepCount >= SOLVER_MAXSTEPS):
-                break
-        FreeCAD.Console.PrintMessage( "Max positionerror: %f\n" %  poserror )
-        FreeCAD.Console.PrintMessage( "Max spinerror: %f\n" %  spinerror )
-        FreeCAD.Console.PrintMessage( "Total steps used: %d\n" %  self.stepCount )
+            startTime = int(round(time.time() * 1000))
+            self.loadSystem(doc)
+            self.assignParentship(doc)
+            loadTime = int(round(time.time() * 1000))
 
-        if systemSolved:
-            self.solutionToParts(doc)
-            FreeCAD.Console.PrintMessage( "===== System solved ! ====== \n" )
-        else:
-            FreeCAD.Console.PrintMessage( "===== Could not solve system ====== \n" )
-            
-            msg = \
-'''
-Constraints inconsistent. Cannot solve System. 
-Please delete your last created constraint !
-'''
-            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Constraint mismatch", msg )
-            
-        
+            systemSolved = self.calculateChain(doc)
+    
+            totalTime = int(round(time.time() * 1000))
+            #FreeCAD.Console.PrintMessage( "Position Accuracy: %f\n" %  self.mySOLVER_POS_ACCURACY )
+            #FreeCAD.Console.PrintMessage( "Max positionerror: %f\n" %  poserror )
+            #FreeCAD.Console.PrintMessage( "Spin Accuracy: %f\n" %  self.mySOLVER_SPIN_ACCURACY )
+            #FreeCAD.Console.PrintMessage( "Max spinerror: %f\n" %  spinerror )
+            FreeCAD.Console.PrintMessage( "Total steps used: %d\n" %  self.stepCount)
+            FreeCAD.Console.PrintMessage( "LoadTime (ms): %d\n" % (loadTime - startTime) )
+            FreeCAD.Console.PrintMessage( "CalcTime (ms): %d\n" % (totalTime - loadTime) )
+            FreeCAD.Console.PrintMessage( "TotalTime (ms): %d\n" % (totalTime - startTime) )
+            if systemSolved:
+                FreeCAD.Console.PrintMessage( "===== System solved ! ====== \n" )
+                break
+                self.mySOLVER_SPIN_ACCURACY *= 1e-1
+                self.mySOLVER_POS_ACCURACY *= 1e-1
+                self.solutionToParts(doc)
+                self.level_of_accuracy+=1
+                if self.level_of_accuracy == 4:
+                    break
+            else:
+                FreeCAD.Console.PrintMessage( "===== Could not solve system ====== \n" )
+                
+                msg = \
+    '''
+    Constraints inconsistent. Cannot solve System. 
+    Please delete your last created constraint !
+    '''
+                QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Constraint mismatch", msg )
+                break
+        self.mySOLVER_SPIN_ACCURACY = SOLVER_SPIN_ACCURACY
+        self.mySOLVER_POS_ACCURACY = SOLVER_POS_ACCURACY
+
+    def printList(self, name, l):
+        FreeCAD.Console.PrintMessage("{} = (".format(name))
+        for e in l:
+            FreeCAD.Console.PrintMessage( "{} ".format(e.label) )
+        FreeCAD.Console.PrintMessage("):\n")
+
+    def calculateChain(self, doc):
+        self.stepCount = 0
+        rigCalcCount = 0
+        haveMore = True
+        workList = []
+
+        # start from fixed rigids and its children
+        #for rig in self.rigids:
+        #    if rig.fixed:
+        #        workList.append(rig);
+        #        rig.getCandidates(workList)
+        workList.extend(self.rigids)
+
+        while haveMore:
+            solutionFound = self.calculateWorkList(doc, workList)
+            if not solutionFound: return False
+
+            addList = []
+            for rig in workList:
+                rig.getCandidates(addList)
+            addList = list(set(addList))
+            workList.extend(addList);
+            haveMore = (len(addList) > 0)
+            self.printList("AddList", addList)
+
+
+        return True
+
+    def calculateWorkList(self, doc, workList):
+        self.printList("WorkList", workList)
+
+        for rig in workList:
+            rig.initDependencies(doc, self, workList)
+
+        calcCount = 0
+        goodAccuracy = False
+        while not goodAccuracy:
+            maxPosError = 0.0
+            maxAxisError = 0.0
+
+            calcCount += 1
+            self.stepCount += 1
+            for w in workList:
+                w.calcMoveData(doc, self)
+                w.move(doc)
+
+                if w.maxPosError > maxPosError:
+                    maxPosError = w.maxPosError
+                if w.maxAxisError > maxAxisError:
+                    maxAxisError = w.maxAxisError
+
+            if (maxPosError <= self.mySOLVER_POS_ACCURACY and
+                maxAxisError <= self.mySOLVER_SPIN_ACCURACY):
+                # The accuracy is good, we're done here
+                goodAccuracy = True
+                # Mark the rigids as tempfixed and add its constrained rigids to pending list to be processed next
+                FreeCAD.Console.PrintMessage( "{} counts \n".format(calcCount) )
+                for r in workList:
+                    r.applySolution(doc, self)
+                    r.tempfixed = True
+
+            if self.stepCount > SOLVER_MAXSTEPS:
+                FreeCAD.Console.PrintMessage( "Reached max calculations count ({})\n".format(SOLVER_MAXSTEPS) )
+                return False
+        return True
+
     def solutionToParts(self,doc):
         for rig in self.rigids:
-            if rig.fixed: continue
-            
-            # Update FreeCAD's placements if deltaPlacement above Tolerances
-            base1 = rig.placement.Base
-            base2 = rig.savedPlacement.Base
-            absPosMove = base1.sub(base2).Length
-            
-            axis1 = rig.placement.Rotation.Axis
-            axis2 = rig.savedPlacement.Rotation.Axis
-            angle = math.degrees(axis2.getAngle(axis1))
-            
-            if absPosMove >= 1e-4 or angle >= 1e-3:
-                ob1 = doc.getObject(rig.objectName)
-                ob1.Placement = rig.placement
-        
-    def doSolverStep(self,doc):
-        self.calcMoveData(doc)
-        self.moveRigids(doc)
-        
+            rig.applySolution(doc, self);
+
 #------------------------------------------------------------------------------
 class Rigid():
     ''' All data necessary for one rigid body'''
     def __init__(self,
-                 name,
-                 fixed,
-                 placement
-                 ):
+                name,
+                label,
+                fixed,
+                placement
+                ):
         self.objectName = name
+        self.label = label
         self.fixed = fixed
+        self.tempfixed = fixed
         self.placement = placement
         self.savedPlacement = placement
         self.dependencies = []
+        self.linkedRigids = []
+        self.parentRigids = []
+        self.childRigids = []
+        self.disatanceFromFixed = None
         self.spinCenter = None
         self.spin = None
         self.moveVectorSum = None
         self.maxPosError = 0.0
         self.maxAxisError = 0.0
-        
+
+    def initDependencies(self, doc, solver, workList):
+        for dep in self.dependencies:
+            # Already initialized
+            #TODO:if dep.Type is not None: continue
+            # Depended rigid is not int working list yet
+            #FreeCAD.Console.PrintMessage("Init dependency for {}, depended: {} ".format(self.label, dep.dependedRigid.label))
+            if dep.dependedRigid not in workList:
+                #FreeCAD.Console.PrintMessage("- not in working list\n")
+                continue
+            dep.initData(doc, solver)
+            dep.Enabled = True
+            dep.foreignDependency.initData(doc, solver)
+            dep.foreignDependency.Enabled = True
+            #FreeCAD.Console.PrintMessage("- enabled\n")
+
+    # The function only sets parentship for childrens that are distant+1 from fixed rigid
+    # The function should be called in a loop with increased distance until it return False
+    def assignParentship(self, distance):
+        #FreeCAD.Console.PrintMessage((self.disatanceFromFixed*3)*" ")
+        #FreeCAD.Console.PrintMessage("In {}:{}, distance {}\n".format(self.label, self.disatanceFromFixed, distance))
+        # Current rigid was already set, pass the call to childrens
+        if self.disatanceFromFixed < distance:
+            haveMore = False
+            for rig in self.childRigids:
+                #FreeCAD.Console.PrintMessage((self.disatanceFromFixed*3)*" ")
+                #FreeCAD.Console.PrintMessage("   passing to {}:{}, distance {}\n".format(rig.label, rig.disatanceFromFixed, distance))
+                if rig.assignParentship(distance):
+                    haveMore = True
+            return haveMore
+        elif self.disatanceFromFixed == distance:
+            while len(self.linkedRigids) > 0:
+                rig = self.linkedRigids[0]
+                # Got to a new rigid, set current as it's father
+                if rig.disatanceFromFixed is None:
+                    #FreeCAD.Console.PrintMessage((self.disatanceFromFixed*3)*" ")
+                    #FreeCAD.Console.PrintMessage("   setting {}:{} with distance {}\n".format(rig.label, rig.disatanceFromFixed, distance+1))
+                    rig.parentRigids.append(self)
+                    self.childRigids.append(rig)
+                    rig.linkedRigids.remove(self)
+                    self.linkedRigids.remove(rig)
+                    rig.disatanceFromFixed = distance+1
+                # That child was already assigned by another (and closer to fixed) father
+                # Leave only child relationship, but don't add current as a father
+                else:
+                    #FreeCAD.Console.PrintMessage((self.disatanceFromFixed*3)*" ")
+                    #FreeCAD.Console.PrintMessage("   the {}:{} was already set, ignore\n".format(rig.label, rig.disatanceFromFixed))
+                    self.childRigids.append(rig)
+                    rig.linkedRigids.remove(self)
+                    self.linkedRigids.remove(rig)
+
+            if len(self.childRigids) + len(self.linkedRigids) > 0: return True
+            else: return False
+#        else:
+#            FreeCAD.Console.PrintMessage("Should not happen: {}:{} got distance {}\n".format(self.label, self.disatanceFromFixed, distance))
+            
+
+    def printHierarchy(self, level):
+        FreeCAD.Console.PrintMessage((level*3)*" ")
+        FreeCAD.Console.PrintMessage("{} - distance {}\n".format(self.label, self.disatanceFromFixed))
+        for rig in self.childRigids:
+            rig.printHierarchy(level+1)
+
+    def getCandidates(self, addList):
+        for rig in self.childRigids:
+            if not rig.tempfixed and rig.isAllParentTempFixed(): 
+                addList.append(rig)
+
+    def addChildrenByDistance(self, addList, distance):
+        # Current rigid is the father of the needed distance, so it might have needed children
+        if self.disatanceFromFixed == distance-1:
+            # No children
+            if len(self.childRigids) == 0: return False
+            else:
+                # There are some childrens, add with the matching distance
+                for rig in self.childRigids:
+                    if rig.disatanceFromFixed == distance:
+                        addList.append(rig)
+        # That rigid have children for needed distance
+        else: return False
+
+    def isAllParentTempFixed(self):
+        for rig in self.parentRigids:
+            if not rig.tempfixed: 
+                return False
+        return True
+
     def applyPlacementStep(self,pl):
         self.placement = pl.multiply(self.placement)
         self.spinCenter = pl.multVec(self.spinCenter)
         for dep in self.dependencies:
+            if dep.Type is None or not dep.Enabled: 
+                FreeCAD.Console.PrintMessage("ApplyPlacement, Skipping dep {}-{}\n".format(dep.currentRigid.label, dep.dependedRigid.label))
+                continue
             if dep.refPoint != None:
                 dep.refPoint = pl.multVec(dep.refPoint)
             if dep.refAxisEnd != None:
@@ -677,10 +402,270 @@ class Rigid():
         for d in self.dependencies:
             d.clear()
         self.dependencies = []
+
+    def applySolution(self, doc, solver):
+        if self.tempfixed: return
+
+        # Update FreeCAD's placements if deltaPlacement above Tolerances
+        base1 = self.placement.Base
+        base2 = self.savedPlacement.Base
+        absPosMove = base1.sub(base2).Length
         
+        axis1 = self.placement.Rotation.Axis
+        axis2 = self.savedPlacement.Rotation.Axis
+        angle = math.degrees(axis2.getAngle(axis1))
+        
+        if absPosMove >= solver.mySOLVER_POS_ACCURACY*1e-2 or angle >= solver.mySOLVER_SPIN_ACCURACY*1e-1:
+            ob1 = doc.getObject(self.objectName)
+            ob1.Placement = self.placement
+        
+
+    def calcMoveData(self, doc, solver):
+        if self.tempfixed: return
+        depRefPoints = [] 
+        depMoveVectors = [] #collect Data to compute central movement of rigid
+        #
+        self.maxPosError = 0.0
+        for dep in self.dependencies:
+            if dep.Type is None or not dep.Enabled:
+                FreeCAD.Console.PrintMessage("CalcMoveData, Skipping dep {}-{}\n".format(dep.currentRigid.label, dep.dependedRigid.label))
+                continue
+
+            if dep.Type == "pointIdentity" or dep.Type == "sphereCenterIdent":
+                depRefPoints.append(dep.refPoint)
+                dep.moveVector = dep.foreignDependency.refPoint.sub(dep.refPoint)
+                depMoveVectors.append(dep.moveVector)
+                
+            if dep.Type == "pointOnLine":
+                # two possibilities, dep.refType can be a point or be a line
+                if dep.refType == "point":
+                    depRefPoints.append(dep.refPoint)
+                    vec1 = dep.foreignDependency.refPoint.sub(dep.refPoint)
+                    axis1 = dep.foreignDependency.refAxisEnd.sub(dep.foreignDependency.refPoint)
+                    dot = vec1.dot(axis1)
+                    axis1.multiply(dot) #projection of vec1 on axis1
+                    dep.moveVector = vec1.sub(axis1)
+                    depMoveVectors.append(dep.moveVector)
+                if dep.refType == "pointAxis":
+                    #depRefPoints.append(dep.refPoint) #is done in special way below
+                    vec1 = dep.foreignDependency.refPoint.sub(dep.refPoint)
+                    axis1 = dep.refAxisEnd.sub(dep.refPoint)
+                    dot = vec1.dot(axis1)
+                    axis1.multiply(dot) #projection of vec1 on axis1
+                    verticalRefOnLine = dep.refPoint.add(axis1)
+                    dep.moveVector = vec1.sub(axis1)
+                    depMoveVectors.append(dep.moveVector)
+                    depRefPoints.append(verticalRefOnLine) #makes spinning around possible
+                    
+                
+            if dep.Type == "pointOnPlane":
+                # two possibilities, dep.refType can be a point or be a plane
+                if dep.refType == "point":
+                    depRefPoints.append(dep.refPoint)
+                    vec1 = dep.foreignDependency.refPoint.sub(dep.refPoint)
+                    # Now move along foreign axis
+                    normal1 = dep.foreignDependency.refAxisEnd.sub(dep.foreignDependency.refPoint)
+                    dot = vec1.dot(normal1)
+                    normal1.multiply(dot)
+                    dep.moveVector = normal1
+                    depMoveVectors.append(dep.moveVector)
+                if dep.refType == "plane":
+                    #depRefPoints.append(dep.refPoint) #is done in special way below
+                    vec1 = dep.foreignDependency.refPoint.sub(dep.refPoint)
+                    normal1 = dep.refAxisEnd.sub(dep.refPoint) # move along own axis
+                    dot = vec1.dot(normal1)
+                    normal1.multiply(dot)
+                    dep.moveVector = normal1
+                    depMoveVectors.append(dep.moveVector)
+                    verticalRefPointOnPlane = vec1.sub(dep.moveVector)                    
+                    depRefPoints.append(verticalRefPointOnPlane) #makes spinning around possible
+                
+            if dep.Type == "circularEdge":
+                depRefPoints.append(dep.refPoint)
+                dep.moveVector = dep.foreignDependency.refPoint.sub(dep.refPoint)
+                depMoveVectors.append(dep.moveVector)
+
+            if dep.Type == "planesParallel":
+                depRefPoints.append(dep.refPoint)
+                depMoveVectors.append(Base.Vector(0,0,0))
+
+            if dep.Type == "angledPlanes":
+                depRefPoints.append(dep.refPoint)
+                depMoveVectors.append(Base.Vector(0,0,0))
+
+            if dep.Type == "plane":
+                depRefPoints.append(dep.refPoint)
+                vec1 = dep.foreignDependency.refPoint.sub(dep.refPoint)
+                # move along foreign axis...
+                normal1 = dep.foreignDependency.refAxisEnd.sub(dep.foreignDependency.refPoint)
+                dot = vec1.dot(normal1)
+                normal1.multiply(dot)
+                dep.moveVector = normal1
+                depMoveVectors.append(dep.moveVector)
+
+            if dep.Type == "axial":
+                depRefPoints.append(dep.refPoint)
+                vec1 = dep.foreignDependency.refPoint.sub(dep.refPoint)
+                destinationAxis = dep.foreignDependency.refAxisEnd.sub(dep.foreignDependency.refPoint)
+                dot = vec1.dot(destinationAxis)
+                parallelToAxisVec = destinationAxis.normalize().multiply(dot)
+                dep.moveVector = vec1.sub(parallelToAxisVec)
+                depMoveVectors.append(dep.moveVector)
+
+        #
+        #compute rigid.moveVectorSum
+        self.maxPosError = 0.0
+        if ( len(depMoveVectors) > 0 ):
+            vec = Base.Vector(0,0,0)
+            for mv in depMoveVectors:
+                mvl = mv.Length
+                if mvl > self.maxPosError: self.maxPosError = mvl
+                vec = vec.add(mv)
+            vec.multiply(1.0/len(depMoveVectors)) #the average of all movings
+            self.moveVectorSum = vec
+        else:
+            self.moveVectorSum = Base.Vector(0,0,0)
+        #
+        #compute rotation caused by refPoint-attractions and axes mismatch
+        if (
+            len(depMoveVectors) > 0 and
+            self.spinCenter != None
+            ):
+            self.spin = Base.Vector(0,0,0)
+            for i in range(0,len(depRefPoints)):
+                vec1 = depRefPoints[i].sub(self.spinCenter) # 'aka Radius'
+                vec2 = depMoveVectors[i].sub(self.moveVectorSum) # 'aka Force'
+                axis = vec1.cross(vec2) #torque-vector
+                self.spin = self.spin.add(axis)
+                
+            #adjust axis' of the dependencies //FIXME (align,opposed,none)
+            self.maxAxisError = 0.0
+            for dep in self.dependencies:
+                if dep.Type is None or not dep.Enabled:
+                    FreeCAD.Console.PrintMessage("CalcModeData2, Skipping dep {}-{}\n".format(dep.currentRigid.label, dep.dependedRigid.label))
+                    continue
+                if (
+                    dep.Type == "angledPlanes"
+                    ):
+                    rigAxis = dep.refAxisEnd.sub(dep.refPoint)
+                    foreignAxis = dep.foreignDependency.refAxisEnd.sub(
+                        dep.foreignDependency.refPoint
+                        )
+                    recentAngle = foreignAxis.getAngle(rigAxis) / 2.0/ math.pi *360
+                    deltaAngle = abs(dep.angle.Value) - recentAngle
+                    if abs(deltaAngle) < 1e-6:
+                        # do not change spin, not necessary..
+                        pass
+                    else:
+                        try: 
+                            axis = rigAxis.cross(foreignAxis)
+                            axis.normalize()
+                            axis.multiply(-deltaAngle*57.296)
+                            self.spin = self.spin.add(axis)
+                            axisErr = self.spin.Length
+                            if axisErr > self.maxAxisError : self.maxAxisError = axisErr
+                        except: #axis = Vector(0,0,0) and cannot be normalized...
+                            x = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
+                            y = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
+                            z = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
+                            self.spin = self.spin.add(Base.Vector(x,y,z))
+
+                if (
+                    dep.Type == "circularEdge" or
+                    dep.Type == "plane" or
+                    dep.Type == "planesParallel" or
+                    dep.Type == "axial"
+                    ):
+                    if dep.direction != "none":
+                        rigAxis = dep.refAxisEnd.sub(dep.refPoint)
+                        foreignAxis = dep.foreignDependency.refAxisEnd.sub(
+                            dep.foreignDependency.refPoint
+                            )
+                        #
+                        #do we have wrong alignment of axes ??
+                        dot = rigAxis.dot(foreignAxis)
+                        if abs(dot+1.0) < solver.mySOLVER_SPIN_ACCURACY*1e-1: #both axes nearly aligned but false orientation...
+                            x = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
+                            y = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
+                            z = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
+                            disturbVector = Base.Vector(x,y,z)
+                            foreignAxis = foreignAxis.add(disturbVector)
+                            
+                        #axis = foreignAxis.cross(rigAxis)
+                        axis = rigAxis.cross(foreignAxis)
+                        try:
+                            axis.normalize()
+                            angle = foreignAxis.getAngle(rigAxis)
+                            axis.multiply(math.degrees(angle)*6)
+                            self.spin = self.spin.add(axis)
+                            axisErr = self.spin.Length
+                            if axisErr > self.maxAxisError : self.maxAxisError = axisErr
+                        except:
+                            pass
+                        
+                    else: #if dep.direction... (== none)
+                        rigAxis = dep.refAxisEnd.sub(dep.refPoint)
+                        foreignAxis1 = dep.foreignDependency.refAxisEnd.sub(
+                            dep.foreignDependency.refPoint
+                            )
+                        foreignAxis2 = dep.foreignDependency.refPoint.sub(
+                            dep.foreignDependency.refAxisEnd
+                            )
+                        angle1 = abs(foreignAxis1.getAngle(rigAxis))
+                        angle2 = abs(foreignAxis2.getAngle(rigAxis))
+                        #
+                        if angle1<=angle2:
+                            axis = rigAxis.cross(foreignAxis1)
+                            foreignAxis = foreignAxis1
+                        else:
+                            axis = rigAxis.cross(foreignAxis2)
+                            foreignAxis = foreignAxis2
+                        try:
+                            axis.normalize()
+                            angle = foreignAxis.getAngle(rigAxis)
+                            axis.multiply(math.degrees(angle)*6)
+                            self.spin = self.spin.add(axis)
+                            axisErr = self.spin.Length
+                            if axisErr > self.maxAxisError : self.maxAxisError = axisErr
+                        except:
+                            pass
+
+    def move(self,doc):
+        if self.tempfixed: return
+        #
+        #Linear moving of a rigid
+        if self.moveVectorSum != None:
+            mov = self.moveVectorSum
+            #mov.multiply(1.0) # stabilize computation, adjust if needed...
+            if mov.Length > 1e-8:
+                pl = FreeCAD.Placement()
+                pl.move(mov)
+                self.applyPlacementStep(pl)
+        #    
+        #Rotate the rigid...
+        if (
+            self.spin != None and
+            self.spin.Length != 0.0
+            ):
+            
+            spinAngle = self.spin.Length
+            if spinAngle>15.0: spinAngle=15.0 # do not accept more degrees
+            if spinAngle> 1e-6:
+                try:
+                    spinStep = spinAngle/(125.0) #it was 250.0
+                    self.spin.normalize()
+                    mov = Base.Vector(0,0,0) # no further moving
+                    rot = FreeCAD.Rotation(self.spin,spinStep)
+                    cent = self.spinCenter
+                    pl = FreeCAD.Placement(mov,rot,cent)
+                    self.applyPlacementStep(pl)
+                except:
+                    pass
+
 #------------------------------------------------------------------------------
 class Dependency():
-    def __init__(self):
+    def __init__(self, constraint):
+        self.Enabled = False
         self.Type = None
         self.refType = None
         self.refPoint = None
@@ -691,6 +676,9 @@ class Dependency():
         self.foreignDependency = None
         self.rotationAxis = None
         self.moveVector = None
+        self.currentRigid = None
+        self.dependedRigid = None
+        self.constraint = constraint
         
     def clear(self):
         self.Type = None
@@ -703,7 +691,198 @@ class Dependency():
         self.foreignDependency = None
         self.rotationAxis = None
         self.moveVector = None
-        
+        self.currentRigid = None
+        self.dependedRigid = None
+        self.constraint = None
+    
+    def initData(self, doc, solver):
+        # Might be already initiated
+        if self.Type is not None: return
+
+        c = self.constraint
+        dep1 = self
+        dep2 = self.foreignDependency
+
+        dep1.Type = c.Type
+        try:
+            dep1.direction = c.directionConstraint
+        except:
+            pass # not all constraints do have direction-Property
+        try:
+            dep1.offset = c.offset 
+        except:
+            pass # not all constraints do have offset-Property
+        try:
+            dep1.angle = c.angle 
+        except:
+            pass # not all constraints do have angle-Property
+
+        dep2.Type = c.Type
+        try:
+            dep2.direction = c.directionConstraint
+        except:
+            pass # not all constraints do have direction-Property
+        try:
+            dep2.offset = c.offset 
+        except:
+            pass # not all constraints do have offset-Property
+        try:
+            dep2.angle = c.angle 
+        except:
+            pass # not all constraints do have angle-Property
+
+        if c.Type == "pointIdentity":
+            dep1.refType = "point"
+            dep2.refType = "point"
+            ob1 = doc.getObject(c.Object1)
+            ob2 = doc.getObject(c.Object2)
+            
+            vert1 = getObjectVertexFromName(ob1, c.SubElement1)
+            vert2 = getObjectVertexFromName(ob2, c.SubElement2)
+            dep1.refPoint = vert1.Point
+            dep2.refPoint = vert2.Point
+            
+            axis1 = None
+            axis2 = None
+            dep1.refAxisEnd = None
+            dep2.refAxisEnd = None
+            
+        if c.Type == "sphereCenterIdent":
+            dep1.refType = "point"
+            dep2.refType = "point"
+            ob1 = doc.getObject(c.Object1)
+            ob2 = doc.getObject(c.Object2)
+            
+            vert1 = getPos(ob1, c.SubElement1)
+            vert2 = getPos(ob2, c.SubElement2)
+            dep1.refPoint = vert1
+            dep2.refPoint = vert2
+            
+            axis1 = None
+            axis2 = None
+            dep1.refAxisEnd = None
+            dep2.refAxisEnd = None
+            
+        if c.Type == "pointOnLine":
+            dep1.refType = "point"
+            dep2.refType = "pointAxis"
+            ob1 = doc.getObject(c.Object1)
+            ob2 = doc.getObject(c.Object2)
+            
+            vert1 = getObjectVertexFromName(ob1, c.SubElement1)
+            line2 = getObjectEdgeFromName(ob2, c.SubElement2)
+            dep1.refPoint = vert1.Point
+            dep2.refPoint = getPos(ob2,c.SubElement2)
+            
+            axis1 = None
+            axis2 = getAxis(ob2, c.SubElement2)
+            dep1.refAxisEnd = None
+            dep2.refAxisEnd = dep2.refPoint.add(axis2)
+            
+        if c.Type == "pointOnPlane":
+            dep1.refType = "point"
+            dep2.refType = "plane"
+            ob1 = doc.getObject(c.Object1)
+            ob2 = doc.getObject(c.Object2)
+            
+            vert1 = getObjectVertexFromName(ob1, c.SubElement1)
+            plane2 = getObjectFaceFromName(ob2, c.SubElement2)
+            dep1.refPoint = vert1.Point
+            dep2.refPoint = plane2.Faces[0].BoundBox.Center
+            
+            axis1 = None
+            normal2 = plane2.Surface.Axis
+            dep1.refAxisEnd = None
+            dep2.refAxisEnd = dep2.refPoint.add(normal2)
+            
+        if c.Type == "circularEdge":
+            dep1.refType = "pointAxis"
+            dep2.refType = "pointAxis"
+            ob1 = doc.getObject(c.Object1)
+            ob2 = doc.getObject(c.Object2)
+            circleEdge1 = getObjectEdgeFromName(ob1, c.SubElement1)
+            circleEdge2 = getObjectEdgeFromName(ob2, c.SubElement2)
+            dep1.refPoint = circleEdge1.Curve.Center
+            dep2.refPoint = circleEdge2.Curve.Center
+            axis1 = circleEdge1.Curve.Axis
+            axis2 = circleEdge2.Curve.Axis
+            if dep2.direction == "opposed":
+                axis2.multiply(-1.0)
+            dep1.refAxisEnd = dep1.refPoint.add(axis1)
+            dep2.refAxisEnd = dep2.refPoint.add(axis2)
+            #
+            if abs(dep2.offset) > solver.mySOLVER_SPIN_ACCURACY * 1e-1:
+                offsetAdjustVec = Base.Vector(axis2.x,axis2.y,axis2.z)
+                offsetAdjustVec.multiply(dep2.offset)
+                dep2.refPoint = dep2.refPoint.add(offsetAdjustVec)
+                dep2.refAxisEnd = dep2.refAxisEnd.add(offsetAdjustVec)
+            
+        if c.Type == "planesParallel":
+            dep1.refType = "pointNormal"
+            dep2.refType = "pointNormal"
+            ob1 = doc.getObject(c.Object1)
+            ob2 = doc.getObject(c.Object2)
+            plane1 = getObjectFaceFromName(ob1, c.SubElement1)
+            plane2 = getObjectFaceFromName(ob2, c.SubElement2)
+            dep1.refPoint = plane1.Faces[0].BoundBox.Center
+            dep2.refPoint = plane2.Faces[0].BoundBox.Center
+            normal1 = plane1.Surface.Axis
+            normal2 = plane2.Surface.Axis
+            if dep2.direction == "opposed":
+                normal2.multiply(-1.0)
+            dep1.refAxisEnd = dep1.refPoint.add(normal1)
+            dep2.refAxisEnd = dep2.refPoint.add(normal2)
+            
+        if c.Type == "angledPlanes":
+            dep1.refType = "pointNormal"
+            dep2.refType = "pointNormal"
+            ob1 = doc.getObject(c.Object1)
+            ob2 = doc.getObject(c.Object2)
+            plane1 = getObjectFaceFromName(ob1, c.SubElement1)
+            plane2 = getObjectFaceFromName(ob2, c.SubElement2)
+            dep1.refPoint = plane1.Faces[0].BoundBox.Center
+            dep2.refPoint = plane2.Faces[0].BoundBox.Center
+            normal1 = plane1.Surface.Axis
+            normal2 = plane2.Surface.Axis
+            dep1.refAxisEnd = dep1.refPoint.add(normal1)
+            dep2.refAxisEnd = dep2.refPoint.add(normal2)
+            
+        if c.Type == "plane":
+            dep1.refType = "pointNormal"
+            dep2.refType = "pointNormal"
+            ob1 = doc.getObject(c.Object1)
+            ob2 = doc.getObject(c.Object2)
+            plane1 = getObjectFaceFromName(ob1, c.SubElement1)
+            plane2 = getObjectFaceFromName(ob2, c.SubElement2)
+            dep1.refPoint = plane1.Faces[0].BoundBox.Center
+            dep2.refPoint = plane2.Faces[0].BoundBox.Center
+            normal1 = plane1.Surface.Axis
+            normal2 = plane2.Surface.Axis
+            if dep2.direction == "opposed":
+                normal2.multiply(-1.0)
+            dep1.refAxisEnd = dep1.refPoint.add(normal1)
+            dep2.refAxisEnd = dep2.refPoint.add(normal2)
+            #
+            if abs(dep2.offset) > solver.mySOLVER_SPIN_ACCURACY * 1e-1:
+                offsetAdjustVec = Base.Vector(normal2.x,normal2.y,normal2.z)
+                offsetAdjustVec.multiply(dep2.offset)
+                dep2.refPoint = dep2.refPoint.add(offsetAdjustVec)
+                dep2.refAxisEnd = dep2.refAxisEnd.add(offsetAdjustVec)
+            
+        if c.Type == "axial":
+            dep1.refType = "pointAxis"
+            dep2.refType = "pointAxis"
+            ob1 = doc.getObject(c.Object1)
+            ob2 = doc.getObject(c.Object2)
+            dep1.refPoint = getPos(ob1,c.SubElement1)
+            dep2.refPoint = getPos(ob2,c.SubElement2)
+            axis1 = getAxis(ob1, c.SubElement1)
+            axis2 = getAxis(ob2, c.SubElement2)
+            if dep2.direction == "opposed":
+                axis2.multiply(-1.0)
+            dep1.refAxisEnd = dep1.refPoint.add(axis1)
+            dep2.refAxisEnd = dep2.refPoint.add(axis2)
+
 #------------------------------------------------------------------------------
         
         
@@ -736,6 +915,10 @@ FreeCADGui.addCommand('a2p_SolverCommand', a2p_SolverCommand())
 
 
 
+if __name__ == "__main__":
+    FreeCAD.Console.PrintMessage( "Starting...\n" )
+    doc = FreeCAD.activeDocument()
+    solveConstraints(doc)
 
 
 
