@@ -214,10 +214,10 @@ class SolverSystem():
             FreeCAD.Console.PrintMessage( "TotalTime (ms): %d\n" % (totalTime - startTime) )
             if systemSolved:
                 FreeCAD.Console.PrintMessage( "===== System solved ! ====== \n" )
-                break
+                #break
                 self.mySOLVER_SPIN_ACCURACY *= 1e-1
                 self.mySOLVER_POS_ACCURACY *= 1e-1
-                self.solutionToParts(doc)
+                #self.solutionToParts(doc)
                 self.level_of_accuracy+=1
                 if self.level_of_accuracy == 4:
                     break
@@ -843,17 +843,15 @@ class Dependency():
         else: #if dep.direction... (== none)
             rigAxis = self.refAxisEnd.sub(self.refPoint)
             foreignDep = self.foreignDependency
-            foreignAxis1 = foreignDep.refAxisEnd.sub(foreignDep.refPoint)
-            foreignAxis2 = foreignDep.refPoint.sub(foreignDep.refAxisEnd)
-            angle1 = abs(foreignAxis1.getAngle(rigAxis))
-            angle2 = abs(foreignAxis2.getAngle(rigAxis))
+            foreignAxis = foreignDep.refAxisEnd.sub(foreignDep.refPoint)
+            angle1 = abs(foreignAxis.getAngle(rigAxis))
+            angle2 = math.pi-angle1
             #
             if angle1<=angle2:
-                axis = rigAxis.cross(foreignAxis1)
-                foreignAxis = foreignAxis1
+                axis = rigAxis.cross(foreignAxis)
             else:
-                axis = rigAxis.cross(foreignAxis2)
-                foreignAxis = foreignAxis2
+                foreignAxis.multiply(-1.0)
+                axis = rigAxis.cross(foreignAxis)
             try:
                 axis.normalize()
                 angle = foreignAxis.getAngle(rigAxis)
@@ -978,7 +976,7 @@ class DependencyAngledPlanes(Dependency):
         rigAxis = self.refAxisEnd.sub(self.refPoint)
         foreignDep = self.foreignDependency
         foreignAxis = foreignDep.refAxisEnd.sub(foreignDep.refPoint)
-        recentAngle = foreignAxis.getAngle(rigAxis) / 2.0 / math.pi * 360
+        recentAngle = math.degrees(foreignAxis.getAngle(rigAxis))
         deltaAngle = abs(self.angle.Value) - recentAngle
         if abs(deltaAngle) < 1e-6:
             # do not change spin, not necessary..
@@ -987,7 +985,7 @@ class DependencyAngledPlanes(Dependency):
             try: 
                 axis = rigAxis.cross(foreignAxis)
                 axis.normalize()
-                axis.multiply(-deltaAngle*57.296)
+                axis.multiply(math.degrees(-deltaAngle))
             except: #axis = Vector(0,0,0) and cannot be normalized...
                 x = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
                 y = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
