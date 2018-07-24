@@ -515,7 +515,7 @@ class Rigid():
                     axis = vec1.cross(vec2) #torque-vector
 
                     vec1.normalize()
-                    vec1.multiply(rig.refPointsBoundBoxSize)
+                    vec1.multiply(self.refPointsBoundBoxSize)
                     vec3 = vec1.add(vec2)
                     beta = vec3.getAngle(vec1)
 
