@@ -40,6 +40,8 @@ from a2plib import (
     getAxis,
     appVersionStr
     )
+import os, sys
+from os.path import expanduser
 #from Units import Unit, Quantity
 
 
@@ -151,6 +153,49 @@ class SolverSystem():
         for rig in self.rigids:
             if rig.fixed: rig.printHierarchy(0)
         FreeCAD.Console.PrintMessage(20*"=" + "\n")
+        self.visualizeHierarchy()
+
+    def visualizeHierarchy(self):
+        home = expanduser("~")
+        out_file = os.path.join(home,'assembly_hierarchy.html')
+        FreeCAD.Console.PrintMessage("Writing visual hierarchy to: {}\n".format(out_file))
+        f = open(out_file, "w")
+
+        f.write("<!DOCTYPE html>\n")
+        f.write("<html>\n")
+        f.write("<head>\n")
+        f.write('    <meta charset="utf-8">\n')
+        f.write('    <meta http-equiv="X-UA-Compatible" content="IE=edge">\n')
+        f.write('    <title>A2P assembly hierarchy visualization</title>\n')
+        f.write("</head>\n")
+        f.write("<body>\n")
+        f.write('<div class="mermaid">\n')
+
+        f.write("graph TD\n")
+        for rig in self.rigids:
+            if len(rig.childRigids) == 0:
+                f.write("{}\n".format(rig.label))
+            else:
+                for c in rig.childRigids:
+                    # find dependency with those rigids
+                    dep = "?"
+                    for d in rig.dependencies:
+                        if(d.currentRigid == rig and d.dependedRigid == c):
+                            dep = d.Type
+                            break
+                    if rig.fixed:
+                        f.write("{}({}<br>*FIXED*) -- {} --> {}\n".format(rig.label, rig.label, dep, c.label))
+                    else:
+                        f.write("{} -- {} --> {}\n".format(rig.label, dep, c.label))
+
+        f.write("</div>\n")
+        f.write('    <script src="https://unpkg.com/mermaid@7.1.2/dist/mermaid.js"></script>\n')
+        f.write("    <script>\n")
+        f.write('        mermaid.initialize({startOnLoad: true});\n')
+        f.write("    </script>\n")
+        f.write("</body>")
+        f.write("</html>")
+        f.close()
 
     def calcMoveData(self,doc):
         for rig in self.rigids:
@@ -361,7 +406,7 @@ class Rigid():
         FreeCAD.Console.PrintMessage("{} - distance {}\n".format(self.label, self.disatanceFromFixed))
         for rig in self.childRigids:
             rig.printHierarchy(level+1)
-
+    
     def getCandidates(self, addList):
         for rig in self.childRigids:
             if not rig.tempfixed and rig.isAllParentTempFixed(): 
