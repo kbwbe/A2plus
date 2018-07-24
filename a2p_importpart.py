@@ -624,12 +624,32 @@ class a2p_ToggleAutoSolveCommand:
 
     def GetResources(self):
         return {
-            #'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_glasses.svg',
+            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_autoSolve.svg',
             'MenuText':     'toggle AutoSolve',
             'ToolTip':      toolTipMessage,
             'Checkable':    self.IsChecked()
             }
 FreeCADGui.addCommand('a2p_ToggleAutoSolveCommand', a2p_ToggleAutoSolveCommand())
+
+
+
+class a2p_TogglePartialProcessingCommand:
+
+    def Activated(self, checked):
+        a2plib.setPartialProcessing(checked)
+
+    def IsChecked(self):
+        return a2plib.isPartialProcessing()
+
+    def GetResources(self):
+        return {
+            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_partialProcessing.svg',
+            'MenuText':     'toggle partial processing',
+            'ToolTip':      'toggle partial processing',
+            'Checkable':    self.IsChecked()
+            }
+FreeCADGui.addCommand('a2p_TogglePartialProcessingCommand', a2p_TogglePartialProcessingCommand())
+
 
 
 

@@ -246,12 +246,14 @@ class SolverSystem():
         haveMore = True
         workList = []
 
-        # start from fixed rigids and its children
-        #for rig in self.rigids:
-        #    if rig.fixed:
-        #        workList.append(rig);
-        #        rig.getCandidates(workList)
-        workList.extend(self.rigids)
+        if a2plib.isPartialProcessing():
+            # start from fixed rigids and its children
+            for rig in self.rigids:
+                if rig.fixed:
+                    workList.append(rig);
+                    rig.getCandidates(workList)
+        else:
+            workList.extend(self.rigids)
 
         while haveMore:
             solutionFound = self.calculateWorkList(doc, workList)

@@ -31,6 +31,7 @@ from  FreeCAD import Base
 
 USE_PROJECTFILE = False
 AUTOSOLVE_ENABLED = True
+PARTIAL_PROCESSING_ENABLED = False
 SAVED_TRANSPARENCY = []
 
 DEBUGPROGRAM = 1
@@ -52,9 +53,16 @@ BLUE = (0.0,0.0,1.0)
 def setAutoSolve(enabled):
     global AUTOSOLVE_ENABLED
     AUTOSOLVE_ENABLED = enabled
-#------------------------------------------------------------------------------
+
 def getAutoSolveState():
     return AUTOSOLVE_ENABLED
+#------------------------------------------------------------------------------
+def setPartialProcessing(enabled):
+    global PARTIAL_PROCESSING_ENABLED
+    PARTIAL_PROCESSING_ENABLED = enabled
+
+def isPartialProcessing():
+    return PARTIAL_PROCESSING_ENABLED
 #------------------------------------------------------------------------------
 def setTransparency():
     global SAVED_TRANSPARENCY
