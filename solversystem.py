@@ -251,7 +251,7 @@ class SolverSystem():
             for rig in self.rigids:
                 if rig.fixed:
                     workList.append(rig);
-                    rig.getCandidates(workList)
+                    workList.extend(rig.getCandidates())
         else:
             workList.extend(self.rigids)
 
@@ -261,8 +261,7 @@ class SolverSystem():
 
             addList = []
             for rig in workList:
-                rig.getCandidates(addList)
-            addList = list(set(addList))
+                addList.extend(rig.getCandidates())
             workList.extend(addList);
             haveMore = (len(addList) > 0)
             self.printList("AddList", addList)
@@ -398,10 +397,12 @@ class Rigid():
         for rig in self.childRigids:
             rig.printHierarchy(level+1)
     
-    def getCandidates(self, addList):
+    def getCandidates(self):
+        candidates = []
         for rig in self.childRigids:
             if not rig.tempfixed and rig.areAllParentTempFixed(): 
-                addList.append(rig)
+                candidates.append(rig)
+        return list(set(candidates))
 
     def addChildrenByDistance(self, addList, distance):
         # Current rigid is the father of the needed distance, so it might have needed children
