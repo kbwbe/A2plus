@@ -806,7 +806,7 @@ class Dependency():
         FreeCAD.Console.PrintMessage("{} - enabled\n".format(self))
 
     def getMovement(self):
-        raise NotImplementedError("Dependecly class {} doesn't implement movement, use inherited classes instead!".format(c.__class__.__name__))
+        raise NotImplementedError("Dependecly class {} doesn't implement movement, use inherited classes instead!".format(self.__class__.__name__))
 
     def getRotation(self, solver):
         if not self.Enabled: return None
@@ -903,7 +903,7 @@ class DependencyPointOnLine(Dependency):
             return verticalRefOnLine, moveVector
 
         else:
-            raise NotImplementedError("Wrong refType for class {}".format(c.__class__.__name__))
+            raise NotImplementedError("Wrong refType for class {}".format(self.__class__.__name__))
 
 
 class DependencyPointOnPlane(Dependency):
@@ -935,7 +935,7 @@ class DependencyPointOnPlane(Dependency):
             return verticalRefPointOnPlane, moveVector
 
         else:
-            raise NotImplementedError("Wrong refType for class {}".format(c.__class__.__name__))
+            raise NotImplementedError("Wrong refType for class {}".format(self.__class__.__name__))
 
 class DependencyCircularEdge(Dependency):
     def __init__(self, constraint, refType):
