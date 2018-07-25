@@ -71,7 +71,8 @@ class a2pWorkbench (Workbench):
             'a2p_SimpleAssemblyShapeCommand',
             'a2p_ToggleTransparencyCommand',
             'a2p_isolateCommand',
-            'a2p_ToggleAutoSolveCommand'
+            'a2p_ToggleAutoSolveCommand',
+            'a2p_TogglePartialProcessingCommand'
             ]
         self.appendToolbar(
                'A2p',
