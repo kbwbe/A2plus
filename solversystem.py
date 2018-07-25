@@ -164,20 +164,17 @@ class SolverSystem():
 
         f.write("graph TD\n")
         for rig in self.rigids:
+            # No children, add current rogod as a leaf entry
             if len(rig.childRigids) == 0:
                 f.write("{}\n".format(rig.label))
             else:
-                for c in rig.childRigids:
-                    # find dependency with those rigids
-                    dep = "?"
-                    for d in rig.dependencies:
-                        if(d.currentRigid == rig and d.dependedRigid == c):
-                            dep = d.Type
-                            break
-                    if rig.fixed:
-                        f.write("{}({}<br>*FIXED*) -- {} --> {}\n".format(rig.label, rig.label, dep, c.label))
-                    else:
-                        f.write("{} -- {} --> {}\n".format(rig.label, dep, c.label))
+                # Rigid have children, add them based on the dependency list
+                for d in rig.dependencies:
+                    if d.dependedRigid in rig.childRigids:
+                        if rig.fixed:
+                            f.write("{}({}<br>*FIXED*) -- {} --> {}\n".format(rig.label, rig.label, d.Type, d.dependedRigid.label))
+                        else:
+                            f.write("{} -- {} --> {}\n".format(rig.label, d.Type, d.dependedRigid.label))
 
         f.write("</div>\n")
         f.write('    <script src="https://unpkg.com/mermaid@7.1.2/dist/mermaid.js"></script>\n')
@@ -573,7 +570,7 @@ class Rigid():
 class Dependency():
     def __init__(self, constraint, refType, axisRotation):
         self.Enabled = False
-        self.Type = None                # TODO: Should not be used
+        self.Type = None
         self.refType = refType
         self.refPoint = None
         self.refAxisEnd = None
