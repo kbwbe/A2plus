@@ -45,11 +45,14 @@ from os.path import expanduser
 #from Units import Unit, Quantity
 
 
-SOLVER_MAXSTEPS = 150000
+SOLVER_MAXSTEPS = 100000
 SOLVER_POS_ACCURACY = 1.0e-1 #Need to implement variable stepwith calculation to improve this..
 SOLVER_SPIN_ACCURACY = 1.0e-1 #Sorry for that at moment...
 
 SPINSTEP_DIVISOR = 12.0
+WEIGHT_LINEAR_MOVE = 0.5
+WEIGHT_REFPOINT_ROTATION = 25.0
+
 
 #------------------------------------------------------------------------------
 class SolverSystem():
@@ -508,6 +511,8 @@ class Rigid():
         if len(depMoveVectors) > 0 and self.spinCenter != None:
             self.spin = Base.Vector(0,0,0)
 
+            #realMoveVectorSum = FreeCAD.Vector(self.moveVectorSum)
+            #realMoveVectorSum.multiply(WEIGHT_LINEAR_MOVE)
             for i in range(0, len(depRefPoints)):
                 try:
                     vec1 = depRefPoints[i].sub(self.spinCenter) # 'aka Radius'
@@ -520,7 +525,7 @@ class Rigid():
                     beta = vec3.getAngle(vec1)
 
                     axis.normalize()
-                    axis.multiply(math.degrees(beta)) #here use degrees
+                    axis.multiply(math.degrees(beta)*WEIGHT_REFPOINT_ROTATION) #here use degrees
                     self.spin = self.spin.add(axis)
                     self.countSpinVectors += 1
                 except:
@@ -547,7 +552,7 @@ class Rigid():
         #Linear moving of a rigid
         if self.moveVectorSum != None:
             mov = self.moveVectorSum
-            #mov.multiply(0.5) # stabilize computation, adjust if needed...
+            mov.multiply(WEIGHT_LINEAR_MOVE) # stabilize computation, adjust if needed...
             if mov.Length > 1e-8:
                 pl = FreeCAD.Placement()
                 pl.move(mov)
