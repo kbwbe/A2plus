@@ -561,15 +561,14 @@ class Rigid():
         if self.tempfixed: return
         #
         #Linear moving of a rigid
+        moveDist = Base.Vector(0,0,0)
         if self.moveVectorSum != None:
-            mov = self.moveVectorSum
-            mov.multiply(WEIGHT_LINEAR_MOVE) # stabilize computation, adjust if needed...
-            if mov.Length > 1e-8:
-                pl = FreeCAD.Placement()
-                pl.move(mov)
-                self.applyPlacementStep(pl)
+            moveDist = Base.Vector(self.moveVectorSum)
+            moveDist.multiply(WEIGHT_LINEAR_MOVE) # stabilize computation, adjust if needed...
         #    
         #Rotate the rigid...
+        center = None
+        rotation = None
         if (self.spin != None and self.spin.Length != 0.0 and self.countSpinVectors != 0):
             spinAngle = self.spin.Length / self.countSpinVectors
             if spinAngle>15.0: spinAngle=15.0 # do not accept more degrees
@@ -577,13 +576,22 @@ class Rigid():
                 try:
                     spinStep = spinAngle/(SPINSTEP_DIVISOR) #it was 250.0
                     self.spin.normalize()
-                    mov = Base.Vector(0,0,0) # no further moving
-                    rot = FreeCAD.Rotation(self.spin, spinStep)
-                    cent = self.spinCenter
-                    pl = FreeCAD.Placement(mov,rot,cent)
-                    self.applyPlacementStep(pl)
+                    rotation = FreeCAD.Rotation(self.spin, spinStep)
+                    center = self.spinCenter
                 except:
                     pass
+                
+        if center != None and rotation != None:
+            pl = FreeCAD.Placement(moveDist,rotation,center)
+            self.applyPlacementStep(pl)
+        else:
+            if moveDist.Length > 1e-8:
+                pl = FreeCAD.Placement()
+                pl.move(moveDist)
+                self.applyPlacementStep(pl)
+        
+            
+            
 
 #------------------------------------------------------------------------------
 class Dependency():
