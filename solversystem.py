@@ -124,6 +124,7 @@ class SolverSystem():
             Dependency.Create(doc, c, self, rigid1, rigid2)
 
         for rig in self.rigids:
+            rig.resetTempFixed()
             rig.calcSpinCenter()
             rig.calcRefPointsBoundBoxSize()            
 
@@ -217,7 +218,7 @@ class SolverSystem():
                 #break
                 self.mySOLVER_SPIN_ACCURACY *= 1e-1
                 self.mySOLVER_POS_ACCURACY *= 1e-1
-                #self.solutionToParts(doc)
+                self.solutionToParts(doc)
                 self.level_of_accuracy+=1
                 if self.level_of_accuracy == 4:
                     break
@@ -247,12 +248,14 @@ class SolverSystem():
         workList = []
 
         if a2plib.isPartialProcessing():
+            FreeCAD.Console.PrintMessage( "Solvermode = partialProcessing !\n")
             # start from fixed rigids and its children
             for rig in self.rigids:
                 if rig.fixed:
                     workList.append(rig);
                     workList.extend(rig.getCandidates())
         else:
+            FreeCAD.Console.PrintMessage( "Solvermode = solve all Parts at once !\n")
             workList.extend(self.rigids)
 
         while haveMore:
@@ -261,8 +264,11 @@ class SolverSystem():
 
             addList = []
             for rig in workList:
-                addList.extend(rig.getCandidates())
-            workList.extend(addList);
+                candidates = rig.getCandidates()
+                for candidate in candidates:
+                    if candidate not in addList:
+                        addList.append(candidate)
+            workList.extend(addList)
             haveMore = (len(addList) > 0)
             self.printList("AddList", addList)
 
@@ -345,6 +351,9 @@ class Rigid():
         self.maxAxisError = 0.0
         self.refPointsBoundBoxSize = 0.0
         self.countSpinVectors = 0
+        
+    def resetTempFixed(self):
+        self.tempfixed = False
 
     def enableDependencies(self, workList):
         for dep in self.dependencies:
