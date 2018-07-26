@@ -255,7 +255,7 @@ class SolverSystem():
             for rig in self.rigids:
                 if rig.fixed:
                     workList.append(rig);
-                    workList.extend(rig.getCandidates())
+                    workList.extend(set(rig.getCandidates()))
         else:
             FreeCAD.Console.PrintMessage( "Solvermode = solve all Parts at once !\n")
             workList.extend(self.rigids)
@@ -266,10 +266,9 @@ class SolverSystem():
 
             addList = []
             for rig in workList:
-                candidates = rig.getCandidates()
-                for candidate in candidates:
-                    if candidate not in addList:
-                        addList.append(candidate)
+                addList.extend(rig.getCandidates())
+            # Eliminate duplicates
+            addList = set(addList)
             workList.extend(addList)
             haveMore = (len(addList) > 0)
             self.printList("AddList", addList)
@@ -416,7 +415,7 @@ class Rigid():
         for rig in self.childRigids:
             if not rig.tempfixed and rig.areAllParentTempFixed(): 
                 candidates.append(rig)
-        return list(set(candidates))
+        return set(candidates)
 
     def addChildrenByDistance(self, addList, distance):
         # Current rigid is the father of the needed distance, so it might have needed children
