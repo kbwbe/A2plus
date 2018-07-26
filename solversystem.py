@@ -124,7 +124,6 @@ class SolverSystem():
             Dependency.Create(doc, c, self, rigid1, rigid2)
 
         for rig in self.rigids:
-            rig.resetTempFixed()
             rig.calcSpinCenter()
             rig.calcRefPointsBoundBoxSize()            
 
@@ -192,18 +191,21 @@ class SolverSystem():
     def calcMoveData(self,doc):
         for rig in self.rigids:
             rig.calcMoveData(doc, self)
+            
+    def prepareRestart(self):
+        for rig in self.rigids:
+            rig.prepareRestart()
 
     def solveSystem(self,doc):
         self.level_of_accuracy=1
         FreeCAD.Console.PrintMessage( "\n===== Start Solving System ====== \n" )
-        while True:
-            startTime = int(round(time.time() * 1000))
-            self.loadSystem(doc)
-            self.assignParentship(doc)
-            loadTime = int(round(time.time() * 1000))
 
+        startTime = int(round(time.time() * 1000))
+        self.loadSystem(doc)
+        self.assignParentship(doc)
+        loadTime = int(round(time.time() * 1000))
+        while True:
             systemSolved = self.calculateChain(doc)
-    
             totalTime = int(round(time.time() * 1000))
             #FreeCAD.Console.PrintMessage( "Position Accuracy: %f\n" %  self.mySOLVER_POS_ACCURACY )
             #FreeCAD.Console.PrintMessage( "Max positionerror: %f\n" %  poserror )
@@ -215,13 +217,13 @@ class SolverSystem():
             FreeCAD.Console.PrintMessage( "TotalTime (ms): %d\n" % (totalTime - startTime) )
             if systemSolved:
                 FreeCAD.Console.PrintMessage( "===== System solved ! ====== \n" )
-                #break
                 self.mySOLVER_SPIN_ACCURACY *= 1e-1
                 self.mySOLVER_POS_ACCURACY *= 1e-1
-                self.solutionToParts(doc)
                 self.level_of_accuracy+=1
                 if self.level_of_accuracy == 4:
+                    self.solutionToParts(doc)
                     break
+                self.prepareRestart()
             else:
                 FreeCAD.Console.PrintMessage( "===== Could not solve system ====== \n" )
 
@@ -352,8 +354,11 @@ class Rigid():
         self.refPointsBoundBoxSize = 0.0
         self.countSpinVectors = 0
         
-    def resetTempFixed(self):
+    def prepareRestart(self):
         self.tempfixed = False
+        for d in self.dependencies:
+            d.disable()
+            
 
     def enableDependencies(self, workList):
         for dep in self.dependencies:
@@ -569,7 +574,7 @@ class Rigid():
         if (self.spin != None and self.spin.Length != 0.0 and self.countSpinVectors != 0):
             spinAngle = self.spin.Length / self.countSpinVectors
             if spinAngle>15.0: spinAngle=15.0 # do not accept more degrees
-            if spinAngle> 1e-6:
+            if spinAngle> 1e-8:
                 try:
                     spinStep = spinAngle/(SPINSTEP_DIVISOR) #it was 250.0
                     self.spin.normalize()
@@ -818,6 +823,10 @@ class Dependency():
         self.Enabled = True
         self.foreignDependency.Enabled = True
         FreeCAD.Console.PrintMessage("{} - enabled\n".format(self))
+        
+    def disable(self):
+        self.Enabled = False
+        self.foreignDependency.Enabled = False
 
     def getMovement(self):
         raise NotImplementedError("Dependecly class {} doesn't implement movement, use inherited classes instead!".format(self.__class__.__name__))
