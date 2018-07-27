@@ -29,9 +29,12 @@ from a2p_viewProviderProxies import *
 from  FreeCAD import Base
 
 
-USE_PROJECTFILE = False
-AUTOSOLVE_ENABLED = True
-PARTIAL_PROCESSING_ENABLED = False
+preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
+
+USE_PROJECTFILE = preferences.GetBool('useProjectFolder', False)
+PARTIAL_PROCESSING_ENABLED = preferences.GetBool('usePartialSolver', True)
+AUTOSOLVE_ENABLED = preferences.GetBool('autoSolve', True)
+
 SAVED_TRANSPARENCY = []
 
 DEBUGPROGRAM = 1
@@ -53,14 +56,18 @@ BLUE = (0.0,0.0,1.0)
 def setAutoSolve(enabled):
     global AUTOSOLVE_ENABLED
     AUTOSOLVE_ENABLED = enabled
-
+    #preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
+    #preferences.SetBool('autoSolve', enabled)
+#------------------------------------------------------------------------------
 def getAutoSolveState():
     return AUTOSOLVE_ENABLED
 #------------------------------------------------------------------------------
 def setPartialProcessing(enabled):
     global PARTIAL_PROCESSING_ENABLED
     PARTIAL_PROCESSING_ENABLED = enabled
-
+    #preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
+    #preferences.SetBool('usePartialSolver', enabled)
+#------------------------------------------------------------------------------
 def isPartialProcessing():
     return PARTIAL_PROCESSING_ENABLED
 #------------------------------------------------------------------------------
@@ -70,7 +77,7 @@ def setTransparency():
     doc = FreeCAD.ActiveDocument
 
     if len(SAVED_TRANSPARENCY) > 0:
-        # Transparancy is already saved, no need to set transparancy again
+        # Transparency is already saved, no need to set transparency again
         return
 
     for obj in doc.Objects:
@@ -79,7 +86,7 @@ def setTransparency():
                 SAVED_TRANSPARENCY.append((obj.Name, obj.ViewObject.Transparency))
                 obj.ViewObject.Transparency = 80 
 #------------------------------------------------------------------------------
-def restoreTransparancy():
+def restoreTransparency():
     global SAVED_TRANSPARENCY
     # restore transparency of objects...
     doc = FreeCAD.ActiveDocument
@@ -90,7 +97,7 @@ def restoreTransparancy():
             obj.ViewObject.Transparency = setting[1]
     SAVED_TRANSPARENCY = []
 #------------------------------------------------------------------------------
-def isTransparancyEnabled():
+def isTransparencyEnabled():
     global SAVED_TRANSPARENCY
     return (len(SAVED_TRANSPARENCY) > 0)
 #------------------------------------------------------------------------------
@@ -132,8 +139,8 @@ def getProjectFolder():
     '''
     if not USE_PROJECTFILE: return ""
     
-    preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Assembly2")
-    return preferences.GetString('projectFolder', '/Error=FirstSetPreferences/')
+    preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
+    return preferences.GetString('projectFolder', '~')
 
 #------------------------------------------------------------------------------
 def findSourceFileInProject(fullPath):

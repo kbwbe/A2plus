@@ -492,7 +492,7 @@ class ViewConnectionsCommand:
         if selected is None:
             return
 
-        if not a2plib.isTransparancyEnabled():
+        if not a2plib.isTransparencyEnabled():
             a2plib.setTransparency()
 
         FreeCADGui.Selection.clearSelection()
@@ -502,11 +502,11 @@ class ViewConnectionsCommand:
         FreeCADGui.Selection.addSelection(
             doc.getObject(selected.Object2), selected.SubElement2)
 
-        # Add observer to remove the transparancy when the selection is chaning or removing
+        # Add observer to remove the transparency when the selection is chaning or removing
         FreeCADGui.Selection.addObserver(ViewConnectionsObserver())
 
     def IsActive(self):
-        return (a2plib.getSelectedConstraint() is not None and a2plib.isTransparancyEnabled() == False)
+        return (a2plib.getSelectedConstraint() is not None and a2plib.isTransparencyEnabled() == False)
 
     def GetResources(self):
         return {
@@ -525,8 +525,8 @@ class ViewConnectionsObserver:
         if self.ignoreClear:
             self.ignoreClear = False
         else:
-            if a2plib.isTransparancyEnabled():
-                a2plib.restoreTransparancy()
+            if a2plib.isTransparencyEnabled():
+                a2plib.restoreTransparency()
                 FreeCADGui.Selection.removeObserver(self)
 
     def setSelection(self, doc):
@@ -581,13 +581,13 @@ FreeCADGui.addCommand('a2p_isolateCommand', a2p_isolateCommand())
 
 class a2p_ToggleTransparencyCommand:
     def Activated(self, checked):
-        if a2plib.isTransparancyEnabled():
-            a2plib.restoreTransparancy()
+        if a2plib.isTransparencyEnabled():
+            a2plib.restoreTransparency()
         else:
             a2plib.setTransparency()
 
     def IsChecked(self):
-        return a2plib.isTransparancyEnabled()
+        return a2plib.isTransparencyEnabled()
 
     def GetResources(self):
         return {
