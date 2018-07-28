@@ -194,6 +194,20 @@ class a2p_ImportPartCommand():
         else:
             return
 
+        if not a2plib.checkFileIsInProjectFolder(filename):
+            msg = \
+'''
+The part you try to import is 
+outside of your project-folder !
+Check your settings of A2plus preferences.
+'''
+            QtGui.QMessageBox.information(
+                QtGui.QApplication.activeWindow(), 
+                "Import Error", 
+                msg
+                )
+            return
+
         importedObject = importPartFromFile(doc, filename)
         
         mw = FreeCADGui.getMainWindow()
@@ -367,12 +381,18 @@ class a2p_EditPartCommand:
         FreeCADGui.Selection.clearSelection() # very imporant! Avoid Editing the assembly the part was called from!
         fileNameWithinProjectFile = a2plib.findSourceFileInProject(obj.sourceFile)
         if fileNameWithinProjectFile == None:
-            QtGui.QMessageBox.critical(  QtGui.QApplication.activeWindow(), 
-                                        "Source file not found in project ! ", 
-                                        "Editor aborted!\nUnable to find {}".format(
-                                            fileNameWithinProjectFile
-                                            ) 
-                                    )
+            msg = \
+'''
+You want to edit a file which
+is not found below your project-folder.
+This is not allowed when using preference
+"Use project Folder"
+'''
+            QtGui.QMessageBox.critical(
+                QtGui.QApplication.activeWindow(), 
+                "File error ! ", 
+                msg
+                )
             return
         docs = FreeCAD.listDocuments().values()
         docFilenames = [ d.FileName for d in docs ]

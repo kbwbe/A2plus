@@ -137,9 +137,8 @@ def getProjectFolder():
     # All Parts will be searched below this projectFolder-Value...        
     #------------------------------------------------------------------------------------
     '''
-    if not USE_PROJECTFILE: return ""
-    
     preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
+    if not preferences.GetBool('useProjectFolder', False): return ""
     return preferences.GetString('projectFolder', '~')
 
 #------------------------------------------------------------------------------
@@ -151,24 +150,26 @@ def findSourceFileInProject(fullPath):
     # Assemblies will become better movable in filesystem...
     #------------------------------------------------------------------------------------
     '''
-    if not USE_PROJECTFILE: return fullPath
+    preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
+    if not preferences.GetBool('useProjectFolder', False): return fullPath
 
     def findFile(name, path):
         for root, dirs, files in os.walk(path):
             if name in files:
                 return os.path.join(root, name) 
         
-    projectFolder = getProjectFolder().rstrip('/')
-    idx = fullPath.rfind('/')
-    if idx >= 0:
-        fileName = fullPath[idx+1:]
-    else:
-        fileName = fullPath
-    return findFile(fileName,projectFolder)
+    projectFolder = os.path.abspath(getProjectFolder()) # get normalized path
+    fileName = os.path.basename(fullPath)
+    retval = findFile(fileName,projectFolder)
+    DebugMsg(
+        "Found file {}\n".format(retval)
+        )
+    return retval
 
 #------------------------------------------------------------------------------
 def checkFileIsInProjectFolder(path):
-    if not USE_PROJECTFILE: return True
+    preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
+    if not preferences.GetBool('useProjectFolder', False): return True
 
     nameInProject = findSourceFileInProject(path)
     if nameInProject == path:
