@@ -449,7 +449,7 @@ class Rigid():
         self.dependencies = []
 
     def applySolution(self, doc, solver):
-        if self.tempfixed: return
+        if self.tempfixed or self.fixed: return
 
         # Update FreeCAD's placements if deltaPlacement above Tolerances
         base1 = self.placement.Base
@@ -492,7 +492,7 @@ class Rigid():
         self.refPointsBoundBoxSize = math.sqrt( (xmax-xmin)**2 + (ymax-ymin)**2 + (zmax-zmin)**2 ) 
 
     def calcMoveData(self, doc, solver):
-        if self.tempfixed: return
+        if self.tempfixed or self.fixed: return
         depRefPoints = [] 
         depMoveVectors = [] #collect Data to compute central movement of rigid
         #
@@ -558,7 +558,7 @@ class Rigid():
                 self.countSpinVectors += 1
 
     def move(self,doc):
-        if self.tempfixed: return
+        if self.tempfixed or self.fixed: return
         #
         #Linear moving of a rigid
         moveDist = Base.Vector(0,0,0)
