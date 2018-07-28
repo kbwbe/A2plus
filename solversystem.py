@@ -469,7 +469,7 @@ class Rigid():
         countRefPoints = 0
         for dep in self.dependencies:
             if dep.refPoint != None:
-                newSpinCenter.add(dep.refPoint)
+                newSpinCenter = newSpinCenter.add(dep.refPoint)
                 countRefPoints += 1
         if countRefPoints > 0:
             newSpinCenter.multiply(1.0/countRefPoints)
