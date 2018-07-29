@@ -672,6 +672,60 @@ FreeCADGui.addCommand('a2p_TogglePartialProcessingCommand', a2p_TogglePartialPro
 
 
 
+def a2p_repairTreeView():
+    doc = FreeCAD.activeDocument()
+    
+    constraints = [ obj for obj in doc.Objects if 'ConstraintInfo' in obj.Content]
+    for c in constraints:
+        c.Proxy.disable_onChanged = True
+        if not hasattr(c,"ParentTreeObject"):
+            c.addProperty("App::PropertyLink","ParentTreeObject","ConstraintInfo")
+            c.setEditorMode("ParentTreeObject", 1)
+        parent = doc.getObject(c.Object1)
+        c.ParentTreeObject = parent
+        parent.Label = parent.Label # trigger an update...
+        c.Proxy.disable_onChanged = False
+    #
+    mirrors = [ obj for obj in doc.Objects if 'ConstraintNfo' in obj.Content]
+    for m in mirrors:
+        m.Proxy.disable_onChanged = True
+        if not hasattr(m,"ParentTreeObject"):
+            m.addProperty("App::PropertyLink","ParentTreeObject","ConstraintNfo")
+            m.setEditorMode("ParentTreeObject", 1)
+        parent = doc.getObject(m.Object2)
+        m.ParentTreeObject = parent
+        parent.Label = parent.Label # trigger an update...
+        m.Proxy.disable_onChanged = False
+    #
+
+toolTipMessage = \
+'''
+repair the treeview,
+if being damaged somehow.
+
+After pressing this button,
+constraints will grouped under
+corresponding parts again
+'''
+
+
+class a2p_repairTreeViewCommand:
+
+    def Activated(self):
+        a2p_repairTreeView()
+
+    def GetResources(self):
+        return {
+            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_treeview.svg',
+            'MenuText':     'repair treeView',
+            'ToolTip':      toolTipMessage
+            }
+FreeCADGui.addCommand('a2p_repairTreeViewCommand', a2p_repairTreeViewCommand())
+
+
+
+
+
 
 def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
     ''' updating constraints, deactivated at moment'''

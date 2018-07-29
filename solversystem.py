@@ -51,7 +51,7 @@ SOLVER_SPIN_ACCURACY = 1.0e-1 #Sorry for that at moment...
 
 SPINSTEP_DIVISOR = 12.0
 WEIGHT_LINEAR_MOVE = 0.5
-WEIGHT_REFPOINT_ROTATION = 25.0
+WEIGHT_REFPOINT_ROTATION = 8.0
 
 
 #------------------------------------------------------------------------------

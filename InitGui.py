@@ -73,7 +73,11 @@ class a2pWorkbench (Workbench):
             'a2p_ToggleTransparencyCommand',
             'a2p_isolateCommand',
             'a2p_ToggleAutoSolveCommand',
-            'a2p_TogglePartialProcessingCommand'
+            'a2p_TogglePartialProcessingCommand',
+            'a2p_repairTreeViewCommand'
+            ]
+        menuEntries = [
+            'a2p_repairTreeViewCommand'
             ]
         self.appendToolbar(
                'A2p',
@@ -81,7 +85,7 @@ class a2pWorkbench (Workbench):
                )
         self.appendMenu(
             'A2p', 
-            commandslist
+            menuEntries
             )
         #FreeCADGui.addPreferencePage( a2plib.pathOfModule() + '/GuiA2p/ui/a2p_prefs.ui','A2plus' )
         FreeCADGui.addPreferencePage(
