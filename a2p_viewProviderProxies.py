@@ -200,6 +200,9 @@ def create_constraint_mirror( constraintObj, iconPath, origLabel= '', mirrorLabe
     return cMirror.Name
  
 class ConstraintObjectProxy:
+    def __init__(self,obj):
+        self.disable_onChanged = False
+    
     def execute(self, obj):
         global a2p_NeedToSolveSystem
         if a2p_NeedToSolveSystem:
@@ -207,6 +210,11 @@ class ConstraintObjectProxy:
             self.callSolveConstraints()
             
     def onChanged(self, obj, prop):
+        # Add new property "disable_onChanged" if not already existing...
+        if not hasattr(self, 'disable_onChanged'):
+            self.disable_onChanged = False
+        #
+        if self.disable_onChanged: return
         global a2p_NeedToSolveSystem
         if hasattr(self, 'mirror_name'):
             cMirror = obj.Document.getObject( self.mirror_name )

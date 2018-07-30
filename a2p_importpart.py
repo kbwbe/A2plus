@@ -194,6 +194,20 @@ class a2p_ImportPartCommand():
         else:
             return
 
+        if not a2plib.checkFileIsInProjectFolder(filename):
+            msg = \
+'''
+The part you try to import is 
+outside of your project-folder !
+Check your settings of A2plus preferences.
+'''
+            QtGui.QMessageBox.information(
+                QtGui.QApplication.activeWindow(), 
+                "Import Error", 
+                msg
+                )
+            return
+
         importedObject = importPartFromFile(doc, filename)
         
         mw = FreeCADGui.getMainWindow()
@@ -367,12 +381,18 @@ class a2p_EditPartCommand:
         FreeCADGui.Selection.clearSelection() # very imporant! Avoid Editing the assembly the part was called from!
         fileNameWithinProjectFile = a2plib.findSourceFileInProject(obj.sourceFile)
         if fileNameWithinProjectFile == None:
-            QtGui.QMessageBox.critical(  QtGui.QApplication.activeWindow(), 
-                                        "Source file not found in project ! ", 
-                                        "Editor aborted!\nUnable to find {}".format(
-                                            fileNameWithinProjectFile
-                                            ) 
-                                    )
+            msg = \
+'''
+You want to edit a file which
+is not found below your project-folder.
+This is not allowed when using preference
+"Use project Folder"
+'''
+            QtGui.QMessageBox.critical(
+                QtGui.QApplication.activeWindow(), 
+                "File error ! ", 
+                msg
+                )
             return
         docs = FreeCAD.listDocuments().values()
         docFilenames = [ d.FileName for d in docs ]
@@ -492,7 +512,7 @@ class ViewConnectionsCommand:
         if selected is None:
             return
 
-        if not a2plib.isTransparancyEnabled():
+        if not a2plib.isTransparencyEnabled():
             a2plib.setTransparency()
 
         FreeCADGui.Selection.clearSelection()
@@ -502,11 +522,11 @@ class ViewConnectionsCommand:
         FreeCADGui.Selection.addSelection(
             doc.getObject(selected.Object2), selected.SubElement2)
 
-        # Add observer to remove the transparancy when the selection is chaning or removing
+        # Add observer to remove the transparency when the selection is chaning or removing
         FreeCADGui.Selection.addObserver(ViewConnectionsObserver())
 
     def IsActive(self):
-        return (a2plib.getSelectedConstraint() is not None and a2plib.isTransparancyEnabled() == False)
+        return (a2plib.getSelectedConstraint() is not None and a2plib.isTransparencyEnabled() == False)
 
     def GetResources(self):
         return {
@@ -525,8 +545,8 @@ class ViewConnectionsObserver:
         if self.ignoreClear:
             self.ignoreClear = False
         else:
-            if a2plib.isTransparancyEnabled():
-                a2plib.restoreTransparancy()
+            if a2plib.isTransparencyEnabled():
+                a2plib.restoreTransparency()
                 FreeCADGui.Selection.removeObserver(self)
 
     def setSelection(self, doc):
@@ -581,13 +601,13 @@ FreeCADGui.addCommand('a2p_isolateCommand', a2p_isolateCommand())
 
 class a2p_ToggleTransparencyCommand:
     def Activated(self, checked):
-        if a2plib.isTransparancyEnabled():
-            a2plib.restoreTransparancy()
+        if a2plib.isTransparencyEnabled():
+            a2plib.restoreTransparency()
         else:
             a2plib.setTransparency()
 
     def IsChecked(self):
-        return a2plib.isTransparancyEnabled()
+        return a2plib.isTransparencyEnabled()
 
     def GetResources(self):
         return {
@@ -624,12 +644,86 @@ class a2p_ToggleAutoSolveCommand:
 
     def GetResources(self):
         return {
-            #'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_glasses.svg',
+            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_autoSolve.svg',
             'MenuText':     'toggle AutoSolve',
             'ToolTip':      toolTipMessage,
             'Checkable':    self.IsChecked()
             }
 FreeCADGui.addCommand('a2p_ToggleAutoSolveCommand', a2p_ToggleAutoSolveCommand())
+
+
+
+class a2p_TogglePartialProcessingCommand:
+
+    def Activated(self, checked):
+        a2plib.setPartialProcessing(checked)
+
+    def IsChecked(self):
+        return a2plib.isPartialProcessing()
+
+    def GetResources(self):
+        return {
+            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_partialProcessing.svg',
+            'MenuText':     'toggle partial processing',
+            'ToolTip':      'toggle partial processing',
+            'Checkable':    self.IsChecked()
+            }
+FreeCADGui.addCommand('a2p_TogglePartialProcessingCommand', a2p_TogglePartialProcessingCommand())
+
+
+
+def a2p_repairTreeView():
+    doc = FreeCAD.activeDocument()
+    
+    constraints = [ obj for obj in doc.Objects if 'ConstraintInfo' in obj.Content]
+    for c in constraints:
+        c.Proxy.disable_onChanged = True
+        if not hasattr(c,"ParentTreeObject"):
+            c.addProperty("App::PropertyLink","ParentTreeObject","ConstraintInfo")
+            c.setEditorMode("ParentTreeObject", 1)
+        parent = doc.getObject(c.Object1)
+        c.ParentTreeObject = parent
+        parent.Label = parent.Label # trigger an update...
+        c.Proxy.disable_onChanged = False
+    #
+    mirrors = [ obj for obj in doc.Objects if 'ConstraintNfo' in obj.Content]
+    for m in mirrors:
+        m.Proxy.disable_onChanged = True
+        if not hasattr(m,"ParentTreeObject"):
+            m.addProperty("App::PropertyLink","ParentTreeObject","ConstraintNfo")
+            m.setEditorMode("ParentTreeObject", 1)
+        parent = doc.getObject(m.Object2)
+        m.ParentTreeObject = parent
+        parent.Label = parent.Label # trigger an update...
+        m.Proxy.disable_onChanged = False
+    #
+
+toolTipMessage = \
+'''
+repair the treeview,
+if being damaged somehow.
+
+After pressing this button,
+constraints will grouped under
+corresponding parts again
+'''
+
+
+class a2p_repairTreeViewCommand:
+
+    def Activated(self):
+        a2p_repairTreeView()
+
+    def GetResources(self):
+        return {
+            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_treeview.svg',
+            'MenuText':     'repair treeView',
+            'ToolTip':      toolTipMessage
+            }
+FreeCADGui.addCommand('a2p_repairTreeViewCommand', a2p_repairTreeViewCommand())
+
+
+
 
 
 

@@ -22,7 +22,7 @@
 #*                                                                         *
 #***************************************************************************
 
-__title__ = 'A2p assembly Workbench - InitGui file'
+__title__ = 'A2plus assembly Workbench - InitGui file'
 __author__ = 'kbwbe'
 
 
@@ -37,6 +37,7 @@ class a2pWorkbench (Workbench):
     
     def Initialize(self):
         
+        import a2plib #QtCore.QResource.registerResource happens in assembly2lib
         import a2p_importpart
         import a2p_CircularEdgeConnection
         import a2p_planesParallelConstraint
@@ -71,7 +72,12 @@ class a2pWorkbench (Workbench):
             'a2p_SimpleAssemblyShapeCommand',
             'a2p_ToggleTransparencyCommand',
             'a2p_isolateCommand',
-            'a2p_ToggleAutoSolveCommand'
+            'a2p_ToggleAutoSolveCommand',
+            'a2p_TogglePartialProcessingCommand',
+            'a2p_repairTreeViewCommand'
+            ]
+        menuEntries = [
+            'a2p_repairTreeViewCommand'
             ]
         self.appendToolbar(
                'A2p',
@@ -79,8 +85,14 @@ class a2pWorkbench (Workbench):
                )
         self.appendMenu(
             'A2p', 
-            commandslist
+            menuEntries
             )
+        #FreeCADGui.addPreferencePage( a2plib.pathOfModule() + '/GuiA2p/ui/a2p_prefs.ui','A2plus' )
+        FreeCADGui.addPreferencePage(
+            a2plib.pathOfModule() +
+            '/GuiA2p/Resources/ui/a2p_prefs.ui','A2plus'
+            )
+        
 
     def Activated(self):
         from a2plib import DebugMsg
