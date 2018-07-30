@@ -28,32 +28,29 @@ from PySide import QtGui, QtCore
 
 
 
-
 '''
 Library that defines the DOF of a Rigid, each rigids has several dependencies which define a refPoint(cross point the the axis)
 and a refAxisEnd which is a vector that defines the direction, togeher we can define an axis used in the constraint.
 
 This code was possible only after the reading of the Hamish's code on His wonderful Assembly2 Workbench for FreeCAD
-This code was possible only after the reading of the Hamish's code on His wonderful WorkFeature Macro for FreeCAD
+This code was possible only after the reading of the code of the wonderful WorkFeature Macro for FreeCAD
 This code was possible only after the reading of Wikipedia pages on vector math 
 
 '''
-
-
 #define some reference axis
-SystemOrigin = FreeCAD.Vector(0,0,0)
+SystemOrigin = FreeCAD.Vector(0.0,0.0,0.0)
 
 SystemXAxis = FreeCAD.Axis()
 SystemXAxis.Base = SystemOrigin
-SystemXAxis.Direction = SystemXAxis.Direction.add(FreeCAD.Vector(1,0,0))
+SystemXAxis.Direction = SystemXAxis.Direction.add(FreeCAD.Vector(1.0,0.0,0.0))
 
 SystemYAxis = FreeCAD.Axis()
 SystemYAxis.Base = SystemOrigin
-SystemYAxis.Direction = SystemYAxis.Direction.add(FreeCAD.Vector(0,1,0))
+SystemYAxis.Direction = SystemYAxis.Direction.add(FreeCAD.Vector(0.0,1.0,0.0))
 
 SystemZAxis = FreeCAD.Axis()
 SystemZAxis.Base = SystemOrigin
-SystemZAxis.Direction = SystemZAxis.Direction.add(FreeCAD.Vector(0,0,1))
+SystemZAxis.Direction = SystemZAxis.Direction.add(FreeCAD.Vector(0.0,0.0,1.0))
 
 
 #at the beginning each rigid is able to move along and around all six DOF
@@ -66,15 +63,40 @@ tolerance = 1e-6  #--> may be equal to parameter accuracy?
 
 #as first some helper functions
 
+#create an axis from refpoint and refAxisEnd taken from rigid deps
+def create_Axis(_base, _direction):
+    axis=FreeCAD.Axis()
+    axis.Base = _base
+    axis.Direction = _direction
+    return axis
+
+
+#create an axis that has Base in the first vector argument and direction defined by _start to _end shifted at SystemOrigin 
+def create_Axis2Points(_start, _end):
+    axis=FreeCAD.Axis()
+    axis.Base = _start
+    axis.Direction = _end.sub(_start)
+    return axis
+
+
+def copynorm_AxisToOrigin(axisa, dbg=False):
+    _offset = SystemOrigin.sub(axisa.Base)
+    axisb = FreeCAD.Axis(axisa)    
+    if dbg: print axisa, axisb    
+    axisb.move(_offset)
+    if dbg: print axisa, axisb
+    #axisb.Base = SystemOrigin
+    axisb.Direction = axisb.Direction.normalize()
+    return axisb
+
+
+
 #create an axis which is normal to the plane defined by given 2 axes as argument
 def normal_2Axis(axisa,axisb,dbg=False):
     #move vectors to origin and normalize
-    axis1 = FreeCAD.Axis(axisa)
-    axis2 = FreeCAD.Axis(axisb)      
-    axis1.Base = SystemOrigin
-    axis2.Base = SystemOrigin
-    axis1.Direction = axis1.Direction.normalize() #useless?
-    axis2.Direction = axis2.Direction.normalize() #useless?
+    axis1 = copynorm_AxisToOrigin(axisa)
+    axis2 = copynorm_AxisToOrigin(axisb)      
+
     #create an axis with base at SystemOrigin 
     axisN = FreeCAD.Axis()
     #set the right direction 
@@ -84,9 +106,8 @@ def normal_2Axis(axisa,axisb,dbg=False):
 
 #create a plane normal to the given axis, return the 2 axis which define that plane 
 def make_planeNormal(axisa,dbg=False):
-    axis1 = FreeCAD.Axis(axisa)
-    axis1.Base = SystemOrigin
-    axis1.Direction = axis1.Direction.normalize()    
+    axis1 = copynorm_AxisToOrigin(axisa)
+    
     planenormal = Part.makePlane(1.0,1.0, axis1.Base, axis1.Direction)
     freeAx1 = FreeCAD.Axis()
     freeAx2 = FreeCAD.Axis()
@@ -100,12 +121,9 @@ def make_planeNormal(axisa,dbg=False):
 def check_ifParallel(axisa,axisb,dbg=False):
     #shift edges to the origin and normalize them
     #move vectors to origin and normalize
-    axis1 = FreeCAD.Axis(axisa)
-    axis2 = FreeCAD.Axis(axisb)      
-    axis1.Base = SystemOrigin
-    axis2.Base = SystemOrigin
-    axis1.Direction = axis1.Direction.normalize() #useless?
-    axis2.Direction = axis2.Direction.normalize() #useless?
+    axis1 = copynorm_AxisToOrigin(axisa)
+    axis2 = copynorm_AxisToOrigin(axisb)
+
     if abs((axis1.Direction.cross(axis2.Direction)).Length) <= tolerance:
         if dbg:print("Parallel Edges" , axis1, axis2 )
         return True
@@ -118,12 +136,9 @@ def check_ifParallel(axisa,axisb,dbg=False):
 def check_ifPerpendicular(axisa,axisb,dbg=False):
     #shift edges to the origin and normalize them
     #move vectors to origin and normalize
-    axis1 = FreeCAD.Axis(axisa)
-    axis2 = FreeCAD.Axis(axisb)    
-    axis1.Base = SystemOrigin
-    axis2.Base = SystemOrigin
-    axis1.Direction = axis1.Direction.normalize() #useless?
-    axis2.Direction = axis2.Direction.normalize() #useless?
+    axis1 = copynorm_AxisToOrigin(axisa)
+    axis2 = copynorm_AxisToOrigin(axisb)    
+    
     if abs(axis1.Direction.dot(axis2.Direction)) <= tolerance:
         if dbg:print("Perpendicular Edges" , axis1, axis2 )
         return True
@@ -177,12 +192,10 @@ def check_ifCoincident(Vertex1, Vertex2, dbg=False):
 def check_ifPointOnAxis(vertexa, axisa, dbg=False):
     #shift edges to the origin and normalize them
     #move vectors to origin and normalize
-    axis1 = FreeCAD.Axis(axisa)
+    axis1 = copy_AxisToOrigin(axisa)
     vertex1 = FreeCAD.Vector(vertexa)    
     _offset = SystemOrigin.sub(axis1.Base)  
-    axis1.Base = SystemOrigin
-    axis1.Direction = axis1.Direction.normalize() #useless?
-    vertex1 = vertex1.sub(_offset) #apply the same offset to the point
+    vertex1 = vertex1.sub(axis1.Base) #apply the same offset to the point
     if abs((axis1.Direction.cross(vertex1)).Length) <= tolerance:
         if dbg:print("Point on Axis" , vertex1, axis1 )
         return True
@@ -344,7 +357,7 @@ def PointIdentityPos(pointA, rigidCenterpoint, dofpos, pointconstraints, dbg=Tru
         elif currentDOFPOSnum == 3 : 
             #if there is only 1 pointidentity do nothing, as single point constraint doesn't lock anything just store the point
             if len(pointconstraints) == 0:            
-                pointconstraints.append(pointA)
+                pointconstraints.append(pointA) #in this way I should modify the array outside the function
                 return dofpos
             else: #add the point to the pointconstraint array
                 pointconstraints.add(pointA)
@@ -390,10 +403,8 @@ def PointIdentityRot(pointA, dofrot, pointconstraints, dbg=True):
         elif len(pointconstraints) == 2:
             #this is a circularedge constraint with an axis with Base on pointA and Direction pointconstraint[0] to pointconstraints[1]
             #so DOFROT as circular edge always locks all 3 axes in position
-            tmpAxis = FreeCAD.Axis()
-            _offset = SystemOrigin.sub(pointconstraints[0]) #calculate the distance from origin
-            tmpAxis.Base = SystemOrigin                
-            tmpAxis.Direction = pointconstraints[1].sub(_offset)  #the direction from origin
+            tmpAxis = create_Axis2Points(pointconstraints[0],pointconstraints[1])            
+            tmpAxis = copy_AxisToOrigin(tmpAxis)
             return AxisAlignment(tmpAxis, dofrot)    
                 
     else:
@@ -401,7 +412,7 @@ def PointIdentityRot(pointA, dofrot, pointconstraints, dbg=True):
         return dofrot 
 
 
-#in the end there are the toolbar constraints, those are simply a combination of the one above
+#in the end there are the toolbar constraints, those are simply a combination of the ones above
 
 #PointIdentity, PointOnLine, PointOnPlane, Spherical Constraints:
 #    PointIdentityPos()    needs to know the point constrained as vector, the dofpos array, the rigid center point as vector and 
@@ -415,6 +426,15 @@ def PointIdentityRot(pointA, dofrot, pointconstraints, dbg=True):
 #    AxisDistance()     needs to know the axis normal to circle (stored in dep as refpoint and refAxisEnd) and the dofpos array    
 #    PlaneOffset()      needs to know the axis normal to circle (stored in dep as refpoint and refAxisEnd) and the dofpos array  
 #    LockRotation()     need to know if LockRotation is True or False and the array dofrot
+#
+#    honestly speaking this would be simplified like this:
+#    if LockRotation:
+#        dofpos = []
+#        dofrot = []         
+#    else:
+#        dofpos = []
+#        dofrot = AxisAlignment(ConstraintAxis, dofrot)
+
 
 #PlanesParallelConstraint:
 #    AxisAlignment()    needs to know the axis normal to the plane constrained (stored in dep as refpoint and refAxisEnd) and the dofrot array
@@ -451,3 +471,7 @@ print "Axes Parallel? = " , check_ifParallel(AXIS1,AXIS2)
 print "Axes Perpendicular? = " , check_ifPerpendicular(AXIS1,AXIS2)
 print "Axes Collinear? = " , check_ifCollinear(AXIS1,AXIS2)
 print "Vertexes are Coincident ? = " ,  check_ifCoincident(AXIS1.Base, AXIS2.Base)
+dfdfdf = create_Axis(FreeCAD.Vector(12.0,33.5,12.7), FreeCAD.Vector(23.5,22.0,99.0))
+print copynorm_AxisToOrigin(dfdfdf)
+print create_Axis2Points(FreeCAD.Vector(1.0,1.0,1.0), FreeCAD.Vector(3,3,3))
+
