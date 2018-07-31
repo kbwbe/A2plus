@@ -1058,15 +1058,16 @@ class DependencyAxial(Dependency):
 
 
 #------------------------------------------------------------------------------
-def solveConstraints( doc, cache=None ): #cache because of compatibility to hamish...
+def solveConstraints( doc, cache=None ):
+    doc.openTransaction("a2p_systemSolving")
     ss = SolverSystem()
     ss.solveSystem(doc)
+    doc.commitTransaction()
 
 def autoSolveConstraints( doc, cache=None):
     if not a2plib.getAutoSolveState():
         return
-    ss = SolverSystem()
-    ss.solveSystem(doc)
+    solveConstraints(doc)
 
 class a2p_SolverCommand:
     def Activated(self):
@@ -1089,6 +1090,12 @@ if __name__ == "__main__":
     FreeCAD.Console.PrintMessage( "Starting...\n" )
     doc = FreeCAD.activeDocument()
     solveConstraints(doc)
+
+
+
+
+
+
 
 
 
