@@ -95,12 +95,12 @@ class a2pWorkbench (Workbench):
         
 
     def Activated(self):
-        from a2plib import DebugMsg
-        DebugMsg("A2plus Workbench activated!\n")
+        import observers
+        FreeCAD.addDocumentObserver(observers.redoUndoObserver)
         
     def Deactivated(self):
-        from a2plib import DebugMsg
-        DebugMsg("A2plus workbench deactivated\n")
+        import observers
+        FreeCAD.removeDocumentObserver(observers.redoUndoObserver)
 
     def ContextMenu(self, recipient):
         import FreeCAD, FreeCADGui

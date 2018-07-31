@@ -200,7 +200,7 @@ def create_constraint_mirror( constraintObj, iconPath, origLabel= '', mirrorLabe
     return cMirror.Name
  
 class ConstraintObjectProxy:
-    def __init__(self,obj):
+    def __init__(self,obj=None):
         self.disable_onChanged = False
     
     def execute(self, obj):

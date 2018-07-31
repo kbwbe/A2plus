@@ -674,6 +674,7 @@ FreeCADGui.addCommand('a2p_TogglePartialProcessingCommand', a2p_TogglePartialPro
 
 def a2p_repairTreeView():
     doc = FreeCAD.activeDocument()
+    if doc == None: return
     
     constraints = [ obj for obj in doc.Objects if 'ConstraintInfo' in obj.Content]
     for c in constraints:
