@@ -678,25 +678,29 @@ def a2p_repairTreeView():
     
     constraints = [ obj for obj in doc.Objects if 'ConstraintInfo' in obj.Content]
     for c in constraints:
-        c.Proxy.disable_onChanged = True
+        if c.Proxy != None:
+            c.Proxy.disable_onChanged = True
         if not hasattr(c,"ParentTreeObject"):
             c.addProperty("App::PropertyLink","ParentTreeObject","ConstraintInfo")
             c.setEditorMode("ParentTreeObject", 1)
         parent = doc.getObject(c.Object1)
         c.ParentTreeObject = parent
         parent.Label = parent.Label # trigger an update...
-        c.Proxy.disable_onChanged = False
+        if c.Proxy != None:
+            c.Proxy.disable_onChanged = False
     #
     mirrors = [ obj for obj in doc.Objects if 'ConstraintNfo' in obj.Content]
     for m in mirrors:
-        m.Proxy.disable_onChanged = True
+        if m.Proxy != None:
+            m.Proxy.disable_onChanged = True
         if not hasattr(m,"ParentTreeObject"):
             m.addProperty("App::PropertyLink","ParentTreeObject","ConstraintNfo")
             m.setEditorMode("ParentTreeObject", 1)
         parent = doc.getObject(m.Object2)
         m.ParentTreeObject = parent
         parent.Label = parent.Label # trigger an update...
-        m.Proxy.disable_onChanged = False
+        if m.Proxy != None:
+            m.Proxy.disable_onChanged = False
     #
 
 toolTipMessage = \
