@@ -53,6 +53,9 @@ SPINSTEP_DIVISOR = 12.0
 WEIGHT_LINEAR_MOVE = 0.5
 WEIGHT_REFPOINT_ROTATION = 8.0
 
+SOLVER_STEPS_CONVERGENCY_CHECK = 1000
+SOLVER_MIN_CONVERGENCY_RATE = 0.9999
+SOLVER_CONVERGENY_ERROR_INIT_VALUE = 1.0e+20
 
 #------------------------------------------------------------------------------
 class SolverSystem():
@@ -69,6 +72,9 @@ class SolverSystem():
         self.objectNames = []
         self.mySOLVER_SPIN_ACCURACY = SOLVER_SPIN_ACCURACY
         self.mySOLVER_POS_ACCURACY = SOLVER_POS_ACCURACY
+        self.lastPositionError = SOLVER_CONVERGENY_ERROR_INIT_VALUE
+        self.lastAxisError = SOLVER_CONVERGENY_ERROR_INIT_VALUE
+        self.convergencyCounter = 0
         
     def clear(self):
         for r in self.rigids:
@@ -87,6 +93,11 @@ class SolverSystem():
     def loadSystem(self,doc):
         self.clear()
         self.doc = doc
+        #
+        self.convergencyCounter = 0
+        self.lastPositionError = SOLVER_CONVERGENY_ERROR_INIT_VALUE
+        self.lastAxisError = SOLVER_CONVERGENY_ERROR_INIT_VALUE
+        #
         self.constraints = [ obj for obj in doc.Objects if 'ConstraintInfo' in obj.Content]
         #
         # Extract all the objectnames which are affected by constraints..
@@ -282,6 +293,10 @@ class SolverSystem():
         for rig in workList:
             rig.enableDependencies(workList)
 
+        self.lastPositionError = SOLVER_CONVERGENY_ERROR_INIT_VALUE
+        self.lastAxisError = SOLVER_CONVERGENY_ERROR_INIT_VALUE
+        self.convergencyCounter = 0
+
         calcCount = 0
         goodAccuracy = False
         while not goodAccuracy:
@@ -290,6 +305,7 @@ class SolverSystem():
 
             calcCount += 1
             self.stepCount += 1
+            self.convergencyCounter += 1
             # First calculate all the movement vectors
             for w in workList:
                 w.calcMoveData(doc, self)
@@ -315,7 +331,18 @@ class SolverSystem():
                 for r in workList:
                     r.applySolution(doc, self)
                     r.tempfixed = True
-
+                    
+            if self.convergencyCounter > SOLVER_STEPS_CONVERGENCY_CHECK:
+                if (
+                    maxPosError > SOLVER_MIN_CONVERGENCY_RATE * self.lastPositionError or
+                    maxAxisError > SOLVER_MIN_CONVERGENCY_RATE * self.lastAxisError
+                    ):
+                    FreeCAD.Console.PrintMessage( "System not solvable, convergency is to bad !\n" )
+                    return False
+                self.lastPositionError = maxPosError
+                self.lastAxisError = maxAxisError
+                self.convergencyCounter = 0
+                
             if self.stepCount > SOLVER_MAXSTEPS:
                 FreeCAD.Console.PrintMessage( "Reached max calculations count ({})\n".format(SOLVER_MAXSTEPS) )
                 return False
