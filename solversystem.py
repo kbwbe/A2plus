@@ -213,20 +213,15 @@ class SolverSystem():
         for rig in self.rigids:
             rig.prepareRestart()
 
-    def solveSystem(self,doc):
+    def solveSystemWithMode(self,doc, mode):
         self.level_of_accuracy=1
-        Msg( "\n===== Start Solving System ====== \n" )
-        if a2plib.isPartialProcessing():
-            Msg( "Solvermode = partialProcessing !\n")
-        else:
-            Msg( "Solvermode = solve all Parts at once !\n")
 
         startTime = int(round(time.time() * 1000))
         self.loadSystem(doc)
         self.assignParentship(doc)
         loadTime = int(round(time.time() * 1000))
         while True:
-            systemSolved = self.calculateChain(doc)
+            systemSolved = self.calculateChain(doc, mode)
             totalTime = int(round(time.time() * 1000))
             DebugMsg(A2P_DEBUG_1, "Total steps used: %d\n" %  self.stepCount)
             DebugMsg(A2P_DEBUG_1, "LoadTime (ms): %d\n" % (loadTime - startTime) )
@@ -238,35 +233,57 @@ class SolverSystem():
                 self.level_of_accuracy+=1
                 if self.level_of_accuracy == 4:
                     self.solutionToParts(doc)
-                    Msg( "===== System solved ! ====== \n" )
                     break
                 self.prepareRestart()
             else:
-                Msg( "===== Could not solve system ====== \n" )
+                break
+        self.mySOLVER_SPIN_ACCURACY = SOLVER_SPIN_ACCURACY
+        self.mySOLVER_POS_ACCURACY = SOLVER_POS_ACCURACY
+        return systemSolved
+        
+    def solveSystem(self,doc):
+        Msg( "\n===== Start Solving System ====== \n" )
+        if a2plib.isPartialProcessing():
+            Msg( "Solvermode = partialProcessing !\n")
+            mode = 'partial'
+        else:
+            Msg( "Solvermode = solve all Parts at once !\n")
+            mode = 'magnetic'
 
-                msg = \
+        systemSolved = self.solveSystemWithMode(doc,mode)
+        if not systemSolved and mode == 'partial':
+            Msg( "Could not solve system with partial processing, swith to 'magnetic' mode  \n" )
+            mode = 'magnetic'
+            systemSolved = self.solveSystemWithMode(doc,mode)
+        if systemSolved:
+            Msg( "===== System solved ! ====== \n" )
+        else:
+            Msg( "===== Could not solve system ====== \n" )
+            msg = \
     '''
     Constraints inconsistent. Cannot solve System. 
     Please delete your last created constraint !
     '''
-                QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Constraint mismatch", msg )
-                break
-        self.mySOLVER_SPIN_ACCURACY = SOLVER_SPIN_ACCURACY
-        self.mySOLVER_POS_ACCURACY = SOLVER_POS_ACCURACY
-
+            QtGui.QMessageBox.information(
+                QtGui.QApplication.activeWindow(), 
+                "Constraint mismatch", 
+                msg
+                )
+            
+        
+        
     def printList(self, name, l):
         Msg("{} = (".format(name))
         for e in l:
             Msg( "{} ".format(e.label) )
         Msg("):\n")
 
-    def calculateChain(self, doc):
+    def calculateChain(self, doc, mode):
         self.stepCount = 0
-        rigCalcCount = 0
         haveMore = True
         workList = []
 
-        if a2plib.isPartialProcessing():
+        if mode == 'partial':
             # start from fixed rigids and its children
             for rig in self.rigids:
                 if rig.fixed:
@@ -276,7 +293,7 @@ class SolverSystem():
             workList.extend(self.rigids)
 
         while haveMore:
-            solutionFound = self.calculateWorkList(doc, workList)
+            solutionFound = self.calculateWorkList(doc, workList, mode)
             if not solutionFound: return False
 
             addList = []
@@ -292,7 +309,7 @@ class SolverSystem():
 
         return True
 
-    def calculateWorkList(self, doc, workList):
+    def calculateWorkList(self, doc, workList, mode):
         if A2P_DEBUG_LEVEL >= A2P_DEBUG_1:
             self.printList("WorkList", workList)
 
@@ -343,15 +360,17 @@ class SolverSystem():
                     maxPosError  >= self.lastPositionError or
                     maxAxisError >= self.lastAxisError
                     ):
-                    Msg( "System not solvable, convergency is to bad !\n" )
-                    Msg( "If you are using solverMode partialProcessing, try solverMode allAtOnce !\n" )
+                    if mode == 'magnetic':
+                        Msg( "System not solvable, convergency is to bad !\n" )
+                        Msg( "If you are using solverMode partialProcessing, try solverMode allAtOnce !\n" )
                     return False
                 self.lastPositionError = maxPosError
                 self.lastAxisError = maxAxisError
                 self.convergencyCounter = 0
                 
             if self.stepCount > SOLVER_MAXSTEPS:
-                Msg( "Reached max calculations count ({})\n".format(SOLVER_MAXSTEPS) )
+                if mode == 'magnetic':
+                    Msg( "Reached max calculations count ({})\n".format(SOLVER_MAXSTEPS) )
                 return False
         return True
 
