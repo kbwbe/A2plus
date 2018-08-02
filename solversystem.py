@@ -59,7 +59,7 @@ WEIGHT_LINEAR_MOVE = 0.5
 WEIGHT_REFPOINT_ROTATION = 8.0
 
 SOLVER_STEPS_CONVERGENCY_CHECK = 1000
-SOLVER_CONVERGENY_ERROR_INIT_VALUE = 1.0e+20
+SOLVER_CONVERGENCY_ERROR_INIT_VALUE = 1.0e+20
 
 #------------------------------------------------------------------------------
 class SolverSystem():
@@ -76,8 +76,8 @@ class SolverSystem():
         self.objectNames = []
         self.mySOLVER_SPIN_ACCURACY = SOLVER_SPIN_ACCURACY
         self.mySOLVER_POS_ACCURACY = SOLVER_POS_ACCURACY
-        self.lastPositionError = SOLVER_CONVERGENY_ERROR_INIT_VALUE
-        self.lastAxisError = SOLVER_CONVERGENY_ERROR_INIT_VALUE
+        self.lastPositionError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
+        self.lastAxisError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
         self.convergencyCounter = 0
         
     def clear(self):
@@ -99,8 +99,8 @@ class SolverSystem():
         self.doc = doc
         #
         self.convergencyCounter = 0
-        self.lastPositionError = SOLVER_CONVERGENY_ERROR_INIT_VALUE
-        self.lastAxisError = SOLVER_CONVERGENY_ERROR_INIT_VALUE
+        self.lastPositionError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
+        self.lastAxisError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
         #
         self.constraints = [ obj for obj in doc.Objects if 'ConstraintInfo' in obj.Content]
         #
@@ -316,8 +316,8 @@ class SolverSystem():
         for rig in workList:
             rig.enableDependencies(workList)
 
-        self.lastPositionError = SOLVER_CONVERGENY_ERROR_INIT_VALUE
-        self.lastAxisError = SOLVER_CONVERGENY_ERROR_INIT_VALUE
+        self.lastPositionError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
+        self.lastAxisError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
         self.convergencyCounter = 0
 
         calcCount = 0
