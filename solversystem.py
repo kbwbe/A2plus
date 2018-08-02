@@ -362,7 +362,6 @@ class SolverSystem():
                     ):
                     if mode == 'magnetic':
                         Msg( "System not solvable, convergency is to bad !\n" )
-                        Msg( "If you are using solverMode partialProcessing, try solverMode allAtOnce !\n" )
                     return False
                 self.lastPositionError = maxPosError
                 self.lastAxisError = maxAxisError
