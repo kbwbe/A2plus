@@ -38,21 +38,28 @@ from a2plib import (
     isLine,
     getPos,
     getAxis,
-    appVersionStr
+    appVersionStr,
+    Msg,
+    DebugMsg,
+    A2P_DEBUG_LEVEL,
+    A2P_DEBUG_1,
+    A2P_DEBUG_2,
+    A2P_DEBUG_3,
     )
 import os, sys
 from os.path import expanduser
-#from Units import Unit, Quantity
 
 
-SOLVER_MAXSTEPS = 100000
-SOLVER_POS_ACCURACY = 1.0e-1 #Need to implement variable stepwith calculation to improve this..
-SOLVER_SPIN_ACCURACY = 1.0e-1 #Sorry for that at moment...
+SOLVER_MAXSTEPS = 300000
+SOLVER_POS_ACCURACY = 1.0e-1  # gets to smaller values during solving
+SOLVER_SPIN_ACCURACY = 1.0e-1 # gets to smaller values during solving
 
 SPINSTEP_DIVISOR = 12.0
 WEIGHT_LINEAR_MOVE = 0.5
 WEIGHT_REFPOINT_ROTATION = 8.0
 
+SOLVER_STEPS_CONVERGENCY_CHECK = 1000
+SOLVER_CONVERGENY_ERROR_INIT_VALUE = 1.0e+20
 
 #------------------------------------------------------------------------------
 class SolverSystem():
@@ -69,6 +76,9 @@ class SolverSystem():
         self.objectNames = []
         self.mySOLVER_SPIN_ACCURACY = SOLVER_SPIN_ACCURACY
         self.mySOLVER_POS_ACCURACY = SOLVER_POS_ACCURACY
+        self.lastPositionError = SOLVER_CONVERGENY_ERROR_INIT_VALUE
+        self.lastAxisError = SOLVER_CONVERGENY_ERROR_INIT_VALUE
+        self.convergencyCounter = 0
         
     def clear(self):
         for r in self.rigids:
@@ -87,6 +97,11 @@ class SolverSystem():
     def loadSystem(self,doc):
         self.clear()
         self.doc = doc
+        #
+        self.convergencyCounter = 0
+        self.lastPositionError = SOLVER_CONVERGENY_ERROR_INIT_VALUE
+        self.lastAxisError = SOLVER_CONVERGENY_ERROR_INIT_VALUE
+        #
         self.constraints = [ obj for obj in doc.Objects if 'ConstraintInfo' in obj.Content]
         #
         # Extract all the objectnames which are affected by constraints..
@@ -141,18 +156,20 @@ class SolverSystem():
                     haveMore = rig.assignParentship(distance)
                     distance += 1
 
-        FreeCAD.Console.PrintMessage(20*"=" + "\n")
-        FreeCAD.Console.PrintMessage("Hierarchy:\n")
-        FreeCAD.Console.PrintMessage(20*"=" + "\n")
-        for rig in self.rigids:
-            if rig.fixed: rig.printHierarchy(0)
-        FreeCAD.Console.PrintMessage(20*"=" + "\n")
+        if A2P_DEBUG_LEVEL > 0:
+            Msg(20*"=" + "\n")
+            Msg("Hierarchy:\n")
+            Msg(20*"=" + "\n")
+            for rig in self.rigids:
+                if rig.fixed: rig.printHierarchy(0)
+            Msg(20*"=" + "\n")
+        
         self.visualizeHierarchy()
 
     def visualizeHierarchy(self):
         home = expanduser("~")
         out_file = os.path.join(home,'assembly_hierarchy.html')
-        FreeCAD.Console.PrintMessage("Writing visual hierarchy to: {}\n".format(out_file))
+        Msg("Writing visual hierarchy to: {}\n".format(out_file))
         f = open(out_file, "w")
 
         f.write("<!DOCTYPE html>\n")
@@ -196,27 +213,21 @@ class SolverSystem():
         for rig in self.rigids:
             rig.prepareRestart()
 
-    def solveSystem(self,doc):
+    def solveSystemWithMode(self,doc, mode):
         self.level_of_accuracy=1
-        FreeCAD.Console.PrintMessage( "\n===== Start Solving System ====== \n" )
 
         startTime = int(round(time.time() * 1000))
         self.loadSystem(doc)
         self.assignParentship(doc)
         loadTime = int(round(time.time() * 1000))
         while True:
-            systemSolved = self.calculateChain(doc)
+            systemSolved = self.calculateChain(doc, mode)
             totalTime = int(round(time.time() * 1000))
-            #FreeCAD.Console.PrintMessage( "Position Accuracy: %f\n" %  self.mySOLVER_POS_ACCURACY )
-            #FreeCAD.Console.PrintMessage( "Max positionerror: %f\n" %  poserror )
-            #FreeCAD.Console.PrintMessage( "Spin Accuracy: %f\n" %  self.mySOLVER_SPIN_ACCURACY )
-            #FreeCAD.Console.PrintMessage( "Max spinerror: %f\n" %  spinerror )
-            FreeCAD.Console.PrintMessage( "Total steps used: %d\n" %  self.stepCount)
-            FreeCAD.Console.PrintMessage( "LoadTime (ms): %d\n" % (loadTime - startTime) )
-            FreeCAD.Console.PrintMessage( "CalcTime (ms): %d\n" % (totalTime - loadTime) )
-            FreeCAD.Console.PrintMessage( "TotalTime (ms): %d\n" % (totalTime - startTime) )
+            DebugMsg(A2P_DEBUG_1, "Total steps used: %d\n" %  self.stepCount)
+            DebugMsg(A2P_DEBUG_1, "LoadTime (ms): %d\n" % (loadTime - startTime) )
+            DebugMsg(A2P_DEBUG_1, "CalcTime (ms): %d\n" % (totalTime - loadTime) )
+            DebugMsg(A2P_DEBUG_1, "TotalTime (ms): %d\n" % (totalTime - startTime) )
             if systemSolved:
-                FreeCAD.Console.PrintMessage( "===== System solved ! ====== \n" )
                 self.mySOLVER_SPIN_ACCURACY *= 1e-1
                 self.mySOLVER_POS_ACCURACY *= 1e-1
                 self.level_of_accuracy+=1
@@ -225,43 +236,64 @@ class SolverSystem():
                     break
                 self.prepareRestart()
             else:
-                FreeCAD.Console.PrintMessage( "===== Could not solve system ====== \n" )
+                break
+        self.mySOLVER_SPIN_ACCURACY = SOLVER_SPIN_ACCURACY
+        self.mySOLVER_POS_ACCURACY = SOLVER_POS_ACCURACY
+        return systemSolved
+        
+    def solveSystem(self,doc):
+        Msg( "\n===== Start Solving System ====== \n" )
+        if a2plib.isPartialProcessing():
+            Msg( "Solvermode = partialProcessing !\n")
+            mode = 'partial'
+        else:
+            Msg( "Solvermode = solve all Parts at once !\n")
+            mode = 'magnetic'
 
-                msg = \
+        systemSolved = self.solveSystemWithMode(doc,mode)
+        if not systemSolved and mode == 'partial':
+            Msg( "Could not solve system with partial processing, swith to 'magnetic' mode  \n" )
+            mode = 'magnetic'
+            systemSolved = self.solveSystemWithMode(doc,mode)
+        if systemSolved:
+            Msg( "===== System solved ! ====== \n" )
+        else:
+            Msg( "===== Could not solve system ====== \n" )
+            msg = \
     '''
     Constraints inconsistent. Cannot solve System. 
     Please delete your last created constraint !
     '''
-                QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Constraint mismatch", msg )
-                break
-        self.mySOLVER_SPIN_ACCURACY = SOLVER_SPIN_ACCURACY
-        self.mySOLVER_POS_ACCURACY = SOLVER_POS_ACCURACY
-
+            QtGui.QMessageBox.information(
+                QtGui.QApplication.activeWindow(), 
+                "Constraint mismatch", 
+                msg
+                )
+            
+        
+        
     def printList(self, name, l):
-        FreeCAD.Console.PrintMessage("{} = (".format(name))
+        Msg("{} = (".format(name))
         for e in l:
-            FreeCAD.Console.PrintMessage( "{} ".format(e.label) )
-        FreeCAD.Console.PrintMessage("):\n")
+            Msg( "{} ".format(e.label) )
+        Msg("):\n")
 
-    def calculateChain(self, doc):
+    def calculateChain(self, doc, mode):
         self.stepCount = 0
-        rigCalcCount = 0
         haveMore = True
         workList = []
 
-        if a2plib.isPartialProcessing():
-            FreeCAD.Console.PrintMessage( "Solvermode = partialProcessing !\n")
+        if mode == 'partial':
             # start from fixed rigids and its children
             for rig in self.rigids:
                 if rig.fixed:
                     workList.append(rig);
                     workList.extend(set(rig.getCandidates()))
         else:
-            FreeCAD.Console.PrintMessage( "Solvermode = solve all Parts at once !\n")
             workList.extend(self.rigids)
 
         while haveMore:
-            solutionFound = self.calculateWorkList(doc, workList)
+            solutionFound = self.calculateWorkList(doc, workList, mode)
             if not solutionFound: return False
 
             addList = []
@@ -271,16 +303,22 @@ class SolverSystem():
             addList = set(addList)
             workList.extend(addList)
             haveMore = (len(addList) > 0)
-            self.printList("AddList", addList)
+            if A2P_DEBUG_LEVEL >= A2P_DEBUG_1:
+                self.printList("AddList", addList)
 
 
         return True
 
-    def calculateWorkList(self, doc, workList):
-        self.printList("WorkList", workList)
+    def calculateWorkList(self, doc, workList, mode):
+        if A2P_DEBUG_LEVEL >= A2P_DEBUG_1:
+            self.printList("WorkList", workList)
 
         for rig in workList:
             rig.enableDependencies(workList)
+
+        self.lastPositionError = SOLVER_CONVERGENY_ERROR_INIT_VALUE
+        self.lastAxisError = SOLVER_CONVERGENY_ERROR_INIT_VALUE
+        self.convergencyCounter = 0
 
         calcCount = 0
         goodAccuracy = False
@@ -290,6 +328,7 @@ class SolverSystem():
 
             calcCount += 1
             self.stepCount += 1
+            self.convergencyCounter += 1
             # First calculate all the movement vectors
             for w in workList:
                 w.calcMoveData(doc, self)
@@ -311,13 +350,26 @@ class SolverSystem():
                 # The accuracy is good, we're done here
                 goodAccuracy = True
                 # Mark the rigids as tempfixed and add its constrained rigids to pending list to be processed next
-                FreeCAD.Console.PrintMessage( "{} counts \n".format(calcCount) )
+                DebugMsg(A2P_DEBUG_1, "{} counts \n".format(calcCount) )
                 for r in workList:
                     r.applySolution(doc, self)
                     r.tempfixed = True
-
+                    
+            if self.convergencyCounter > SOLVER_STEPS_CONVERGENCY_CHECK:
+                if (
+                    maxPosError  >= self.lastPositionError or
+                    maxAxisError >= self.lastAxisError
+                    ):
+                    if mode == 'magnetic':
+                        Msg( "System not solvable, convergency is to bad !\n" )
+                    return False
+                self.lastPositionError = maxPosError
+                self.lastAxisError = maxAxisError
+                self.convergencyCounter = 0
+                
             if self.stepCount > SOLVER_MAXSTEPS:
-                FreeCAD.Console.PrintMessage( "Reached max calculations count ({})\n".format(SOLVER_MAXSTEPS) )
+                if mode == 'magnetic':
+                    Msg( "Reached max calculations count ({})\n".format(SOLVER_MAXSTEPS) )
                 return False
         return True
 
@@ -405,8 +457,8 @@ class Rigid():
             
 
     def printHierarchy(self, level):
-        FreeCAD.Console.PrintMessage((level*3)*" ")
-        FreeCAD.Console.PrintMessage("{} - distance {}\n".format(self.label, self.disatanceFromFixed))
+        Msg((level*3)*" ")
+        Msg("{} - distance {}\n".format(self.label, self.disatanceFromFixed))
         for rig in self.childRigids:
             rig.printHierarchy(level+1)
     
@@ -642,11 +694,22 @@ class Dependency():
         self.axisRotationEnabled = False
 
     def __str__(self):
-        return "Dependencies between {}-{}, type {}".format(self.currentRigid.label, self.dependedRigid.label, self.Type)
+        return "Dependencies between {}-{}, type {}".format(
+            self.currentRigid.label, 
+            self.dependedRigid.label, 
+            self.Type
+            )
 
     @staticmethod
     def Create(doc, constraint, solver, rigid1, rigid2):
-        FreeCAD.Console.PrintMessage("Creating dependencies between {}-{}, type {}\n".format(rigid1.label, rigid2.label, constraint.Type))
+        DebugMsg(
+            A2P_DEBUG_2,
+            "Creating dependencies between {}-{}, type {}\n".format(
+                rigid1.label, 
+                rigid2.label, 
+                constraint.Type
+                )
+            )
 
         c = constraint
 
@@ -824,12 +887,18 @@ class Dependency():
 
     def enable(self, workList):
         if self.dependedRigid not in workList:
-            FreeCAD.Console.PrintMessage("{} - not in working list\n".format(self))
+            DebugMsg(
+                A2P_DEBUG_2,
+                "{} - not in working list\n".format(self)
+                )
             return
 
         self.Enabled = True
         self.foreignDependency.Enabled = True
-        FreeCAD.Console.PrintMessage("{} - enabled\n".format(self))
+        DebugMsg(
+            A2P_DEBUG_2,
+            "{} - enabled\n".format(self)
+            )
         
     def disable(self):
         self.Enabled = False
@@ -889,7 +958,6 @@ class Dependency():
             except:
                 axis = None
 
-        #FreeCAD.Console.PrintMessage("{} - rotate by {}\n".format(self, axis.Length))
         return axis
 
 #------------------------------------------------------------------------------
@@ -902,7 +970,6 @@ class DependencyPointIdentity(Dependency):
         if not self.Enabled: return None, None
 
         moveVector = self.foreignDependency.refPoint.sub(self.refPoint)
-        #FreeCAD.Console.PrintMessage("{} - move by {}\n".format(self, moveVector.Length))
         return self.refPoint, moveVector
 
 class DependencyPointOnLine(Dependency):
@@ -918,7 +985,6 @@ class DependencyPointOnLine(Dependency):
             dot = vec1.dot(axis1)
             axis1.multiply(dot) #projection of vec1 on axis1
             moveVector = vec1.sub(axis1)
-            #FreeCAD.Console.PrintMessage("{} - move by {}\n".format(self, moveVector.Length))
             return self.refPoint, moveVector
 
         elif self.refType == "pointAxis":
@@ -929,7 +995,6 @@ class DependencyPointOnLine(Dependency):
             axis1.multiply(dot) #projection of vec1 on axis1
             verticalRefOnLine = self.refPoint.add(axis1) #makes spinning around possible
             moveVector = vec1.sub(axis1)
-            #FreeCAD.Console.PrintMessage("{} - move by {}\n".format(self, moveVector.Length))
             return verticalRefOnLine, moveVector
 
         else:
@@ -950,7 +1015,6 @@ class DependencyPointOnPlane(Dependency):
             dot = vec1.dot(normal1)
             normal1.multiply(dot)
             moveVector = normal1
-            #FreeCAD.Console.PrintMessage("{} - move by {}\n".format(self, moveVector.Length))
             return self.refPoint, moveVector
 
         elif self.refType == "plane":
@@ -961,7 +1025,6 @@ class DependencyPointOnPlane(Dependency):
             normal1.multiply(dot)
             moveVector = normal1
             verticalRefPointOnPlane = vec1.sub(moveVector)  #makes spinning around possible
-            #FreeCAD.Console.PrintMessage("{} - move by {}\n".format(self, moveVector.Length))
             return verticalRefPointOnPlane, moveVector
 
         else:
@@ -975,7 +1038,6 @@ class DependencyCircularEdge(Dependency):
         if not self.Enabled: return None, None
 
         moveVector = self.foreignDependency.refPoint.sub(self.refPoint)
-        #FreeCAD.Console.PrintMessage("{} - move by {}\n".format(self, moveVector.Length))
         return self.refPoint, moveVector
 
 class DependencyParallelPlanes(Dependency):
@@ -985,7 +1047,6 @@ class DependencyParallelPlanes(Dependency):
     def getMovement(self):
         if not self.Enabled: return None, None
 
-        #FreeCAD.Console.PrintMessage("{} - no move\n".format(self))
         return self.refPoint, Base.Vector(0,0,0)
 
 class DependencyAngledPlanes(Dependency):
@@ -995,7 +1056,6 @@ class DependencyAngledPlanes(Dependency):
     def getMovement(self):
         if not self.Enabled: return None, None
 
-        #FreeCAD.Console.PrintMessage("{} - no move\n".format(self))
         return self.refPoint, Base.Vector(0,0,0)
 
     def getRotation(self, solver):
@@ -1021,7 +1081,7 @@ class DependencyAngledPlanes(Dependency):
                 y = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
                 z = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
                 axis = Base.Vector(x,y,z)
-        #FreeCAD.Console.PrintMessage("{} - rotate by {}\n".format(self, axis.Length))
+        #DebugMsg(A2P_DEBUG_3, "{} - rotate by {}\n".format(self, axis.Length))
         return axis
 
 class DependencyPlane(Dependency):
@@ -1037,7 +1097,7 @@ class DependencyPlane(Dependency):
         dot = vec1.dot(normal1)
         normal1.multiply(dot)
         moveVector = normal1
-        #FreeCAD.Console.PrintMessage("{} - move by {}\n".format(self, moveVector.Length))
+        #DebugMsg(A2P_DEBUG_3,"{} - move by {}\n".format(self, moveVector.Length))
         return self.refPoint, moveVector
 
 class DependencyAxial(Dependency):
@@ -1052,7 +1112,7 @@ class DependencyAxial(Dependency):
         dot = vec1.dot(destinationAxis)
         parallelToAxisVec = destinationAxis.normalize().multiply(dot)
         moveVector = vec1.sub(parallelToAxisVec)
-        #FreeCAD.Console.PrintMessage("{} - move by {}\n".format(self, moveVector.Length))
+        #DebugMsg(A2P_DEBUG_3, "{} - move by {}\n".format(self, moveVector.Length))
         return self.refPoint, moveVector
 
 
@@ -1087,7 +1147,7 @@ FreeCADGui.addCommand('a2p_SolverCommand', a2p_SolverCommand())
 
 
 if __name__ == "__main__":
-    FreeCAD.Console.PrintMessage( "Starting...\n" )
+    DebugMsg(A2P_DEBUG_1, "Starting solveConstraints latest script...\n" )
     doc = FreeCAD.activeDocument()
     solveConstraints(doc)
 
