@@ -361,7 +361,7 @@ class SolverSystem():
                     maxAxisError >= self.lastAxisError
                     ):
                     if mode == 'magnetic':
-                        Msg( "System not solvable, convergency is to bad !\n" )
+                        Msg( "System not solvable, convergency is incorrect!\n" )
                     return False
                 self.lastPositionError = maxPosError
                 self.lastAxisError = maxAxisError
