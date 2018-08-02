@@ -1082,7 +1082,7 @@ class DependencyAngledPlanes(Dependency):
                 y = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
                 z = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
                 axis = Base.Vector(x,y,z)
-        DebugMsg(A2P_DEBUG_3, "{} - rotate by {}\n".format(self, axis.Length))
+        #DebugMsg(A2P_DEBUG_3, "{} - rotate by {}\n".format(self, axis.Length))
         return axis
 
 class DependencyPlane(Dependency):
@@ -1098,7 +1098,7 @@ class DependencyPlane(Dependency):
         dot = vec1.dot(normal1)
         normal1.multiply(dot)
         moveVector = normal1
-        DebugMsg(A2P_DEBUG_3,"{} - move by {}\n".format(self, moveVector.Length))
+        #DebugMsg(A2P_DEBUG_3,"{} - move by {}\n".format(self, moveVector.Length))
         return self.refPoint, moveVector
 
 class DependencyAxial(Dependency):
@@ -1113,7 +1113,7 @@ class DependencyAxial(Dependency):
         dot = vec1.dot(destinationAxis)
         parallelToAxisVec = destinationAxis.normalize().multiply(dot)
         moveVector = vec1.sub(parallelToAxisVec)
-        DebugMsg(A2P_DEBUG_3, "{} - move by {}\n".format(self, moveVector.Length))
+        #DebugMsg(A2P_DEBUG_3, "{} - move by {}\n".format(self, moveVector.Length))
         return self.refPoint, moveVector
 
 
