@@ -252,7 +252,7 @@ class SolverSystem():
 
         systemSolved = self.solveSystemWithMode(doc,mode)
         if not systemSolved and mode == 'partial':
-            Msg( "Could not solve system with partial processing, swith to 'magnetic' mode  \n" )
+            Msg( "Could not solve system with partial processing, switch to 'magnetic' mode  \n" )
             mode = 'magnetic'
             systemSolved = self.solveSystemWithMode(doc,mode)
         if systemSolved:

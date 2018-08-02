@@ -56,7 +56,7 @@ def parseSelection(selection, objectToUpdate=None):
         QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Incorrect Usage", msg)
         return 
     
-    # calulate recent angle here to be stored in property "angle"
+    # calculate recent angle here to be stored in property "angle"
     ob1 = FreeCAD.activeDocument().getObject(s1.ObjectName)
     ob2 = FreeCAD.activeDocument().getObject(s2.ObjectName)
     plane1 = getObjectFaceFromName(ob1, s1.SubElementNames[0])
