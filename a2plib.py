@@ -52,6 +52,15 @@ RED = (1.0,0.0,0.0)
 GREEN = (0.0,1.0,0.0)
 BLUE = (0.0,0.0,1.0)
 
+# DEFINE DEBUG LEVELS FOR CONSOLE OUTPUT
+A2P_DEBUG_NONE      = 0
+A2P_DEBUG_1         = 1
+A2P_DEBUG_2         = 2
+A2P_DEBUG_3         = 3
+
+A2P_DEBUG_LEVEL = A2P_DEBUG_NONE
+
+
 #------------------------------------------------------------------------------
 def setAutoSolve(enabled):
     global AUTOSOLVE_ENABLED
@@ -161,7 +170,7 @@ def findSourceFileInProject(fullPath):
     projectFolder = os.path.abspath(getProjectFolder()) # get normalized path
     fileName = os.path.basename(fullPath)
     retval = findFile(fileName,projectFolder)
-    DebugMsg(
+    DebugMsg(A2P_DEBUG_1,
         "Found file {}\n".format(retval)
         )
     return retval
@@ -186,8 +195,8 @@ def Msg(tx):
     FreeCAD.Console.PrintMessage(tx)
     
 #------------------------------------------------------------------------------
-def DebugMsg(tx):
-    if DEBUGPROGRAM:
+def DebugMsg(level, tx):
+    if A2P_DEBUG_LEVEL >= level:
         FreeCAD.Console.PrintMessage(tx)
 
 #------------------------------------------------------------------------------
