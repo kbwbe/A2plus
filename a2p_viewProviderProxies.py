@@ -28,7 +28,7 @@ from pivy import coin
 import traceback
 
 #---------------------------------------------------------------------------
-# Modul global vars, automatically managed, hands off !!
+# Module global vars, automatically managed, hands off !!
 #---------------------------------------------------------------------------
 a2p_NeedToSolveSystem = False
 #---------------------------------------------------------------------------
@@ -206,7 +206,7 @@ class ConstraintObjectProxy:
     def execute(self, obj):
         global a2p_NeedToSolveSystem
         if a2p_NeedToSolveSystem:
-            a2p_NeedToSolveSystem = False # Solve only once after editing a constraints property
+            a2p_NeedToSolveSystem = False # Solve only once after editing a constraint's property
             self.callSolveConstraints()
             
     def onChanged(self, obj, prop):
