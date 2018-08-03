@@ -522,7 +522,7 @@ class ViewConnectionsCommand:
         FreeCADGui.Selection.addSelection(
             doc.getObject(selected.Object2), selected.SubElement2)
 
-        # Add observer to remove the transparency when the selection is chaning or removing
+        # Add observer to remove the transparency when the selection is changing or removing
         FreeCADGui.Selection.addObserver(ViewConnectionsObserver())
 
     def IsActive(self):

@@ -28,7 +28,7 @@ from pivy import coin
 import traceback
 
 #---------------------------------------------------------------------------
-# Modul global vars, automaticaly managed, hands off !!
+# Modul global vars, automatically managed, hands off !!
 #---------------------------------------------------------------------------
 a2p_NeedToSolveSystem = False
 #---------------------------------------------------------------------------
