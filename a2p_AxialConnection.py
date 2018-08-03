@@ -46,11 +46,11 @@ def parseSelection(selection, objectToUpdate=None):
                            [s2.ObjectName, s2.SubElementNames[0], s2.Object.Label ] ]
     if not validSelection:
         msg = '''
-              To add an axial constraint select two cylindrical surfaces or two 
+              To add an axial constraint select two cylindrical surfaces or two
               straight lines, each from a different part. Selection made:%s
               '''  % printSelection(selection)
         QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Incorrect Usage", msg)
-        return 
+        return
 
     if objectToUpdate == None:
         cName = findUnusedObjectName('axialConstraint')
@@ -60,15 +60,15 @@ def parseSelection(selection, objectToUpdate=None):
         c.addProperty("App::PropertyString","SubElement1","ConstraintInfo").SubElement1 = cParms[0][1]
         c.addProperty("App::PropertyString","Object2","ConstraintInfo").Object2 = cParms[1][0]
         c.addProperty("App::PropertyString","SubElement2","ConstraintInfo").SubElement2 = cParms[1][1]
-        
+
         c.addProperty("App::PropertyEnumeration","directionConstraint", "ConstraintInfo")
         c.directionConstraint = ["none","aligned","opposed"]
         c.addProperty("App::PropertyBool","lockRotation","ConstraintInfo")
-                       
+
         c.setEditorMode('Type',1)
         for prop in ["Object1","Object2","SubElement1","SubElement2"]:
-            c.setEditorMode(prop, 1) 
-        
+            c.setEditorMode(prop, 1)
+
         #-------------------------------------------
         # Group correctly under ParentObject in tree
         #-------------------------------------------
@@ -79,11 +79,11 @@ def parseSelection(selection, objectToUpdate=None):
         #-------------------------------------------
 
         c.Proxy = ConstraintObjectProxy()
-        c.ViewObject.Proxy = ConstraintViewProviderProxy( 
-            c, 
-            path_a2p + '/icons/a2p_axialConstraint.svg', 
-            True, 
-            cParms[1][2], 
+        c.ViewObject.Proxy = ConstraintViewProviderProxy(
+            c,
+            path_a2p + '/icons/a2p_axialConstraint.svg',
+            True,
+            cParms[1][2],
             cParms[0][2]
             )
     else:
@@ -93,7 +93,7 @@ def parseSelection(selection, objectToUpdate=None):
         c.Object2 = cParms[1][0]
         c.SubElement2 = cParms[1][1]
         updateObjectProperties(c)
-    
+
     c.purgeTouched()
     c.Proxy.callSolveConstraints()
 
@@ -121,83 +121,18 @@ class a2p_AxialConnectionCommand:
             parseSelection( selection )
         else:
             FreeCADGui.Selection.clearSelection()
-            ConstraintSelectionObserver( 
-                 AxialSelectionGate(), 
+            ConstraintSelectionObserver(
+                 AxialSelectionGate(),
                  parseSelection,
-                 taskDialog_title ='add axial constraint', 
-                 taskDialog_iconPath = self.GetResources()['Pixmap'], 
+                 taskDialog_title ='add axial constraint',
+                 taskDialog_iconPath = self.GetResources()['Pixmap'],
                  taskDialog_text = selection_text
                  )
-    def GetResources(self): 
+    def GetResources(self):
         return {
-             'Pixmap' : path_a2p + '/icons/a2p_axialConstraint.svg', 
-             'MenuText': 'Add axial constraint', 
+             'Pixmap' : path_a2p + '/icons/a2p_axialConstraint.svg',
+             'MenuText': 'Add axial constraint',
              'ToolTip': toolTipText
-             } 
+             }
 
 FreeCADGui.addCommand('a2p_AxialConnection', a2p_AxialConnectionCommand())
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

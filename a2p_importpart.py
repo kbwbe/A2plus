@@ -55,23 +55,23 @@ class ObjectCache:
 
     def add(self,fileName,obj): # pi_obj = PartInformation-Object
         self.objects[fileName] = obj
-        
+
     def get(self,fileName):
         obj = self.objects.get(fileName,None)
         if obj:
             return obj
         else:
             return None
-        
+
     def isCached(self,fileName):
         if fileName in self.objects.keys():
             return True
         else:
             return False
-        
+
     def len(self):
         return len(self.objects.keys())
-        
+
 objectCache = ObjectCache()
 
 
@@ -98,16 +98,16 @@ def importPartFromFile(_doc, filename, importToCache=False):
     visibleObjects = [ obj for obj in importDoc.Objects
                     if hasattr(obj,'ViewObject') and obj.ViewObject.isVisible()
                     and hasattr(obj,'Shape') and len(obj.Shape.Faces) > 0 and 'Body' not in obj.Name]
-    
+
     if visibleObjects == None or len(visibleObjects) == 0:
         msg = "No visible Part to import found. Aborting operation"
         QtGui.QMessageBox.information(
-            QtGui.QApplication.activeWindow(), 
-            "Import Error", 
+            QtGui.QApplication.activeWindow(),
+            "Import Error",
             msg
             )
         return
-        
+
     #-------------------------------------------
     # Discover whether we are importing a subassembly or a single part
     #-------------------------------------------
@@ -115,7 +115,7 @@ def importPartFromFile(_doc, filename, importToCache=False):
     subAssemblyImport = False
     if len(visibleObjects) > 1:
         subAssemblyImport = True
-        
+
     #-------------------------------------------
     # create new object
     #-------------------------------------------
@@ -128,8 +128,8 @@ def importPartFromFile(_doc, filename, importToCache=False):
         partLabel = a2plib.findUnusedObjectLabel( importDoc.Label, document=doc )
         newObj = doc.addObject("Part::FeaturePython",partName.encode('utf-8'))
         newObj.Label = partLabel
-        
-    
+
+
     newObj.addProperty("App::PropertyString", "a2p_Version","importPart").a2p_Version = A2P_VERSION
     newObj.addProperty("App::PropertyFile",    "sourceFile",    "importPart").sourceFile = filename
     newObj.addProperty("App::PropertyStringList","muxInfo","importPart")
@@ -152,7 +152,7 @@ def importPartFromFile(_doc, filename, importToCache=False):
         if appVersionStr() <= '000.016': #FC0.17: DiffuseColor overrides ShapeColor !
             newObj.ViewObject.DiffuseColor = tmpObj.ViewObject.DiffuseColor
         newObj.muxInfo = createTopoInfo(tmpObj)
-        
+
     newObj.Proxy = Proxy_muxAssemblyObj()
     newObj.ViewObject.Proxy = ImportedPartViewProviderProxy()
 
@@ -160,10 +160,10 @@ def importPartFromFile(_doc, filename, importToCache=False):
 
     if importToCache:
         objectCache.add(newObj.sourceFile, newObj)
-        
+
     if not importDocIsOpen:
         FreeCAD.closeDocument(importDoc.Name)
-    
+
     return newObj
 
 
@@ -171,7 +171,7 @@ class a2p_ImportPartCommand():
 
     def GetResources(self):
         import a2plib
-        return {'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_ImportPart.svg', 
+        return {'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_ImportPart.svg',
                 'Accel' : "Shift+A", # a default shortcut (optional)
                 'MenuText': "add Part from external file",
                 'ToolTip' : "add Part from external file"
@@ -197,26 +197,26 @@ class a2p_ImportPartCommand():
         if not a2plib.checkFileIsInProjectFolder(filename):
             msg = \
 '''
-The part you try to import is 
+The part you try to import is
 outside of your project-folder !
 Check your settings of A2plus preferences.
 '''
             QtGui.QMessageBox.information(
-                QtGui.QApplication.activeWindow(), 
-                "Import Error", 
+                QtGui.QApplication.activeWindow(),
+                "Import Error",
                 msg
                 )
             return
 
         importedObject = importPartFromFile(doc, filename)
-        
+
         mw = FreeCADGui.getMainWindow()
         mdi = mw.findChild(QtGui.QMdiArea)
         sub = mdi.activeSubWindow()
         if sub != None:
             sub.showMaximized()
-        
-        
+
+
         if not importedObject.fixedPosition: #will be true for the first imported part
             PartMover( view, importedObject )
         else:
@@ -230,13 +230,13 @@ Check your settings of A2plus preferences.
         """Here you can define if the command must be active or not (greyed) if certain conditions
         are met or not. This function is optional."""
         return True
-    
+
     def GuiViewFit(self):
         FreeCADGui.SendMsgToActiveView("ViewFit")
         self.timer.stop()
 
 
-FreeCADGui.addCommand('a2p_ImportPart',a2p_ImportPartCommand()) 
+FreeCADGui.addCommand('a2p_ImportPart',a2p_ImportPartCommand())
 
 
 
@@ -253,19 +253,19 @@ def updateImportedParts(doc):
                 obj.setEditorMode("a2p_Version",1)
             if not hasattr( obj, 'muxInfo'):
                 obj.addProperty("App::PropertyStringList","muxInfo","importPart").muxInfo = []
-                
-            if a2plib.USE_PROJECTFILE:    
+
+            if a2plib.USE_PROJECTFILE:
                 replacement = a2plib.findSourceFileInProject(obj.sourceFile) # work in any case with files within projectFolder!
             else:
                 replacement = obj.sourceFile
-                
+
             if replacement == None:
-                QtGui.QMessageBox.critical(  QtGui.QApplication.activeWindow(), 
-                                            "Source file not found", 
+                QtGui.QMessageBox.critical(  QtGui.QApplication.activeWindow(),
+                                            "Source file not found",
                                             "update of %s aborted!\nUnable to find %s" % (
-                                                obj.Name, 
+                                                obj.Name,
                                                 obj.sourceFile
-                                                ) 
+                                                )
                                         )
             else:
                 obj.sourceFile = replacement # update Filepath, perhaps location changed !
@@ -289,7 +289,7 @@ def updateImportedParts(doc):
                     obj.Shape = newObject.Shape.copy()
                     obj.ViewObject.DiffuseColor = copy.copy(newObject.ViewObject.DiffuseColor)
                     obj.Placement = savedPlacement # restore the old placement
-                    
+
     mw = FreeCADGui.getMainWindow()
     mdi = mw.findChild(QtGui.QMdiArea)
     sub = mdi.activeSubWindow()
@@ -298,10 +298,10 @@ def updateImportedParts(doc):
     objectCache.cleanUp(doc)
     solversystem.solveConstraints(doc)
     doc.recompute()
-    
+
 
 class a2p_UpdateImportedPartsCommand:
-    
+
     def Activated(self):
         doc = FreeCAD.ActiveDocument
         updateImportedParts(doc)
@@ -312,7 +312,7 @@ class a2p_UpdateImportedPartsCommand:
             'MenuText': 'Update parts imported into the assembly',
             'ToolTip': 'Update parts imported into the assembly'
             }
-        
+
 FreeCADGui.addCommand('a2p_updateImportedParts', a2p_UpdateImportedPartsCommand())
 
 
@@ -389,8 +389,8 @@ This is not allowed when using preference
 "Use project Folder"
 '''
             QtGui.QMessageBox.critical(
-                QtGui.QApplication.activeWindow(), 
-                "File error ! ", 
+                QtGui.QApplication.activeWindow(),
+                "File error ! ",
                 msg
                 )
             return
@@ -403,7 +403,7 @@ This is not allowed when using preference
             FreeCAD.setActiveDocument( name )
             FreeCAD.ActiveDocument=FreeCAD.getDocument( name )
             FreeCADGui.ActiveDocument=FreeCADGui.getDocument( name )
-            
+
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_EditPart.svg',
@@ -495,7 +495,7 @@ class DeleteConnectionsCommand:
             response = QtGui.QMessageBox.critical(QtGui.QApplication.activeWindow(), "Delete constraints?", msg, flags )
             if response == QtGui.QMessageBox.Yes:
                 for c in deleteList:
-                    a2plib.removeConstraint(c) 
+                    a2plib.removeConstraint(c)
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_deleteConnections.svg',
@@ -534,9 +534,9 @@ class ViewConnectionsCommand:
             'MenuText':     'show connected elements',
             'ToolTip':      'show connected elements',
             }
-        
+
 FreeCADGui.addCommand('a2p_ViewConnectionsCommand', ViewConnectionsCommand())
-    
+
 class ViewConnectionsObserver:
     def __init__(self):
         self.ignoreClear = False
@@ -585,14 +585,14 @@ class a2p_isolateCommand:
                             obj.ViewObject.Visibility = True
                         else:
                             obj.ViewObject.Visibility = False
-        
+
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_isolate.svg',
             'MenuText': 'show only selected elements, or all if none is selected',
             'ToolTip': 'show only selected elements, or all if none is selected'
             }
-        
+
 FreeCADGui.addCommand('a2p_isolateCommand', a2p_isolateCommand())
 
 
@@ -675,7 +675,7 @@ FreeCADGui.addCommand('a2p_TogglePartialProcessingCommand', a2p_TogglePartialPro
 def a2p_repairTreeView():
     doc = FreeCAD.activeDocument()
     if doc == None: return
-    
+
     constraints = [ obj for obj in doc.Objects if 'ConstraintInfo' in obj.Content]
     for c in constraints:
         if c.Proxy != None:
@@ -735,46 +735,3 @@ FreeCADGui.addCommand('a2p_repairTreeViewCommand', a2p_repairTreeViewCommand())
 def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
     ''' updating constraints, deactivated at moment'''
     return
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

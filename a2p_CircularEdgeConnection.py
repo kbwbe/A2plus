@@ -54,27 +54,27 @@ def parseSelection(selection, objectToUpdate=None, callSolveConstraints=True, lo
     if not validSelection:
         msg = '''Please select two circular edges from different parts. But election made is:%s'''  % printSelection(selection)
         QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Incorrect Usage", msg)
-        return 
+        return
 
     if objectToUpdate == None:
         cName = findUnusedObjectName('circularEdgeConstraint')
         c = FreeCAD.ActiveDocument.addObject("App::FeaturePython", cName)
-        
+
         c.addProperty("App::PropertyString","Type","ConstraintInfo").Type = 'circularEdge'
         c.addProperty("App::PropertyString","Object1","ConstraintInfo").Object1 = cParms[0][0]
         c.addProperty("App::PropertyString","SubElement1","ConstraintInfo").SubElement1 = cParms[0][1]
         c.addProperty("App::PropertyString","Object2","ConstraintInfo").Object2 = cParms[1][0]
         c.addProperty("App::PropertyString","SubElement2","ConstraintInfo").SubElement2 = cParms[1][1]
-    
+
         c.addProperty("App::PropertyEnumeration","directionConstraint", "ConstraintInfo")
         c.directionConstraint = ["none","aligned","opposed"]
         c.addProperty("App::PropertyDistance","offset","ConstraintInfo")
         c.addProperty("App::PropertyBool","lockRotation","ConstraintInfo").lockRotation = lockRotation
-    
+
         c.setEditorMode('Type',1)
         for prop in ["Object1","Object2","SubElement1","SubElement2"]:
-            c.setEditorMode(prop, 1) 
-        
+            c.setEditorMode(prop, 1)
+
         #-------------------------------------------
         # Group correctly under ParentObject in tree
         #-------------------------------------------
@@ -85,11 +85,11 @@ def parseSelection(selection, objectToUpdate=None, callSolveConstraints=True, lo
         #-------------------------------------------
 
         c.Proxy = ConstraintObjectProxy()
-        c.ViewObject.Proxy = ConstraintViewProviderProxy( 
-            c, 
-            path_a2p + '/icons/a2p_circularEdgeConstraint.svg', 
-            True, 
-            cParms[1][2], 
+        c.ViewObject.Proxy = ConstraintViewProviderProxy(
+            c,
+            path_a2p + '/icons/a2p_circularEdgeConstraint.svg',
+            True,
+            cParms[1][2],
             cParms[0][2]
             )
     else:
@@ -102,7 +102,7 @@ def parseSelection(selection, objectToUpdate=None, callSolveConstraints=True, lo
 
     c.purgeTouched()
     if callSolveConstraints:
-        c.Proxy.callSolveConstraints()  
+        c.Proxy.callSolveConstraints()
     #FreeCADGui.Selection.clearSelection()
     #FreeCADGui.Selection.addSelection(c)
     return c
@@ -121,7 +121,7 @@ selection-hint:
 1.) select circular edge on first importPart
 2.) select circular edge on other importPart
 '''
-    
+
 
 class a2p_CircularEdgeConnectionCommand:
     def Activated(self):
@@ -130,51 +130,20 @@ class a2p_CircularEdgeConnectionCommand:
             parseSelection( selection )
         else:
             FreeCADGui.Selection.clearSelection()
-            ConstraintSelectionObserver( 
-                CircularEdgeSelectionGate(), 
+            ConstraintSelectionObserver(
+                CircularEdgeSelectionGate(),
                 parseSelection,
-                taskDialog_title ='add circular edge constraint', 
-                taskDialog_iconPath = self.GetResources()['Pixmap'], 
+                taskDialog_title ='add circular edge constraint',
+                taskDialog_iconPath = self.GetResources()['Pixmap'],
                 taskDialog_text = selection_text,
-                 secondSelectionGate = CircularEdgeSelectionGate2() 
+                 secondSelectionGate = CircularEdgeSelectionGate2()
                 )
 
-    def GetResources(self): 
+    def GetResources(self):
         return {
-            'Pixmap' : path_a2p + '/icons/a2p_circularEdgeConstraint.svg' , 
-            'MenuText': 'Add circular edge connection', 
+            'Pixmap' : path_a2p + '/icons/a2p_circularEdgeConstraint.svg' ,
+            'MenuText': 'Add circular edge connection',
             'ToolTip': toolTipText
-            } 
+            }
 
 FreeCADGui.addCommand('a2p_CircularEdgeConnection', a2p_CircularEdgeConnectionCommand())
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

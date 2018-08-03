@@ -33,5 +33,5 @@ class RedoUndoObserver(object):
         a2p_importpart.a2p_repairTreeView()
     def slotUndoDocument(self,doc):
         a2p_importpart.a2p_repairTreeView()
-        
+
 redoUndoObserver = RedoUndoObserver()

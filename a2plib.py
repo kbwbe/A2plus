@@ -93,7 +93,7 @@ def setTransparency():
         if hasattr(obj,'ViewObject'):
             if hasattr(obj.ViewObject,'Transparency'):
                 SAVED_TRANSPARENCY.append((obj.Name, obj.ViewObject.Transparency))
-                obj.ViewObject.Transparency = 80 
+                obj.ViewObject.Transparency = 80
 #------------------------------------------------------------------------------
 def restoreTransparency():
     global SAVED_TRANSPARENCY
@@ -118,7 +118,7 @@ def getSelectedConstraint():
     doc = FreeCAD.ActiveDocument
     connectionToView = selection[0]
 
-    if not 'ConstraintInfo' in connectionToView.Content and not 'ConstraintNfo' in connectionToView.Content: 
+    if not 'ConstraintInfo' in connectionToView.Content and not 'ConstraintNfo' in connectionToView.Content:
         return None
 
     return connectionToView
@@ -136,14 +136,14 @@ def isLine(param):
 #------------------------------------------------------------------------------
 def getObjectFaceFromName( obj, faceName ):
     assert faceName.startswith('Face')
-    ind = int( faceName[4:]) -1 
+    ind = int( faceName[4:]) -1
     return obj.Shape.Faces[ind]
 #------------------------------------------------------------------------------
 def getProjectFolder():
     '''
     #------------------------------------------------------------------------------------
     # A new Parameter is required: projectFolder...
-    # All Parts will be searched below this projectFolder-Value...        
+    # All Parts will be searched below this projectFolder-Value...
     #------------------------------------------------------------------------------------
     '''
     preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
@@ -152,7 +152,7 @@ def getProjectFolder():
 
 #------------------------------------------------------------------------------
 def findSourceFileInProject(fullPath):
-    ''' 
+    '''
     #------------------------------------------------------------------------------------
     # function to find filename in projectFolder
     # The path stored in an imported Part will be ignored
@@ -165,8 +165,8 @@ def findSourceFileInProject(fullPath):
     def findFile(name, path):
         for root, dirs, files in os.walk(path):
             if name in files:
-                return os.path.join(root, name) 
-        
+                return os.path.join(root, name)
+
     projectFolder = os.path.abspath(getProjectFolder()) # get normalized path
     fileName = os.path.basename(fullPath)
     retval = findFile(fileName,projectFolder)
@@ -193,17 +193,17 @@ def pathOfModule():
 #------------------------------------------------------------------------------
 def Msg(tx):
     FreeCAD.Console.PrintMessage(tx)
-    
+
 #------------------------------------------------------------------------------
 def DebugMsg(level, tx):
     if A2P_DEBUG_LEVEL >= level:
         FreeCAD.Console.PrintMessage(tx)
 
 #------------------------------------------------------------------------------
-def drawVector(fromPoint,toPoint, color): 
+def drawVector(fromPoint,toPoint, color):
     if fromPoint == toPoint: return
     doc = FreeCAD.ActiveDocument
-    
+
     l = Part.Line(fromPoint,toPoint)
     line = doc.addObject("Part::Feature","ArrowTail")
     line.Shape = l.toShape()
@@ -221,16 +221,16 @@ def drawVector(fromPoint,toPoint, color):
     cent = Base.Vector(0,0,0)
     conePlacement = FreeCAD.Placement(mov,rot,cent)
     cone.Placement = conePlacement.multiply(cone.Placement)
-    cone.Placement.move(toPoint) 
+    cone.Placement.move(toPoint)
     doc.recompute()
-    
+
 #------------------------------------------------------------------------------
 def findUnusedObjectName(base, counterStart=1, fmt='%03i', document=None):
     if document == None:
         document = FreeCAD.ActiveDocument
     i = counterStart
-    usedNames = [ obj.Name for obj in document.Objects ]    
-    
+    usedNames = [ obj.Name for obj in document.Objects ]
+
     if base[-4:-3] == '_':
         base2 = base[:-4]
     else:
@@ -248,8 +248,8 @@ def findUnusedObjectLabel(base, counterStart=1, fmt='%03i', document=None):
     if document == None:
         document = FreeCAD.ActiveDocument
     i = counterStart
-    usedLabels = [ obj.Label for obj in document.Objects ]    
-    
+    usedLabels = [ obj.Label for obj in document.Objects ]
+
     if base[-4:-3] == '_':
         base2 = base[:-4]
     else:
@@ -264,14 +264,14 @@ def findUnusedObjectLabel(base, counterStart=1, fmt='%03i', document=None):
 
 #------------------------------------------------------------------------------
 class ConstraintSelectionObserver:
-    
-    def __init__(self, selectionGate, parseSelectionFunction, 
+
+    def __init__(self, selectionGate, parseSelectionFunction,
                   taskDialog_title, taskDialog_iconPath, taskDialog_text,
                   secondSelectionGate=None):
         self.selections = []
         self.parseSelectionFunction = parseSelectionFunction
         self.secondSelectionGate = secondSelectionGate
-        FreeCADGui.Selection.addObserver(self)  
+        FreeCADGui.Selection.addObserver(self)
         FreeCADGui.Selection.removeSelectionGate()
         FreeCADGui.Selection.addSelectionGate( selectionGate )
         wb_globals['selectionObserver'] = self
@@ -289,7 +289,7 @@ class ConstraintSelectionObserver:
             FreeCADGui.Selection.addSelectionGate( self.secondSelectionGate )
 
     def stopSelectionObservation(self):
-        FreeCADGui.Selection.removeObserver(self) 
+        FreeCADGui.Selection.removeObserver(self)
         del wb_globals['selectionObserver']
         FreeCADGui.Selection.removeSelectionGate()
         FreeCADGui.Control.closeDialog()
@@ -301,35 +301,35 @@ class SelectionRecord:
         self.ObjectName = objName
         self.Object = self.Document.getObject(objName)
         self.SubElementNames = [sub]
-        
+
 #------------------------------------------------------------------------------
 class SelectionTaskDialog:
-    
+
     def __init__(self, title, iconPath, textLines ):
         self.form = SelectionTaskDialogForm( textLines )
-        self.form.setWindowTitle( title )    
+        self.form.setWindowTitle( title )
         if iconPath != None:
             self.form.setWindowIcon( QtGui.QIcon( iconPath ) )
-            
+
     def reject(self):
         wb_globals['selectionObserver'].stopSelectionObservation()
 
     def getStandardButtons(self): #http://forum.freecadweb.org/viewtopic.php?f=10&t=11801
         return 0x00400000 #cancel button
 #------------------------------------------------------------------------------
-class SelectionTaskDialogForm(QtGui.QWidget):    
-    
+class SelectionTaskDialogForm(QtGui.QWidget):
+
     def __init__(self, textLines ):
         super(SelectionTaskDialogForm, self).__init__()
-        self.textLines = textLines 
+        self.textLines = textLines
         self.initUI()
-    
+
     def initUI(self):
         vbox = QtGui.QVBoxLayout()
         for line in self.textLines.split('\n'):
             vbox.addWidget( QtGui.QLabel(line) )
         self.setLayout(vbox)
-        
+
 #------------------------------------------------------------------------------
 class SelectionExObject:
     'allows for selection gate functions to interface with classification functions below'
@@ -341,7 +341,7 @@ class SelectionExObject:
 #------------------------------------------------------------------------------
 def getObjectEdgeFromName( obj, name ):
     assert name.startswith('Edge')
-    ind = int( name[4:]) -1 
+    ind = int( name[4:]) -1
     return obj.Shape.Edges[ind]
 #------------------------------------------------------------------------------
 def CircularEdgeSelected( selection ):
@@ -370,7 +370,7 @@ def printSelection(selection):
         for e in s.SubElementNames:
             entries.append(' - %s:%s' % (s.ObjectName, e))
             if e.startswith('Face'):
-                ind = int( e[4:]) -1 
+                ind = int( e[4:]) -1
                 face = s.Object.Shape.Faces[ind]
                 entries[-1] = entries[-1] + ' %s' % str(face.Surface)
     return '\n'.join( entries[:5] )
@@ -429,7 +429,7 @@ def sphericalSurfaceSelected( selection ):
 #------------------------------------------------------------------------------
 def getObjectVertexFromName( obj, name ):
     assert name.startswith('Vertex')
-    ind = int( name[6:]) -1 
+    ind = int( name[6:]) -1
     return obj.Shape.Vertexes[ind]
 #------------------------------------------------------------------------------
 def removeConstraint( constraint ):
@@ -482,59 +482,3 @@ def getAxis(obj, subElementName):
             axis =  edge.Curve.Axis
     return axis # may be none!
 #------------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        

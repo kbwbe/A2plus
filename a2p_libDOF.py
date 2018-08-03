@@ -34,7 +34,7 @@ and a refAxisEnd which is a vector that defines the direction, togeher we can de
 
 This code was possible only after the reading of the Hamish's code on His wonderful Assembly2 Workbench for FreeCAD
 This code was possible only after the reading of the code of the wonderful WorkFeature Macro for FreeCAD
-This code was possible only after the reading of Wikipedia pages on vector math 
+This code was possible only after the reading of Wikipedia pages on vector math
 
 '''
 #define some reference axis
@@ -71,7 +71,7 @@ def create_Axis(_base, _direction):
     return axis
 
 
-#create an axis that has Base in the first vector argument and direction defined by _start to _end shifted at SystemOrigin 
+#create an axis that has Base in the first vector argument and direction defined by _start to _end shifted at SystemOrigin
 def create_Axis2Points(_start, _end):
     axis=FreeCAD.Axis()
     axis.Base = _start
@@ -81,8 +81,8 @@ def create_Axis2Points(_start, _end):
 
 def copynorm_AxisToOrigin(axisa, dbg=False):
     _offset = SystemOrigin.sub(axisa.Base)
-    axisb = FreeCAD.Axis(axisa)    
-    if dbg: print axisa, axisb    
+    axisb = FreeCAD.Axis(axisa)
+    if dbg: print axisa, axisb
     axisb.move(_offset)
     if dbg: print axisa, axisb
     #axisb.Base = SystemOrigin
@@ -95,19 +95,19 @@ def copynorm_AxisToOrigin(axisa, dbg=False):
 def normal_2Axis(axisa,axisb,dbg=False):
     #move vectors to origin and normalize
     axis1 = copynorm_AxisToOrigin(axisa)
-    axis2 = copynorm_AxisToOrigin(axisb)      
+    axis2 = copynorm_AxisToOrigin(axisb)
 
-    #create an axis with base at SystemOrigin 
+    #create an axis with base at SystemOrigin
     axisN = FreeCAD.Axis()
-    #set the right direction 
-    axisN.Direction = axis1.Direction.cross(axis2.Direction)   
-    if dbg: print axis1, axis2, axisN  
+    #set the right direction
+    axisN.Direction = axis1.Direction.cross(axis2.Direction)
+    if dbg: print axis1, axis2, axisN
     return axisN
 
-#create a plane normal to the given axis, return the 2 axis which define that plane 
+#create a plane normal to the given axis, return the 2 axis which define that plane
 def make_planeNormal(axisa,dbg=False):
     axis1 = copynorm_AxisToOrigin(axisa)
-    
+
     planenormal = Part.makePlane(1.0,1.0, axis1.Base, axis1.Direction)
     freeAx1 = FreeCAD.Axis()
     freeAx2 = FreeCAD.Axis()
@@ -137,8 +137,8 @@ def check_ifPerpendicular(axisa,axisb,dbg=False):
     #shift edges to the origin and normalize them
     #move vectors to origin and normalize
     axis1 = copynorm_AxisToOrigin(axisa)
-    axis2 = copynorm_AxisToOrigin(axisb)    
-    
+    axis2 = copynorm_AxisToOrigin(axisb)
+
     if abs(axis1.Direction.dot(axis2.Direction)) <= tolerance:
         if dbg:print("Perpendicular Edges" , axis1, axis2 )
         return True
@@ -157,15 +157,15 @@ def check_ifCollinear(axisa,axisb,dbg=False):
         if check_ifParallel(axis1,axis2):
             return True
         else:
-            return False 
-    baseMove = SystemOrigin.sub(axis1.Base)  
+            return False
+    baseMove = SystemOrigin.sub(axis1.Base)
     axis1.Base = SystemOrigin
     axis2.move(baseMove)
     axis1.Direction = axis1.Direction.normalize() #useless?
     axis2.Direction = axis2.Direction.normalize() #useless?
     axis3 = FreeCAD.Axis()
-    axis3.Direction = axis2.Base #create an axis with direction base1 to base2 
-    
+    axis3.Direction = axis2.Base #create an axis with direction base1 to base2
+
     if check_ifParallel(axis1,axis3) and check_ifParallel(axis2,axis3):
         if dbg:print("Collinear Edges" , axis1, axis2 )
         return True
@@ -185,7 +185,7 @@ def check_ifCoincident(Vertex1, Vertex2, dbg=False):
         if dbg: print "Vertexes Coincident", Vertex1, Vertex2
         return True
     else:
-        if dbg: print "Vertexes Not Coincident", Vertex1, Vertex2    
+        if dbg: print "Vertexes Not Coincident", Vertex1, Vertex2
         return False
 
 #check if a point is on an axis
@@ -193,15 +193,15 @@ def check_ifPointOnAxis(vertexa, axisa, dbg=False):
     #shift edges to the origin and normalize them
     #move vectors to origin and normalize
     axis1 = copy_AxisToOrigin(axisa)
-    vertex1 = FreeCAD.Vector(vertexa)    
-    _offset = SystemOrigin.sub(axis1.Base)  
+    vertex1 = FreeCAD.Vector(vertexa)
+    _offset = SystemOrigin.sub(axis1.Base)
     vertex1 = vertex1.sub(axis1.Base) #apply the same offset to the point
     if abs((axis1.Direction.cross(vertex1)).Length) <= tolerance:
         if dbg:print("Point on Axis" , vertex1, axis1 )
         return True
     else:
         if dbg:print("Point not on Axis", vertex1, axis1 )
-        return False    
+        return False
 
 
 
@@ -211,7 +211,7 @@ def check_ifPointOnAxis(vertexa, axisa, dbg=False):
 #start with Axis Alignment which takes an axis as arguments and operates according to the remaining dof
 #this basic constraint affects only rotation DOF
 def AxisAlignment(axisa , dofrot, dbg=True):
-    currentDOFROTnum = len(dofrot)   
+    currentDOFROTnum = len(dofrot)
     if currentDOFROTnum == 0 : #already locked on rotation so ignore it
         return []
     elif currentDOFROTnum == 1 : #partially locked on rotation so compare to the given axis
@@ -225,7 +225,7 @@ def AxisAlignment(axisa , dofrot, dbg=True):
         return [axisa]
     else:
         #this shouldn't happens...ignore it and return the current dofrot
-        return dofrot 
+        return dofrot
 
 
 #then Lock Rotation which locks the remaining rotation axis when enabled
@@ -236,13 +236,13 @@ def LockRotation(enabled, dofrot, dbg=True):
         return []
     else:
         #nothing to do return the given dofrot
-        return dofrot            
+        return dofrot
 
 #then Angle Alignment which takes an axis as arguments and operates according to the remaining dof
 #the axis is the normal of the angled plane, that said it acts exaclty as axis alignment, meybe I'll remove it
 #this basic constraint affects only rotation DOF
 def AngleAlignment(axisa , dofrot, dbg=True):
-    currentDOFROTnum = len(dofrot)   
+    currentDOFROTnum = len(dofrot)
     if currentDOFROTnum == 0 : #already locked on rotation so ignore it
         return dofrot
     elif currentDOFROTnum == 1 : #partially locked on rotation so compare to the given axis
@@ -256,7 +256,7 @@ def AngleAlignment(axisa , dofrot, dbg=True):
         return [axisa]
     else:
         #this shouldn't happens...ignore it and return the current dofrot
-        return dofrot 
+        return dofrot
 
 
 
@@ -265,9 +265,9 @@ def AngleAlignment(axisa , dofrot, dbg=True):
 #the first is axis normal on plane to plane distance
 #arguments are
 #axisa which the axis used in constraint (axial, circular edge, etc...)
-#dofpos which is the array of left free positional axes 
+#dofpos which is the array of left free positional axes
 def AxisDistance(axisa, dofpos, dbg=False):
-    currentDOFPOSnum = len(dofpos)   
+    currentDOFPOSnum = len(dofpos)
     if currentDOFPOSnum == 0 : #already locked on position so ignore it
         return []
     elif currentDOFPOSnum == 1 : #partially locked on position so compare axis free to the given axis
@@ -281,28 +281,28 @@ def AxisDistance(axisa, dofpos, dbg=False):
         #calculate the axis normal to the plane defined by the 2 axes left free
         tempNormAxis = normal_2Axis(dofpos[0], dofpos[1])
         #now compare it to the given axis
-                  
-        if check_ifPerpendicular(axisa,tempNormAxis):            
+
+        if check_ifPerpendicular(axisa,tempNormAxis):
             #axes are perpendicular so the axis left free is the normal to the plane defined by given axis and tempNormAxis DOFPOS=1
             return [ normal_2Axis(axisa, tempNormAxis)]
-        else:           
+        else:
             #the object is fully constrained DOFPOS=0
             return []
-            
+
     elif currentDOFPOSnum == 3 : # there are no constraints on position, so the rigid can slides along the given axis, DOFPOS=1
         return [axisa]
-    
-    else:    
-        #this shouldn't happens...ignore it and return the current dofrot
-        return dofpos 
 
-    
+    else:
+        #this shouldn't happens...ignore it and return the current dofrot
+        return dofpos
+
+
 #then plane to plane constraint
 #arguments are
 #axisa which the axis normal to the plane constrained
-#dofpos which is the array of left free positional axes 
+#dofpos which is the array of left free positional axes
 def planeOffset(axisa, dofpos, dbg=False):
-    currentDOFPOSnum = len(dofpos)   
+    currentDOFPOSnum = len(dofpos)
     if currentDOFPOSnum == 0 : #already locked on position so ignore it
         return []
     elif currentDOFPOSnum == 1 : #partially locked on position so compare to the given axis
@@ -319,17 +319,17 @@ def planeOffset(axisa, dofpos, dbg=False):
         if check_ifParallel(axisa,tempNormAxis):
             #the plane is parallel to the plane where it can slide, so the constraint is redundant, return dofpos as is DOFPOS=2
             return dofpos
-        else:      
+        else:
             #now calculate the axis normal to the plane create by the given axis and the tempNormAxis
-            #and return it as last free DOFPOS=1            
+            #and return it as last free DOFPOS=1
             return [ normal_2Axis(axisa, tempNormAxis) ]
-            
+
     elif currentDOFPOSnum == 3 : # there are no constraints on position, so the left axes free are the two axes which define a plane normal to the given axis DOFPOS=2
         return make_planeNormal(axisa)
-    
-    else:    
+
+    else:
         #this shouldn't happens...ignore it and return the current dofrot
-        return dofpos      
+        return dofpos
 
 
 #this is very tricky...
@@ -338,25 +338,25 @@ def PointIdentityPos(pointA, rigidCenterpoint, dofpos, pointconstraints, dbg=Tru
         #the center of rigid is coincident to the point constrained, the obj can't move anymore DOFPOS=0
         return []
     else:
-        #check how many DOF    
-        currentDOFPOSnum = len(dofpos) 
+        #check how many DOF
+        currentDOFPOSnum = len(dofpos)
         for a in len(pointconstraints):
                 if check_ifCoincident(pointA,pointconstraints[a]):
                     #the same point is already constrained so skip it , redundant
                     return dofpos
-      
+
         if currentDOFPOSnum == 0 : #already locked on position so ignore it
             return []
-  
+
         elif currentDOFPOSnum == 1 : #already partially locked, an additional point identity locks the object
             return []  #if the point isn't already constrained, the obj is now fully constrained DOFPOS=0
 
-        elif currentDOFPOSnum == 2 : 
+        elif currentDOFPOSnum == 2 :
             return []  #if the point isn't already constrained, the obj is now fully constrained DOFPOS=0
 
-        elif currentDOFPOSnum == 3 : 
+        elif currentDOFPOSnum == 3 :
             #if there is only 1 pointidentity do nothing, as single point constraint doesn't lock anything just store the point
-            if len(pointconstraints) == 0:            
+            if len(pointconstraints) == 0:
                 pointconstraints.append(pointA) #in this way I should modify the array outside the function
                 return dofpos
             else: #add the point to the pointconstraint array
@@ -371,66 +371,66 @@ def PointIdentityPos(pointA, rigidCenterpoint, dofpos, pointconstraints, dbg=Tru
                     return []
         else:
             #this shouldn't happens...ignore it and return the current dofrot
-            return dofpos 
+            return dofpos
 
 
 
 #this is very tricky...call it always after PointIdentityPos as pointconstraints is handled only there
 def PointIdentityRot(pointA, dofrot, pointconstraints, dbg=True):
-    currentDOFROTnum = len(dofrot) 
+    currentDOFROTnum = len(dofrot)
     for a in len(pointconstraints):
         if check_ifCoincident(pointA,pointconstraints[a]):
             #the same point is already constrained so skip it , redundant
-            return dofrot  
+            return dofrot
     if currentDOFROTnum == 0 : #already locked on rotation so ignore it
         return []
     elif currentDOFROTnum == 1 : #already partially locked, an additional point identity locks the object
         if check_ifPointOnAxis(pointA,dofrot[0]):    #check if the point is on the same direction of the axis left free
             #the point is on the rotation axis left free, it doesn't lock anything
-            return dofrot            
+            return dofrot
         else:
             #the pointidentity locks permanently
             return []
     elif currentDOFROTnum == 3 : #no constraints on rotation the point identity does nothing on its own
-        #here I have to insert the point on pointconstraint, only if the point is not coincident to some point already stored in pointconstraint       
-        #return back here        
+        #here I have to insert the point on pointconstraint, only if the point is not coincident to some point already stored in pointconstraint
+        #return back here
         #if there is only 1 pointidentity do nothing, as single point constraint doesn't lock anything just store the point
-        if len(pointconstraints) == 1:            
+        if len(pointconstraints) == 1:
             return dofrot
-        elif len(pointconstraints) >= 3: 
+        elif len(pointconstraints) >= 3:
             #there are 3 unique points so the object is fully constrained DOFROT=0
             return []
         elif len(pointconstraints) == 2:
             #this is a circularedge constraint with an axis with Base on pointA and Direction pointconstraint[0] to pointconstraints[1]
             #so DOFROT as circular edge always locks all 3 axes in position
-            tmpAxis = create_Axis2Points(pointconstraints[0],pointconstraints[1])            
+            tmpAxis = create_Axis2Points(pointconstraints[0],pointconstraints[1])
             tmpAxis = copy_AxisToOrigin(tmpAxis)
-            return AxisAlignment(tmpAxis, dofrot)    
-                
+            return AxisAlignment(tmpAxis, dofrot)
+
     else:
         #this shouldn't happens...ignore it and return the current dofrot
-        return dofrot 
+        return dofrot
 
 
 #in the end there are the toolbar constraints, those are simply a combination of the ones above
 
 #PointIdentity, PointOnLine, PointOnPlane, Spherical Constraints:
-#    PointIdentityPos()    needs to know the point constrained as vector, the dofpos array, the rigid center point as vector and 
-#                        the pointconstraints which stores all point constraints of the rigid 
-#    PointIdentityRot()    needs to know the point constrained as vector, the dofrot array, and 
-#                        the pointconstraints which stores all point constraints of the rigid 
+#    PointIdentityPos()    needs to know the point constrained as vector, the dofpos array, the rigid center point as vector and
+#                        the pointconstraints which stores all point constraints of the rigid
+#    PointIdentityRot()    needs to know the point constrained as vector, the dofrot array, and
+#                        the pointconstraints which stores all point constraints of the rigid
 # These constraint have to be the last evaluated in the chain of constraints.
 
 #CircularEdgeConstraint:
 #    AxisAlignment()    needs to know the axis normal to circle (stored in dep as refpoint and refAxisEnd) and the dofrot array
-#    AxisDistance()     needs to know the axis normal to circle (stored in dep as refpoint and refAxisEnd) and the dofpos array    
-#    PlaneOffset()      needs to know the axis normal to circle (stored in dep as refpoint and refAxisEnd) and the dofpos array  
+#    AxisDistance()     needs to know the axis normal to circle (stored in dep as refpoint and refAxisEnd) and the dofpos array
+#    PlaneOffset()      needs to know the axis normal to circle (stored in dep as refpoint and refAxisEnd) and the dofpos array
 #    LockRotation()     need to know if LockRotation is True or False and the array dofrot
 #
 #    honestly speaking this would be simplified like this:
 #    if LockRotation:
 #        dofpos = []
-#        dofrot = []         
+#        dofrot = []
 #    else:
 #        dofpos = []
 #        dofrot = AxisAlignment(ConstraintAxis, dofrot)
@@ -441,11 +441,11 @@ def PointIdentityRot(pointA, dofrot, pointconstraints, dbg=True):
 
 #PlaneCoincident:
 #    AxisAlignment()    needs to know the axis normal to the plane constrained (stored in dep as refpoint and refAxisEnd) and the dofrot array
-#    PlaneOffset()      needs to know the axis normal to the plane constrained (stored in dep as refpoint and refAxisEnd) and the dofpos array  
+#    PlaneOffset()      needs to know the axis normal to the plane constrained (stored in dep as refpoint and refAxisEnd) and the dofpos array
 
 #AxialConstraint:
 #    AxisAlignment()    needs to know the axis normal to circle (stored in dep as refpoint and refAxisEnd) and the dofrot array
-#    AxisDistance()     needs to know the axis normal to circle (stored in dep as refpoint and refAxisEnd) and the dofpos array  
+#    AxisDistance()     needs to know the axis normal to circle (stored in dep as refpoint and refAxisEnd) and the dofpos array
 #    LockRotation()     need to know if LockRotation is True or False and the array dofrot
 
 #AngleBetweenPlanesConstraint
@@ -474,4 +474,3 @@ print "Vertexes are Coincident ? = " ,  check_ifCoincident(AXIS1.Base, AXIS2.Bas
 dfdfdf = create_Axis(FreeCAD.Vector(12.0,33.5,12.7), FreeCAD.Vector(23.5,22.0,99.0))
 print copynorm_AxisToOrigin(dfdfdf)
 print create_Axis2Points(FreeCAD.Vector(1.0,1.0,1.0), FreeCAD.Vector(3,3,3))
-

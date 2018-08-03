@@ -56,7 +56,7 @@ def parseSelection(selection, objectToUpdate=None):
               ''' % printSelection(selection)
 
         QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Incorrect Usage", msg)
-        return 
+        return
 
     if objectToUpdate == None:
         extraText = ''
@@ -68,13 +68,13 @@ def parseSelection(selection, objectToUpdate=None):
         c.addProperty("App::PropertyString","Object2","ConstraintInfo").Object2 = cParms[1][0]
         c.addProperty("App::PropertyString","SubElement2","ConstraintInfo").SubElement2 = cParms[1][1]
         c.addProperty('App::PropertyDistance','offset',"ConstraintInfo")
-        
+
         c.addProperty("App::PropertyEnumeration","directionConstraint", "ConstraintInfo")
         c.directionConstraint = ["none","aligned","opposed"]
-        
+
         c.setEditorMode('Type',1)
         for prop in ["Object1","Object2","SubElement1","SubElement2"]:
-            c.setEditorMode(prop, 1) 
+            c.setEditorMode(prop, 1)
 
         #-------------------------------------------
         # Group correctly under ParentObject in tree
@@ -84,15 +84,15 @@ def parseSelection(selection, objectToUpdate=None):
         c.setEditorMode('ParentTreeObject',1)
         parent.Label = parent.Label # this is needed to trigger an update
         #-------------------------------------------
-            
+
         c.Proxy = ConstraintObjectProxy()
-        c.ViewObject.Proxy = ConstraintViewProviderProxy( 
-            c, 
-            path_a2p + '/icons/a2p_planeConstraint.svg', 
-            True, cParms[1][2], 
-            cParms[0][2], 
+        c.ViewObject.Proxy = ConstraintViewProviderProxy(
+            c,
+            path_a2p + '/icons/a2p_planeConstraint.svg',
+            True, cParms[1][2],
+            cParms[0][2],
             extraText
-            ) 
+            )
     else:
         c = objectToUpdate
         c.Object1 = cParms[0][0]
@@ -103,7 +103,7 @@ def parseSelection(selection, objectToUpdate=None):
 
     c.purgeTouched()
     c.Proxy.callSolveConstraints()
-         
+
 
 selection_text = \
 '''1.) select Plane on first importPart
@@ -127,77 +127,19 @@ class a2p_PlaneConnectionCommand:
             parseSelection( selection )
         else:
             FreeCADGui.Selection.clearSelection()
-            ConstraintSelectionObserver( 
-                 PlaneSelectionGate(), 
-                 parseSelection, 
-                 taskDialog_title ='add planeCoincident constraint', 
-                 taskDialog_iconPath = self.GetResources()['Pixmap'], 
+            ConstraintSelectionObserver(
+                 PlaneSelectionGate(),
+                 parseSelection,
+                 taskDialog_title ='add planeCoincident constraint',
+                 taskDialog_iconPath = self.GetResources()['Pixmap'],
                  taskDialog_text = selection_text,
                  secondSelectionGate = PlaneSelectionGate2() )
-              
-    def GetResources(self): 
+
+    def GetResources(self):
         return {
-             'Pixmap' : path_a2p + '/icons/a2p_planeConstraint.svg', 
-             'MenuText': 'Add plane constraint', 
+             'Pixmap' : path_a2p + '/icons/a2p_planeConstraint.svg',
+             'MenuText': 'Add plane constraint',
              'ToolTip': toolTipText
-             } 
+             }
 
 FreeCADGui.addCommand('a2p_PlaneConnection', a2p_PlaneConnectionCommand())
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
