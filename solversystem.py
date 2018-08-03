@@ -1,6 +1,6 @@
 #***************************************************************************
 #*                                                                         *
-#*   Copyright (c) 2018 kbwbe                                     * 
+#*   Copyright (c) 2018 kbwbe                                              *
 #*                                                                         *
 #*   This program is free software; you can redistribute it and/or modify  *
 #*   it under the terms of the GNU Lesser General Public License (LGPL)    *
@@ -30,7 +30,7 @@ from PySide import QtGui, QtCore
 from  FreeCAD import Base
 import a2plib
 from a2plib import (
-    drawVector, 
+    drawVector,
     path_a2p,
     getObjectVertexFromName,
     getObjectEdgeFromName,
@@ -79,7 +79,7 @@ class SolverSystem():
         self.lastPositionError = SOLVER_CONVERGENY_ERROR_INIT_VALUE
         self.lastAxisError = SOLVER_CONVERGENY_ERROR_INIT_VALUE
         self.convergencyCounter = 0
-        
+
     def clear(self):
         for r in self.rigids:
             r.clear()
@@ -87,13 +87,13 @@ class SolverSystem():
         self.rigids = []
         self.constraints = []
         self.objectNames = []
-        
+
     def getRigid(self,objectName):
         '''get a Rigid by objectName'''
         rigs = [r for r in self.rigids if r.objectName == objectName]
         if len(rigs) > 0: return rigs[0]
         return None
-        
+
     def loadSystem(self,doc):
         self.clear()
         self.doc = doc
@@ -140,7 +140,7 @@ class SolverSystem():
 
         for rig in self.rigids:
             rig.calcSpinCenter()
-            rig.calcRefPointsBoundBoxSize()            
+            rig.calcRefPointsBoundBoxSize()
 
 
     # TODO: maybe instead of traversing from the root every time, save a list of objects on current distance
@@ -163,7 +163,7 @@ class SolverSystem():
             for rig in self.rigids:
                 if rig.fixed: rig.printHierarchy(0)
             Msg(20*"=" + "\n")
-        
+
         self.visualizeHierarchy()
 
     def visualizeHierarchy(self):
@@ -208,7 +208,7 @@ class SolverSystem():
     def calcMoveData(self,doc):
         for rig in self.rigids:
             rig.calcMoveData(doc, self)
-            
+
     def prepareRestart(self):
         for rig in self.rigids:
             rig.prepareRestart()
@@ -240,7 +240,7 @@ class SolverSystem():
         self.mySOLVER_SPIN_ACCURACY = SOLVER_SPIN_ACCURACY
         self.mySOLVER_POS_ACCURACY = SOLVER_POS_ACCURACY
         return systemSolved
-        
+
     def solveSystem(self,doc):
         Msg( "\n===== Start Solving System ====== \n" )
         if a2plib.isPartialProcessing():
@@ -261,17 +261,17 @@ class SolverSystem():
             Msg( "===== Could not solve system ====== \n" )
             msg = \
     '''
-    Constraints inconsistent. Cannot solve System. 
+    Constraints inconsistent. Cannot solve System.
     Please delete your last created constraint !
     '''
             QtGui.QMessageBox.information(
-                QtGui.QApplication.activeWindow(), 
-                "Constraint mismatch", 
+                QtGui.QApplication.activeWindow(),
+                "Constraint mismatch",
                 msg
                 )
-            
-        
-        
+
+
+
     def printList(self, name, l):
         Msg("{} = (".format(name))
         for e in l:
@@ -354,19 +354,19 @@ class SolverSystem():
                 for r in workList:
                     r.applySolution(doc, self)
                     r.tempfixed = True
-                    
+
             if self.convergencyCounter > SOLVER_STEPS_CONVERGENCY_CHECK:
                 if (
                     maxPosError  >= self.lastPositionError or
                     maxAxisError >= self.lastAxisError
                     ):
                     if mode == 'magnetic':
-                        Msg( "System not solvable, convergency is to bad !\n" )
+                        Msg( "System not solvable, convergency is incorrect!\n" )
                     return False
                 self.lastPositionError = maxPosError
                 self.lastAxisError = maxAxisError
                 self.convergencyCounter = 0
-                
+
             if self.stepCount > SOLVER_MAXSTEPS:
                 if mode == 'magnetic':
                     Msg( "Reached max calculations count ({})\n".format(SOLVER_MAXSTEPS) )
@@ -404,12 +404,12 @@ class Rigid():
         self.maxAxisError = 0.0
         self.refPointsBoundBoxSize = 0.0
         self.countSpinVectors = 0
-        
+
     def prepareRestart(self):
         self.tempfixed = False
         for d in self.dependencies:
             d.disable()
-            
+
 
     def enableDependencies(self, workList):
         for dep in self.dependencies:
@@ -454,18 +454,18 @@ class Rigid():
             else: return False
 #        else:
 #            FreeCAD.Console.PrintMessage("Should not happen: {}:{} got distance {}\n".format(self.label, self.disatanceFromFixed, distance))
-            
+
 
     def printHierarchy(self, level):
         Msg((level*3)*" ")
         Msg("{} - distance {}\n".format(self.label, self.disatanceFromFixed))
         for rig in self.childRigids:
             rig.printHierarchy(level+1)
-    
+
     def getCandidates(self):
         candidates = []
         for rig in self.childRigids:
-            if not rig.tempfixed and rig.areAllParentTempFixed(): 
+            if not rig.tempfixed and rig.areAllParentTempFixed():
                 candidates.append(rig)
         return set(candidates)
 
@@ -484,7 +484,7 @@ class Rigid():
 
     def areAllParentTempFixed(self):
         for rig in self.parentRigids:
-            if not rig.tempfixed: 
+            if not rig.tempfixed:
                 return False
         return True
 
@@ -541,11 +541,11 @@ class Rigid():
             if dep.refPoint.y > ymax: ymax=dep.refPoint.y
             if dep.refPoint.z < zmin: zmin=dep.refPoint.z
             if dep.refPoint.z > zmax: zmax=dep.refPoint.z
-        self.refPointsBoundBoxSize = math.sqrt( (xmax-xmin)**2 + (ymax-ymin)**2 + (zmax-zmin)**2 ) 
+        self.refPointsBoundBoxSize = math.sqrt( (xmax-xmin)**2 + (ymax-ymin)**2 + (zmax-zmin)**2 )
 
     def calcMoveData(self, doc, solver):
         if self.tempfixed or self.fixed: return
-        depRefPoints = [] 
+        depRefPoints = []
         depMoveVectors = [] #collect Data to compute central movement of rigid
         #
         self.maxPosError = 0.0
@@ -617,7 +617,7 @@ class Rigid():
         if self.moveVectorSum != None:
             moveDist = Base.Vector(self.moveVectorSum)
             moveDist.multiply(WEIGHT_LINEAR_MOVE) # stabilize computation, adjust if needed...
-        #    
+        #
         #Rotate the rigid...
         center = None
         rotation = None
@@ -632,7 +632,7 @@ class Rigid():
                     center = self.spinCenter
                 except:
                     pass
-                
+
         if center != None and rotation != None:
             pl = FreeCAD.Placement(moveDist,rotation,center)
             self.applyPlacementStep(pl)
@@ -641,9 +641,9 @@ class Rigid():
                 pl = FreeCAD.Placement()
                 pl.move(moveDist)
                 self.applyPlacementStep(pl)
-        
-            
-            
+
+
+
 
 #------------------------------------------------------------------------------
 class Dependency():
@@ -669,11 +669,11 @@ class Dependency():
         except:
             pass # not all constraints do have direction-Property
         try:
-            self.offset = constraint.offset 
+            self.offset = constraint.offset
         except:
             pass # not all constraints do have offset-Property
         try:
-            self.angle = constraint.angle 
+            self.angle = constraint.angle
         except:
             pass # not all constraints do have angle-Property
 
@@ -695,8 +695,8 @@ class Dependency():
 
     def __str__(self):
         return "Dependencies between {}-{}, type {}".format(
-            self.currentRigid.label, 
-            self.dependedRigid.label, 
+            self.currentRigid.label,
+            self.dependedRigid.label,
             self.Type
             )
 
@@ -705,8 +705,8 @@ class Dependency():
         DebugMsg(
             A2P_DEBUG_2,
             "Creating dependencies between {}-{}, type {}\n".format(
-                rigid1.label, 
-                rigid2.label, 
+                rigid1.label,
+                rigid2.label,
                 constraint.Type
                 )
             )
@@ -899,7 +899,7 @@ class Dependency():
             A2P_DEBUG_2,
             "{} - enabled\n".format(self)
             )
-        
+
     def disable(self):
         self.Enabled = False
         self.foreignDependency.Enabled = False
@@ -1072,7 +1072,7 @@ class DependencyAngledPlanes(Dependency):
             # do not change spin, not necessary..
             axis = None
         else:
-            try: 
+            try:
                 axis = rigAxis.cross(foreignAxis)
                 axis.normalize()
                 axis.multiply(math.degrees(-deltaAngle))
@@ -1133,12 +1133,12 @@ class a2p_SolverCommand:
     def Activated(self):
         solveConstraints( FreeCAD.ActiveDocument ) #the new iterative solver
 
-    def GetResources(self): 
+    def GetResources(self):
         return {
-            'Pixmap' : path_a2p + '/icons/a2p_solver.svg', 
-            'MenuText': 'Solve', 
+            'Pixmap' : path_a2p + '/icons/a2p_solver.svg',
+            'MenuText': 'Solve',
             'ToolTip': 'Solve Assembly 2 constraints'
-            } 
+            }
 
 FreeCADGui.addCommand('a2p_SolverCommand', a2p_SolverCommand())
 #------------------------------------------------------------------------------
@@ -1150,27 +1150,3 @@ if __name__ == "__main__":
     DebugMsg(A2P_DEBUG_1, "Starting solveConstraints latest script...\n" )
     doc = FreeCAD.activeDocument()
     solveConstraints(doc)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
