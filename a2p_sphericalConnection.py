@@ -26,7 +26,7 @@ from a2plib import *
 #from lib3D import *
 from pivy import coin
 from PySide import QtGui
-         
+
 class SphericalSurfaceSelectionGate:
     def allow(self, doc, obj, sub):
         if sub.startswith('Face'):
@@ -51,27 +51,27 @@ def parseSelection(selection, objectToUpdate=None):
 
     if not validSelection:
         msg = '''
-              To add a spherical surface constraint select two 
-              spherical surfaces (or vertexs), 
-              each from a different part. 
+              To add a spherical surface constraint select two
+              spherical surfaces (or vertexs),
+              each from a different part.
               Selection made: %s
               '''  % printSelection(selection)
         QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Incorrect Usage", msg)
-        return 
+        return
 
     if objectToUpdate == None:
         cName = findUnusedObjectName('sphericalConstraint')
         c = FreeCAD.ActiveDocument.addObject("App::FeaturePython", cName)
-                
+
         c.addProperty("App::PropertyString","Type","ConstraintInfo").Type = 'sphereCenterIdent'
         c.addProperty("App::PropertyString","Object1","ConstraintInfo").Object1 = cParms[0][0]
         c.addProperty("App::PropertyString","SubElement1","ConstraintInfo").SubElement1 = cParms[0][1]
         c.addProperty("App::PropertyString","Object2","ConstraintInfo").Object2 = cParms[1][0]
         c.addProperty("App::PropertyString","SubElement2","ConstraintInfo").SubElement2 = cParms[1][1]
-    
+
         c.setEditorMode('Type',1)
         for prop in ["Object1","Object2","SubElement1","SubElement2"]:
-            c.setEditorMode(prop, 1) 
+            c.setEditorMode(prop, 1)
 
         #-------------------------------------------
         # Group correctly under ParentObject in tree
@@ -81,12 +81,12 @@ def parseSelection(selection, objectToUpdate=None):
         c.setEditorMode('ParentTreeObject',1)
         parent.Label = parent.Label # this is needed to trigger an update
         #-------------------------------------------
-        
+
         c.Proxy = ConstraintObjectProxy()
-        c.ViewObject.Proxy = ConstraintViewProviderProxy( 
-            c, 
-            path_a2p + '/icons/a2p_sphericalSurfaceConstraint.svg', 
-            True, cParms[1][2], 
+        c.ViewObject.Proxy = ConstraintViewProviderProxy(
+            c,
+            path_a2p + '/icons/a2p_sphericalSurfaceConstraint.svg',
+            True, cParms[1][2],
             cParms[0][2]
             )
     else:
@@ -98,8 +98,8 @@ def parseSelection(selection, objectToUpdate=None):
         updateObjectProperties(c)
 
     c.purgeTouched()
-    c.Proxy.callSolveConstraints()    
-    
+    c.Proxy.callSolveConstraints()
+
 selection_text = \
 '''
 Selection options:
@@ -123,64 +123,19 @@ class a2p_SphericalSurfaceConnectionCommand:
             parseSelection( selection )
         else:
             FreeCADGui.Selection.clearSelection()
-            ConstraintSelectionObserver( 
-                SphericalSurfaceSelectionGate(), 
+            ConstraintSelectionObserver(
+                SphericalSurfaceSelectionGate(),
                 parseSelection,
-                taskDialog_title ='add spherical surface constraint', 
-                taskDialog_iconPath = self.GetResources()['Pixmap'], 
+                taskDialog_title ='add spherical surface constraint',
+                taskDialog_iconPath = self.GetResources()['Pixmap'],
                 taskDialog_text = selection_text
                 )
 
-    def GetResources(self): 
+    def GetResources(self):
         return {
-            'Pixmap' : path_a2p + '/icons/a2p_sphericalSurfaceConstraint.svg', 
-            'MenuText': 'Add a spherical constraint', 
+            'Pixmap' : path_a2p + '/icons/a2p_sphericalSurfaceConstraint.svg',
+            'MenuText': 'Add a spherical constraint',
             'ToolTip': toolTipText
-            } 
+            }
 
 FreeCADGui.addCommand('a2p_SphericalConnection', a2p_SphericalSurfaceConnectionCommand())
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -39,21 +39,21 @@ def group_constraints_under_parts():
 def allow_deletetion_when_activice_doc_ne_object_doc():
     return False
 
-class ImportedPartViewProviderProxy:   
-    
+class ImportedPartViewProviderProxy:
+
     def claimChildren(self):
         if hasattr(self,'Object'):
             return self.Object.InList
         else:
             return []
-    
+
     def onDelete(self, viewObject, subelements): # subelements is a tuple of strings
         if FreeCAD.activeDocument() != viewObject.Object.Document:
             return False # only delete objects in the active Document anytime !!
-        
+
         obj = viewObject.Object
         doc = obj.Document
-        
+
         deleteList = []
         for c in doc.Objects:
             if 'ConstraintInfo' in c.Content: # a related Constraint
@@ -62,11 +62,11 @@ class ImportedPartViewProviderProxy:
             if 'ConstraintNfo' in c.Content: # a related mirror-Constraint
                 if obj.Name in [ c.Object1, c.Object2 ]:
                     deleteList.append(c)
-                    
+
         if len(deleteList) > 0:
             for c in deleteList:
                 doc.removeObject(c.Name)
-                
+
         return True # If False is returned the object won't be deleted
 
     def __getstate__(self):
@@ -74,7 +74,7 @@ class ImportedPartViewProviderProxy:
 
     def __setstate__(self, state):
         return None
-    
+
     def attach(self, vobj):
         self.object_Name = vobj.Object.Name
         self.Object = vobj.Object
@@ -97,30 +97,30 @@ class PopUpMenuItem:
 
 
 class ConstraintViewProviderProxy:
-    def __init__( 
-            self, 
-            constraintObj, 
-            iconPath, 
-            createMirror=True, 
-            origLabel = '', 
-            mirrorLabel = '', 
-            extraLabel = '' 
+    def __init__(
+            self,
+            constraintObj,
+            iconPath,
+            createMirror=True,
+            origLabel = '',
+            mirrorLabel = '',
+            extraLabel = ''
             ):
         self.iconPath = iconPath
         self.constraintObj_name = constraintObj.Name
         constraintObj.purgeTouched()
         if createMirror:
             self.mirror_name = create_constraint_mirror(
-                constraintObj, 
-                iconPath, 
-                origLabel, 
-                mirrorLabel, 
-                extraLabel 
+                constraintObj,
+                iconPath,
+                origLabel,
+                mirrorLabel,
+                extraLabel
                 )
-        
+
     def getIcon(self):
         return self.iconPath
-        
+
     def attach(self, vobj): #attach to what document?
         vobj.addDisplayMode( coin.SoGroup(),"Standard" )
 
@@ -141,7 +141,7 @@ class ConstraintViewProviderProxy:
                 doc.removeObject(  obj.Proxy.constraintObj_name ) # also delete the original constraint which obj mirrors
             except:
                 pass # bloede Fehlermeldung weg, wenn Original fehlt! (Klaus)
-        elif hasattr( obj.Proxy, 'mirror_name'): # the original constraint, #isinstance( obj.Proxy,  ConstraintObjectProxy ) not done since ConstraintObjectProxy not defined in namespace 
+        elif hasattr( obj.Proxy, 'mirror_name'): # the original constraint, #isinstance( obj.Proxy,  ConstraintObjectProxy ) not done since ConstraintObjectProxy not defined in namespace
             doc.removeObject( obj.Proxy.mirror_name ) # also delete mirror
         return True
 
@@ -166,7 +166,7 @@ def create_constraint_mirror( constraintObj, iconPath, origLabel= '', mirrorLabe
         if extraLabel != '':
             cMirror.Label += '__' + extraLabel
             constraintObj.Label += '__' + extraLabel
-            
+
     for pName in constraintObj.PropertiesList:
         if pName == "ParentTreeObject": continue #causes problems with fc0.16
         if constraintObj.getGroupOfProperty( pName ) == 'ConstraintInfo':
@@ -188,27 +188,27 @@ def create_constraint_mirror( constraintObj, iconPath, origLabel= '', mirrorLabe
                 setattr( cMirror, pName, getattr( constraintObj, pName) )
             if constraintObj.getEditorMode(pName) == ['ReadOnly']:
                 cMirror.setEditorMode( pName, 1 )
-                
+
     cMirror.addProperty("App::PropertyLink","ParentTreeObject","ConstraintNfo") # this was not copied because fc0.16
     parent = FreeCAD.ActiveDocument.getObject(constraintObj.Object2)
     cMirror.ParentTreeObject = parent
     cMirror.setEditorMode('ParentTreeObject',1)
     parent.Label = parent.Label # this is needed to trigger an update
-                
+
     ConstraintMirrorObjectProxy( cMirror, constraintObj )
     cMirror.ViewObject.Proxy = ConstraintMirrorViewProviderProxy( constraintObj, iconPath )
     return cMirror.Name
- 
+
 class ConstraintObjectProxy:
     def __init__(self,obj=None):
         self.disable_onChanged = False
-    
+
     def execute(self, obj):
         global a2p_NeedToSolveSystem
         if a2p_NeedToSolveSystem:
             a2p_NeedToSolveSystem = False # Solve only once after editing a constraint's property
             self.callSolveConstraints()
-            
+
     def onChanged(self, obj, prop):
         # Add new property "disable_onChanged" if not already existing...
         if not hasattr(self, 'disable_onChanged'):
@@ -233,19 +233,19 @@ class ConstraintObjectProxy:
             cMirror.directionConstraint = ["aligned","opposed"] #value should be updated in onChanged call due to assignment in 2 lines
         obj.directionConstraint = ["aligned","opposed"]
         obj.directionConstraint = value
-        
+
     def callSolveConstraints(self):
         from solversystem import autoSolveConstraints
         autoSolveConstraints( FreeCAD.activeDocument(), cache = None )
- 
- 
+
+
 class ConstraintMirrorObjectProxy:
     def __init__(self, obj, constraintObj ):
         self.constraintObj_name = constraintObj.Name
         constraintObj.Proxy.mirror_name = obj.Name
         self.disable_onChanged = False
         obj.Proxy = self
-        
+
     def execute(self, obj):
         return #no work required in onChanged causes touched in original constraint ...
 
@@ -256,7 +256,7 @@ class ConstraintMirrorObjectProxy:
         '''
         #FreeCAD.Console.PrintMessage("%s.%s property changed\n" % (obj.Name, prop))
         if getattr( self, 'disable_onChanged', True):
-            return 
+            return
         if obj.getGroupOfProperty( prop ) == 'ConstraintNfo':
             if hasattr( self, 'constraintObj_name' ):
                 constraintObj = obj.Document.getObject( self.constraintObj_name )
@@ -265,44 +265,3 @@ class ConstraintMirrorObjectProxy:
                         setattr( constraintObj, prop, getattr( obj, prop) )
                 except:
                     pass #loading issues...
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

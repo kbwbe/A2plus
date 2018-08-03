@@ -27,16 +27,16 @@ __author__ = 'kbwbe'
 
 
 
-class a2pWorkbench (Workbench): 
-    
+class a2pWorkbench (Workbench):
+
     def __init__(self):
         import a2plib
         self.__class__.Icon = a2plib.pathOfModule() + "/icons/a2p_workbench.svg"
         self.__class__.MenuText = 'A2plus'
         self.__class__.ToolTip  = 'An other assembly workbench for FreeCAD'
-    
+
     def Initialize(self):
-        
+
         import a2plib #QtCore.QResource.registerResource happens in assembly2lib
         import a2p_importpart
         import a2p_CircularEdgeConnection
@@ -84,7 +84,7 @@ class a2pWorkbench (Workbench):
                commandslist
                )
         self.appendMenu(
-            'A2p', 
+            'A2p',
             menuEntries
             )
         #FreeCADGui.addPreferencePage( a2plib.pathOfModule() + '/GuiA2p/ui/a2p_prefs.ui','A2plus' )
@@ -92,12 +92,12 @@ class a2pWorkbench (Workbench):
             a2plib.pathOfModule() +
             '/GuiA2p/Resources/ui/a2p_prefs.ui','A2plus'
             )
-        
+
 
     def Activated(self):
         import observers
         FreeCAD.addDocumentObserver(observers.redoUndoObserver)
-        
+
     def Deactivated(self):
         import observers
         FreeCAD.removeDocumentObserver(observers.redoUndoObserver)
@@ -108,9 +108,9 @@ class a2pWorkbench (Workbench):
         if len(selection) == 1:
             obj = selection[0]
             if 'sourceFile' in  obj.Content:
-                self.appendContextMenu( 
-                    "A2p", 
-                    [ 
+                self.appendContextMenu(
+                    "A2p",
+                    [
                       'a2p_movePart',
                       'a2p_duplicatePart',
                       'a2p_editImportedPart',

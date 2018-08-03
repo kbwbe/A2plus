@@ -48,11 +48,11 @@ def muxObjectsWithKeys(doc, withColor=False):
     faces = []
     faceColors = []
     muxInfo = [] # List of keys, not used at moment...
-    
+
     visibleObjects = [ obj for obj in doc.Objects
                        if hasattr(obj,'ViewObject') and obj.ViewObject.isVisible()
                        and hasattr(obj,'Shape') and len(obj.Shape.Faces) > 0 and 'Body' not in obj.Name]
-        
+
     for obj in visibleObjects:
         # Save Computing time, store this before the for..enumerate loop later...
         colorFlag = ( len(obj.ViewObject.DiffuseColor) < len(obj.Shape.Faces) )
@@ -67,9 +67,9 @@ def muxObjectsWithKeys(doc, withColor=False):
                     faceColors.append(shapeCol)
                 else:
                     faceColors.append(diffuseCol[i])
-    
+
     shell = Part.makeShell(faces)
-    if withColor:    
+    if withColor:
         return muxInfo, shell, faceColors
     else:
         return muxInfo, shell
@@ -93,7 +93,7 @@ class SimpleAssemblyShape:
         obj.addProperty("App::PropertyString", "type").type = 'SimpleAssemblyShape'
         obj.addProperty("App::PropertyFloat", "timeOfGenerating").timeOfGenerating = time.time()
         obj.Proxy = self
-        
+
     def onChanged(self, fp, prop):
         pass
 
@@ -107,20 +107,20 @@ class ViewProviderSimpleAssemblyShape:
 
     def onDelete(self, viewObject, subelements):
         return True
-        
+
     def __getstate__(self):
         return None
 
     def __setstate__(self, state):
         return None
-    
+
     def getIcon(self):
         return a2plib.path_a2p + '/icons/simpleAssemblyShape.svg'
-    
+
     def attach(self, obj):
         self.object_Name = obj.Object.Name
         self.Object = obj.Object
-        
+
     def getDisplayModes(self,obj):
         "Return a list of display modes."
         modes=[]
@@ -128,32 +128,32 @@ class ViewProviderSimpleAssemblyShape:
         modes.append("Wireframe")
         modes.append("Flat Lines")
         return modes
-    
+
     def getDefaultDisplayMode(self):
         "Return the name of the default display mode. It must be defined in getDisplayModes."
         return "Flat Lines"
-    
+
     def setDisplayMode(self,mode):
         return mode
-        
+
 
 def createOrUpdateSimpleAssemblyShape(doc):
     visibleImportObjects = [ obj for obj in doc.Objects
                            if 'importPart' in obj.Content
-                           and hasattr(obj,'ViewObject') 
+                           and hasattr(obj,'ViewObject')
                            and obj.ViewObject.isVisible()
-                           and hasattr(obj,'Shape') 
-                           and len(obj.Shape.Faces) > 0 
+                           and hasattr(obj,'Shape')
+                           and len(obj.Shape.Faces) > 0
                            ]
-    
+
     if len(visibleImportObjects) == 0:
-        QtGui.QMessageBox.critical(  QtGui.QApplication.activeWindow(), 
-                                     "Cannot create SimpleAssemblyShape", 
-                                     "No visible ImportParts found" 
+        QtGui.QMessageBox.critical(  QtGui.QApplication.activeWindow(),
+                                     "Cannot create SimpleAssemblyShape",
+                                     "No visible ImportParts found"
                                    )
         return
-        
-    sas = doc.getObject('SimpleAssemblyShape')    
+
+    sas = doc.getObject('SimpleAssemblyShape')
     if sas == None:
         sas = doc.addObject("Part::FeaturePython","SimpleAssemblyShape")
         SimpleAssemblyShape(sas)
@@ -172,7 +172,7 @@ class a2p_SimpleAssemblyShapeCommand():
 
     def GetResources(self):
         import a2plib
-        return {'Pixmap'  : a2plib.path_a2p +'/icons/a2p_simpleAssemblyShape.svg', 
+        return {'Pixmap'  : a2plib.path_a2p +'/icons/a2p_simpleAssemblyShape.svg',
                 'MenuText': "create or refresh simple Shape of complete Assembly",
                 'ToolTip': "create or refresh simple Shape of complete Assembly"
                 }
@@ -185,57 +185,5 @@ class a2p_SimpleAssemblyShapeCommand():
 
     def IsActive(self):
         return True
-    
-FreeCADGui.addCommand('a2p_SimpleAssemblyShapeCommand',a2p_SimpleAssemblyShapeCommand()) 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+FreeCADGui.addCommand('a2p_SimpleAssemblyShapeCommand',a2p_SimpleAssemblyShapeCommand())

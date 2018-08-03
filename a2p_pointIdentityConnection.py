@@ -44,10 +44,10 @@ def parseSelection(selection, objectToUpdate=None):
                            [s2.ObjectName, s2.SubElementNames[0], s2.Object.Label ] ]
     if not validSelection:
         msg = '''
-              To add a point Identity constraint select exactly two vertexes! 
+              To add a point Identity constraint select exactly two vertexes!
               '''
         QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Incorrect Usage", msg)
-        return 
+        return
 
     if objectToUpdate == None:
         cName = findUnusedObjectName('pointIdentity')
@@ -57,10 +57,10 @@ def parseSelection(selection, objectToUpdate=None):
         c.addProperty("App::PropertyString","SubElement1","ConstraintInfo").SubElement1 = cParms[0][1]
         c.addProperty("App::PropertyString","Object2","ConstraintInfo").Object2 = cParms[1][0]
         c.addProperty("App::PropertyString","SubElement2","ConstraintInfo").SubElement2 = cParms[1][1]
-        
+
         c.setEditorMode('Type',1)
         for prop in ["Object1","Object2","SubElement1","SubElement2"]:
-            c.setEditorMode(prop, 1) 
+            c.setEditorMode(prop, 1)
 
         #-------------------------------------------
         # Group correctly under ParentObject in tree
@@ -70,13 +70,13 @@ def parseSelection(selection, objectToUpdate=None):
         c.setEditorMode('ParentTreeObject',1)
         parent.Label = parent.Label # this is needed to trigger an update
         #-------------------------------------------
-        
+
         c.Proxy = ConstraintObjectProxy()
-        c.ViewObject.Proxy = ConstraintViewProviderProxy( 
-            c, 
-            path_a2p + '/icons/a2p_pointIdentity.svg', 
-            True, 
-            cParms[1][2], 
+        c.ViewObject.Proxy = ConstraintViewProviderProxy(
+            c,
+            path_a2p + '/icons/a2p_pointIdentity.svg',
+            True,
+            cParms[1][2],
             cParms[0][2]
             )
     else:
@@ -86,7 +86,7 @@ def parseSelection(selection, objectToUpdate=None):
         c.Object2 = cParms[1][0]
         c.SubElement2 = cParms[1][1]
         updateObjectProperties(c)
-    
+
     c.purgeTouched()
     c.Proxy.callSolveConstraints()
 
@@ -96,14 +96,14 @@ selection_text = \
     - 1. vertex on a part
     - 2. vertex on another part
     '''
-    
+
 toolTipText = \
 '''
 Add PointIdentity Constraint:
 selection:
 1.) select a vertex on a part
 2.) select a vertex on another part
-'''    
+'''
 
 class a2p_PointIdentityConnectionCommand:
     def Activated(self):
@@ -112,84 +112,19 @@ class a2p_PointIdentityConnectionCommand:
             parseSelection( selection )
         else:
             FreeCADGui.Selection.clearSelection()
-            ConstraintSelectionObserver( 
-                 PointIdentitySelectionGate(), 
+            ConstraintSelectionObserver(
+                 PointIdentitySelectionGate(),
                  parseSelection,
-                 taskDialog_title ='add point Identity constraint', 
-                 #taskDialog_iconPath = self.GetResources()['Pixmap'], 
-                 taskDialog_iconPath = path_a2p + '/icons/a2p_pointIdentity.svg', 
+                 taskDialog_title ='add point Identity constraint',
+                 #taskDialog_iconPath = self.GetResources()['Pixmap'],
+                 taskDialog_iconPath = path_a2p + '/icons/a2p_pointIdentity.svg',
                  taskDialog_text = selection_text
                  )
-    def GetResources(self): 
+    def GetResources(self):
         return {
-             'Pixmap' : path_a2p + '/icons/a2p_pointIdentity.svg', 
-             'MenuText': 'Add PointIdentity Constraint', 
+             'Pixmap' : path_a2p + '/icons/a2p_pointIdentity.svg',
+             'MenuText': 'Add PointIdentity Constraint',
              'ToolTip': toolTipText
-             } 
+             }
 
 FreeCADGui.addCommand('a2p_PointIdentityConnectionCommand', a2p_PointIdentityConnectionCommand())
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -49,13 +49,13 @@ def parseSelection(selection, objectToUpdate=None):
                            [s2.ObjectName, s2.SubElementNames[0], s2.Object.Label ] ]
     if not validSelection:
         msg = '''
-              Angle constraint requires a selection of 2 planes 
+              Angle constraint requires a selection of 2 planes
               each on different objects. Selection made:
               %s
               '''  % printSelection(selection)
         QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Incorrect Usage", msg)
-        return 
-    
+        return
+
     # calculate recent angle here to be stored in property "angle"
     ob1 = FreeCAD.activeDocument().getObject(s1.ObjectName)
     ob2 = FreeCAD.activeDocument().getObject(s2.ObjectName)
@@ -64,7 +64,7 @@ def parseSelection(selection, objectToUpdate=None):
     normal1 = plane1.Surface.Axis
     normal2 = plane2.Surface.Axis
     angle = normal2.getAngle(normal1) / 2.0 / math.pi * 360.0
-    
+
     if objectToUpdate == None:
         cName = findUnusedObjectName('angledPlanesContraint')
         c = FreeCAD.ActiveDocument.addObject("App::FeaturePython", cName)
@@ -79,8 +79,8 @@ def parseSelection(selection, objectToUpdate=None):
         c.Object2 = cParms[1][0]
         c.SubElement2 = cParms[1][1]
         for prop in ["Object1","Object2","SubElement1","SubElement2","Type"]:
-            c.setEditorMode(prop, 1) 
-            
+            c.setEditorMode(prop, 1)
+
         #-------------------------------------------
         # Group correctly under ParentObject in tree
         #-------------------------------------------
@@ -89,13 +89,13 @@ def parseSelection(selection, objectToUpdate=None):
         c.setEditorMode('ParentTreeObject',1)
         parent.Label = parent.Label # this is needed to trigger an update
         #-------------------------------------------
-            
+
         c.Proxy = ConstraintObjectProxy()
-        c.ViewObject.Proxy = ConstraintViewProviderProxy( 
-            c, 
-            path_a2p +'/icons/a2p_angleConstraint.svg', 
-            True, 
-            cParms[1][2], 
+        c.ViewObject.Proxy = ConstraintViewProviderProxy(
+            c,
+            path_a2p +'/icons/a2p_angleConstraint.svg',
+            True,
+            cParms[1][2],
             cParms[0][2]
             )
     else:
@@ -105,10 +105,10 @@ def parseSelection(selection, objectToUpdate=None):
         c.Object2 = cParms[1][0]
         c.SubElement2 = cParms[1][1]
         updateObjectProperties(c)
-    
+
     c.purgeTouched()
     c.Proxy.callSolveConstraints()
-         
+
 
 selection_text = \
 '''
@@ -146,69 +146,20 @@ class a2p_AngledPlanesCommand:
             parseSelection( selection )
         else:
             FreeCADGui.Selection.clearSelection()
-            ConstraintSelectionObserver( 
-                 PlanesAngleSelectionGate(), 
+            ConstraintSelectionObserver(
+                 PlanesAngleSelectionGate(),
                  parseSelection,
-                 taskDialog_title ='add angle between planes constraint', 
-                 taskDialog_iconPath = self.GetResources()['Pixmap'], 
+                 taskDialog_title ='add angle between planes constraint',
+                 taskDialog_iconPath = self.GetResources()['Pixmap'],
                  taskDialog_text = selection_text,
-                 secondSelectionGate = PlanesAngleSelectionGate2() 
+                 secondSelectionGate = PlanesAngleSelectionGate2()
                  )
-              
-    def GetResources(self): 
+
+    def GetResources(self):
         return {
-             'Pixmap' : path_a2p + '/icons/a2p_angleConstraint.svg', 
-             'MenuText': 'angle between planes constraint', 
+             'Pixmap' : path_a2p + '/icons/a2p_angleConstraint.svg',
+             'MenuText': 'angle between planes constraint',
              'ToolTip': toolTipText,
-             } 
+             }
 
 FreeCADGui.addCommand('a2p_AngledPlanesCommand', a2p_AngledPlanesCommand())
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

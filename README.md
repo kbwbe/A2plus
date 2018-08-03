@@ -21,7 +21,7 @@ Similar is:
 
 Different is:
 * A new designed solving algorithm, able to solve some more complicated relations.
-* Different and in future more constraints, internally with different names. 
+* Different and in future more constraints, internally with different names.
 * No animation for degrees of freedom, as difficult for new solver type.
 * No parts list at moment. Export to office spreadsheats planned for future versions.
 * No collision check of parts at moment. Planned for future versions
@@ -107,48 +107,48 @@ As your first steps learning this workbench, please have look at tutorials relat
 You can follow the tool-tips in the workbench's toolbar. They describe exactly what to do in which order.
 
 Current Features like shown in the workbench's toolbar:
-* Add a part from external file (Shift+A) - 
+* Add a part from external file (Shift+A) -
     Begin and continue here with adding (importing existing files) .fcstd parts
-* Update parts imported into the assembly - 
+* Update parts imported into the assembly -
     Use this to refresh changed parts already assembled
 * Move part - 
     Just move selected part
-* Duplicate part - 
+* Duplicate part -
     Adds one or more previously imported part into assembly
-* Edit - 
+* Edit -
     Opens the selected assembly part to be changed in a new tab
-* Add a point-to-point identity {pointIdentityConstraint} - 
+* Add a point-to-point identity {pointIdentityConstraint} -
     Fix a point vertex to another point vertex
-* Add a point-on-line match {pointOnLineConstraint} - 
+* Add a point-on-line match {pointOnLineConstraint} -
     Fix a point vertex to a line vertex
-* Add a point-on-plane match {pointOnPlaneConstraint} - 
+* Add a point-on-plane match {pointOnPlaneConstraint} -
     Fix a point vertex to be on a plane
-* Add a circular-to-circular edge match {circularEdgeConstraint} - 
-    Fix one circular edge to another. You can choose a special direction (aligned, opposed or none). 
+* Add a circular-to-circular edge match {circularEdgeConstraint} -
+    Fix one circular edge to another. You can choose a special direction (aligned, opposed or none).
     An offset can be applied
-* Add a plane-to-plane parallelism {planeParallel} - 
+* Add a plane-to-plane parallelism {planeParallel} -
     Adjust selected planes to be parallel. You can choose a special direction (aligned, opposed)
-* Add a plane-to-plane offset {planeConstraint} - 
+* Add a plane-to-plane offset {planeConstraint} -
     Makes planes parallel and offers to give an offset value and direction (aligned, opposed,none)
-* Add an axis-to-axis identity {axialConstraint} - 
+* Add an axis-to-axis identity {axialConstraint} -
     Makes cylindrical objects or two axes to be axially aligned
-* Add an angle between planes {angledPlanesConstraint} - 
+* Add an angle between planes {angledPlanesConstraint} -
     Selected planes make the latter object to be rotated by your edited 'angle' value.
-    Keep the angle between aprox 0.1° and 179.9° or use workarounds. 
-* Add a spherical constraint between objects - 
+    Keep the angle between aprox 0.1° and 179.9° or use workarounds.
+* Add a spherical constraint between objects -
     Select spheres to be aligned or vertex/sphere or vertex/vertex
-* Solve A2plus constraints - 
+* Solve A2plus constraints -
     Manually invoke the A2pus solver (especially when AutoSolve is OFF)
-* Delete constraints - 
+* Delete constraints -
     Remove all constraints of selected part in one step
-* View constrained element - 
+* View constrained element -
     Show all elements for a Tree view selected constraint
-* SAS Create or refresh simple shape of complete assembly - 
+* SAS Create or refresh simple shape of complete assembly -
     the newly created compound can be found in tree vies
-* Toggle transparency of assembly - 
+* Toggle transparency of assembly -
     The whole assembly will get transparent
-* Show only selected items (or all if none selected) - 
+* Show only selected items (or all if none selected) -
     Just another visibility helper
-* Toggle AutoSolve - 
+* Toggle AutoSolve -
     Normally the solver defaults to and works with AutoSolve, but for larger
     assemblies one may chose OFF and solve manually, as it saves computation time.
