@@ -29,7 +29,7 @@ import a2plib
 from a2p_MuxAssembly import muxObjectsWithKeys, createTopoInfo, Proxy_muxAssemblyObj
 from a2p_viewProviderProxies import *
 from a2p_versionmanagement import SubAssemblyWalk, A2P_VERSION
-import solversystem
+import a2p_solversystem
 from a2plib import (
     appVersionStr,
     AUTOSOLVE_ENABLED

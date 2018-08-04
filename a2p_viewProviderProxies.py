@@ -235,7 +235,7 @@ class ConstraintObjectProxy:
         obj.directionConstraint = value
 
     def callSolveConstraints(self):
-        from solversystem import autoSolveConstraints
+        from a2p_solversystem import autoSolveConstraints
         autoSolveConstraints( FreeCAD.activeDocument(), cache = None )
 
 

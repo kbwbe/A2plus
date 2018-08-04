@@ -46,8 +46,8 @@ from a2plib import (
     A2P_DEBUG_2,
     A2P_DEBUG_3,
     )
-from dependencies import Dependency
-from rigid import Rigid
+from a2p_dependencies import Dependency
+from a2p_rigid import Rigid
 import os, sys
 from os.path import expanduser
 
