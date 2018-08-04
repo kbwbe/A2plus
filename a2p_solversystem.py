@@ -77,6 +77,7 @@ class SolverSystem():
         self.lastPositionError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
         self.lastAxisError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
         self.convergencyCounter = 0
+        self.status = "created"
 
     def clear(self):
         for r in self.rigids:
@@ -95,6 +96,7 @@ class SolverSystem():
     def loadSystem(self,doc):
         self.clear()
         self.doc = doc
+        self.status = "loading"
         #
         self.convergencyCounter = 0
         self.lastPositionError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
@@ -127,6 +129,7 @@ class SolverSystem():
             self.rigids.append(rig)
         #
         #link constraints to rigids using dependencies
+        deleteList = [] # a list to collect broken constraints
         for c in self.constraints:
             rigid1 = self.getRigid(c.Object1)
             rigid2 = self.getRigid(c.Object2)
@@ -134,11 +137,37 @@ class SolverSystem():
             rigid1.linkedRigids.append(rigid2);
             rigid2.linkedRigids.append(rigid1);
 
-            Dependency.Create(doc, c, self, rigid1, rigid2)
+            try:
+                Dependency.Create(doc, c, self, rigid1, rigid2)
+            except:
+                self.status = "loadingDependencyError"
+                deleteList.append(c)
+                
+        if len(deleteList) > 0:
+            msg = "The following constraints are broken:\n"
+            for c in deleteList:
+                msg += "{}\n".format(c.Label)
+            msg += "Do you want to delete them ?"
 
+            flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
+            response = QtGui.QMessageBox.critical(
+                QtGui.QApplication.activeWindow(),
+                "Delete broken constraints?",
+                msg,
+                flags
+                )
+            if response == QtGui.QMessageBox.Yes:
+                for c in deleteList:
+                    a2plib.removeConstraint(c)
+        
+        if self.status == "loadingDependencyError":
+            return
+                
         for rig in self.rigids:
             rig.calcSpinCenter()
             rig.calcRefPointsBoundBoxSize()
+            
+        self.status = "loaded"
 
 
     # TODO: maybe instead of traversing from the root every time, save a list of objects on current distance
@@ -216,6 +245,8 @@ class SolverSystem():
 
         startTime = int(round(time.time() * 1000))
         self.loadSystem(doc)
+        if self.status == "loadingDependencyError":
+            return
         self.assignParentship(doc)
         loadTime = int(round(time.time() * 1000))
         while True:
@@ -249,13 +280,18 @@ class SolverSystem():
             mode = 'magnetic'
 
         systemSolved = self.solveSystemWithMode(doc,mode)
+        if self.status == "loadingDependencyError":
+            return
+
         if not systemSolved and mode == 'partial':
             Msg( "Could not solve system with partial processing, switch to 'magnetic' mode  \n" )
             mode = 'magnetic'
             systemSolved = self.solveSystemWithMode(doc,mode)
         if systemSolved:
+            self.status = "solved"
             Msg( "===== System solved ! ====== \n" )
         else:
+            self.status = "unsolved"
             Msg( "===== Could not solve system ====== \n" )
             msg = \
     '''

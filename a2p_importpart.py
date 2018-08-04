@@ -296,7 +296,7 @@ def updateImportedParts(doc):
     sub.showMaximized()
 
     objectCache.cleanUp(doc)
-    solversystem.solveConstraints(doc)
+    a2p_solversystem.autoSolveConstraints(doc)
     doc.recompute()
 
 
