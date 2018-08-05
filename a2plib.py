@@ -435,8 +435,8 @@ def getObjectVertexFromName( obj, name ):
 def removeConstraint( constraint ):
     'required as constraint.Proxy.onDelete only called when deleted through GUI'
     doc = constraint.Document
-    if constraint.ViewObject != None: #do not this check is actually nessary ...
-        constraint.ViewObject.Proxy.onDelete( constraint.ViewObject, None )
+    if constraint.ViewObject != None:
+        constraint.ViewObject.Proxy.onDelete( constraint.ViewObject, None ) # also removes mirror...
     doc.removeObject( constraint.Name )
 #------------------------------------------------------------------------------
 def getPos(obj, subElementName):
