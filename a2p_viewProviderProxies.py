@@ -35,12 +35,6 @@ import a2plib
 a2p_NeedToSolveSystem = False
 #---------------------------------------------------------------------------
 
-def group_constraints_under_parts():
-    return True
-
-def allow_deletetion_when_activice_doc_ne_object_doc():
-    return False
-
 class ImportedPartViewProviderProxy:
 
     def claimChildren(self):
@@ -92,6 +86,7 @@ class PopUpMenuItem:
         action = menu.addAction(label)
         action.triggered.connect( self.execute )
         proxy.pop_up_menu_items.append( self )
+
     def execute( self ):
         try:
             FreeCADGui.runCommand( self.Freecad_cmd )
