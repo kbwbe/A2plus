@@ -278,13 +278,13 @@ class Rigid():
 
                 if rotation is None: continue       # No rotation for that dep
 
-                # Calculate max rotation error
-                axisErr = self.spin.Length
-                if axisErr > self.maxAxisError : self.maxAxisError = axisErr
-
                 # Accumulate all rotations for later average calculation
                 self.spin = self.spin.add(rotation)
                 self.countSpinVectors += 1
+
+                # Calculate max rotation error
+                axisErr = self.spin.Length
+                if axisErr > self.maxAxisError : self.maxAxisError = axisErr
 
     def move(self,doc):
         if self.tempfixed or self.fixed: return
