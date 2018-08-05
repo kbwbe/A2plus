@@ -26,6 +26,8 @@ import FreeCAD, FreeCADGui
 from PySide import QtGui, QtCore
 from pivy import coin
 import traceback
+import a2plib
+
 
 #---------------------------------------------------------------------------
 # Module global vars, automatically managed, hands off !!
@@ -33,17 +35,15 @@ import traceback
 a2p_NeedToSolveSystem = False
 #---------------------------------------------------------------------------
 
-def group_constraints_under_parts():
-    return True
-
-def allow_deletetion_when_activice_doc_ne_object_doc():
-    return False
-
 class ImportedPartViewProviderProxy:
 
     def claimChildren(self):
         if hasattr(self,'Object'):
-            return self.Object.InList
+            try:
+                return self.Object.InList
+            except:
+                #FreeCAD has already deleted self.Object !!
+                return[]
         else:
             return []
 
@@ -59,13 +59,10 @@ class ImportedPartViewProviderProxy:
             if 'ConstraintInfo' in c.Content: # a related Constraint
                 if obj.Name in [ c.Object1, c.Object2 ]:
                     deleteList.append(c)
-            if 'ConstraintNfo' in c.Content: # a related mirror-Constraint
-                if obj.Name in [ c.Object1, c.Object2 ]:
-                    deleteList.append(c)
 
         if len(deleteList) > 0:
             for c in deleteList:
-                doc.removeObject(c.Name)
+                a2plib.removeConstraint(c) #also deletes the mirrors...
 
         return True # If False is returned the object won't be deleted
 
@@ -89,6 +86,7 @@ class PopUpMenuItem:
         action = menu.addAction(label)
         action.triggered.connect( self.execute )
         proxy.pop_up_menu_items.append( self )
+
     def execute( self ):
         try:
             FreeCADGui.runCommand( self.Freecad_cmd )
@@ -117,6 +115,7 @@ class ConstraintViewProviderProxy:
                 mirrorLabel,
                 extraLabel
                 )
+        self.enableDeleteCounterPart = True #allow to delete the mirror
 
     def getIcon(self):
         return self.iconPath
@@ -134,24 +133,61 @@ class ConstraintViewProviderProxy:
         if FreeCAD.activeDocument() != viewObject.Object.Document:
             return False
 
+        if not hasattr(self,'enableDeleteCounterPart'):
+            self.enableDeleteCounterPart = True
+
+        if not self.enableDeleteCounterPart: return True # nothing more to do...
+
+        # first delete the mirror...
         obj = viewObject.Object
         doc = obj.Document
-        if isinstance( obj.Proxy, ConstraintMirrorObjectProxy ):
+        if hasattr( obj.Proxy, 'mirror_name'):
             try:
-                doc.removeObject(  obj.Proxy.constraintObj_name ) # also delete the original constraint which obj mirrors
+                m = doc.getObject(obj.Proxy.mirror_name)
+                m.Proxy.enableDeleteCounterPart = False
+                doc.removeObject( obj.Proxy.mirror_name ) # also delete mirror
             except:
-                pass # bloede Fehlermeldung weg, wenn Original fehlt! (Klaus)
-        elif hasattr( obj.Proxy, 'mirror_name'): # the original constraint, #isinstance( obj.Proxy,  ConstraintObjectProxy ) not done since ConstraintObjectProxy not defined in namespace
-            doc.removeObject( obj.Proxy.mirror_name ) # also delete mirror
+                pass # if mirror is already deleted...
         return True
 
 
-class ConstraintMirrorViewProviderProxy( ConstraintViewProviderProxy ):
+class ConstraintMirrorViewProviderProxy:
     def __init__( self, constraintObj, iconPath ):
         self.iconPath = iconPath
         self.constraintObj_name = constraintObj.Name
+        self.enableDeleteCounterPart = True #allow to delete the original of the mirror
+
+    def getIcon(self):
+        return self.iconPath
+
     def attach(self, vobj):
         vobj.addDisplayMode( coin.SoGroup(),"Standard" )
+
+    def getDisplayModes(self,obj):
+        return ["Standard"]
+
+    def getDefaultDisplayMode(self):
+        return "Standard"
+
+    def onDelete(self, viewObject, subelements): # subelements is a tuple of strings
+        if FreeCAD.activeDocument() != viewObject.Object.Document:
+            return False
+        
+        if not hasattr(self,'enableDeleteCounterPart'):
+            self.enableDeleteCounterPart = True
+            
+        if not self.enableDeleteCounterPart: return True # nothing more to do...
+
+        # First delete the original...
+        obj = viewObject.Object
+        doc = obj.Document
+        try:
+            c = doc.getObject(obj.Proxy.constraintObj_name)
+            c.Proxy.enableDeleteCounterPart = False
+            doc.removeObject(obj.Proxy.constraintObj_name) # also delete the original
+        except:
+            pass # if original has already been removed...
+        return True
 
 
 def create_constraint_mirror( constraintObj, iconPath, origLabel= '', mirrorLabel='', extraLabel = '' ):
@@ -235,7 +271,7 @@ class ConstraintObjectProxy:
         obj.directionConstraint = value
 
     def callSolveConstraints(self):
-        from solversystem import autoSolveConstraints
+        from a2p_solversystem import autoSolveConstraints
         autoSolveConstraints( FreeCAD.activeDocument(), cache = None )
 
 

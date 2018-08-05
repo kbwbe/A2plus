@@ -48,7 +48,7 @@ class a2pWorkbench (Workbench):
         import a2p_pointOnLineConstraint
         import a2p_pointOnPlaneConstraint
         import a2p_sphericalConnection
-        import solversystem
+        import a2p_solversystem
         import a2p_MuxAssembly
 
         commandslist = [
@@ -95,12 +95,12 @@ class a2pWorkbench (Workbench):
 
 
     def Activated(self):
-        import observers
-        FreeCAD.addDocumentObserver(observers.redoUndoObserver)
+        import a2p_observers
+        FreeCAD.addDocumentObserver(a2p_observers.redoUndoObserver)
 
     def Deactivated(self):
-        import observers
-        FreeCAD.removeDocumentObserver(observers.redoUndoObserver)
+        import a2p_observers
+        FreeCAD.removeDocumentObserver(a2p_observers.redoUndoObserver)
 
     def ContextMenu(self, recipient):
         import FreeCAD, FreeCADGui
