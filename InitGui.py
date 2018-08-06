@@ -51,38 +51,76 @@ class a2pWorkbench (Workbench):
         import a2p_solversystem
         import a2p_MuxAssembly
 
-        commandslist = [
+        partCommands = [
             'a2p_ImportPart',
             'a2p_updateImportedParts',
             'a2p_movePart',
             'a2p_duplicatePart',
             'a2p_editImportedPart',
+            ]
+        constraintCommands = [
             'a2p_PointIdentityConnectionCommand',
             'a2p_PointOnLineConstraintCommand',
             'a2p_PointOnPlaneConstraintCommand',
             'a2p_CircularEdgeConnection',
+            'a2p_AxialConnection',
             'a2p_PlanesParallelConnectionCommand',
             'a2p_PlaneConnection',
-            'a2p_AxialConnection',
             'a2p_AngledPlanesCommand',
             'a2p_SphericalConnection',
-            'a2p_SolverCommand',
             'a2p_DeleteConnectionsCommand',
-            'a2p_ViewConnectionsCommand',
-            'a2p_SimpleAssemblyShapeCommand',
-            'a2p_ToggleTransparencyCommand',
-            'a2p_isolateCommand',
+            ]
+        solverCommands = [
+            'a2p_SolverCommand',
             'a2p_ToggleAutoSolveCommand',
             'a2p_TogglePartialProcessingCommand',
+            ]
+        viewCommands = [
+            'a2p_ViewConnectionsCommand',
+            'a2p_ToggleTransparencyCommand',
+            'a2p_isolateCommand',
+            ]
+        miscCommands = [
+            'a2p_SimpleAssemblyShapeCommand',
             'a2p_repairTreeViewCommand'
             ]
+
+        self.appendToolbar(
+               'A2p_Part',
+               partCommands
+               )
+        self.appendToolbar(
+               'A2p_Constraint',
+               constraintCommands
+               )
+        self.appendToolbar(
+               'A2p_Solver',
+               solverCommands
+               )
+        self.appendToolbar(
+               'A2p_View',
+               viewCommands
+               )
+        self.appendToolbar(
+               'A2p_Misc',
+               miscCommands
+               )
+
+        commandslist = list()
+        commandslist.extend(partCommands)
+        commandslist.extend(constraintCommands)
+        commandslist.extend(solverCommands)
+        commandslist.extend(viewCommands)
+        commandslist.extend(miscCommands)
+
+        self.appendMenu(
+            'A2p',
+            commandslist
+            )
+
         menuEntries = [
             'a2p_repairTreeViewCommand'
             ]
-        self.appendToolbar(
-               'A2p',
-               commandslist
-               )
         self.appendMenu(
             'A2p',
             menuEntries

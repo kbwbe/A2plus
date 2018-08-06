@@ -115,7 +115,7 @@ class ViewProviderSimpleAssemblyShape:
         return None
 
     def getIcon(self):
-        return a2plib.path_a2p + '/icons/simpleAssemblyShape.svg'
+        return a2plib.path_a2p + '/icons/SimpleAssemblyShape.svg'
 
     def attach(self, obj):
         self.object_Name = obj.Object.Name
@@ -172,7 +172,7 @@ class a2p_SimpleAssemblyShapeCommand():
 
     def GetResources(self):
         import a2plib
-        return {'Pixmap'  : a2plib.path_a2p +'/icons/a2p_simpleAssemblyShape.svg',
+        return {'Pixmap'  : a2plib.path_a2p +'/icons/a2p_SimpleAssemblyShape.svg',
                 'MenuText': "create or refresh simple Shape of complete Assembly",
                 'ToolTip': "create or refresh simple Shape of complete Assembly"
                 }

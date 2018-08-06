@@ -83,7 +83,7 @@ def parseSelection(selection, objectToUpdate=None):
         c.Proxy = ConstraintObjectProxy()
         c.ViewObject.Proxy = ConstraintViewProviderProxy(
             c,
-            path_a2p + '/icons/a2p_pointOnPlaneConstraint.svg',
+            path_a2p + '/icons/a2p_PointOnPlaneConstraint.svg',
             True,
             cParms[1][2],
             cParms[0][2],
@@ -125,13 +125,13 @@ class a2p_PointOnPlaneConstraintCommand:
                  PointOnPlaneSelectionGate(),
                  parseSelection,
                  taskDialog_title ='add pointOnPlane constraint',
-                 taskDialog_iconPath = path_a2p + '/icons/a2p_pointOnPlaneConstraint.svg',
+                 taskDialog_iconPath = path_a2p + '/icons/a2p_PointOnPlaneConstraint.svg',
                  taskDialog_text = selection_text,
                  secondSelectionGate = PointOnPlaneSelectionGate2() )
 
     def GetResources(self):
         return {
-             'Pixmap' : path_a2p + '/icons/a2p_pointOnPlaneConstraint.svg',
+             'Pixmap' : path_a2p + '/icons/a2p_PointOnPlaneConstraint.svg',
              'MenuText': 'Add PointOnPlane constraint',
              'ToolTip': toolTipText
              }
