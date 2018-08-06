@@ -87,7 +87,7 @@ def parseSelection(selection, objectToUpdate=None, callSolveConstraints=True, lo
         c.Proxy = ConstraintObjectProxy()
         c.ViewObject.Proxy = ConstraintViewProviderProxy(
             c,
-            path_a2p + '/icons/a2p_circularEdgeConstraint.svg',
+            path_a2p + '/icons/a2p_CircularEdgeConstraint.svg',
             True,
             cParms[1][2],
             cParms[0][2]
@@ -141,7 +141,7 @@ class a2p_CircularEdgeConnectionCommand:
 
     def GetResources(self):
         return {
-            'Pixmap' : path_a2p + '/icons/a2p_circularEdgeConstraint.svg' ,
+            'Pixmap' : path_a2p + '/icons/a2p_CircularEdgeConstraint.svg' ,
             'MenuText': 'Add circular edge connection',
             'ToolTip': toolTipText
             }

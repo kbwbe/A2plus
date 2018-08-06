@@ -74,7 +74,7 @@ def parseSelection(selection, objectToUpdate=None):
         c.Proxy = ConstraintObjectProxy()
         c.ViewObject.Proxy = ConstraintViewProviderProxy(
             c,
-            path_a2p + '/icons/a2p_pointIdentity.svg',
+            path_a2p + '/icons/a2p_PointIdentity.svg',
             True,
             cParms[1][2],
             cParms[0][2]
@@ -117,12 +117,12 @@ class a2p_PointIdentityConnectionCommand:
                  parseSelection,
                  taskDialog_title ='add point Identity constraint',
                  #taskDialog_iconPath = self.GetResources()['Pixmap'],
-                 taskDialog_iconPath = path_a2p + '/icons/a2p_pointIdentity.svg',
+                 taskDialog_iconPath = path_a2p + '/icons/a2p_PointIdentity.svg',
                  taskDialog_text = selection_text
                  )
     def GetResources(self):
         return {
-             'Pixmap' : path_a2p + '/icons/a2p_pointIdentity.svg',
+             'Pixmap' : path_a2p + '/icons/a2p_PointIdentity.svg',
              'MenuText': 'Add PointIdentity Constraint',
              'ToolTip': toolTipText
              }

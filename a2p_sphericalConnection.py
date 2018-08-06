@@ -85,7 +85,7 @@ def parseSelection(selection, objectToUpdate=None):
         c.Proxy = ConstraintObjectProxy()
         c.ViewObject.Proxy = ConstraintViewProviderProxy(
             c,
-            path_a2p + '/icons/a2p_sphericalSurfaceConstraint.svg',
+            path_a2p + '/icons/a2p_SphericalSurfaceConstraint.svg',
             True, cParms[1][2],
             cParms[0][2]
             )
@@ -133,7 +133,7 @@ class a2p_SphericalSurfaceConnectionCommand:
 
     def GetResources(self):
         return {
-            'Pixmap' : path_a2p + '/icons/a2p_sphericalSurfaceConstraint.svg',
+            'Pixmap' : path_a2p + '/icons/a2p_SphericalSurfaceConstraint.svg',
             'MenuText': 'Add a spherical constraint',
             'ToolTip': toolTipText
             }

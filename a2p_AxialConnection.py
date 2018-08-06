@@ -81,7 +81,7 @@ def parseSelection(selection, objectToUpdate=None):
         c.Proxy = ConstraintObjectProxy()
         c.ViewObject.Proxy = ConstraintViewProviderProxy(
             c,
-            path_a2p + '/icons/a2p_axialConstraint.svg',
+            path_a2p + '/icons/a2p_AxialConstraint.svg',
             True,
             cParms[1][2],
             cParms[0][2]
@@ -130,7 +130,7 @@ class a2p_AxialConnectionCommand:
                  )
     def GetResources(self):
         return {
-             'Pixmap' : path_a2p + '/icons/a2p_axialConstraint.svg',
+             'Pixmap' : path_a2p + '/icons/a2p_AxialConstraint.svg',
              'MenuText': 'Add axial constraint',
              'ToolTip': toolTipText
              }

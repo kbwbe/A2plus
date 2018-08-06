@@ -308,7 +308,7 @@ class a2p_UpdateImportedPartsCommand:
 
     def GetResources(self):
         return {
-            'Pixmap' : a2plib.path_a2p + '/icons/a2p_importPart_update.svg',
+            'Pixmap' : a2plib.path_a2p + '/icons/a2p_ImportPart_Update.svg',
             'MenuText': 'Update parts imported into the assembly',
             'ToolTip': 'Update parts imported into the assembly'
             }
@@ -466,8 +466,8 @@ class a2p_MovePartCommand:
 
     def GetResources(self):
         return {
-            #'Pixmap' : ':/assembly2/icons/Draft_Move.svg',
-            'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_Draft_Move.svg',
+            #'Pixmap' : ':/assembly2/icons/MovePart.svg',
+            'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_MovePart.svg',
             'MenuText': 'move',
             'ToolTip': 'move part  ( shift+click to copy )'
             }
@@ -498,7 +498,7 @@ class DeleteConnectionsCommand:
                     a2plib.removeConstraint(c)
     def GetResources(self):
         return {
-            'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_deleteConnections.svg',
+            'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_DeleteConnections.svg',
             'MenuText': 'delete constraints',
             }
 FreeCADGui.addCommand('a2p_DeleteConnectionsCommand', DeleteConnectionsCommand())
@@ -530,7 +530,7 @@ class ViewConnectionsCommand:
 
     def GetResources(self):
         return {
-            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_viewConnection.svg',
+            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_ViewConnection.svg',
             'MenuText':     'show connected elements',
             'ToolTip':      'show connected elements',
             }
@@ -588,7 +588,7 @@ class a2p_isolateCommand:
 
     def GetResources(self):
         return {
-            'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_isolate.svg',
+            'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_Isolate_Element.svg',
             'MenuText': 'show only selected elements, or all if none is selected',
             'ToolTip': 'show only selected elements, or all if none is selected'
             }
@@ -611,7 +611,7 @@ class a2p_ToggleTransparencyCommand:
 
     def GetResources(self):
         return {
-            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_glasses.svg',
+            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_ToggleTranparency.svg',
             'MenuText':     'toggle transparency of assembly',
             'ToolTip':      'toggle transparency of assembly',
             'Checkable':    self.IsChecked()

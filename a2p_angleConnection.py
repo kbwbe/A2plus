@@ -93,7 +93,7 @@ def parseSelection(selection, objectToUpdate=None):
         c.Proxy = ConstraintObjectProxy()
         c.ViewObject.Proxy = ConstraintViewProviderProxy(
             c,
-            path_a2p +'/icons/a2p_angleConstraint.svg',
+            path_a2p +'/icons/a2p_AngleConstraint.svg',
             True,
             cParms[1][2],
             cParms[0][2]
@@ -157,7 +157,7 @@ class a2p_AngledPlanesCommand:
 
     def GetResources(self):
         return {
-             'Pixmap' : path_a2p + '/icons/a2p_angleConstraint.svg',
+             'Pixmap' : path_a2p + '/icons/a2p_AngleConstraint.svg',
              'MenuText': 'angle between planes constraint',
              'ToolTip': toolTipText,
              }

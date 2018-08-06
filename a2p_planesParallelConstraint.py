@@ -88,7 +88,7 @@ def parseSelection(selection, objectToUpdate=None):
         c.Proxy = ConstraintObjectProxy()
         c.ViewObject.Proxy = ConstraintViewProviderProxy(
             c,
-            path_a2p + '/icons/a2p_planesParallelConstraint.svg',
+            path_a2p + '/icons/a2p_PlanesParallelConstraint.svg',
             True, cParms[1][2],
             cParms[0][2],
             extraText
@@ -140,7 +140,7 @@ class a2p_PlanesParallelConnectionCommand:
 
     def GetResources(self):
         return {
-             'Pixmap' : path_a2p + '/icons/a2p_planesParallelConstraint.svg',
+             'Pixmap' : path_a2p + '/icons/a2p_PlanesParallelConstraint.svg',
              'MenuText': 'Add planesParallel constraint',
              'ToolTip': toolTipText
              }
