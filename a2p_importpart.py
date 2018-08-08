@@ -36,7 +36,6 @@ from a2plib import (
     )
 
 
-
 class ObjectCache:
     '''
     An assembly could use multiple instances of then same importPart.
@@ -46,6 +45,7 @@ class ObjectCache:
         self.objects = {} # dict, key=fileName, val=object
 
     def cleanUp(self,doc):
+        ''' delete cached objects from assembly document '''
         for key in self.objects.keys():
             try:
                 doc.removeObject(self.objects[key].Name) #remove temporaryParts from doc
@@ -54,9 +54,11 @@ class ObjectCache:
         self.objects = {} # dict, key=fileName
 
     def add(self,fileName,obj): # pi_obj = PartInformation-Object
+        '''add 1 object to the dictionary under key=fileName'''
         self.objects[fileName] = obj
 
     def get(self,fileName):
+        '''get all objects in dictionary under key = fileName'''
         obj = self.objects.get(fileName,None)
         if obj:
             return obj
@@ -64,6 +66,7 @@ class ObjectCache:
             return None
 
     def isCached(self,fileName):
+        ''' is fileName already in cache? '''
         if fileName in self.objects.keys():
             return True
         else:
@@ -377,8 +380,18 @@ FreeCADGui.addCommand('a2p_duplicatePart', a2p_DuplicatePartCommand())
 class a2p_EditPartCommand:
     def Activated(self):
         selection = [s for s in FreeCADGui.Selection.getSelection() if s.Document == FreeCAD.ActiveDocument ]
-        obj = selection[0]
-        FreeCADGui.Selection.clearSelection() # very imporant! Avoid Editing the assembly the part was called from!
+        fileNameWithinProjectFile = None
+        if len(selection) == 1:
+            obj = selection[0]
+            FreeCADGui.Selection.clearSelection() # very imporant! Avoid Editing the assembly the part was called from!
+        else:
+            QtGui.QMessageBox.critical(
+                QtGui.QApplication.activeWindow(),
+                "Selection Error",
+                "Select exactly 1 Part."
+                )
+            return
+
         fileNameWithinProjectFile = a2plib.findSourceFileInProject(obj.sourceFile)
         if fileNameWithinProjectFile == None:
             msg = \
@@ -394,6 +407,8 @@ This is not allowed when using preference
                 msg
                 )
             return
+
+        #TODO: WF fails if "use folder" = false here
         docs = FreeCAD.listDocuments().values()
         docFilenames = [ d.FileName for d in docs ]
         if not fileNameWithinProjectFile in docFilenames :
@@ -481,6 +496,15 @@ class DeleteConnectionsCommand:
     def Activated(self):
         selection = [s for s in FreeCADGui.Selection.getSelection() if s.Document == FreeCAD.ActiveDocument ]
         #if len(selection) == 1: not required as this check is done in initGui
+        # WF: still get 'list index out of range' if nothing selected.
+        if len(selection != 1):
+            QtGui.QMessageBox.critical(
+                QtGui.QApplication.activeWindow(),
+                "Selection Error",
+                "Select exactly 1 Part"
+                )
+            return
+
         part = selection[0]
         deleteList = []
         for c in FreeCAD.ActiveDocument.Objects:
