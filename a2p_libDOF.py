@@ -233,8 +233,16 @@ def AxisAlignment(axisa , dofrot, pointconstraints = None, dbg=True):
     if currentDOFROTnum == 0 : #already locked on rotation so ignore it
         return []
     elif currentDOFROTnum == 1 : #partially locked on rotation so compare to the given axis
-        
-        if check_ifCollinear(axisa,dofrot[0]):
+        if dofrot[0].Direction.Length == 2:
+            #the stored axis isn't a specific axis so check if parallel
+            if check_ifParallel(axisa, dofrot[0]):
+                #ok return the axisa as new dofrot
+                #axisa.Direction.Length = 1
+                return [axisa]
+            else:
+                #if not parallel return dofrot as []
+                return []
+        elif check_ifCollinear(axisa,dofrot[0]):
             #the axis are collinear, so the constraint is redundant, skip it
             return dofrot
         else:
@@ -245,7 +253,6 @@ def AxisAlignment(axisa , dofrot, pointconstraints = None, dbg=True):
     else:
         #this shouldn't happens...ignore it and return the current dofrot
         return dofrot
-
 
 #then Lock Rotation which locks the remaining rotation axis when enabled
 #this basic constraint affects only rotation DOF
@@ -263,16 +270,24 @@ def LockRotation(enabled, dofrot, pointconstraints = None, dbg=True):
 def AngleAlignment(axisa , dofrot, pointconstraints = None, dbg=True):
     currentDOFROTnum = len(dofrot)
     if currentDOFROTnum == 0 : #already locked on rotation so ignore it
-        return dofrot
+        return []
     elif currentDOFROTnum == 1 : #partially locked on rotation so compare to the given axis
-        if check_ifCollinear(axisa,dofrot[0]):
+        if dofrot[0].Direction.Length == 2:
+            #the stored axis isn't a specific axis so check if parallel
+            if check_ifParallel(axisa, dofrot[0]):
+                #ok return the axisa as new dofrot
+                #axisa.Direction.Length = 1
+                return [axisa]
+            else:
+                #if not parallel return dofrot as []
+                return []
+        elif check_ifCollinear(axisa,dofrot[0]):
             #the axis are collinear, so the constraint is redundant, skip it
             return dofrot
         else:
             #the axis locks permanently the rotation so DOFRot=[]
             return []
     elif currentDOFROTnum == 3 : #no constraints on rotation so the given axis is the one left free
-        
         return [axisa]
     else:
         #this shouldn't happens...ignore it and return the current dofrot
@@ -396,7 +411,13 @@ def PointIdentity(axisa, dofpos, dofrot, pointconstraints, dbg=False):
         if currentDOFROTnum == 0 : #already locked on rotation so ignore it
             tmpdofrot = []
         elif currentDOFROTnum == 1 : #already partially locked, an additional point identity locks the object
-            if check_ifPointOnAxis(pointA,dofrot[0]):    #check if the point is on the same direction of the axis left free
+            if dofrot[0].Direction.Length == 2:
+                # the stored axis isn't a specific axis.
+                #get the point projected to the plane created by current axis
+                dofrot[0].Base = pointA
+                dofrot[0].Direction.Length = 1
+                tmpdofrot = dofrot
+            elif check_ifPointOnAxis(pointA,dofrot[0]):    #check if the point is on the same direction of the axis left free
             #the point is on the rotation axis left free, it doesn't lock anything
                 tmpdofrot = dofrot
             else:
@@ -431,94 +452,6 @@ def PointIdentity(axisa, dofpos, dofrot, pointconstraints, dbg=False):
 
 
     
-#this is very tricky...
-def PointIdentityPos(axisa, dofpos, pointconstraints, dbg=True):
-    
-    pointA = axisa.Base
-    rigidCenterpoint = axisa.Direction
-    print "axisa= " , axisa
-    if len(pointconstraints)>0:
-        for a in range(0, len(pointconstraints)):
-            if check_ifCoincident(pointA,pointconstraints[a]):
-                #the same point is already constrained so skip it , redundant
-                return dofpos
-    pointconstraints.append(pointA)
-    if dbg: print "Point POS: current pointconstraints = ", pointconstraints
-    if check_ifCoincident(pointA,rigidCenterpoint):
-        #the center of rigid is coincident to the point constrained, the obj can't move anymore DOFPOS=0
-        return []
-    else:
-        #check how many DOF
-        currentDOFPOSnum = len(dofpos)
-        
-        #the point isn' t already in the list of points, add it to array
-        
-        if currentDOFPOSnum == 0 : #already locked on position so ignore it
-            return []
-
-        elif currentDOFPOSnum == 1 : #already partially locked, an additional point identity locks the object
-            return []  #if the point isn't already constrained, the obj is now fully constrained DOFPOS=0
-
-        elif currentDOFPOSnum == 2 :
-            return []  #if the point isn't already constrained, the obj is now fully constrained DOFPOS=0
-
-        elif currentDOFPOSnum == 3 :
-            #if there is only 1 pointidentity do nothing, as single point constraint doesn't lock anything just store the point
-            if len(pointconstraints) == 1:
-                return dofpos
-            else: 
-                
-                #check again the count of the point constraint
-                if len(pointconstraints) >= 2:
-                    #there are 3 unique points so the object is fully constrained DOFPOS=0
-                    #this is a circularedge constraint with an axis with Base on pointA and Direction pointconstraint[0] to pointconstraints[1]
-                    #so DOFPOS=0 as circular edge always locks all 3 axes in position
-                    return []
-        else:
-            #this shouldn't happens...ignore it and return the current dofrot
-            return dofpos
-
-
-
-#this is very tricky...call it always after PointIdentityPos as pointconstraints is handled only there
-def PointIdentityRot(axisa, dofrot, pointconstraints, dbg=True):
-    
-    pointA = axisa.Base
-    currentDOFROTnum = len(dofrot)
-    for a in range(0, len(pointconstraints)):
-        if check_ifCoincident(pointA,pointconstraints[a]):
-            #the same point is already constrained so skip it , redundant
-            return dofrot
-    if dbg: print "Point ROT: current pointconstraints = ", pointconstraints
-    if currentDOFROTnum == 0 : #already locked on rotation so ignore it
-        return []
-    elif currentDOFROTnum == 1 : #already partially locked, an additional point identity locks the object
-        if check_ifPointOnAxis(pointA,dofrot[0]):    #check if the point is on the same direction of the axis left free
-            #the point is on the rotation axis left free, it doesn't lock anything
-            return dofrot
-        else:
-            #the pointidentity locks permanently
-            return []
-    elif currentDOFROTnum == 3 : #no constraints on rotation the point identity does nothing on its own
-        #here I have to insert the point on pointconstraint, only if the point is not coincident to some point already stored in pointconstraint
-        #return back here
-        #if there is only 1 pointidentity do nothing, as single point constraint doesn't lock anything just store the point
-        if len(pointconstraints) == 1:
-            return dofrot
-        elif len(pointconstraints) >= 3:
-            #there are 3 unique points so the object is fully constrained DOFROT=0
-            return []
-        elif len(pointconstraints) == 2:
-            #this is a circularedge constraint with an axis with Base on pointA and Direction pointconstraint[0] to pointconstraints[1]
-            #so DOFROT as circular edge always locks all 3 axes in position
-            
-            tmpAxis = create_Axis2Points(pointconstraints[0],pointconstraints[1])
-            tmpAxis = copy_AxisToOrigin(tmpAxis)
-            return AxisAlignment(tmpAxis, dofrot)
-
-    else:
-        #this shouldn't happens...ignore it and return the current dofrot
-        return dofrot
 
 
 #in the end there are the toolbar constraints, those are simply a combination of the ones above
