@@ -361,16 +361,19 @@ class Rigid():
 
 
     def checkIfInvolved(self):
-        #check if the rigid has some dependencies enabled
-        enableddep = 0
+        '''
+        check if the rigid has some dependencies enabled
+        '''
         for dep in self.dependencies:
             if dep.Enabled:
-                enableddep +=1
-        if enableddep == 0: return False#rigid not involved so skip  
-        return True
-#update whole DOF of the rigid (useful for animation and get the number
-#useful to determine if an object is fully constrained    
+                return True
+        return False
+    
     def currentDOF(self):
+        '''
+        update whole DOF of the rigid (useful for animation and get the number
+        useful to determine if an object is fully constrained    
+        '''
         self.pointConstraints = []
         _dofPos = a2p_libDOF.initPosDOF
         _dofRot = a2p_libDOF.initRotDOF
@@ -386,9 +389,7 @@ class Rigid():
         self.currentDOFCount = len(self.posDOF) + len(self.rotDOF)
         return self.currentDOFCount
     
-    
     def linkedTempFixedDOF(self):
-        pointConstraints = []
         _dofPos = a2p_libDOF.initPosDOF
         _dofRot = a2p_libDOF.initRotDOF
         self.reorderDependencies()
@@ -402,33 +403,40 @@ class Rigid():
         #print  self.label , len(_dofPos) + len(_dofRot)  
         return len(_dofPos) + len(_dofRot)
     
-#place all kind of pointconstraints at the end of the dependencies list       
     def reorderDependencies(self):
+        '''
+        place all kind of pointconstraints at the end
+        of the dependencies list
+        '''
         tmplist1 = []
         tmplist2 = []
-        for a in self.dependencies:
-            if a.isPointConstraint:
-                tmplist1.append(a)
+        for dep in self.dependencies:
+            if dep.isPointConstraint:
+                tmplist1.append(dep)
             else:
-                tmplist2.append(a)
+                tmplist2.append(dep)
         self.dependencies = []
-        for a in tmplist2:
-            self.dependencies.append(a)
-        for a in tmplist1:
-            self.dependencies.append(a)
+        self.dependencies.extend(tmplist2)
+        self.dependencies.extend(tmplist1)
 
-#pretty print output that describe the current DOF of the rigid
     def beautyDOFPrint(self):
-        print
-        print "Current Rigid = ", self.label
+        '''
+        pretty print output that describe the current DOF of the rigid
+        '''
+        Msg('\n')
+        Msg("Current Rigid = {}\n".format(self.label) )
         if self.fixed:
-            print "    is Fixed"
+            Msg("    is Fixed\n")
         else:
-            print "    is not Fixed and has ", self.currentDOF(), " DegreesOfFreedom"
-        for a in self.depsPerLinkedRigids.keys():
-            print "    Depends on Rigid = ", a.label
-            for b in self.depsPerLinkedRigids[a]:
-                print "        ", b
-            print "        DOF Position free with this rigid = ", len(self.dofPOSPerLinkedRigids[a])
-            print "        DOF Rotation free with this rigid = ", len(self.dofROTPerLinkedRigids[a])
-        
+            Msg("    is not Fixed and has {} DegreesOfFreedom\n".format(self.currentDOF()))
+        for rig in self.depsPerLinkedRigids.keys():
+            Msg("    Depends on Rigid = {}\n".format(rig.label))
+            for dep in self.depsPerLinkedRigids[rig]:
+                Msg("        {}\n".format(dep) )
+            Msg("        DOF Position free with this rigid = {}\n".format( len(self.dofPOSPerLinkedRigids[rig])))
+            Msg("        DOF Rotation free with this rigid = {}\n".format( len(self.dofROTPerLinkedRigids[rig])))
+
+
+
+
+

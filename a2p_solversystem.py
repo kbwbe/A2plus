@@ -177,72 +177,58 @@ class SolverSystem():
             return
         
         rig.reorderDependencies()
-        tmplinkedrigids = []        
         for rig in self.rigids:
             
             rig.calcSpinCenter()
             rig.calcRefPointsBoundBoxSize()
-            #print rig.label
-            #print ' has this dof '
-            #print rig.currentDOF()        
         numdep = 0
-        self.retrieveDOFInfo()
+        self.retrieveDOFInfo() #function only once used here at this place in whole program
         for rig in self.rigids:
             rig.currentDOF()
             rig.beautyDOFPrint()
             numdep+=rig.countDependencies()
-        print 'there are ', numdep/2 ,' dependencies'       
+        Msg( 'there are {} dependencies\n'.format(numdep/2))       
         self.status = "loaded"
 
-#method used to retrieve all onfo related to DOF handling
-#the method scans each rigid, and on each not tempfixed rigid scans the list of linkedobjects
-#then for each linked object compile a dict where each linked object has its dependencies
-#then for each linked object compile a dict where each linked object has its dof position
-#then for each linked object compile a dict where each linked object has its dof rotation
     
     def retrieveDOFInfo(self):
+        '''
+        method used to retrieve all info related to DOF handling
+        the method scans each rigid, and on each not tempfixed rigid scans the list of linkedobjects
+        then for each linked object compile a dict where each linked object has its dependencies
+        then for each linked object compile a dict where each linked object has its dof position
+        then for each linked object compile a dict where each linked object has its dof rotation
+        '''
         for rig in self.rigids:            
             if not rig.tempfixed:  #skip already fixed objs
-                #print "OBJ ", rig.label
-                for a in rig.linkedRigids:
-                    tmplinkedrigids = []
-                    tmppointconstraints = []
-                    #print "--->" , a.label
-                    for b in rig.dependencies:
-                        if a==b.dependedRigid:
-                            #print "    --->", b 
+                for linkedRig in rig.linkedRigids:
+                    tmplinkedDeps = []
+                    tmpLinkedPointDeps = []
+                    for dep in rig.dependencies:
+                        if linkedRig==dep.dependedRigid:
                             #be sure pointconstraints are at the end of the list
-                            if b.isPointConstraint :
-                                tmppointconstraints.append(b)
+                            if dep.isPointConstraint :
+                                tmpLinkedPointDeps.append(dep)
                             else:
-                                tmplinkedrigids.append(b)
+                                tmplinkedDeps.append(dep)
                     #add at the end the point constraints
-                    #print tmplinkedrigids
-                    tmplinkedrigids.extend(tmppointconstraints) 
-                    #print tmplinkedrigids
-                    rig.depsPerLinkedRigids[a] = tmplinkedrigids
-            #print rig.depsPerLinkedRigids #ok get a dict of deps related to obj 
+                    tmplinkedDeps.extend(tmpLinkedPointDeps) 
+                    rig.depsPerLinkedRigids[linkedRig] = tmplinkedDeps
             
-            #dofPosperLinkedRigid is a dict where for each 
-                for j in rig.depsPerLinkedRigids.keys():
-                    j.pointConstraints = []
-                    _dofPos = j.posDOF
-                    _dofRot = j.rotDOF
-                    for x in rig.depsPerLinkedRigids[j]:
-                        _dofPos, _dofRot = x.calcDOF(_dofPos,_dofRot, j.pointConstraints)
-                    #print "Rigid constraints= ", j.label                
-                    #print "dofPOS= ", _dofPos
-                    #print "dofROT= ", _dofRot
-                    rig.dofPOSPerLinkedRigids[j] = _dofPos
-                    rig.dofROTPerLinkedRigids[j] = _dofRot
+                #dofPOSPerLinkedRigid is a dict where for each 
+                for linkedRig in rig.depsPerLinkedRigids.keys():
+                    linkedRig.pointConstraints = []
+                    _dofPos = linkedRig.posDOF
+                    _dofRot = linkedRig.rotDOF
+                    for dep in rig.depsPerLinkedRigids[linkedRig]:
+                        _dofPos, _dofRot = dep.calcDOF(_dofPos,_dofRot, linkedRig.pointConstraints)
+                    rig.dofPOSPerLinkedRigids[linkedRig] = _dofPos
+                    rig.dofROTPerLinkedRigids[linkedRig] = _dofRot
             
             #ok each rigid has a dict for each linked objects,
             #so we now know the list of linked objects and which 
             #dof rot and pos both limits.
             
-                #print rig.dofPOSPerLinkedRigids
-                #print rig.dofROTPerLinkedRigids  
-                #print rig.depsPerLinkedRigids
 
 
     # TODO: maybe instead of traversing from the root every time, save a list of objects on current distance

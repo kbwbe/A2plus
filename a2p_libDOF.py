@@ -561,25 +561,26 @@ def PointIdentityRot(axisa, dofrot, pointconstraints, dbg=True):
 #    AngleAlignment()   needs to know the axis normal to plane constrained (stored in dep as refpoint and refAxisEnd) and the dofrot array
 
 #some test for helper functions
-print
-AXIS1=FreeCAD.Axis()
-AXIS1.Base = FreeCAD.Vector(2,10,12)
-AXIS1.Direction = AXIS1.Direction.add(SystemXAxis.Direction)
-AXIS2=FreeCAD.Axis()
-AXIS2.Base = FreeCAD.Vector(2,10,12)
-AXIS2.Direction = AXIS2.Direction.add(SystemXAxis.Direction)
-AXIS3=FreeCAD.Axis()
-AXIS3.Base = SystemOrigin
-AXIS3.Direction = AXIS3.Direction.add(SystemZAxis.Direction)
-
-#print "Axis Normal to plane defined by 2 axes = " , normal_2Axis(AXIS1,AXIS2)
-print AXIS1
-print "Axes defining a plane normal to given axis = " , make_planeNormal(AXIS1)
-print "test recursive get normal to a plane created by 2axes defined by 1 axis normal= " , normal_2Axis(make_planeNormal(AXIS1)[0], make_planeNormal(AXIS1)[1])
-print "Axes Parallel? = " , check_ifParallel(AXIS1,AXIS2)
-print "Axes Perpendicular? = " , check_ifPerpendicular(AXIS1,AXIS2)
-print "Axes Collinear? = " , check_ifCollinear(AXIS1,AXIS2)
-print "Vertexes are Coincident ? = " ,  check_ifCoincident(AXIS1.Base, AXIS2.Base)
-dfdfdf = create_Axis(FreeCAD.Vector(12.0,33.5,12.7), FreeCAD.Vector(23.5,22.0,99.0))
-print copynorm_AxisToOrigin(dfdfdf)
-print create_Axis2Points(FreeCAD.Vector(1.0,1.0,1.0), FreeCAD.Vector(3,3,3))
+if __name__ == '__main__':
+    print
+    AXIS1=FreeCAD.Axis()
+    AXIS1.Base = FreeCAD.Vector(2,10,12)
+    AXIS1.Direction = AXIS1.Direction.add(SystemXAxis.Direction)
+    AXIS2=FreeCAD.Axis()
+    AXIS2.Base = FreeCAD.Vector(2,10,12)
+    AXIS2.Direction = AXIS2.Direction.add(SystemXAxis.Direction)
+    AXIS3=FreeCAD.Axis()
+    AXIS3.Base = SystemOrigin
+    AXIS3.Direction = AXIS3.Direction.add(SystemZAxis.Direction)
+    
+    #print "Axis Normal to plane defined by 2 axes = " , normal_2Axis(AXIS1,AXIS2)
+    print AXIS1
+    print "Axes defining a plane normal to given axis = " , make_planeNormal(AXIS1)
+    print "test recursive get normal to a plane created by 2axes defined by 1 axis normal= " , normal_2Axis(make_planeNormal(AXIS1)[0], make_planeNormal(AXIS1)[1])
+    print "Axes Parallel? = " , check_ifParallel(AXIS1,AXIS2)
+    print "Axes Perpendicular? = " , check_ifPerpendicular(AXIS1,AXIS2)
+    print "Axes Collinear? = " , check_ifCollinear(AXIS1,AXIS2)
+    print "Vertexes are Coincident ? = " ,  check_ifCoincident(AXIS1.Base, AXIS2.Base)
+    dfdfdf = create_Axis(FreeCAD.Vector(12.0,33.5,12.7), FreeCAD.Vector(23.5,22.0,99.0))
+    print copynorm_AxisToOrigin(dfdfdf)
+    print create_Axis2Points(FreeCAD.Vector(1.0,1.0,1.0), FreeCAD.Vector(3,3,3))
