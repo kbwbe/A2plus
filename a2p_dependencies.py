@@ -569,6 +569,7 @@ class DependencyParallelPlanes(Dependency):
         #PlanesParallelConstraint:
         #    AxisAlignment()    needs to know the axis normal to the plane constrained (stored in dep as refpoint and refAxisEnd) and the dofrot array
         tmpaxis = cleanAxis(create_Axis2Points(self.refPoint,self.refAxisEnd))
+        tmpaxis.Direction.Length = 2.0
         return _dofPos, AxisAlignment(tmpaxis,_dofRot)
 
 class DependencyAngledPlanes(Dependency):
@@ -611,6 +612,7 @@ class DependencyAngledPlanes(Dependency):
         #AngleBetweenPlanesConstraint
         #    AngleAlignment()   needs to know the axis normal to plane constrained (stored in dep as refpoint and refAxisEnd) and the dofrot array
         tmpaxis = cleanAxis(create_Axis2Points(self.refPoint,self.refAxisEnd))
+        tmpaxis.Direction.Length = 2.0
         return _dofPos, AngleAlignment(tmpaxis,_dofRot)
 
 class DependencyPlane(Dependency):
@@ -636,6 +638,7 @@ class DependencyPlane(Dependency):
         #    PlaneOffset()      needs to know the axis normal to the plane constrained (stored in dep as refpoint and refAxisEnd) and the dofpos array
         tmpaxis = cleanAxis(create_Axis2Points(self.refPoint,self.refAxisEnd))
         #print "tmpaxis = " , tmpaxis
+        tmpaxis.Direction.Length = 2.0
         return PlaneOffset(tmpaxis,_dofPos), AxisAlignment(tmpaxis,_dofRot)
 
 class DependencyAxial(Dependency):
