@@ -159,8 +159,10 @@ class Rigid():
         for rig in self.childRigids:
             rig.printHierarchy(level+1)
 
-    def getCandidates(self):
+    def getCandidates(self, solverStage = None):
         candidates = []
+        return candidates #FIXME, not ready...
+    
         for rig in self.childRigids:
             if not rig.tempfixed and rig.areAllParentTempFixed():
                 candidates.append(rig)
