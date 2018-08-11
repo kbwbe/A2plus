@@ -78,44 +78,49 @@ class ObjectCache:
 objectCache = ObjectCache()
 
 #*********************************************
-# brute force implementation of ImportPart extraction
-# from ImportFile's document.  Uses dict() to remove duplicates.
-# tree crawler should be smart enough not to grab items more than
-# once. 
-#TODO: smarter document crawl
-#TODO: need to apply globalPlacement somewhere!
+# smarter implementation of ImportPart extraction
+# from ImportFile's document. Visits objects in ImportFile
+# only once
+#************************************************************
 def getImpPartsFromDoc(doc):
     objsIn = doc.Objects
-    impPartsOut = dict()
+    impPartsOut = list()
     for obj in objsIn:
-        objDict = filterImpParts(obj)
-        if objDict:
-            impPartsOut.update(objDict)
-    return impPartsOut.values()
+        impPartList = filterImpParts(obj)
+        if impPartList:
+            impPartsOut.extend(impPartList)
+    return impPartsOut
 
 def filterImpParts(obj):
-    impPartsOut = dict()
+    impPartsOut = list()
     if obj.isDerivedFrom("Sketcher::SketchObject"):
         pass
     elif obj.isDerivedFrom("PartDesign::Feature"):
         pass
     elif obj.isDerivedFrom("PartDesign::Body"):
-        impPartsOut[obj.Name] = obj
+        plmGlobal = obj.getGlobalPlacement();
+        plmLocal  = obj.Placement;
+        if (plmGlobal != plmLocal):
+            obj.Placement = plmGlobal             ## obj is NOT a copy!!! but also not in orig doc - maybe no problem?
+        impPartsOut.append(obj)
     elif obj.hasExtension("App::GroupExtension"):    #App::Part container      
-        for x in obj.Group:
-            xDict = filterImpParts(x)
-            impPartsOut.update(xDict)
+        pass   # GroupEx contents are already in list, don't need to find them
     elif obj.isDerivedFrom("Part::Feature"):
         if not(obj.InList):
-            impPartsOut[obj.Name] = obj             # top level Part::Feature 
+            plmGlobal = obj.getGlobalPlacement();
+            plmLocal  = obj.Placement;
+            if (plmGlobal != plmLocal):
+                obj.Placement = plmGlobal
+            impPartsOut.append(obj)                  # top level in within Document 
         elif (len(obj.InList) == 1) and (obj.InList[0].hasExtension("App::GroupExtension")):
-            impPartsOut[obj.Name] = obj             # top level within Group
+            plmGlobal = obj.getGlobalPlacement();
+            plmLocal  = obj.Placement;
+            if (plmGlobal != plmLocal):
+                obj.Placement = plmGlobal
+            impPartsOut.append(obj)                  # top level within Group
     else:
-        pass
+        pass                                         # garbage objects - Origins, Axis, etc
     return impPartsOut
-    
-#************************************************************
-
 
 
 def importPartFromFile(_doc, filename, importToCache=False):
@@ -134,16 +139,13 @@ def importPartFromFile(_doc, filename, importToCache=False):
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Value Error", msg )
             return
     #-------------------------------------------
-    # Get a list of the visible Objects
+    # Get a list of the importable Objects
     #-------------------------------------------
-#    visibleObjects = [ obj for obj in importDoc.Objects
-#                    if hasattr(obj,'ViewObject') and obj.ViewObject.isVisible()
-#                    and hasattr(obj,'Shape') and len(obj.Shape.Faces) > 0 and 'Body' not in obj.Name]
 
-    visibleObjects = list()
-    visibleObjects.extend(getImpPartsFromDoc(importDoc))
+    importableObjects = list()
+    importableObjects.extend(getImpPartsFromDoc(importDoc))
 
-    if visibleObjects == None or len(visibleObjects) == 0:
+    if importableObjects == None or len(importableObjects) == 0:
         msg = "No visible Part to import found. Aborting operation"
         QtGui.QMessageBox.information(
             QtGui.QApplication.activeWindow(),
@@ -155,13 +157,12 @@ def importPartFromFile(_doc, filename, importToCache=False):
     #-------------------------------------------
     # Discover whether we are importing a subassembly or a single part
     #-------------------------------------------
-    #if any([ 'importPart' in obj.Content for obj in importDoc.Objects]) and not len(visibleObjects) == 1:
-    subAssemblyImport = False
-    if len(visibleObjects) > 1:
-        subAssemblyImport = True
 
     #TODO: if not getPref(subAssemblyImportOption): 
-    #          for vo in visibleObjects:
+    #          for vo in importableObjects:
+    subAssemblyImport = False
+    if len(importableObjects) > 1:
+        subAssemblyImport = True
 
     #-------------------------------------------
     # create new object
@@ -188,12 +189,13 @@ def importPartFromFile(_doc, filename, importToCache=False):
     newObj.addProperty("App::PropertyBool","subassemblyImport","importPart").subassemblyImport = subAssemblyImport
     newObj.setEditorMode("subassemblyImport",1)
     newObj.addProperty("App::PropertyBool","updateColors","importPart").updateColors = True
-    #
+
     if subAssemblyImport:
-        newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor = muxObjectsWithKeys(importDoc, withColor=True)
+        newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor = muxObjectsWithKeys(importableObjects, withColor=True)
         #newObj.muxInfo, newObj.Shape = muxObjectsWithKeys(importDoc, withColor=False)
     else:
-        tmpObj = visibleObjects[0]
+        tmpObj = importableObjects[0]
+        plm    = tmpObj.getGlobalPlacement()
         newObj.Shape = tmpObj.Shape.copy()
         newObj.ViewObject.ShapeColor = tmpObj.ViewObject.ShapeColor
         if appVersionStr() <= '000.016': #FC0.17: DiffuseColor overrides ShapeColor !
