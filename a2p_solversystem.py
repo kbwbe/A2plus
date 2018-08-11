@@ -301,7 +301,7 @@ class SolverSystem():
         self.loadSystem(doc)
         if self.status == "loadingDependencyError":
             return
-        self.assignParentship(doc)
+        #self.assignParentship(doc)
         loadTime = int(round(time.time() * 1000))
         while True:
             systemSolved = self.calculateChain(doc, mode)
@@ -368,32 +368,38 @@ class SolverSystem():
 
     def calculateChain(self, doc, mode):
         self.stepCount = 0
-        haveMore = True
-        workList = []
-
-        if mode == 'partial':
-            # start from fixed rigids and its children
-            for rig in self.rigids:
-                if rig.fixed:
-                    workList.append(rig);
-                    workList.extend(set(rig.getCandidates()))
-        else:
+        
+        if mode == 'magnetic':
+            workList = []
             workList.extend(self.rigids)
-
-        while haveMore:
             solutionFound = self.calculateWorkList(doc, workList, mode)
-            if not solutionFound: return False
+            return solutionFound
+        
+        # mode is 'partial' now definitely!
+        workList = []
+        solverStage = PARTIAL_SOLVE_STAGE1
 
+        # load initial worklist with all fixed parts...
+        for rig in self.rigids:
+            if rig.fixed:
+                workList.append(rig);
+        self.printList("Initial-Worklist", workList)
+
+        # Do all necessary solverStages...
+        while solverStage != PARTIAL_SOLVE_END:
             addList = []
             for rig in workList:
-                addList.extend(rig.getCandidates())
+                addList.extend(rig.getCandidates(solverStage))
+            if len(addList) == 0:
+                solverStage += 1
+                continue
             # Eliminate duplicates
             addList = set(addList)
-            workList.extend(addList)
-            haveMore = (len(addList) > 0)
             if A2P_DEBUG_LEVEL >= A2P_DEBUG_1:
                 self.printList("AddList", addList)
-
+            workList.extend(addList)
+            solutionFound = self.calculateWorkList(doc, workList, mode)
+            if not solutionFound: return False
 
         return True
 
