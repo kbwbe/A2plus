@@ -77,6 +77,44 @@ class ObjectCache:
 
 objectCache = ObjectCache()
 
+#*********************************************
+# brute force implementation of ImportPart extraction
+# from ImportFile's document.  Uses dict() to remove duplicates.
+# tree crawler should be smart enough not to grab items more than
+# once. 
+#TODO: smarter document crawl
+#TODO: need to apply globalPlacement somewhere!
+def getImpPartsFromDoc(doc):
+    objsIn = doc.Objects
+    impPartsOut = dict()
+    for obj in objsIn:
+        objDict = filterImpParts(obj)
+        if objDict:
+            impPartsOut.update(objDict)
+    return impPartsOut.values()
+
+def filterImpParts(obj):
+    impPartsOut = dict()
+    if obj.isDerivedFrom("Sketcher::SketchObject"):
+        pass
+    elif obj.isDerivedFrom("PartDesign::Feature"):
+        pass
+    elif obj.isDerivedFrom("PartDesign::Body"):
+        impPartsOut[obj.Name] = obj
+    elif obj.hasExtension("App::GroupExtension"):    #App::Part container      
+        for x in obj.Group:
+            xDict = filterImpParts(x)
+            impPartsOut.update(xDict)
+    elif obj.isDerivedFrom("Part::Feature"):
+        if not(obj.InList):
+            impPartsOut[obj.Name] = obj             # top level Part::Feature 
+        elif (len(obj.InList) == 1) and (obj.InList[0].hasExtension("App::GroupExtension")):
+            impPartsOut[obj.Name] = obj             # top level within Group
+    else:
+        pass
+    return impPartsOut
+    
+#************************************************************
 
 
 
@@ -98,9 +136,12 @@ def importPartFromFile(_doc, filename, importToCache=False):
     #-------------------------------------------
     # Get a list of the visible Objects
     #-------------------------------------------
-    visibleObjects = [ obj for obj in importDoc.Objects
-                    if hasattr(obj,'ViewObject') and obj.ViewObject.isVisible()
-                    and hasattr(obj,'Shape') and len(obj.Shape.Faces) > 0 and 'Body' not in obj.Name]
+#    visibleObjects = [ obj for obj in importDoc.Objects
+#                    if hasattr(obj,'ViewObject') and obj.ViewObject.isVisible()
+#                    and hasattr(obj,'Shape') and len(obj.Shape.Faces) > 0 and 'Body' not in obj.Name]
+
+    visibleObjects = list()
+    visibleObjects.extend(getImpPartsFromDoc(importDoc))
 
     if visibleObjects == None or len(visibleObjects) == 0:
         msg = "No visible Part to import found. Aborting operation"
@@ -118,6 +159,9 @@ def importPartFromFile(_doc, filename, importToCache=False):
     subAssemblyImport = False
     if len(visibleObjects) > 1:
         subAssemblyImport = True
+
+    #TODO: if not getPref(subAssemblyImportOption): 
+    #          for vo in visibleObjects:
 
     #-------------------------------------------
     # create new object
