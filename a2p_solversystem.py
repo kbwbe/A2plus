@@ -58,6 +58,15 @@ SOLVER_SPIN_ACCURACY = 1.0e-1 # gets to smaller values during solving
 
 SOLVER_STEPS_CONVERGENCY_CHECK = 1000
 SOLVER_CONVERGENCY_ERROR_INIT_VALUE = 1.0e+20
+MAX_LEVEL_ACCURACY = 4  #accuracy reached is 1.0e-MAX_LEVEL_ACCURACY
+
+PARTIAL_SOLVE_STAGE1 = 1    #solve all rigid fully constrained to tempfixed rigid, enable only involved dep, then set them as tempfixed
+PARTIAL_SOLVE_STAGE2 = 2    #solve all rigid constrained only to tempfixed rigids, it doesn't matter if fully constrained or not. 
+                            #in case more than one tempfixed rigid
+PARTIAL_SOLVE_STAGE3 = 3    #repeat stage 1 and stage2 as there are rigids that match
+PARTIAL_SOLVE_STAGE4 = 4    #look for block of rigids, if a rigid is fully constrained to one rigid, solve them and create a superrigid (disabled at the moment)
+PARTIAL_SOLVE_STAGE5 = 5    #take all remaining rigid and dependencies not done and try to solve them all together
+PARTIAL_SOLVE_END = 6
 
 #------------------------------------------------------------------------------
 class SolverSystem():
@@ -167,7 +176,52 @@ class SolverSystem():
             rig.calcSpinCenter()
             rig.calcRefPointsBoundBoxSize()
             
+        numdep = 0
+        self.retrieveDOFInfo() #function only once used here at this place in whole program
+        for rig in self.rigids:
+            rig.currentDOF()
+            #rig.beautyDOFPrint()
+            numdep+=rig.countDependencies()
+        Msg( 'there are {} dependencies\n'.format(numdep/2))       
         self.status = "loaded"
+
+    def retrieveDOFInfo(self):
+        '''
+        method used to retrieve all info related to DOF handling
+        the method scans each rigid, and on each not tempfixed rigid scans the list of linkedobjects
+        then for each linked object compile a dict where each linked object has its dependencies
+        then for each linked object compile a dict where each linked object has its dof position
+        then for each linked object compile a dict where each linked object has its dof rotation
+        '''
+        for rig in self.rigids:            
+            if not rig.tempfixed:  #skip already fixed objs
+                for linkedRig in rig.linkedRigids:
+                    tmplinkedDeps = []
+                    tmpLinkedPointDeps = []
+                    for dep in rig.dependencies:
+                        if linkedRig==dep.dependedRigid:
+                            #be sure pointconstraints are at the end of the list
+                            if dep.isPointConstraint :
+                                tmpLinkedPointDeps.append(dep)
+                            else:
+                                tmplinkedDeps.append(dep)
+                    #add at the end the point constraints
+                    tmplinkedDeps.extend(tmpLinkedPointDeps) 
+                    rig.depsPerLinkedRigids[linkedRig] = tmplinkedDeps
+            
+                #dofPOSPerLinkedRigid is a dict where for each 
+                for linkedRig in rig.depsPerLinkedRigids.keys():
+                    linkedRig.pointConstraints = []
+                    _dofPos = linkedRig.posDOF
+                    _dofRot = linkedRig.rotDOF
+                    for dep in rig.depsPerLinkedRigids[linkedRig]:
+                        _dofPos, _dofRot = dep.calcDOF(_dofPos,_dofRot, linkedRig.pointConstraints)
+                    rig.dofPOSPerLinkedRigids[linkedRig] = _dofPos
+                    rig.dofROTPerLinkedRigids[linkedRig] = _dofRot
+            
+            #ok each rigid has a dict for each linked objects,
+            #so we now know the list of linked objects and which 
+            #dof rot and pos both limits.
 
 
     # TODO: maybe instead of traversing from the root every time, save a list of objects on current distance
@@ -260,7 +314,7 @@ class SolverSystem():
                 self.mySOLVER_SPIN_ACCURACY *= 1e-1
                 self.mySOLVER_POS_ACCURACY *= 1e-1
                 self.level_of_accuracy+=1
-                if self.level_of_accuracy == 4:
+                if self.level_of_accuracy == MAX_LEVEL_ACCURACY:
                     self.solutionToParts(doc)
                     break
                 self.prepareRestart()
