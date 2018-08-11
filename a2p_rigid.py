@@ -47,6 +47,16 @@ from a2plib import (
     A2P_DEBUG_3,
     )
 import a2p_libDOF
+
+from a2plib import (
+    PARTIAL_SOLVE_STAGE1,
+    PARTIAL_SOLVE_STAGE2, 
+    PARTIAL_SOLVE_STAGE3,
+    PARTIAL_SOLVE_STAGE4,
+    PARTIAL_SOLVE_STAGE5,
+    PARTIAL_SOLVE_END
+    )
+
 from a2p_libDOF import (
     SystemOrigin,
     SystemXAxis,
@@ -161,13 +171,20 @@ class Rigid():
 
     def getCandidates(self, solverStage = None):
         candidates = []
+        
+        if solverStage == PARTIAL_SOLVE_STAGE1:
+            for linkedRig in self.linkedRigids:
+                if linkedRig.linkedTempFixedDOF()==0: #found a fully constrained obj to tempfixed rigids
+                    for dep in self.depsPerLinkedRigids[linkedRig]: 
+                        #enable involved dep
+                        if not dep.Done:
+                            dep.enable([dep.currentRigid, dep.dependedRigid])
+                            #self.solvedCounter += 1
+                    if linkedRig.tempfixed: continue
+                    candidates.append(linkedRig)
+                    
         return candidates #FIXME, not ready...
     
-        for rig in self.childRigids:
-            if not rig.tempfixed and rig.areAllParentTempFixed():
-                candidates.append(rig)
-        return set(candidates)
-
     def addChildrenByDistance(self, addList, distance):
         # Current rigid is the father of the needed distance, so it might have needed children
         if self.disatanceFromFixed == distance-1:
