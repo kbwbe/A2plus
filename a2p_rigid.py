@@ -88,8 +88,9 @@ class Rigid():
         self.savedPlacement = placement
         self.dependencies = []
         self.linkedRigids = []
-        self.depsPerLinkedRigids = {}   #dict for each linked obj as key, the value
-                                        # is an array with all dep related to it
+        self.hierarchyLinkedRigids = []
+        self.depsPerLinkedRigids = {}  #dict for each linked obj as key, the value
+                                       # is an array with all dep related to it
         self.dofPOSPerLinkedRigids = {} #for each linked rigid (Key) the related dof left free
         self.dofROTPerLinkedRigids = {} #for each linked rigid (Key) the related dof left free
         self.pointConstraints = []
@@ -128,7 +129,7 @@ class Rigid():
         #FreeCAD.Console.PrintMessage((self.disatanceFromFixed*3)*" ")
         #FreeCAD.Console.PrintMessage("In {}:{}, distance {}\n".format(self.label, self.disatanceFromFixed, distance))
         # Current rigid was already set, pass the call to childrens
-        '''if self.disatanceFromFixed < distance:
+        if self.disatanceFromFixed < distance:
             haveMore = False
             for rig in self.childRigids:
                 #FreeCAD.Console.PrintMessage((self.disatanceFromFixed*3)*" ")
@@ -137,16 +138,16 @@ class Rigid():
                     haveMore = True
             return haveMore
         elif self.disatanceFromFixed == distance:
-            while len(self.linkedRigids) > 0:
-                rig = self.linkedRigids[0]
+            while len(self.hierarchyLinkedRigids) > 0:
+                rig = self.hierarchyLinkedRigids[0]
                 # Got to a new rigid, set current as it's father
                 if rig.disatanceFromFixed is None:
                     #FreeCAD.Console.PrintMessage((self.disatanceFromFixed*3)*" ")
                     #FreeCAD.Console.PrintMessage("   setting {}:{} with distance {}\n".format(rig.label, rig.disatanceFromFixed, distance+1))
                     rig.parentRigids.append(self)
                     self.childRigids.append(rig)
-                    rig.linkedRigids.remove(self)
-                    self.linkedRigids.remove(rig)
+                    rig.hierarchyLinkedRigids.remove(self)
+                    self.hierarchyLinkedRigids.remove(rig)
                     rig.disatanceFromFixed = distance+1
                 # That child was already assigned by another (and closer to fixed) father
                 # Leave only child relationship, but don't add current as a father
@@ -154,14 +155,14 @@ class Rigid():
                     #FreeCAD.Console.PrintMessage((self.disatanceFromFixed*3)*" ")
                     #FreeCAD.Console.PrintMessage("   the {}:{} was already set, ignore\n".format(rig.label, rig.disatanceFromFixed))
                     self.childRigids.append(rig)
-                    rig.linkedRigids.remove(self)
-                    self.linkedRigids.remove(rig)
+                    rig.hierarchyLinkedRigids.remove(self)
+                    self.hierarchyLinkedRigids.remove(rig)
 
-            if len(self.childRigids) + len(self.linkedRigids) > 0: return True
+            if len(self.childRigids) + len(self.hierarchyLinkedRigids) > 0: return True
             else: return False
 #        else:
 #            FreeCAD.Console.PrintMessage("Should not happen: {}:{} got distance {}\n".format(self.label, self.disatanceFromFixed, distance))
-'''
+
 
     def printHierarchy(self, level):
         Msg((level*3)*" ")
@@ -214,8 +215,7 @@ class Rigid():
         self.spinCenter = pl.multVec(self.spinCenter)
         # Update dependencies
         for dep in self.dependencies:
-            if dep.Enabled:  #handle only enable constraints
-                dep.applyPlacement(pl)
+            dep.applyPlacement(pl)
 
     def clear(self):
         for d in self.dependencies:
@@ -241,7 +241,6 @@ class Rigid():
 
     def getRigidCenter(self):
         _currentRigid = FreeCAD.ActiveDocument.getObject(self.objectName)
-        #print "rigidCenter = ", _currentRigid.Shape.BoundBox.Center
         return _currentRigid.Shape.BoundBox.Center
     
     def calcSpinCenter(self):
@@ -273,9 +272,8 @@ class Rigid():
         self.refPointsBoundBoxSize = math.sqrt( (xmax-xmin)**2 + (ymax-ymin)**2 + (zmax-zmin)**2 )
 
     def calcMoveData(self, doc, solver):
-        if self.tempfixed or self.fixed or not self.checkIfInvolved(): return
+        if self.tempfixed: return
         
-        #print "cqalmovedata"     
         depRefPoints = []
         depMoveVectors = [] #collect Data to compute central movement of rigid
         #
@@ -345,7 +343,7 @@ class Rigid():
                     if axisErr > self.maxAxisError : self.maxAxisError = axisErr
 
     def move(self,doc):
-        if self.tempfixed or self.fixed or not self.checkIfInvolved(): return
+        if self.tempfixed or not self.checkIfInvolved(): return
         #print 'move'
         #
         #Linear moving of a rigid
@@ -371,11 +369,13 @@ class Rigid():
 
         if center != None and rotation != None:
             pl = FreeCAD.Placement(moveDist,rotation,center)
+            #print 'Apply placement ',self.label
             self.applyPlacementStep(pl)
         else:
             if moveDist.Length > 1e-8:
                 pl = FreeCAD.Placement()
                 pl.move(moveDist)
+                #print 'Apply placement ',self.label
                 self.applyPlacementStep(pl)
 
 
@@ -408,7 +408,9 @@ class Rigid():
         self.currentDOFCount = len(self.posDOF) + len(self.rotDOF)
         return self.currentDOFCount
     
+    
     def linkedTempFixedDOF(self):
+        pointConstraints = []
         _dofPos = a2p_libDOF.initPosDOF
         _dofRot = a2p_libDOF.initRotDOF
         self.reorderDependencies()
