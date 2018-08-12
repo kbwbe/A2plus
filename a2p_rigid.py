@@ -126,14 +126,10 @@ class Rigid():
     # The function only sets parentship for childrens that are distant+1 from fixed rigid
     # The function should be called in a loop with increased distance until it return False
     def assignParentship(self, distance):
-        #FreeCAD.Console.PrintMessage((self.disatanceFromFixed*3)*" ")
-        #FreeCAD.Console.PrintMessage("In {}:{}, distance {}\n".format(self.label, self.disatanceFromFixed, distance))
         # Current rigid was already set, pass the call to childrens
         if self.disatanceFromFixed < distance:
             haveMore = False
             for rig in self.childRigids:
-                #FreeCAD.Console.PrintMessage((self.disatanceFromFixed*3)*" ")
-                #FreeCAD.Console.PrintMessage("   passing to {}:{}, distance {}\n".format(rig.label, rig.disatanceFromFixed, distance))
                 if rig.assignParentship(distance):
                     haveMore = True
             return haveMore
@@ -142,8 +138,6 @@ class Rigid():
                 rig = self.hierarchyLinkedRigids[0]
                 # Got to a new rigid, set current as it's father
                 if rig.disatanceFromFixed is None:
-                    #FreeCAD.Console.PrintMessage((self.disatanceFromFixed*3)*" ")
-                    #FreeCAD.Console.PrintMessage("   setting {}:{} with distance {}\n".format(rig.label, rig.disatanceFromFixed, distance+1))
                     rig.parentRigids.append(self)
                     self.childRigids.append(rig)
                     rig.hierarchyLinkedRigids.remove(self)
@@ -152,17 +146,12 @@ class Rigid():
                 # That child was already assigned by another (and closer to fixed) father
                 # Leave only child relationship, but don't add current as a father
                 else:
-                    #FreeCAD.Console.PrintMessage((self.disatanceFromFixed*3)*" ")
-                    #FreeCAD.Console.PrintMessage("   the {}:{} was already set, ignore\n".format(rig.label, rig.disatanceFromFixed))
                     self.childRigids.append(rig)
                     rig.hierarchyLinkedRigids.remove(self)
                     self.hierarchyLinkedRigids.remove(rig)
 
             if len(self.childRigids) + len(self.hierarchyLinkedRigids) > 0: return True
             else: return False
-#        else:
-#            FreeCAD.Console.PrintMessage("Should not happen: {}:{} got distance {}\n".format(self.label, self.disatanceFromFixed, distance))
-
 
     def printHierarchy(self, level):
         Msg((level*3)*" ")
@@ -368,7 +357,6 @@ class Rigid():
 
     def move(self,doc):
         if self.tempfixed or not self.checkIfInvolved(): return
-        #print 'move'
         #
         #Linear moving of a rigid
         moveDist = Base.Vector(0,0,0)
@@ -393,13 +381,11 @@ class Rigid():
 
         if center != None and rotation != None:
             pl = FreeCAD.Placement(moveDist,rotation,center)
-            #print 'Apply placement ',self.label
             self.applyPlacementStep(pl)
         else:
             if moveDist.Length > 1e-8:
                 pl = FreeCAD.Placement()
                 pl.move(moveDist)
-                #print 'Apply placement ',self.label
                 self.applyPlacementStep(pl)
 
 
@@ -445,7 +431,6 @@ class Rigid():
                         _dofPos, _dofRot = x.calcDOF(_dofPos,_dofRot, self.pointConstraints)
         else:
             _dofPos, _dofRot = [] , []
-        #print  self.label , len(_dofPos) + len(_dofRot)  
         return len(_dofPos) + len(_dofRot)
     
     def reorderDependencies(self):

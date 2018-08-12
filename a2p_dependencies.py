@@ -67,7 +67,6 @@ from a2p_libDOF import (
     
     )
 import os, sys
-#from assembly2.assembly2solver import doc
 
 #------------------------------------------------------------------------------
 class Dependency():
@@ -148,7 +147,6 @@ class Dependency():
             )
 
         c = constraint
-    
 
         if c.Type == "pointIdentity":
             dep1 = DependencyPointIdentity(doc, c, "point")
@@ -543,9 +541,7 @@ class DependencyParallelPlanes(Dependency):
     def calcRefPoints(self, index):
         self.index = index
         if index==1:
-            #print self.doc
             ob1 = self.doc.getObject(self.constraint.Object1)  
-            #print ob1          
             plane1 = getObjectFaceFromName(ob1, self.constraint.SubElement1)            
             self.refPoint = plane1.Faces[0].BoundBox.Center
             normal1 = plane1.Surface.Axis                    
@@ -676,7 +672,6 @@ class DependencyPlane(Dependency):
         
         # the axis used on axisalignment isn't a real axis but a random axis normal to the plane
         #set it to length = 2 instead of normalize it
-        #FreeCAD.Console.PrintMessage("tmpaxis = " , tmpaxis)
         pos = PlaneOffset(tmpaxis,_dofPos)
         tmpaxis.Direction.Length = 2.0
         return pos, AxisAlignment(tmpaxis,_dofRot)
@@ -695,7 +690,6 @@ class DependencyAxial(Dependency):
         dot = vec1.dot(destinationAxis)
         parallelToAxisVec = destinationAxis.normalize().multiply(dot)
         moveVector = vec1.sub(parallelToAxisVec)
-        #DebugMsg(A2P_DEBUG_3, "{} - move by {}\n".format(self, moveVector.Length))
         return self.refPoint, moveVector
     
     def calcRefPoints(self, index):
