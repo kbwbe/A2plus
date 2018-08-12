@@ -335,8 +335,12 @@ class DependencyPointIdentity(Dependency):
             if self.constraint.Type == "sphereCenterIdent":
                 vert = getPos(ob, self.constraint.SubElement2)
             else:
-                vert = getObjectVertexFromName(ob, self.constraint.SubElement2)                    
-        self.refPoint = vert.Point
+                vert = getObjectVertexFromName(ob, self.constraint.SubElement2)
+                                    
+        if self.constraint.Type == "sphereCenterIdent":
+            self.refPoint = vert
+        else:
+            self.refPoint = vert.Point
     
     def calcDOF(self, _dofPos, _dofRot, _pointconstraints=[]):
         #PointIdentity, PointOnLine, PointOnPlane, Spherical Constraints:
