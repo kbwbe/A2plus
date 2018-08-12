@@ -89,8 +89,8 @@ class Rigid():
         self.dependencies = []
         self.linkedRigids = []
         self.hierarchyLinkedRigids = []
-        self.depsPerLinkedRigids = {}  #dict for each linked obj as key, the value
-                                       # is an array with all dep related to it
+        self.depsPerLinkedRigids = {}   #dict for each linked obj as key, the value
+                                        # is an array with all dep related to it
         self.dofPOSPerLinkedRigids = {} #for each linked rigid (Key) the related dof left free
         self.dofROTPerLinkedRigids = {} #for each linked rigid (Key) the related dof left free
         self.pointConstraints = []
@@ -180,11 +180,35 @@ class Rigid():
                         #enable involved dep
                         if not dep.Done:
                             dep.enable([dep.currentRigid, dep.dependedRigid])
-                            #self.solvedCounter += 1
                     if linkedRig.tempfixed: continue
                     candidates.append(linkedRig)
                     
-        return candidates #FIXME, not ready...
+        elif solverStage == PARTIAL_SOLVE_STAGE2:
+            for linkedRig in self.linkedRigids:
+                if linkedRig.tempfixed: continue
+                if linkedRig.areAllParentTempFixed():
+                    for dep in self.depsPerLinkedRigids[linkedRig]: 
+                        #enable involved dep
+                        if not dep.Done:
+                            dep.enable([dep.currentRigid, dep.dependedRigid])
+                    candidates.append(linkedRig)
+        
+        elif solverStage == PARTIAL_SOLVE_STAGE3:
+            pass
+
+        elif solverStage == PARTIAL_SOLVE_STAGE4:
+            pass
+
+        elif solverStage == PARTIAL_SOLVE_STAGE5:
+            for linkedRig in self.linkedRigids:
+                if linkedRig.tempfixed: continue
+                for dep in self.depsPerLinkedRigids[linkedRig]: 
+                    #enable involved dep
+                    if not dep.Done:
+                        dep.enable([dep.currentRigid, dep.dependedRigid])
+                candidates.append(linkedRig)
+
+        return set(candidates)
     
     def addChildrenByDistance(self, addList, distance):
         # Current rigid is the father of the needed distance, so it might have needed children
