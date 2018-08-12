@@ -99,32 +99,28 @@ def cleanAxis(axisa):
     return axis
     
 def copynorm_AxisToOrigin(axisa, dbg=False):
-    _offset = SystemOrigin.sub(axisa.Base)
+    offset = SystemOrigin.sub(axisa.Base)
     axisb = FreeCAD.Axis(axisa)
-    if dbg: a = axisa, axisb; print a
-    #axisb.move(_offset)
-    if dbg: a = axisa, axisb; print a
     axisb.Base = SystemOrigin
-    #axisb.Direction = axisb.Direction.add(_offset)    
     return cleanAxis(axisb)
 
-
-
-#create an axis which is normal to the plane defined by given 2 axes as argument
 def normal_2Axis(axisa,axisb,dbg=False):
+    '''
+    create an axis which is normal to the plane defined by given 2 axes as argument
+    '''
     #move vectors to origin and normalize
     axis1 = copynorm_AxisToOrigin(axisa)
     axis2 = copynorm_AxisToOrigin(axisb)
-
     #create an axis with base at SystemOrigin
     axisN = FreeCAD.Axis()
     #set the right direction
     axisN.Direction = axis1.Direction.cross(axis2.Direction)
-    if dbg: print axis1, axis2, axisN   
     return cleanAxis(axisN)
 
-#create a plane normal to the given axis, return the 2 axis which define that plane
 def make_planeNormal(axisa,dbg=False):
+    '''
+    create a plane normal to the given axis, return the 2 axis which define that plane
+    '''
     axis1 = copynorm_AxisToOrigin(axisa)
 
     planenormal = Part.makePlane(1.0,1.0, axis1.Base, axis1.Direction)
@@ -132,41 +128,42 @@ def make_planeNormal(axisa,dbg=False):
     freeAx2 = FreeCAD.Axis()
     freeAx1.Direction = FreeCAD.Vector(planenormal.Vertexes[2].Point)
     freeAx2.Direction = FreeCAD.Vector(planenormal.Vertexes[1].Point)
-    if dbg: print  planenormal.Vertexes[0].Point, planenormal.Vertexes[1].Point, planenormal.Vertexes[2].Point, planenormal.Vertexes[3].Point
     return [copynorm_AxisToOrigin(freeAx1),copynorm_AxisToOrigin(freeAx2)]
 
 
-#check if 2 axes are parallel
 def check_ifParallel(axisa,axisb,dbg=False):
+    '''
+    check if 2 axes are parallel
+    '''
     #shift edges to the origin and normalize them
     #move vectors to origin and normalize
     axis1 = copynorm_AxisToOrigin(axisa)
     axis2 = copynorm_AxisToOrigin(axisb)
 
     if abs((axis1.Direction.cross(axis2.Direction)).Length) <= tolerance:
-        if dbg:print "Parallel Edges" , axis1, axis2
         return True
     else:
-        if dbg:print "Non Parallel Edges", axis1, axis2
         return False
 
 
-#check if 2 axes are perpendicular
 def check_ifPerpendicular(axisa,axisb,dbg=False):
+    '''
+    check if 2 axes are perpendicular
+    '''
     #shift edges to the origin and normalize them
     #move vectors to origin and normalize
     axis1 = copynorm_AxisToOrigin(axisa)
     axis2 = copynorm_AxisToOrigin(axisb)
 
     if abs(axis1.Direction.dot(axis2.Direction)) <= tolerance:
-        if dbg:print "Perpendicular Edges" , axis1, axis2
         return True
     else:
-        if dbg:print "Perpendicular Edges", axis1, axis2
         return False
 
-#check if 2 axes are collinear
 def check_ifCollinear(axisa,axisb,dbg=False):
+    '''
+    check if 2 axes are collinear
+    '''
     #shift edges to the origin and normalize them
     #move vectors to origin and normalize
     axis1 = FreeCAD.Axis(axisa)
@@ -186,29 +183,29 @@ def check_ifCollinear(axisa,axisb,dbg=False):
     axis3.Direction = axis2.Base #create an axis with direction base1 to base2
 
     if check_ifParallel(axis1,axis3) and check_ifParallel(axis2,axis3):
-        if dbg:print "Collinear Edges" , axis1, axis2
         return True
     else:
-        if dbg:print "Non Collinear Edges", axis1, axis2
         return False
 
-#check if 2 vertexes are coincident
 def check_ifCoincident(Vertex1, Vertex2, dbg=False):
-    _X1=Vertex1.x
-    _X2=Vertex2.x
-    _Y1=Vertex1.y
-    _Y2=Vertex2.y
-    _Z1=Vertex1.z
-    _Z2=Vertex2.z
-    if (abs(_Z2 - _Z1) <= tolerance) and (abs(_X2 - _X1) <= tolerance) and (abs(_Y2 - _Y1) <= tolerance):
-        if dbg: print "Vertexes Coincident", Vertex1, Vertex2
+    '''
+    check if 2 vertexes are coincident
+    '''
+    X1=Vertex1.x
+    X2=Vertex2.x
+    Y1=Vertex1.y
+    Y2=Vertex2.y
+    Z1=Vertex1.z
+    Z2=Vertex2.z
+    if (abs(Z2 - Z1) <= tolerance) and (abs(X2 - X1) <= tolerance) and (abs(Y2 - Y1) <= tolerance):
         return True
     else:
-        if dbg: print  "Vertexes Not Coincident", Vertex1, Vertex2
         return False
 
-#check if a point is on an axis
 def check_ifPointOnAxis(vertexa, axisa, dbg=False):
+    '''
+    check if a point is on an axis
+    '''
     #shift edges to the origin and normalize them
     #move vectors to origin and normalize
     axis1 = copynorm_AxisToOrigin(axisa)
@@ -216,10 +213,8 @@ def check_ifPointOnAxis(vertexa, axisa, dbg=False):
     _offset = SystemOrigin.sub(axis1.Base)
     vertex1 = vertex1.add(axis1.Base) #apply the same offset to the point
     if abs((axis1.Direction.cross(vertex1)).Length) <= tolerance:
-        if dbg:print "Point on Axis" , vertex1, axis1
         return True
     else:
-        if dbg:print "Point not on Axis", vertex1, axis1
         return False
 
 
@@ -331,12 +326,10 @@ def AxisDistance(axisa, dofpos, pointconstraints = None, dbg=False):
 #axisa which the axis normal to the plane constrained
 #dofpos which is the array of left free positional axes
 def PlaneOffset(axisa, dofpos, pointconstraints = [], dbg=False):
-    if dbg: print "the axis is: ", axisa, copynorm_AxisToOrigin(axisa)
     currentDOFPOSnum = len(dofpos)
     if currentDOFPOSnum == 0 : #already locked on position so ignore it
         return []
     elif currentDOFPOSnum == 1 : #partially locked on position so compare to the given axis
-        if dbg: print "The Axes are: ", axisa,dofpos[0]
         if check_ifParallel(axisa,dofpos[0]):
             #the axis are parallel, so #the axis locks permanently the position so DOFPos=[]
             return []         
@@ -368,14 +361,12 @@ def PointIdentity(axisa, dofpos, dofrot, pointconstraints, dbg=False):
 
     pointA = zeroIfLessThanTol(axisa.Base)
     rigidCenterpoint = zeroIfLessThanTol(axisa.Direction)
-    #print  "axisa= " , cleanAxis(axisa))
     if len(pointconstraints)>0:
         for a in range(0, len(pointconstraints)):
             if check_ifCoincident(pointA,pointconstraints[a]):
                 #the same point is already constrained so skip it , redundant
                 return dofpos,dofrot
     pointconstraints.append(pointA)
-    if dbg: print "Point POS: current pointconstraints = ", len(pointconstraints)
     if check_ifCoincident(pointA,rigidCenterpoint):
         #the center of rigid is coincident to the point constrained, the obj can't move anymore DOFPOS=0
         return [], dofrot
@@ -430,11 +421,8 @@ def PointIdentity(axisa, dofpos, dofrot, pointconstraints, dbg=False):
             elif len(pointconstraints) == 2:
                 #this is a circularedge constraint with an axis with Base on pointA and Direction pointconstraint[0] to pointconstraints[1]
                 #so DOFROT as circular edge always locks all 3 axes in position
-                #print pointconstraints)
                 tmpAxis = create_Axis2Points(pointconstraints[0],pointconstraints[1])
-                #print tmpAxis)
                 tmpAxis = cleanAxis(tmpAxis)                
-                #print tmpAxis)
                 tmpdofrot = AxisAlignment(tmpAxis, dofrot)
 
         else:
@@ -451,14 +439,12 @@ def PointIdentityPos(axisa, dofpos, pointconstraints, dbg=True):
     
     pointA = axisa.Base
     rigidCenterpoint = axisa.Direction
-    print "axisa= " , axisa
     if len(pointconstraints)>0:
         for a in range(0, len(pointconstraints)):
             if check_ifCoincident(pointA,pointconstraints[a]):
                 #the same point is already constrained so skip it , redundant
                 return dofpos
     pointconstraints.append(pointA)
-    if dbg: print "Point POS: current pointconstraints = ", pointconstraints
     if check_ifCoincident(pointA,rigidCenterpoint):
         #the center of rigid is coincident to the point constrained, the obj can't move anymore DOFPOS=0
         return []
@@ -504,7 +490,6 @@ def PointIdentityRot(axisa, dofrot, pointconstraints, dbg=True):
         if check_ifCoincident(pointA,pointconstraints[a]):
             #the same point is already constrained so skip it , redundant
             return dofrot
-    if dbg: print "Point ROT: current pointconstraints = ", pointconstraints
     if currentDOFROTnum == 0 : #already locked on rotation so ignore it
         return []
     elif currentDOFROTnum == 1 : #already partially locked, an additional point identity locks the object
@@ -577,8 +562,10 @@ def PointIdentityRot(axisa, dofrot, pointconstraints, dbg=True):
 
 #some test for helper functions
 if __name__ == "__main__":
-    print 
+    pass
+    '''
     AXIS1=FreeCAD.Axis()
+    
     AXIS1.Base = FreeCAD.Vector(2,10,12)
     AXIS1.Direction = AXIS1.Direction.add(SystemXAxis.Direction)
     AXIS2=FreeCAD.Axis()
@@ -599,3 +586,5 @@ if __name__ == "__main__":
     dfdfdf = create_Axis(FreeCAD.Vector(12.0,33.5,12.7), FreeCAD.Vector(23.5,22.0,99.0))
     print copynorm_AxisToOrigin(dfdfdf)
     print create_Axis2Points(FreeCAD.Vector(1.0,1.0,1.0), FreeCAD.Vector(3,3,3))
+    '''
+

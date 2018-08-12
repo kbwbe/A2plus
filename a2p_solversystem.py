@@ -330,7 +330,7 @@ class SolverSystem():
             if systemSolved:
                 self.mySOLVER_SPIN_ACCURACY *= 1e-1
                 self.mySOLVER_POS_ACCURACY *= 1e-1
-                Msg( '--->LEVEL OF ACCURACY :{}'.format(self.level_of_accuracy) )
+                Msg( '--->LEVEL OF ACCURACY :{}\n'.format(self.level_of_accuracy) )
                 self.level_of_accuracy+=1
                 if self.level_of_accuracy == MAX_LEVEL_ACCURACY:
                     self.solutionToParts(doc)
