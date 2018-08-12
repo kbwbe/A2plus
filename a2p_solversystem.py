@@ -88,6 +88,9 @@ class SolverSystem():
         self.lastAxisError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
         self.convergencyCounter = 0
         self.status = "created"
+        self.partialSolverCurrentStage = 0
+        self.currentstage = 0
+        self.solvedCounter = 0
 
     def clear(self):
         for r in self.rigids:
@@ -96,6 +99,7 @@ class SolverSystem():
         self.rigids = []
         self.constraints = []
         self.objectNames = []
+        self.partialSolverCurrentStage = PARTIAL_SOLVE_STAGE1
 
     def getRigid(self,objectName):
         '''get a Rigid by objectName'''
@@ -143,16 +147,20 @@ class SolverSystem():
         for c in self.constraints:
             rigid1 = self.getRigid(c.Object1)
             rigid2 = self.getRigid(c.Object2)
-
-            rigid1.linkedRigids.append(rigid2);
-            rigid2.linkedRigids.append(rigid1);
-
+            
+            #create and update list of constrained rigids
+            if rigid2 != None and not rigid2 in rigid1.linkedRigids: rigid1.linkedRigids.append(rigid2);
+            if rigid1 != None and not rigid1 in rigid2.linkedRigids: rigid2.linkedRigids.append(rigid1);
+            
             try:
                 Dependency.Create(doc, c, self, rigid1, rigid2)
             except:
                 self.status = "loadingDependencyError"
                 deleteList.append(c)
-                
+        
+        for rig in self.rigids:
+            rig.hierarchyLinkedRigids.extend(rig.linkedRigids)
+               
         if len(deleteList) > 0:
             msg = "The following constraints are broken:\n"
             for c in deleteList:
@@ -225,6 +233,7 @@ class SolverSystem():
             #ok each rigid has a dict for each linked objects,
             #so we now know the list of linked objects and which 
             #dof rot and pos both limits.
+            
 
 
     # TODO: maybe instead of traversing from the root every time, save a list of objects on current distance
@@ -232,6 +241,7 @@ class SolverSystem():
     def assignParentship(self, doc):
         # Start from fixed parts
         for rig in self.rigids:
+            
             if rig.fixed:
                 rig.disatanceFromFixed = 0
                 haveMore = True
@@ -251,8 +261,8 @@ class SolverSystem():
         self.visualizeHierarchy()
 
     def visualizeHierarchy(self):
-        home = expanduser("~")
-        out_file = os.path.join(home,'assembly_hierarchy.html')
+        #modified hierarchy file name and path, now the html file is in the same folder with the same filename of the assembly
+        out_file = os.path.splitext(self.doc.FileName)[0] + '_asm_hierarchy.html'
         Msg("Writing visual hierarchy to: {}\n".format(out_file))
         f = open(out_file, "w")
 
@@ -288,6 +298,9 @@ class SolverSystem():
         f.write("</body>")
         f.write("</html>")
         f.close()
+        import WebGui
+        #str = "file://",out_file
+        #WebGui.openBrowser(str.__str__()) 
 
     def calcMoveData(self,doc):
         for rig in self.rigids:
@@ -296,6 +309,7 @@ class SolverSystem():
     def prepareRestart(self):
         for rig in self.rigids:
             rig.prepareRestart()
+        self.partialSolverCurrentStage = PARTIAL_SOLVE_STAGE1
 
     def solveSystemWithMode(self,doc, mode):
         self.level_of_accuracy=1
@@ -304,7 +318,7 @@ class SolverSystem():
         self.loadSystem(doc)
         if self.status == "loadingDependencyError":
             return
-        #self.assignParentship(doc)
+        self.assignParentship(doc)
         loadTime = int(round(time.time() * 1000))
         while True:
             systemSolved = self.calculateChain(doc, mode)
@@ -316,9 +330,11 @@ class SolverSystem():
             if systemSolved:
                 self.mySOLVER_SPIN_ACCURACY *= 1e-1
                 self.mySOLVER_POS_ACCURACY *= 1e-1
+                Msg( '--->LEVEL OF ACCURACY :{}'.format(self.level_of_accuracy) )
                 self.level_of_accuracy+=1
                 if self.level_of_accuracy == MAX_LEVEL_ACCURACY:
                     self.solutionToParts(doc)
+                    #FreeCADGui.updateGui()
                     break
                 self.prepareRestart()
             else:
@@ -345,6 +361,7 @@ class SolverSystem():
             mode = 'magnetic'
             systemSolved = self.solveSystemWithMode(doc,mode)
         if systemSolved:
+            
             self.status = "solved"
             Msg( "===== System solved ! ====== \n" )
         else:
@@ -448,6 +465,8 @@ class SolverSystem():
                 goodAccuracy = True
                 # Mark the rigids as tempfixed and add its constrained rigids to pending list to be processed next
                 DebugMsg(A2P_DEBUG_1, "{} counts \n".format(calcCount) )
+                #self.prnPlacement()
+                
                 for r in workList:
                     r.applySolution(doc, self)
                     r.tempfixed = True
@@ -480,7 +499,11 @@ def solveConstraints( doc, cache=None ):
     ss = SolverSystem()
     ss.solveSystem(doc)
     doc.commitTransaction()
-
+    try:
+        doc.recompute()
+    except:
+        pass
+    
 def autoSolveConstraints( doc, cache=None):
     if not a2plib.getAutoSolveState():
         return
