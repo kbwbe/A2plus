@@ -35,8 +35,6 @@ from a2plib import (
     AUTOSOLVE_ENABLED
     )
 
-
-
 class ObjectCache:
     '''
     An assembly could use multiple instances of then same importPart.
@@ -74,7 +72,63 @@ class ObjectCache:
 
 objectCache = ObjectCache()
 
+def getImpPartsFromDoc(doc, visibleOnly = True):
+    objsIn = doc.Objects
+    impPartsOut = list()
+    for obj in objsIn:
+        impPartList = filterImpParts(obj)
+        if (impPartList):
+            if (visibleOnly):
+                vizParts = list()
+                for imp in impPartList:
+                    if imp.isDerivedFrom("PartDesign::Body"):
+                        if hasattr(imp,'ViewObject') and imp.ViewObject.isVisible() and \
+                           hasattr(imp.Tip,'ViewObject') and imp.Tip.ViewObject.isVisible():
+                            vizParts.append(imp)
+                    else: 
+                        if hasattr(imp,'ViewObject') and imp.ViewObject.isVisible():
+                            vizParts.append(imp)
+                impPartsOut.extend(vizParts)
+            else:
+                impPartsOut.extend(impPartList)
+    return impPartsOut
 
+def filterImpParts(obj):
+    impPartsOut = list()
+    if obj.isDerivedFrom("Sketcher::SketchObject"):
+        pass
+    elif obj.isDerivedFrom("PartDesign::Feature"):
+        pass
+    elif obj.isDerivedFrom("PartDesign::Body"):
+        # we want bodies that are top level in the document or top level in a container(App::Part)
+        # we don't want bodies that are inside other bodies.  
+        if ((not(obj.InList)) or  \
+            ((len(obj.InList) == 1) and (obj.InList[0].hasExtension("App::GroupExtension")))):  #top of group
+            plmGlobal = obj.getGlobalPlacement();
+            plmLocal  = obj.Placement;
+            if (plmGlobal != plmLocal):
+                obj.Placement = plmGlobal             # should obj be a copy here?  not in orig doc - maybe no problem?
+            impPartsOut.append(obj)
+    elif obj.hasExtension("App::GroupExtension"):     # App::Part container.  GroupEx contents are already in list, 
+        pass                                          # don't need to find them      
+    elif obj.isDerivedFrom("Part::Feature"):
+        if not(obj.InList):
+            plmGlobal = obj.getGlobalPlacement();
+            plmLocal  = obj.Placement;
+            if (plmGlobal != plmLocal):
+                obj.Placement = plmGlobal
+            impPartsOut.append(obj)                  # top level in within Document 
+        elif (len(obj.InList) == 1) and (obj.InList[0].hasExtension("App::GroupExtension")):
+            plmGlobal = obj.getGlobalPlacement();
+            plmLocal  = obj.Placement;
+            if (plmGlobal != plmLocal):
+                obj.Placement = plmGlobal
+            impPartsOut.append(obj)                  # top level within Group
+        else:
+            pass                                     # more odd PF cases?? BaseFeature in body??
+    else:
+        pass                                         # garbage objects - Origins, Axis, etc
+    return impPartsOut
 
 
 def importPartFromFile(_doc, filename, importToCache=False):
@@ -93,14 +147,15 @@ def importPartFromFile(_doc, filename, importToCache=False):
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Value Error", msg )
             return
     #-------------------------------------------
-    # Get a list of the visible Objects
+    # Get a list of the importable Objects
     #-------------------------------------------
-    visibleObjects = [ obj for obj in importDoc.Objects
-                    if hasattr(obj,'ViewObject') and obj.ViewObject.isVisible()
-                    and hasattr(obj,'Shape') and len(obj.Shape.Faces) > 0 and 'Body' not in obj.Name]
 
-    if visibleObjects == None or len(visibleObjects) == 0:
-        msg = "No visible Part to import found. Aborting operation"
+    importableObjects = list()
+    importableObjects.extend(getImpPartsFromDoc(importDoc))            #visible parts only
+#    importableObjects.extend(getImpPartsFromDoc(importDoc, False))     #take invisible parts too
+
+    if importableObjects == None or len(importableObjects) == 0:
+        msg = translate("A2plus","No visible Part to import found. Aborting operation")
         QtGui.QMessageBox.information(
             QtGui.QApplication.activeWindow(),
             "Import Error",
@@ -108,12 +163,13 @@ def importPartFromFile(_doc, filename, importToCache=False):
             )
         return
 
+    #TODO: allow import multiple parts as separate items
     #-------------------------------------------
     # Discover whether we are importing a subassembly or a single part
     #-------------------------------------------
     #if any([ 'importPart' in obj.Content for obj in importDoc.Objects]) and not len(visibleObjects) == 1:
     subAssemblyImport = False
-    if len(visibleObjects) > 1:
+    if len(importableObjects) > 1:
         subAssemblyImport = True
 
     #-------------------------------------------
@@ -143,10 +199,10 @@ def importPartFromFile(_doc, filename, importToCache=False):
     newObj.addProperty("App::PropertyBool","updateColors","importPart").updateColors = True
     #
     if subAssemblyImport:
-        newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor = muxObjectsWithKeys(importDoc, withColor=True)
+        newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor = muxObjectsWithKeys(importableObjects, withColor=True)
         #newObj.muxInfo, newObj.Shape = muxObjectsWithKeys(importDoc, withColor=False)
     else:
-        tmpObj = visibleObjects[0]
+        tmpObj = importableObjects[0]
         newObj.Shape = tmpObj.Shape.copy()
         newObj.ViewObject.ShapeColor = tmpObj.ViewObject.ShapeColor
         if appVersionStr() <= '000.016': #FC0.17: DiffuseColor overrides ShapeColor !
@@ -394,6 +450,7 @@ This is not allowed when using preference
                 msg
                 )
             return
+        #TODO: WF fails if "use folder" = false here
         docs = FreeCAD.listDocuments().values()
         docFilenames = [ d.FileName for d in docs ]
         if not fileNameWithinProjectFile in docFilenames :
@@ -481,6 +538,13 @@ class DeleteConnectionsCommand:
     def Activated(self):
         selection = [s for s in FreeCADGui.Selection.getSelection() if s.Document == FreeCAD.ActiveDocument ]
         #if len(selection) == 1: not required as this check is done in initGui
+        # WF: still get 'list index out of range' if nothing selected.
+        if len(selection != 1):
+            QtGui.QMessageBox.critical(
+                QtGui.QApplication.activeWindow(),
+               "Selection Error",
+               "Select exactly 1 Part")
+            return
         part = selection[0]
         deleteList = []
         for c in FreeCAD.ActiveDocument.Objects:
