@@ -122,6 +122,7 @@ class Rigid():
     def enableDependencies(self, workList):
         for dep in self.dependencies:
             dep.enable(workList)
+            dep.calcRefPoints(dep.index)
 
     # The function only sets parentship for childrens that are distant+1 from fixed rigid
     # The function should be called in a loop with increased distance until it return False
@@ -163,14 +164,15 @@ class Rigid():
         candidates = []
         
         if solverStage == PARTIAL_SOLVE_STAGE1:
-            for linkedRig in self.linkedRigids:
-                if linkedRig.linkedTempFixedDOF()==0: #found a fully constrained obj to tempfixed rigids
-                    for dep in self.depsPerLinkedRigids[linkedRig]: 
-                        #enable involved dep
-                        if not dep.Done:
-                            dep.enable([dep.currentRigid, dep.dependedRigid])
-                    if linkedRig.tempfixed: continue
-                    candidates.append(linkedRig)
+            if not self.tempfixed:
+                if self.linkedTempFixedDOF():
+                    for linkedRig in self.linkedRigids:
+                        if linkedRig.tempfixed: #found a fully constrained obj to tempfixed rigids
+                            for dep in self.depsPerLinkedRigids[linkedRig]: 
+                                #enable involved dep
+                                if not dep.Done:
+                                    dep.enable([dep.currentRigid, dep.dependedRigid])
+                            candidates.append(linkedRig)
                     
         elif solverStage == PARTIAL_SOLVE_STAGE2:
             for linkedRig in self.linkedRigids:
@@ -237,7 +239,7 @@ class Rigid():
         self.superRigid = None
 
     def applySolution(self, doc, solver):
-        if self.tempfixed or self.fixed: return
+        if self.tempfixed: return
 
         # Update FreeCAD's placements if deltaPlacement above Tolerances
         base1 = self.placement.Base
