@@ -298,7 +298,7 @@ class SolverSystem():
         f.write("</body>")
         f.write("</html>")
         f.close()
-        import WebGui
+        #import WebGui
         #str = "file://",out_file
         #WebGui.openBrowser(str.__str__()) 
 
@@ -363,7 +363,7 @@ class SolverSystem():
         if systemSolved:
             
             self.status = "solved"
-            Msg( "===== System solved ! ====== \n" )
+            Msg( "===== System solved ! by using mode {} =====".format(mode) )
         else:
             self.status = "unsolved"
             Msg( "===== Could not solve system ====== \n" )

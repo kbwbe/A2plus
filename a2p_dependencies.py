@@ -151,58 +151,52 @@ class Dependency():
         if c.Type == "pointIdentity":
             dep1 = DependencyPointIdentity(doc, c, "point")
             dep2 = DependencyPointIdentity(doc, c, "point")
-            dep1.calcRefPoints(1)
-            dep2.calcRefPoints(2)
+            
 
         elif c.Type == "sphereCenterIdent":
             dep1 = DependencyPointIdentity(doc, c, "point")
             dep2 = DependencyPointIdentity(doc, c, "point")
-            dep1.calcRefPoints(1)
-            dep2.calcRefPoints(2)
+            
 
         elif c.Type == "pointOnLine":
             dep1 = DependencyPointOnLine(doc, c, "point")
             dep2 = DependencyPointOnLine(doc, c, "pointAxis")
-            dep1.calcRefPoints(1)
-            dep2.calcRefPoints(2)
+            
 
         elif c.Type == "pointOnPlane":
             dep1 = DependencyPointOnPlane(doc, c, "point")
             dep2 = DependencyPointOnPlane(doc, c, "plane")
-            dep1.calcRefPoints(1)
-            dep2.calcRefPoints(2)
+            
 
         elif c.Type == "circularEdge":
             dep1 = DependencyCircularEdge(doc,c, "pointAxis")
             dep2 = DependencyCircularEdge(doc,c, "pointAxis")
-            dep1.calcRefPoints(1)
-            dep2.calcRefPoints(2)
+            
 
         elif c.Type == "planesParallel":
             dep1 = DependencyParallelPlanes(doc,c, "pointNormal")
             dep2 = DependencyParallelPlanes(doc,c, "pointNormal")
-            dep1.calcRefPoints(1)
-            dep2.calcRefPoints(2)
+            
 
         elif c.Type == "angledPlanes":
             dep1 = DependencyAngledPlanes(doc, c, "pointNormal")
             dep2 = DependencyAngledPlanes(doc, c, "pointNormal")
-            dep1.calcRefPoints(1)
-            dep2.calcRefPoints(2)
+            
 
         elif c.Type == "plane":
             dep1 = DependencyPlane(doc,c, "pointNormal")
             dep2 = DependencyPlane(doc,c, "pointNormal")
-            dep1.calcRefPoints(1)
-            dep2.calcRefPoints(2)
+            
 
         elif c.Type == "axial":
             dep1 = DependencyAxial(doc, c, "pointAxis")
             dep2 = DependencyAxial(doc, c, "pointAxis")
-            dep1.calcRefPoints(1)
-            dep2.calcRefPoints(2)
+            
         else:
             raise NotImplementedError("Constraint type {} was not implemented!".format(c.Type))
+
+        dep1.calcRefPoints(1)
+        dep2.calcRefPoints(2)
 
         # Assignments
         dep1.currentRigid = rigid1
