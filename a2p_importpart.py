@@ -155,7 +155,7 @@ def importPartFromFile(_doc, filename, importToCache=False):
 #    importableObjects.extend(getImpPartsFromDoc(importDoc, False))     #take invisible parts too
 
     if importableObjects == None or len(importableObjects) == 0:
-        msg = translate("A2plus","No visible Part to import found. Aborting operation")
+        msg = "No visible Part to import found. Aborting operation"
         QtGui.QMessageBox.information(
             QtGui.QApplication.activeWindow(),
             "Import Error",
