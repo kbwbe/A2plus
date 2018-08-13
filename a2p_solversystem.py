@@ -58,6 +58,16 @@ SOLVER_SPIN_ACCURACY = 1.0e-1 # gets to smaller values during solving
 
 SOLVER_STEPS_CONVERGENCY_CHECK = 1000
 SOLVER_CONVERGENCY_ERROR_INIT_VALUE = 1.0e+20
+MAX_LEVEL_ACCURACY = 4  #accuracy reached is 1.0e-MAX_LEVEL_ACCURACY
+
+from a2plib import (
+    PARTIAL_SOLVE_STAGE1,
+    PARTIAL_SOLVE_STAGE2, 
+    PARTIAL_SOLVE_STAGE3,
+    PARTIAL_SOLVE_STAGE4,
+    PARTIAL_SOLVE_STAGE5,
+    PARTIAL_SOLVE_END
+    )
 
 #------------------------------------------------------------------------------
 class SolverSystem():
@@ -78,6 +88,7 @@ class SolverSystem():
         self.lastAxisError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
         self.convergencyCounter = 0
         self.status = "created"
+        self.partialSolverCurrentStage = 0
 
     def clear(self):
         for r in self.rigids:
@@ -86,6 +97,7 @@ class SolverSystem():
         self.rigids = []
         self.constraints = []
         self.objectNames = []
+        self.partialSolverCurrentStage = PARTIAL_SOLVE_STAGE1
 
     def getRigid(self,objectName):
         '''get a Rigid by objectName'''
@@ -133,16 +145,20 @@ class SolverSystem():
         for c in self.constraints:
             rigid1 = self.getRigid(c.Object1)
             rigid2 = self.getRigid(c.Object2)
-
-            rigid1.linkedRigids.append(rigid2);
-            rigid2.linkedRigids.append(rigid1);
-
+            
+            #create and update list of constrained rigids
+            if rigid2 != None and not rigid2 in rigid1.linkedRigids: rigid1.linkedRigids.append(rigid2);
+            if rigid1 != None and not rigid1 in rigid2.linkedRigids: rigid2.linkedRigids.append(rigid1);
+            
             try:
                 Dependency.Create(doc, c, self, rigid1, rigid2)
             except:
                 self.status = "loadingDependencyError"
                 deleteList.append(c)
-                
+        
+        for rig in self.rigids:
+            rig.hierarchyLinkedRigids.extend(rig.linkedRigids)
+               
         if len(deleteList) > 0:
             msg = "The following constraints are broken:\n"
             for c in deleteList:
@@ -167,7 +183,55 @@ class SolverSystem():
             rig.calcSpinCenter()
             rig.calcRefPointsBoundBoxSize()
             
+        numdep = 0
+        self.retrieveDOFInfo() #function only once used here at this place in whole program
+        for rig in self.rigids:
+            rig.currentDOF()
+            rig.beautyDOFPrint()
+            numdep+=rig.countDependencies()
+        Msg( 'there are {} dependencies\n'.format(numdep/2))       
         self.status = "loaded"
+
+    def retrieveDOFInfo(self):
+        '''
+        method used to retrieve all info related to DOF handling
+        the method scans each rigid, and on each not tempfixed rigid scans the list of linkedobjects
+        then for each linked object compile a dict where each linked object has its dependencies
+        then for each linked object compile a dict where each linked object has its dof position
+        then for each linked object compile a dict where each linked object has its dof rotation
+        '''
+        for rig in self.rigids:   
+                     
+            #if not rig.tempfixed:  #skip already fixed objs
+
+            for linkedRig in rig.linkedRigids:
+                tmplinkedDeps = []
+                tmpLinkedPointDeps = []
+                for dep in rig.dependencies:
+                    if linkedRig==dep.dependedRigid:
+                        #be sure pointconstraints are at the end of the list
+                        if dep.isPointConstraint :
+                            tmpLinkedPointDeps.append(dep)
+                        else:
+                            tmplinkedDeps.append(dep)
+                #add at the end the point constraints
+                tmplinkedDeps.extend(tmpLinkedPointDeps) 
+                rig.depsPerLinkedRigids[linkedRig] = tmplinkedDeps
+        
+            #dofPOSPerLinkedRigid is a dict where for each 
+            for linkedRig in rig.depsPerLinkedRigids.keys():
+                linkedRig.pointConstraints = []
+                _dofPos = linkedRig.posDOF
+                _dofRot = linkedRig.rotDOF
+                for dep in rig.depsPerLinkedRigids[linkedRig]:
+                    _dofPos, _dofRot = dep.calcDOF(_dofPos,_dofRot, linkedRig.pointConstraints)
+                rig.dofPOSPerLinkedRigids[linkedRig] = _dofPos
+                rig.dofROTPerLinkedRigids[linkedRig] = _dofRot
+            
+            #ok each rigid has a dict for each linked objects,
+            #so we now know the list of linked objects and which 
+            #dof rot and pos both limits.
+            
 
 
     # TODO: maybe instead of traversing from the root every time, save a list of objects on current distance
@@ -175,6 +239,7 @@ class SolverSystem():
     def assignParentship(self, doc):
         # Start from fixed parts
         for rig in self.rigids:
+            
             if rig.fixed:
                 rig.disatanceFromFixed = 0
                 haveMore = True
@@ -194,8 +259,8 @@ class SolverSystem():
         self.visualizeHierarchy()
 
     def visualizeHierarchy(self):
-        home = expanduser("~")
-        out_file = os.path.join(home,'assembly_hierarchy.html')
+        #modified hierarchy file name and path, now the html file is in the same folder with the same filename of the assembly
+        out_file = os.path.splitext(self.doc.FileName)[0] + '_asm_hierarchy.html'
         Msg("Writing visual hierarchy to: {}\n".format(out_file))
         f = open(out_file, "w")
 
@@ -231,6 +296,9 @@ class SolverSystem():
         f.write("</body>")
         f.write("</html>")
         f.close()
+        #import WebGui
+        #str = "file://",out_file
+        #WebGui.openBrowser(str.__str__()) 
 
     def calcMoveData(self,doc):
         for rig in self.rigids:
@@ -239,6 +307,7 @@ class SolverSystem():
     def prepareRestart(self):
         for rig in self.rigids:
             rig.prepareRestart()
+        self.partialSolverCurrentStage = PARTIAL_SOLVE_STAGE1
 
     def solveSystemWithMode(self,doc, mode):
         self.level_of_accuracy=1
@@ -259,9 +328,11 @@ class SolverSystem():
             if systemSolved:
                 self.mySOLVER_SPIN_ACCURACY *= 1e-1
                 self.mySOLVER_POS_ACCURACY *= 1e-1
+                Msg( '--->LEVEL OF ACCURACY :{}\n'.format(self.level_of_accuracy) )
                 self.level_of_accuracy+=1
-                if self.level_of_accuracy == 4:
+                if self.level_of_accuracy == MAX_LEVEL_ACCURACY:
                     self.solutionToParts(doc)
+                    #FreeCADGui.updateGui()
                     break
                 self.prepareRestart()
             else:
@@ -288,8 +359,9 @@ class SolverSystem():
             mode = 'magnetic'
             systemSolved = self.solveSystemWithMode(doc,mode)
         if systemSolved:
+            
             self.status = "solved"
-            Msg( "===== System solved ! ====== \n" )
+            Msg( "===== System solved ! by using mode {} =====".format(mode) )
         else:
             self.status = "unsolved"
             Msg( "===== Could not solve system ====== \n" )
@@ -316,39 +388,61 @@ class SolverSystem():
         self.stepCount = 0
         haveMore = True
         workList = []
-
+        workList.extend(self.rigids)
+        
         if mode == 'partial':
             # start from fixed rigids and its children
-            for rig in self.rigids:
-                if rig.fixed:
-                    workList.append(rig);
-                    workList.extend(set(rig.getCandidates()))
+            self.solvedCounter = 0
+            while self.partialSolverCurrentStage != PARTIAL_SOLVE_END:
+                #print "evaluating stage = ", self.partialSolverCurrentStage
+                #print 'Tempfixed objs:'
+                '''for i in self.rigids:
+                    if i.tempfixed:
+                        print '    ',i.label'''
+                while True:
+                    
+                    if self.calculateChainByPartialStage(self.partialSolverCurrentStage)== False: 
+                        break
+                    else:
+                        #print "found something to solve at stage = ", currentstage
+                        #some rigid match stage 1, try solving
+                        
+                        
+                        solutionFound = self.calculateWorkList(doc, workList, mode)
+                        if not solutionFound: 
+                            return False
+                        else:
+                            #partial system successfully solved, set as Done and disable
+                            #print 'Solution found'
+                            #FreeCADGui.updateGui()
+                            for rig in self.rigids:
+                                for dep in rig.dependencies:
+                                    if dep.Enabled:
+                                        dep.Done = True
+                                        dep.disable()
+                                        #rig.tempfixed = True
+                    
         else:
-            workList.extend(self.rigids)
-
-        while haveMore:
+            #enable all dependencies, set all as done=false
+            self.partialSolverCurrentStage = PARTIAL_SOLVE_END
+            for rig in self.rigids:
+                rig.tempfixed = rig.fixed
+                for dep in rig.dependencies:
+                    dep.Done = False
+                    dep.Enabled = True
+            
             solutionFound = self.calculateWorkList(doc, workList, mode)
             if not solutionFound: return False
-
-            addList = []
-            for rig in workList:
-                addList.extend(rig.getCandidates())
-            # Eliminate duplicates
-            addList = set(addList)
-            workList.extend(addList)
-            haveMore = (len(addList) > 0)
-            if A2P_DEBUG_LEVEL >= A2P_DEBUG_1:
-                self.printList("AddList", addList)
-
-
+        
         return True
 
     def calculateWorkList(self, doc, workList, mode):
+        #print 'calculate worklist'
         if A2P_DEBUG_LEVEL >= A2P_DEBUG_1:
             self.printList("WorkList", workList)
 
-        for rig in workList:
-            rig.enableDependencies(workList)
+        #for rig in workList:
+        #    rig.enableDependencies(workList)
 
         self.lastPositionError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
         self.lastAxisError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
@@ -365,14 +459,15 @@ class SolverSystem():
             self.convergencyCounter += 1
             # First calculate all the movement vectors
             for w in workList:
-                w.calcMoveData(doc, self)
-                if w.maxPosError > maxPosError:
-                    maxPosError = w.maxPosError
-                if w.maxAxisError > maxAxisError:
-                    maxAxisError = w.maxAxisError
+                if w.checkIfInvolved():
+                    w.calcMoveData(doc, self)
+                    if w.maxPosError > maxPosError:
+                        maxPosError = w.maxPosError
+                    if w.maxAxisError > maxAxisError:
+                        maxAxisError = w.maxAxisError
 
             # Perform the move
-            for w in workList:
+            for w in workList:                
                 w.move(doc)
                 # Enable those 2 lines to see the computation progress on screen
                 #w.applySolution(doc, self)
@@ -385,31 +480,121 @@ class SolverSystem():
                 goodAccuracy = True
                 # Mark the rigids as tempfixed and add its constrained rigids to pending list to be processed next
                 DebugMsg(A2P_DEBUG_1, "{} counts \n".format(calcCount) )
+                #self.prnPlacement()
+                
                 for r in workList:
-                    r.applySolution(doc, self)
-                    r.tempfixed = True
-
+                    if r.checkIfInvolved():
+                        r.applySolution(doc, self)                        
+                        if self.partialSolverCurrentStage == PARTIAL_SOLVE_STAGE1:
+                            #print r.label , ' set as Tempfixed'
+                            r.tempfixed = True
+                        elif r.checkIfAllDone():
+                            r.tempfixed = True
+                 
+                    
+                #self.prnPlacement()
             if self.convergencyCounter > SOLVER_STEPS_CONVERGENCY_CHECK:
                 if (
-                    maxPosError  >= self.lastPositionError or
-                    maxAxisError >= self.lastAxisError
+                    maxPosError  > self.lastPositionError  or
+                    maxAxisError > self.lastAxisError
                     ):
-                    if mode == 'magnetic':
-                        Msg( "System not solvable, convergency is incorrect!\n" )
+                    Msg( "System not solvable, convergency is incorrect!\n" )
                     return False
                 self.lastPositionError = maxPosError
                 self.lastAxisError = maxAxisError
                 self.convergencyCounter = 0
+                
 
             if self.stepCount > SOLVER_MAXSTEPS:
-                if mode == 'magnetic':
-                    Msg( "Reached max calculations count ({})\n".format(SOLVER_MAXSTEPS) )
+                
+                Msg( "Reached max calculations count ({})\n".format(SOLVER_MAXSTEPS) )
                 return False
         return True
 
     def solutionToParts(self,doc):
         for rig in self.rigids:
             rig.applySolution(doc, self);
+            
+            
+    def calculateChainByPartialStage(self, currentstage): 
+        outputRigidList = []       
+        
+        if currentstage == PARTIAL_SOLVE_STAGE1:  
+            #solve all rigid fully constrained to tempfixed rigids, enable only involved dep, then set them as tempfixed        
+            for rig in self.rigids:
+                if not rig.tempfixed: #skip already fixed objs
+                    #print 'current dof = ', rig.currentDOF()
+                    #print rig.label
+                    if rig.linkedTempFixedDOF()==0: #found a fully constrained obj to tempfixed rigids
+                        
+                        for j in rig.depsPerLinkedRigids.keys(): #look on each linked obj
+                            if j.tempfixed: #the linked rigid is already fixed
+                                outputRigidList.append(j)
+                                for dep in rig.depsPerLinkedRigids[j]: 
+                                    #enable involved dep
+                                    if not dep.Done:
+                                        dep.enable([dep.currentRigid, dep.dependedRigid])
+                                        
+                                        #print '        ',dep
+                        if len(outputRigidList)>0: #found something!
+                            #print '        Solve them!'                            
+                            return True #something match, return it to solver
+            
+            self.partialSolverCurrentStage = PARTIAL_SOLVE_STAGE2
+            return False #nothing match, jump to next stage
+         
+        elif currentstage == PARTIAL_SOLVE_STAGE2:  
+            #solve all rigid constrained ONLY to tempfixed rigid, 
+            #enable only involved dep, then set them as tempfixed        
+            for rig in self.rigids:
+                if not rig.tempfixed: #skip already fixed objs  
+                                    
+                    if rig.areAllParentTempFixed(): #linked only to fixed rigids                                                
+                        #print rig.label 
+                        #print rig.linkedRigids 
+                        if not rig.checkIfAllDone():                              
+                            #all linked rigid are tempfixed, so solve it now    
+                            #print rig.label
+                            for j in rig.depsPerLinkedRigids.keys(): #look again on each linked obj
+                                outputRigidList.append(j)
+                                #print 'Rigid ', j.label
+                                for dep in rig.depsPerLinkedRigids[j]: 
+                                    
+                                    #enable involved dep
+                                    if not dep.Done:
+                                        dep.enable([dep.currentRigid, dep.dependedRigid])
+                                        #self.solvedCounter += 1
+                                        #print '        ',dep
+                    if len(outputRigidList)>0: #found something!
+                        #print '        Solve them!'
+                        return True #something match
+            
+            self.partialSolverCurrentStage = PARTIAL_SOLVE_STAGE3
+            return False #nothing match, jump to next stage                       
+                            
+        elif currentstage == PARTIAL_SOLVE_STAGE3:
+            self.partialSolverCurrentStage = PARTIAL_SOLVE_STAGE4
+            return False
+        
+        elif currentstage == PARTIAL_SOLVE_STAGE4:
+            self.partialSolverCurrentStage = PARTIAL_SOLVE_STAGE5
+            return False        
+        
+        elif currentstage == PARTIAL_SOLVE_STAGE5: 
+            #enable all dep not marked as done
+            tmpfound = False
+            for rig in self.rigids:
+                if not rig.tempfixed:
+                    for dep in rig.dependencies:
+                        if not dep.Done and not dep.Enabled:
+                            dep.enable([dep.currentRigid, dep.dependedRigid])
+                            #print '        ',dep
+                            tmpfound = True
+            
+            self.partialSolverCurrentStage = PARTIAL_SOLVE_END  
+            return tmpfound
+        else:
+            return False
 
 #------------------------------------------------------------------------------
 def solveConstraints( doc, cache=None ):
@@ -417,7 +602,11 @@ def solveConstraints( doc, cache=None ):
     ss = SolverSystem()
     ss.solveSystem(doc)
     doc.commitTransaction()
-
+    try:
+        doc.recompute()
+    except:
+        pass
+    
 def autoSolveConstraints( doc, cache=None):
     if not a2plib.getAutoSolveState():
         return
