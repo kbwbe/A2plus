@@ -72,6 +72,16 @@ class ObjectCache:
 
 objectCache = ObjectCache()
 
+def globalVisibility(doc, imp):
+    if not imp.InList:
+        return imp.ViewObject.Visibility
+    else:
+        for parent in imp.InList:
+            if not parent.ViewObject.Visibility:
+               return parent.ViewObject.Visibility
+            else:
+               return globalVisibility(doc, parent)
+
 def getImpPartsFromDoc(doc, visibleOnly = True):
     objsIn = doc.Objects
     impPartsOut = list()
@@ -84,10 +94,14 @@ def getImpPartsFromDoc(doc, visibleOnly = True):
                     if imp.isDerivedFrom("PartDesign::Body"):
                         if hasattr(imp,'ViewObject') and imp.ViewObject.isVisible() and \
                            hasattr(imp.Tip,'ViewObject') and imp.Tip.ViewObject.isVisible():
-                            vizParts.append(imp)
+                            gv = globalVisibility(doc, imp)
+                            if gv: 
+                                vizParts.append(imp)
                     else: 
                         if hasattr(imp,'ViewObject') and imp.ViewObject.isVisible():
-                            vizParts.append(imp)
+                            gv = globalVisibility(doc, imp)
+                            if gv: 
+                                vizParts.append(imp)
                 impPartsOut.extend(vizParts)
             else:
                 impPartsOut.extend(impPartList)
