@@ -110,10 +110,10 @@ class Rigid():
         self.posDOF = a2p_libDOF.initPosDOF #each rigid has DOF for position
         self.rotDOF = a2p_libDOF.initRotDOF #each rigid has DOF for rotation
         #dof are useful only for animation at the moment? maybe it can be used to set tempfixed property
+
     def prepareRestart(self):
         self.tempfixed = self.fixed
         for d in self.dependencies:
-            d.Done = False
             d.disable()
 
     def countDependencies(self):
@@ -122,7 +122,6 @@ class Rigid():
     def enableDependencies(self, workList):
         for dep in self.dependencies:
             dep.enable(workList)
-            dep.calcRefPoints(dep.index)
 
     # The function only sets parentship for childrens that are distant+1 from fixed rigid
     # The function should be called in a loop with increased distance until it return False
@@ -170,8 +169,7 @@ class Rigid():
                         if linkedRig.tempfixed: #found a fully constrained obj to tempfixed rigids
                             for dep in self.depsPerLinkedRigids[linkedRig]: 
                                 #enable involved dep
-                                if not dep.Done:
-                                    dep.enable([dep.currentRigid, dep.dependedRigid])
+		                dep.enable([dep.currentRigid, dep.dependedRigid])
                             candidates.append(linkedRig)
                     
         elif solverStage == PARTIAL_SOLVE_STAGE2:
@@ -180,8 +178,7 @@ class Rigid():
                 if linkedRig.areAllParentTempFixed():
                     for dep in self.depsPerLinkedRigids[linkedRig]: 
                         #enable involved dep
-                        if not dep.Done:
-                            dep.enable([dep.currentRigid, dep.dependedRigid])
+                        dep.enable([dep.currentRigid, dep.dependedRigid])
                     candidates.append(linkedRig)
         
         elif solverStage == PARTIAL_SOLVE_STAGE3:
@@ -195,8 +192,7 @@ class Rigid():
                 if linkedRig.tempfixed: continue
                 for dep in self.depsPerLinkedRigids[linkedRig]: 
                     #enable involved dep
-                    if not dep.Done:
-                        dep.enable([dep.currentRigid, dep.dependedRigid])
+                    dep.enable([dep.currentRigid, dep.dependedRigid])
                 candidates.append(linkedRig)
 
         return set(candidates)
@@ -213,11 +209,6 @@ class Rigid():
                         addList.append(rig)
         # That rigid have children for needed distance
         else: return False
-
-    def checkIfAllDone(self):
-        for dep in self.dependencies:
-            if not dep.Done: return False
-        return True
 
     def areAllParentTempFixed(self):
         for rig in self.linkedRigids:
@@ -358,7 +349,7 @@ class Rigid():
                     if axisErr > self.maxAxisError : self.maxAxisError = axisErr
 
     def move(self,doc):
-        if self.tempfixed or not self.checkIfInvolved(): return
+        if self.tempfixed: return
         #
         #Linear moving of a rigid
         moveDist = Base.Vector(0,0,0)
@@ -389,16 +380,6 @@ class Rigid():
                 pl = FreeCAD.Placement()
                 pl.move(moveDist)
                 self.applyPlacementStep(pl)
-
-
-    def checkIfInvolved(self):
-        '''
-        check if the rigid has some dependencies enabled
-        '''
-        for dep in self.dependencies:
-            if dep.Enabled:
-                return True
-        return False
     
     def currentDOF(self):
         '''
