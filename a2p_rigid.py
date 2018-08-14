@@ -174,7 +174,7 @@ class Rigid():
                             for dep in self.depsPerLinkedRigids[j]: 
                                 #enable involved dep
                                 if not dep.Done and not dep.Enabled:
-                                    dep.enable([dep.currentRigid, dep.dependedRigid])
+                                    #dep.enable([dep.currentRigid, dep.dependedRigid])
                                     candidates.extend([dep.currentRigid, dep.dependedRigid])                                        
                                     DebugMsg(A2P_DEBUG_1, "        {}\n".format(dep))
                     #if len(outputRigidList)>0: #found something!
@@ -200,7 +200,7 @@ class Rigid():
                                 
                                 #enable involved dep
                                 if not dep.Done and not dep.Enabled:
-                                    dep.enable([dep.currentRigid, dep.dependedRigid])
+                                    #dep.enable([dep.currentRigid, dep.dependedRigid])
                                     candidates.extend([dep.currentRigid, dep.dependedRigid])
                                     #self.solvedCounter += 1
                                     DebugMsg(A2P_DEBUG_1, "        {}\n".format(dep))
@@ -216,7 +216,7 @@ class Rigid():
             if not self.tempfixed:
                 for dep in self.dependencies:
                     if not dep.Done and not dep.Enabled:
-                        dep.enable([dep.currentRigid, dep.dependedRigid])
+                        #dep.enable([dep.currentRigid, dep.dependedRigid])
                         DebugMsg(A2P_DEBUG_1, "        {}\n".format(dep))
                         candidates.extend([dep.currentRigid, dep.dependedRigid])
                 
@@ -286,10 +286,9 @@ class Rigid():
         newSpinCenter = Base.Vector(0,0,0)
         countRefPoints = 0
         for dep in self.dependencies:
-            if dep.Enabled:  #handle only enabled constraints
-                if dep.refPoint != None:
-                    newSpinCenter = newSpinCenter.add(dep.refPoint)
-                    countRefPoints += 1
+            if dep.refPoint != None:
+                newSpinCenter = newSpinCenter.add(dep.refPoint)
+                countRefPoints += 1
         if countRefPoints > 0:
             newSpinCenter.multiply(1.0/countRefPoints)
             self.spinCenter = newSpinCenter
@@ -322,18 +321,18 @@ class Rigid():
         self.moveVectorSum = Base.Vector(0,0,0)
 
         for dep in self.dependencies:
-            
-            refPoint, moveVector = dep.getMovement()
-            if refPoint is None or moveVector is None: continue     # Should not happen
-
-            depRefPoints.append(refPoint)
-            depMoveVectors.append(moveVector)
-
-            # Calculate max move error
-            if moveVector.Length > self.maxPosError: self.maxPosError = moveVector.Length
-
-            # Accomulate all the movements for later average calculations
-            self.moveVectorSum = self.moveVectorSum.add(moveVector)
+            if dep.Enabled:
+                refPoint, moveVector = dep.getMovement()
+                if refPoint is None or moveVector is None: continue     # Should not happen
+    
+                depRefPoints.append(refPoint)
+                depMoveVectors.append(moveVector)
+    
+                # Calculate max move error
+                if moveVector.Length > self.maxPosError: self.maxPosError = moveVector.Length
+    
+                # Accomulate all the movements for later average calculations
+                self.moveVectorSum = self.moveVectorSum.add(moveVector)
 
         # Calculate the average of all the movements
         if len(depMoveVectors) > 0:
@@ -366,20 +365,21 @@ class Rigid():
             #adjust axis' of the dependencies //FIXME (align,opposed,none)
 
             for dep in self.dependencies:
-                rotation = dep.getRotation(solver)
-
-                if rotation is None: continue       # No rotation for that dep
-
-                # Accumulate all rotations for later average calculation
-                self.spin = self.spin.add(rotation)
-                self.countSpinVectors += 1
-
-                # Calculate max rotation error
-                axisErr = self.spin.Length
-                if axisErr > self.maxAxisError : self.maxAxisError = axisErr
+                if dep.Enabled:
+                    rotation = dep.getRotation(solver)
+    
+                    if rotation is None: continue       # No rotation for that dep
+    
+                    # Accumulate all rotations for later average calculation
+                    self.spin = self.spin.add(rotation)
+                    self.countSpinVectors += 1
+    
+                    # Calculate max rotation error
+                    axisErr = self.spin.Length
+                    if axisErr > self.maxAxisError : self.maxAxisError = axisErr
 
     def move(self,doc):
-        if self.tempfixed or self.fixed: return
+        if self.tempfixed: return
         #
         #Linear moving of a rigid
         moveDist = Base.Vector(0,0,0)

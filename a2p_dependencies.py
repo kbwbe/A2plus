@@ -225,7 +225,9 @@ class Dependency():
             return
 
         self.Enabled = True
-        self.foreignDependency.Enabled = True
+        self.Done = False
+        self.foreignDependency.Enabled = self.Enabled
+        self.foreignDependency.Done = self.Done
         DebugMsg(
             A2P_DEBUG_2,
             "{} - enabled\n".format(self)
@@ -233,9 +235,8 @@ class Dependency():
 
     def disable(self):
         self.Enabled = False
-        if self.Done:
-            self.foreignDependency.Done = True
-        self.foreignDependency.Enabled = False
+        self.foreignDependency.Done = self.Done
+        self.foreignDependency.Enabled = self.Enabled
 
     def getMovement(self):
         raise NotImplementedError("Dependency class {} doesn't implement movement, use inherited classes instead!".format(self.__class__.__name__))

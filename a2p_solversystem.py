@@ -466,8 +466,8 @@ class SolverSystem():
         if A2P_DEBUG_LEVEL >= A2P_DEBUG_1:
             self.printList("WorkList", workList)
 
-        #for rig in workList:
-        #    rig.enableDependencies(workList)
+        for rig in workList:
+            rig.enableDependencies(workList)
 
         self.lastPositionError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
         self.lastAxisError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
@@ -630,10 +630,10 @@ def solveConstraints( doc, cache=None ):
     ss = SolverSystem()
     ss.solveSystem(doc)
     doc.commitTransaction()
-    try:
-        doc.recompute()
-    except:
-        pass
+    #try:
+        #doc.recompute()
+    #except:
+    #    pass
     
 def autoSolveConstraints( doc, cache=None):
     if not a2plib.getAutoSolveState():
