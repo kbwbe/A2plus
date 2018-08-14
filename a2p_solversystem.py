@@ -429,6 +429,7 @@ class SolverSystem():
 
         for rig in workList:
             rig.enableDependencies(workList)
+        rig.calcSpinCenter()
 
         self.lastPositionError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
         self.lastAxisError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
