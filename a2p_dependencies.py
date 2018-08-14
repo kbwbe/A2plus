@@ -345,8 +345,6 @@ class DependencyPointIdentity(Dependency):
         # These constraint have to be the last evaluated in the chain of constraints.
             
         tmpaxis = cleanAxis(create_Axis(self.refPoint, self.currentRigid.getRigidCenter()))
-        #dofpos = PointIdentityPos(tmpaxis,_dofPos,_pointconstraints)
-        #dofrot = PointIdentityRot(tmpaxis,_dofRot,_pointconstraints)
         return PointIdentity(tmpaxis, _dofPos, _dofRot, _pointconstraints)
                 
         
@@ -403,8 +401,6 @@ class DependencyPointOnLine(Dependency):
         #                        the pointconstraints which stores all point constraints of the rigid
         # These constraint have to be the last evaluated in the chain of c    
         tmpaxis = cleanAxis(create_Axis(self.refPoint, self.currentRigid.getRigidCenter()))
-        #dofpos = PointIdentityPos(tmpaxis,_dofPos,_pointconstraints)
-        #dofrot = PointIdentityRot(tmpaxis,_dofRot,_pointconstraints)
         return PointIdentity(tmpaxis, _dofPos, _dofRot, _pointconstraints)
                
 
@@ -462,9 +458,6 @@ class DependencyPointOnPlane(Dependency):
         # These constraint have to be the last evaluated in the chain of constraints.
                
         tmpaxis = cleanAxis(create_Axis(self.refPoint, self.currentRigid.getRigidCenter()))
-        
-        #dofpos = PointIdentityPos(tmpaxis,_dofPos,_pointconstraints)
-        #dofrot = PointIdentityRot(tmpaxis,_dofRot,_pointconstraints)
         return PointIdentity(tmpaxis, _dofPos, _dofRot, _pointconstraints)
         
 class DependencyCircularEdge(Dependency):
@@ -498,7 +491,7 @@ class DependencyCircularEdge(Dependency):
                 axis2.multiply(-1.0)
             self.refAxisEnd = self.refPoint.add(axis2)
             self.lockRotation = self.constraint.lockRotation
-            if abs(self.offset) > 1e-4: #solver.mySOLVER_SPIN_ACCURACY * 1e-1:
+            if abs(self.offset) > 1e-3: #solver.mySOLVER_SPIN_ACCURACY * 1e-1:
                 offsetAdjustVec = Base.Vector(axis2.x,axis2.y,axis2.z)
                 offsetAdjustVec.multiply(self.offset)
                 self.refPoint = self.refPoint.add(offsetAdjustVec)
