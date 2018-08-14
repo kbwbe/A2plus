@@ -124,6 +124,8 @@ def filterImpParts(obj):
             if (plmGlobal != plmLocal):
                 obj.Placement = plmGlobal
             impPartsOut.append(obj)                  # top level within Group
+        elif hasattr(obj,"a2p_Version"):             # assem item
+            impPartsOut.append(obj)
         else:
             pass                                     # more odd PF cases?? BaseFeature in body??
     else:
@@ -155,7 +157,7 @@ def importPartFromFile(_doc, filename, importToCache=False):
 #    importableObjects.extend(getImpPartsFromDoc(importDoc, False))     #take invisible parts too
 
     if importableObjects == None or len(importableObjects) == 0:
-        msg = translate("A2plus","No visible Part to import found. Aborting operation")
+        msg = "No visible Part to import found. Aborting operation"
         QtGui.QMessageBox.information(
             QtGui.QApplication.activeWindow(),
             "Import Error",
@@ -264,7 +266,12 @@ Check your settings of A2plus preferences.
                 )
             return
 
+        #TODO: change for multi separate part import
         importedObject = importPartFromFile(doc, filename)
+
+        if not importedObject:
+            print "imported Object is empty/none"
+            return
 
         mw = FreeCADGui.getMainWindow()
         mdi = mw.findChild(QtGui.QMdiArea)
@@ -272,8 +279,9 @@ Check your settings of A2plus preferences.
         if sub != None:
             sub.showMaximized()
 
-
-        if not importedObject.fixedPosition: #will be true for the first imported part
+# WF: how will this work for multiple imported objects?
+#     only A2p AI's will have property "fixedPosition"
+        if importedObject and not importedObject.fixedPosition:
             PartMover( view, importedObject )
         else:
             from PySide import QtCore
