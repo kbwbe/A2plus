@@ -169,7 +169,7 @@ class Rigid():
                         if linkedRig.tempfixed: #found a fully constrained obj to tempfixed rigids
                             for dep in self.depsPerLinkedRigids[linkedRig]: 
                                 #enable involved dep
-		                dep.enable([dep.currentRigid, dep.dependedRigid])
+                                dep.enable([dep.currentRigid, dep.dependedRigid])
                             candidates.append(linkedRig)
                     
         elif solverStage == PARTIAL_SOLVE_STAGE2:
