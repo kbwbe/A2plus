@@ -122,7 +122,7 @@ class Rigid():
     def enableDependencies(self, workList):
         for dep in self.dependencies:
             dep.enable(workList)
-            dep.calcRefPoints(dep.index)
+            #dep.calcRefPoints(dep.index)
 
     # The function only sets parentship for childrens that are distant+1 from fixed rigid
     # The function should be called in a loop with increased distance until it return False
@@ -164,25 +164,47 @@ class Rigid():
         candidates = []
         
         if solverStage == PARTIAL_SOLVE_STAGE1:
-            if not self.tempfixed:
-                if self.linkedTempFixedDOF():
-                    for linkedRig in self.linkedRigids:
-                        if linkedRig.tempfixed: #found a fully constrained obj to tempfixed rigids
-                            for dep in self.depsPerLinkedRigids[linkedRig]: 
+            if not self.tempfixed: #skip already fixed objs
+                #print 'current dof = ', rig.currentDOF()
+                #DebugMsg(A2P_DEBUG_1, "    {}\n".format(self.label))
+                a = self.label
+                if self.linkedTempFixedDOF()==0: #found a fully constrained obj to tempfixed rigids
+                    for j in self.depsPerLinkedRigids.keys(): #look on each linked obj
+                        if j.tempfixed: #the linked rigid is already fixed
+                            for dep in self.depsPerLinkedRigids[j]: 
                                 #enable involved dep
-                                if not dep.Done:
-                                    dep.enable([dep.currentRigid, dep.dependedRigid])
-                            candidates.append(linkedRig)
+                                if not dep.Done and not dep.Enabled:
+                                    #dep.enable([dep.currentRigid, dep.dependedRigid])
+                                    candidates.extend([dep.currentRigid, dep.dependedRigid])                                        
+                                    DebugMsg(A2P_DEBUG_1, "        {}\n".format(dep))
+                    #if len(outputRigidList)>0: #found something!
+                        #print '        Solve them!'                            
+            
                     
-        elif solverStage == PARTIAL_SOLVE_STAGE2:
-            for linkedRig in self.linkedRigids:
-                if linkedRig.tempfixed: continue
-                if linkedRig.areAllParentTempFixed():
-                    for dep in self.depsPerLinkedRigids[linkedRig]: 
-                        #enable involved dep
-                        if not dep.Done:
-                            dep.enable([dep.currentRigid, dep.dependedRigid])
-                    candidates.append(linkedRig)
+        elif solverStage == PARTIAL_SOLVE_STAGE2:  
+            #solve all rigid constrained ONLY to tempfixed rigid, 
+            #enable only involved dep, then set them as tempfixed        
+            
+            if not self.tempfixed: #skip already fixed objs  
+                                
+                if self.areAllParentTempFixed(): #linked only to fixed rigids                                                
+                    DebugMsg(A2P_DEBUG_1, "    {}\n".format(self.label))
+                    #print rig.linkedRigids 
+                    if not self.checkIfAllDone():                              
+                        #all linked rigid are tempfixed, so solve it now    
+                        #print rig.label
+                        for j in self.depsPerLinkedRigids.keys(): #look again on each linked obj
+                            #outputRigidList.append(j)
+                            #print 'Rigid ', j.label
+                            for dep in self.depsPerLinkedRigids[j]: 
+                                
+                                #enable involved dep
+                                if not dep.Done and not dep.Enabled:
+                                    #dep.enable([dep.currentRigid, dep.dependedRigid])
+                                    candidates.extend([dep.currentRigid, dep.dependedRigid])
+                                    #self.solvedCounter += 1
+                                    DebugMsg(A2P_DEBUG_1, "        {}\n".format(dep))
+            
         
         elif solverStage == PARTIAL_SOLVE_STAGE3:
             pass
@@ -191,15 +213,16 @@ class Rigid():
             pass
 
         elif solverStage == PARTIAL_SOLVE_STAGE5:
-            for linkedRig in self.linkedRigids:
-                if linkedRig.tempfixed: continue
-                for dep in self.depsPerLinkedRigids[linkedRig]: 
-                    #enable involved dep
-                    if not dep.Done:
-                        dep.enable([dep.currentRigid, dep.dependedRigid])
-                candidates.append(linkedRig)
+            if not self.tempfixed:
+                for dep in self.dependencies:
+                    if not dep.Done and not dep.Enabled:
+                        #dep.enable([dep.currentRigid, dep.dependedRigid])
+                        DebugMsg(A2P_DEBUG_1, "        {}\n".format(dep))
+                        candidates.extend([dep.currentRigid, dep.dependedRigid])
+                
 
-        return set(candidates)
+        #candidates = list(set(candidates))
+        return candidates#something match, return it to solver
     
     def addChildrenByDistance(self, addList, distance):
         # Current rigid is the father of the needed distance, so it might have needed children
@@ -231,6 +254,7 @@ class Rigid():
         # Update dependencies
         for dep in self.dependencies:
             dep.applyPlacement(pl)
+            #dep.calcRefPoints(dep.index)
 
     def clear(self):
         for d in self.dependencies:
@@ -262,10 +286,9 @@ class Rigid():
         newSpinCenter = Base.Vector(0,0,0)
         countRefPoints = 0
         for dep in self.dependencies:
-            if dep.Enabled:  #handle only enabled constraints
-                if dep.refPoint != None:
-                    newSpinCenter = newSpinCenter.add(dep.refPoint)
-                    countRefPoints += 1
+            if dep.refPoint != None:
+                newSpinCenter = newSpinCenter.add(dep.refPoint)
+                countRefPoints += 1
         if countRefPoints > 0:
             newSpinCenter.multiply(1.0/countRefPoints)
             self.spinCenter = newSpinCenter
@@ -298,7 +321,7 @@ class Rigid():
         self.moveVectorSum = Base.Vector(0,0,0)
 
         for dep in self.dependencies:
-            if dep.Enabled:  #handle only enable constraints
+            if dep.Enabled:
                 refPoint, moveVector = dep.getMovement()
                 if refPoint is None or moveVector is None: continue     # Should not happen
     
@@ -342,23 +365,21 @@ class Rigid():
             #adjust axis' of the dependencies //FIXME (align,opposed,none)
 
             for dep in self.dependencies:
-                if dep.Enabled:  #handle only enable constraints
+                if dep.Enabled:
                     rotation = dep.getRotation(solver)
     
                     if rotation is None: continue       # No rotation for that dep
     
-                    
-    
                     # Accumulate all rotations for later average calculation
                     self.spin = self.spin.add(rotation)
                     self.countSpinVectors += 1
-                    
+    
                     # Calculate max rotation error
                     axisErr = self.spin.Length
                     if axisErr > self.maxAxisError : self.maxAxisError = axisErr
 
     def move(self,doc):
-        if self.tempfixed or not self.checkIfInvolved(): return
+        if self.tempfixed: return
         #
         #Linear moving of a rigid
         moveDist = Base.Vector(0,0,0)
@@ -422,7 +443,7 @@ class Rigid():
     
     
     def linkedTempFixedDOF(self):
-        pointConstraints = []
+        self.pointConstraints = []
         _dofPos = a2p_libDOF.initPosDOF
         _dofRot = a2p_libDOF.initRotDOF
         self.reorderDependencies()
