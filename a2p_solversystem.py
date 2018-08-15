@@ -50,7 +50,7 @@ from a2p_dependencies import Dependency
 from a2p_rigid import Rigid
 import os, sys
 from os.path import expanduser
-from test.test_MimeWriter import OUTPUT
+#from test.test_MimeWriter import OUTPUT
 
 
 SOLVER_MAXSTEPS = 300000
