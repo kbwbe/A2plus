@@ -64,6 +64,7 @@ from a2p_libDOF import (
     SystemZAxis
     )
 import os, sys
+from __builtin__ import False
 
 
 SPINSTEP_DIVISOR = 12.0
@@ -163,15 +164,12 @@ class Rigid():
         candidates = []
         
         if solverStage == PARTIAL_SOLVE_STAGE1:
-            if not self.tempfixed:
-                if self.linkedTempFixedDOF():
-                    for linkedRig in self.linkedRigids:
-                        if linkedRig.tempfixed: #found a fully constrained obj to tempfixed rigids
-                            for dep in self.depsPerLinkedRigids[linkedRig]: 
-                                #enable involved dep
-                                dep.enable([dep.currentRigid, dep.dependedRigid])
-                            candidates.append(linkedRig)
-                    
+            for linkedRig in self.linkedRigids:
+                if not linkedRig.tempfixed:
+                    if self.isFullyConstrainedTo(linkedRig):
+                        candidates.append(linkedRig)
+                        #Msg("append Candidate {}\n".format(linkedRig.objectName))
+        
         elif solverStage == PARTIAL_SOLVE_STAGE2:
             for linkedRig in self.linkedRigids:
                 if linkedRig.tempfixed: continue
@@ -191,7 +189,8 @@ class Rigid():
             for linkedRig in self.linkedRigids:
                 if linkedRig.tempfixed: continue
                 for dep in self.depsPerLinkedRigids[linkedRig]: 
-                    #enable involved dep
+                    #enable involved dep                            candidates.append(linkedRig)
+
                     dep.enable([dep.currentRigid, dep.dependedRigid])
                 candidates.append(linkedRig)
 
@@ -401,6 +400,14 @@ class Rigid():
         self.currentDOFCount = len(self.posDOF) + len(self.rotDOF)
         return self.currentDOFCount
     
+    def isFullyConstrainedTo(self,rig):
+        if rig not in self.linkedRigids:
+            return False
+        dofPOS = self.dofPOSPerLinkedRigids[rig]
+        dofROT = self.dofROTPerLinkedRigids[rig]
+        if len(dofPOS) + len(dofROT) == 0:
+            return True
+        return False
     
     def linkedTempFixedDOF(self):
         pointConstraints = []
