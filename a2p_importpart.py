@@ -284,7 +284,7 @@ Check your settings of A2plus preferences.
         importedObject = importPartFromFile(doc, filename)
 
         if not importedObject:
-            print "imported Object is empty/none"
+            a2plib.Msg("imported Object is empty/none\n")
             return
 
         mw = FreeCADGui.getMainWindow()
