@@ -189,7 +189,7 @@ class SolverSystem():
         self.retrieveDOFInfo() #function only once used here at this place in whole program
         for rig in self.rigids:
             rig.currentDOF()
-            rig.beautyDOFPrint()
+            #rig.beautyDOFPrint()
             numdep+=rig.countDependencies()
         Msg( 'there are {} dependencies\n'.format(numdep/2))       
         self.status = "loaded"
@@ -410,13 +410,15 @@ class SolverSystem():
             addList = []
             for rig in workList:
                 addList.extend(rig.getCandidates(solverStage))
+            addList = set(addList)
+            Msg("\n")
+            Msg("solverStage = {}\n".format(solverStage))
+            self.printList("AddList", addList)
+            Msg("solve them!\n")
             if len(addList) == 0:
                 solverStage += 1
                 continue
             # Eliminate duplicates
-            addList = set(addList)
-            if A2P_DEBUG_LEVEL >= A2P_DEBUG_1:
-                self.printList("AddList", addList)
             workList.extend(addList)
             solutionFound = self.calculateWorkList(doc, workList, mode)
             if not solutionFound: return False

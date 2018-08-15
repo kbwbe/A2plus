@@ -168,15 +168,11 @@ class Rigid():
                 if not linkedRig.tempfixed:
                     if self.isFullyConstrainedTo(linkedRig):
                         candidates.append(linkedRig)
-                        #Msg("append Candidate {}\n".format(linkedRig.objectName))
         
         elif solverStage == PARTIAL_SOLVE_STAGE2:
             for linkedRig in self.linkedRigids:
                 if linkedRig.tempfixed: continue
                 if linkedRig.areAllParentTempFixed():
-                    for dep in self.depsPerLinkedRigids[linkedRig]: 
-                        #enable involved dep
-                        dep.enable([dep.currentRigid, dep.dependedRigid])
                     candidates.append(linkedRig)
         
         elif solverStage == PARTIAL_SOLVE_STAGE3:
