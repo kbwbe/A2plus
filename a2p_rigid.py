@@ -64,7 +64,7 @@ from a2p_libDOF import (
     SystemZAxis
     )
 import os, sys
-from __builtin__ import False
+#from __builtin__ import False
 
 
 SPINSTEP_DIVISOR = 12.0
