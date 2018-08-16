@@ -73,8 +73,11 @@ class ImportedPartViewProviderProxy:
         return None
 
     def attach(self, vobj):
+        default = coin.SoGroup()
+        vobj.addDisplayMode(default, "Standard")
         self.object_Name = vobj.Object.Name
         self.Object = vobj.Object
+        
 
     def setupContextMenu(self, ViewObject, popup_menu):
         pass

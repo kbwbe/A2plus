@@ -115,6 +115,8 @@ class ViewProviderSimpleAssemblyShape:
         return a2plib.path_a2p + '/icons/SimpleAssemblyShape.svg'
 
     def attach(self, obj):
+        default = coin.SoGroup()
+        obj.addDisplayMode(default, "Standard")
         self.object_Name = obj.Object.Name
         self.Object = obj.Object
 
