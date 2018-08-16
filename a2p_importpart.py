@@ -224,6 +224,7 @@ def importPartFromFile(_doc, filename, importToCache=False):
         if appVersionStr() <= '000.016': #FC0.17: DiffuseColor overrides ShapeColor !
             newObj.ViewObject.DiffuseColor = tmpObj.ViewObject.DiffuseColor
         newObj.muxInfo = createTopoInfo(tmpObj)
+        newObj.ViewObject.Transparency = tmpObj.ViewObject.Transparency
 
     newObj.Proxy = Proxy_muxAssemblyObj()
     newObj.ViewObject.Proxy = ImportedPartViewProviderProxy()
@@ -366,6 +367,7 @@ def updateImportedParts(doc):
                     savedPlacement  = obj.Placement
                     obj.Shape = newObject.Shape.copy()
                     obj.ViewObject.DiffuseColor = copy.copy(newObject.ViewObject.DiffuseColor)
+                    obj.ViewObject.Transparency = newObject.ViewObject.Transparency
                     obj.Placement = savedPlacement # restore the old placement
 
     mw = FreeCADGui.getMainWindow()
@@ -427,6 +429,7 @@ def duplicateImportedPart( part ):
         if hasattr(newObj.ViewObject, p) and p not in ['DiffuseColor','Proxy','MappedColors']:
             setattr(newObj.ViewObject, p, getattr( part.ViewObject, p))
     newObj.ViewObject.DiffuseColor = copy.copy( part.ViewObject.DiffuseColor )
+    newObj.ViewObject.Transparency = part.ViewObject.Transparency
     newObj.Proxy = Proxy_importPart()
     newObj.ViewObject.Proxy = ImportedPartViewProviderProxy()
     newObj.Placement.Base = part.Placement.Base
