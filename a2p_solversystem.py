@@ -420,18 +420,38 @@ class SolverSystem():
                 continue
             # Eliminate duplicates
             workList.extend(addList)
-            solutionFound = self.calculateWorkList(doc, workList, mode)
+            solutionFound = self.calculateWorkList(doc, workList, mode, solverStage)
+            if solverStage == PARTIAL_SOLVE_STAGE2:
+                solverStage = PARTIAL_SOLVE_STAGE1
             if not solutionFound: return False
 
         return True
 
-    def calculateWorkList(self, doc, workList, mode):
+    def calculateWorkList(self, doc, workList, mode, solverStage=None):
+        if mode == "partial":
+            if solverStage != None and solverStage == PARTIAL_SOLVE_STAGE1:
+                reqPosAccuracy = self.mySOLVER_POS_ACCURACY *0.01
+                reqSpinAccuracy = self.mySOLVER_SPIN_ACCURACY *0.01
+            elif solverStage != None and solverStage == PARTIAL_SOLVE_STAGE2:
+                reqPosAccuracy = self.mySOLVER_POS_ACCURACY *0.1
+                reqSpinAccuracy = self.mySOLVER_SPIN_ACCURACY *0.1
+            else:
+                reqPosAccuracy = self.mySOLVER_POS_ACCURACY
+                reqSpinAccuracy = self.mySOLVER_SPIN_ACCURACY
+        else:
+            reqPosAccuracy = self.mySOLVER_POS_ACCURACY
+            reqSpinAccuracy = self.mySOLVER_SPIN_ACCURACY
+                
+        
+        
         if A2P_DEBUG_LEVEL >= A2P_DEBUG_1:
             self.printList("WorkList", workList)
 
         for rig in workList:
             rig.enableDependencies(workList)
-        rig.calcSpinCenter()
+        for rig in workList:
+            rig.calcSpinCenter()
+            rig.calcRefPointsBoundBoxSize()
 
         self.lastPositionError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
         self.lastAxisError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
@@ -462,8 +482,8 @@ class SolverSystem():
                 #FreeCADGui.updateGui()
 
             # The accuracy is good, apply the solution to FreeCAD's objects
-            if (maxPosError <= self.mySOLVER_POS_ACCURACY and
-                maxAxisError <= self.mySOLVER_SPIN_ACCURACY):
+            if (maxPosError <= reqPosAccuracy and
+                maxAxisError <= reqSpinAccuracy):
                 # The accuracy is good, we're done here
                 goodAccuracy = True
                 # Mark the rigids as tempfixed and add its constrained rigids to pending list to be processed next
