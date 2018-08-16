@@ -166,28 +166,34 @@ class Rigid():
         if solverStage == PARTIAL_SOLVE_STAGE1:
             for linkedRig in self.linkedRigids:
                 if not linkedRig.tempfixed:
-                    if self.isFullyConstrainedTo(linkedRig):
+                    if self.isFullyConstrainedByRigid(linkedRig):
                         candidates.append(linkedRig)
         
         elif solverStage == PARTIAL_SOLVE_STAGE2:
+            for linkedRig in self.linkedRigids:
+                if not linkedRig.tempfixed:
+                    '''
+                    Msg( "Rigid {} isFullyConstrainedByFixed: {}\n".format(
+                            linkedRig.objectName,
+                            linkedRig.isFullyConstrainedByFixedRigids()
+                            )
+                        )
+                    '''
+                    if linkedRig.isFullyConstrainedByFixedRigids():
+                        candidates.append(linkedRig)
+
+        elif solverStage == PARTIAL_SOLVE_STAGE3:
             for linkedRig in self.linkedRigids:
                 if linkedRig.tempfixed: continue
                 if linkedRig.areAllParentTempFixed():
                     candidates.append(linkedRig)
         
-        elif solverStage == PARTIAL_SOLVE_STAGE3:
-            pass
-
         elif solverStage == PARTIAL_SOLVE_STAGE4:
             pass
 
         elif solverStage == PARTIAL_SOLVE_STAGE5:
             for linkedRig in self.linkedRigids:
                 if linkedRig.tempfixed: continue
-                for dep in self.depsPerLinkedRigids[linkedRig]: 
-                    #enable involved dep                            candidates.append(linkedRig)
-
-                    dep.enable([dep.currentRigid, dep.dependedRigid])
                 candidates.append(linkedRig)
 
         return set(candidates)
@@ -225,7 +231,7 @@ class Rigid():
         self.superRigid = None
 
     def applySolution(self, doc, solver):
-        if self.tempfixed: return
+        if self.tempfixed or self.fixed: return
 
         # Update FreeCAD's placements if deltaPlacement above Tolerances
         base1 = self.placement.Base
@@ -236,7 +242,7 @@ class Rigid():
         axis2 = self.savedPlacement.Rotation.Axis
         angle = math.degrees(axis2.getAngle(axis1))
 
-        if absPosMove >= solver.mySOLVER_POS_ACCURACY*1e-2 or angle >= solver.mySOLVER_SPIN_ACCURACY*1e-1:
+        if absPosMove >= solver.mySOLVER_POS_ACCURACY*1e-2 or angle >= solver.mySOLVER_SPIN_ACCURACY*1e-2:
             ob1 = doc.getObject(self.objectName)
             ob1.Placement = self.placement
 
@@ -248,10 +254,9 @@ class Rigid():
         newSpinCenter = Base.Vector(0,0,0)
         countRefPoints = 0
         for dep in self.dependencies:
-            if dep.Enabled:  #handle only enabled constraints
-                if dep.refPoint != None:
-                    newSpinCenter = newSpinCenter.add(dep.refPoint)
-                    countRefPoints += 1
+            if dep.refPoint != None:
+                newSpinCenter = newSpinCenter.add(dep.refPoint)
+                countRefPoints += 1
         if countRefPoints > 0:
             newSpinCenter.multiply(1.0/countRefPoints)
             self.spinCenter = newSpinCenter
@@ -273,8 +278,7 @@ class Rigid():
         self.refPointsBoundBoxSize = math.sqrt( (xmax-xmin)**2 + (ymax-ymin)**2 + (zmax-zmin)**2 )
 
     def calcMoveData(self, doc, solver):
-        if self.tempfixed: return
-        
+        if self.tempfixed or self.fixed: return
         depRefPoints = []
         depMoveVectors = [] #collect Data to compute central movement of rigid
         #
@@ -284,18 +288,17 @@ class Rigid():
         self.moveVectorSum = Base.Vector(0,0,0)
 
         for dep in self.dependencies:
-            if dep.Enabled:  #handle only enable constraints
-                refPoint, moveVector = dep.getMovement()
-                if refPoint is None or moveVector is None: continue     # Should not happen
-    
-                depRefPoints.append(refPoint)
-                depMoveVectors.append(moveVector)
-    
-                # Calculate max move error
-                if moveVector.Length > self.maxPosError: self.maxPosError = moveVector.Length
-    
-                # Accomulate all the movements for later average calculations
-                self.moveVectorSum = self.moveVectorSum.add(moveVector)
+            refPoint, moveVector = dep.getMovement()
+            if refPoint is None or moveVector is None: continue     # Should not happen
+
+            depRefPoints.append(refPoint)
+            depMoveVectors.append(moveVector)
+
+            # Calculate max move error
+            if moveVector.Length > self.maxPosError: self.maxPosError = moveVector.Length
+
+            # Accomulate all the movements for later average calculations
+            self.moveVectorSum = self.moveVectorSum.add(moveVector)
 
         # Calculate the average of all the movements
         if len(depMoveVectors) > 0:
@@ -328,23 +331,20 @@ class Rigid():
             #adjust axis' of the dependencies //FIXME (align,opposed,none)
 
             for dep in self.dependencies:
-                if dep.Enabled:  #handle only enable constraints
-                    rotation = dep.getRotation(solver)
-    
-                    if rotation is None: continue       # No rotation for that dep
-    
-                    
-    
-                    # Accumulate all rotations for later average calculation
-                    self.spin = self.spin.add(rotation)
-                    self.countSpinVectors += 1
-                    
-                    # Calculate max rotation error
-                    axisErr = self.spin.Length
-                    if axisErr > self.maxAxisError : self.maxAxisError = axisErr
+                rotation = dep.getRotation(solver)
+
+                if rotation is None: continue       # No rotation for that dep
+
+                # Accumulate all rotations for later average calculation
+                self.spin = self.spin.add(rotation)
+                self.countSpinVectors += 1
+
+                # Calculate max rotation error
+                axisErr = self.spin.Length
+                if axisErr > self.maxAxisError : self.maxAxisError = axisErr
 
     def move(self,doc):
-        if self.tempfixed: return
+        if self.tempfixed or self.fixed: return
         #
         #Linear moving of a rigid
         moveDist = Base.Vector(0,0,0)
@@ -396,7 +396,7 @@ class Rigid():
         self.currentDOFCount = len(self.posDOF) + len(self.rotDOF)
         return self.currentDOFCount
     
-    def isFullyConstrainedTo(self,rig):
+    def isFullyConstrainedByRigid(self,rig):
         if rig not in self.linkedRigids:
             return False
         dofPOS = self.dofPOSPerLinkedRigids[rig]
@@ -404,6 +404,21 @@ class Rigid():
         if len(dofPOS) + len(dofROT) == 0:
             return True
         return False
+    
+    def isFullyConstrainedByFixedRigids(self):
+        _dofPos = a2p_libDOF.initPosDOF
+        _dofRot = a2p_libDOF.initRotDOF
+        self.reorderDependencies()
+        if len(self.dependencies) > 0:            
+            for dep in self.dependencies:
+                if dep.dependedRigid.tempfixed:
+                    _dofPos, _dofRot = dep.calcDOF(_dofPos,_dofRot, self.pointConstraints)
+        else:
+            return False
+        if len(_dofPos) + len(_dofRot):
+            return False
+        else:
+            return True
     
     def linkedTempFixedDOF(self):
         pointConstraints = []

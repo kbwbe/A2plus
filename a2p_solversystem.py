@@ -241,7 +241,6 @@ class SolverSystem():
     def assignParentship(self, doc):
         # Start from fixed parts
         for rig in self.rigids:
-            
             if rig.fixed:
                 rig.disatanceFromFixed = 0
                 haveMore = True
@@ -298,9 +297,6 @@ class SolverSystem():
         f.write("</body>")
         f.write("</html>")
         f.close()
-        #import WebGui
-        #str = "file://",out_file
-        #WebGui.openBrowser(str.__str__()) 
 
     def calcMoveData(self,doc):
         for rig in self.rigids:
@@ -330,11 +326,10 @@ class SolverSystem():
             if systemSolved:
                 self.mySOLVER_SPIN_ACCURACY *= 1e-1
                 self.mySOLVER_POS_ACCURACY *= 1e-1
-                Msg( '--->LEVEL OF ACCURACY :{}\n'.format(self.level_of_accuracy) )
+                Msg( '--->SOLVED WITH LEVEL OF ACCURACY :{}\n'.format(self.level_of_accuracy) )
                 self.level_of_accuracy+=1
                 if self.level_of_accuracy == MAX_LEVEL_ACCURACY:
                     self.solutionToParts(doc)
-                    #FreeCADGui.updateGui()
                     break
                 self.prepareRestart()
             else:
@@ -361,7 +356,6 @@ class SolverSystem():
             mode = 'magnetic'
             systemSolved = self.solveSystemWithMode(doc,mode)
         if systemSolved:
-            
             self.status = "solved"
             Msg( "===== System solved ! by using mode {} =====".format(mode) )
         else:
@@ -420,18 +414,35 @@ class SolverSystem():
                 continue
             # Eliminate duplicates
             workList.extend(addList)
-            solutionFound = self.calculateWorkList(doc, workList, mode)
+            solutionFound = self.calculateWorkList(doc, workList, mode, solverStage)
+            if solverStage == PARTIAL_SOLVE_STAGE2:
+                solverStage = PARTIAL_SOLVE_STAGE1
             if not solutionFound: return False
 
         return True
 
-    def calculateWorkList(self, doc, workList, mode):
+    def calculateWorkList(self, doc, workList, mode, solverStage=None):
+        if mode == "partial":
+            if solverStage != None and solverStage == PARTIAL_SOLVE_STAGE1:
+                reqPosAccuracy = self.mySOLVER_POS_ACCURACY *0.01
+                reqSpinAccuracy = self.mySOLVER_SPIN_ACCURACY *0.01
+            elif solverStage != None and solverStage == PARTIAL_SOLVE_STAGE2:
+                reqPosAccuracy = self.mySOLVER_POS_ACCURACY *0.1
+                reqSpinAccuracy = self.mySOLVER_SPIN_ACCURACY *0.1
+            else:
+                reqPosAccuracy = self.mySOLVER_POS_ACCURACY
+                reqSpinAccuracy = self.mySOLVER_SPIN_ACCURACY
+        else:
+            reqPosAccuracy = self.mySOLVER_POS_ACCURACY
+            reqSpinAccuracy = self.mySOLVER_SPIN_ACCURACY
+                
+        
+        
         if A2P_DEBUG_LEVEL >= A2P_DEBUG_1:
             self.printList("WorkList", workList)
 
         for rig in workList:
             rig.enableDependencies(workList)
-        rig.calcSpinCenter()
 
         self.lastPositionError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
         self.lastAxisError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
@@ -462,14 +473,12 @@ class SolverSystem():
                 #FreeCADGui.updateGui()
 
             # The accuracy is good, apply the solution to FreeCAD's objects
-            if (maxPosError <= self.mySOLVER_POS_ACCURACY and
-                maxAxisError <= self.mySOLVER_SPIN_ACCURACY):
+            if (maxPosError <= reqPosAccuracy and
+                maxAxisError <= reqSpinAccuracy):
                 # The accuracy is good, we're done here
                 goodAccuracy = True
                 # Mark the rigids as tempfixed and add its constrained rigids to pending list to be processed next
                 DebugMsg(A2P_DEBUG_1, "{} counts \n".format(calcCount) )
-                #self.prnPlacement()
-                
                 for r in workList:
                     r.applySolution(doc, self)
                     r.tempfixed = True
@@ -502,11 +511,7 @@ def solveConstraints( doc, cache=None ):
     ss = SolverSystem()
     ss.solveSystem(doc)
     doc.commitTransaction()
-    try:
-        doc.recompute()
-    except:
-        pass
-    
+
 def autoSolveConstraints( doc, cache=None):
     if not a2plib.getAutoSolveState():
         return
