@@ -564,7 +564,7 @@ class DeleteConnectionsCommand:
         selection = [s for s in FreeCADGui.Selection.getSelection() if s.Document == FreeCAD.ActiveDocument ]
         #if len(selection) == 1: not required as this check is done in initGui
         # WF: still get 'list index out of range' if nothing selected.
-        if len(selection != 1):
+        if len(selection) != 1:
             QtGui.QMessageBox.critical(
                 QtGui.QApplication.activeWindow(),
                "Selection Error",
