@@ -166,18 +166,28 @@ class Rigid():
         if solverStage == PARTIAL_SOLVE_STAGE1:
             for linkedRig in self.linkedRigids:
                 if not linkedRig.tempfixed:
-                    if self.isFullyConstrainedTo(linkedRig):
+                    if self.isFullyConstrainedByRigid(linkedRig):
                         candidates.append(linkedRig)
         
         elif solverStage == PARTIAL_SOLVE_STAGE2:
+            for linkedRig in self.linkedRigids:
+                if not linkedRig.tempfixed:
+                    '''
+                    Msg( "Rigid {} isFullyConstrainedByFixed: {}\n".format(
+                            linkedRig.objectName,
+                            linkedRig.isFullyConstrainedByFixedRigids()
+                            )
+                        )
+                    '''
+                    if linkedRig.isFullyConstrainedByFixedRigids():
+                        candidates.append(linkedRig)
+
+        elif solverStage == PARTIAL_SOLVE_STAGE3:
             for linkedRig in self.linkedRigids:
                 if linkedRig.tempfixed: continue
                 if linkedRig.areAllParentTempFixed():
                     candidates.append(linkedRig)
         
-        elif solverStage == PARTIAL_SOLVE_STAGE3:
-            pass
-
         elif solverStage == PARTIAL_SOLVE_STAGE4:
             pass
 
@@ -396,7 +406,7 @@ class Rigid():
         self.currentDOFCount = len(self.posDOF) + len(self.rotDOF)
         return self.currentDOFCount
     
-    def isFullyConstrainedTo(self,rig):
+    def isFullyConstrainedByRigid(self,rig):
         if rig not in self.linkedRigids:
             return False
         dofPOS = self.dofPOSPerLinkedRigids[rig]
@@ -404,6 +414,21 @@ class Rigid():
         if len(dofPOS) + len(dofROT) == 0:
             return True
         return False
+    
+    def isFullyConstrainedByFixedRigids(self):
+        _dofPos = a2p_libDOF.initPosDOF
+        _dofRot = a2p_libDOF.initRotDOF
+        self.reorderDependencies()
+        if len(self.dependencies) > 0:            
+            for dep in self.dependencies:
+                if dep.dependedRigid.tempfixed:
+                    _dofPos, _dofRot = dep.calcDOF(_dofPos,_dofRot, self.pointConstraints)
+        else:
+            return False
+        if len(_dofPos) + len(_dofRot):
+            return False
+        else:
+            return True
     
     def linkedTempFixedDOF(self):
         pointConstraints = []
