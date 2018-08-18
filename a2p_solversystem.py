@@ -41,6 +41,7 @@ from a2plib import (
     appVersionStr,
     Msg,
     DebugMsg,
+    A2P_MOVIMODE,
     A2P_DEBUG_LEVEL,
     A2P_DEBUG_1,
     A2P_DEBUG_2,
@@ -506,11 +507,42 @@ class SolverSystem():
             rig.applySolution(doc, self);
 
 #------------------------------------------------------------------------------
-def solveConstraints( doc, cache=None ):
+def solveConstraints_OperationalMode( doc, cache=None ):
+    '''
+    Normal solving. Parts are moved according
+    required level of accuracy
+    '''
     doc.openTransaction("a2p_systemSolving")
     ss = SolverSystem()
     ss.solveSystem(doc)
     doc.commitTransaction()
+
+def solveConstraints_MoviMode( doc, cache=None ):
+    '''
+    Test solving mode. Solver does only some steps.
+    You can view the movement of parts on screen.
+    Used for approving of dependencies for correct operations
+    '''
+    doc.openTransaction("a2p_systemSolving")
+    ss = SolverSystem()
+    ss.loadSystem(doc)
+    for rig in ss.rigids:
+        rig.enableDependencies(ss.rigids)
+    for i in range(0,10):
+        for r in ss.rigids:
+            r.calcMoveData(doc, ss)
+        for r in ss.rigids:
+            r.move(doc)
+            # Enable those 2 lines to see the computation progress on screen
+            r.applySolution(doc, ss)
+            FreeCADGui.updateGui()
+    doc.commitTransaction()
+    
+def solveConstraints( doc, cache=None ):
+    if A2P_MOVIMODE: #visual solver testmode, some visual solversteps on screen
+        solveConstraints_MoviMode(doc, cache=None)
+    else:
+        solveConstraints_OperationalMode(doc, cache=None) #Normal solver mode
 
 def autoSolveConstraints( doc, cache=None):
     if not a2plib.getAutoSolveState():
