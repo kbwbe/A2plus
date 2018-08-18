@@ -52,6 +52,10 @@ RED = (1.0,0.0,0.0)
 GREEN = (0.0,1.0,0.0)
 BLUE = (0.0,0.0,1.0)
 
+# Activate a Testmode, solving does only some steps,
+# you can see Movement of parts on screen
+A2P_MOVIMODE        = False 
+
 # DEFINE DEBUG LEVELS FOR CONSOLE OUTPUT
 A2P_DEBUG_NONE      = 0
 A2P_DEBUG_1         = 1
