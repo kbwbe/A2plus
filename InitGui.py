@@ -36,7 +36,12 @@ class a2pWorkbench (Workbench):
         self.__class__.ToolTip  = 'An other assembly workbench for FreeCAD'
 
     def Initialize(self):
-        import a2p_Resources
+        import sys
+        PyVersion = sys.version_info[0]
+        if PyVersion == 2:
+            import a2p_Resources2
+        else:
+            import a2p_Resources3
         import a2plib #QtCore.QResource.registerResource happens in assembly2lib
         import a2p_importpart
         import a2p_CircularEdgeConnection
