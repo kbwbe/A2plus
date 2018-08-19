@@ -474,6 +474,17 @@ class SolverSystem():
                         self.lastPositionError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
                         self.lastAxisError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
                         self.convergencyCounter = 0
+                        Msg("restart with some unfixed parts\n")
+                        tempfixedRigids = []
+                        for rig in workList:
+                            if rig.tempfixed: tempfixedRigids.append(rig)
+                        self.printList("temfixed parts:", tempfixedRigids)
+                        unfixedRigids = []
+                        for rig in workList:
+                            if not rig.tempfixed: unfixedRigids.append(rig)
+                        self.printList("unfixed parts:", unfixedRigids)
+                        Msg("\n")
+                        
                         continue
                     else:            
                         Msg('\n')
