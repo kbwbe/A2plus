@@ -308,7 +308,7 @@ class SolverSystem():
             rig.prepareRestart()
         self.partialSolverCurrentStage = PARTIAL_SOLVE_STAGE1
 
-    def solveSystemWithMode(self,doc, mode):
+    def solveAccuracySteps(self,doc):
         self.level_of_accuracy=1
 
         startTime = int(round(time.time() * 1000))
@@ -318,7 +318,7 @@ class SolverSystem():
         self.assignParentship(doc)
         loadTime = int(round(time.time() * 1000))
         while True:
-            systemSolved = self.calculateChain(doc, mode)
+            systemSolved = self.calculateChain(doc)
             totalTime = int(round(time.time() * 1000))
             DebugMsg(A2P_DEBUG_1, "Total steps used: %d\n" %  self.stepCount)
             DebugMsg(A2P_DEBUG_1, "LoadTime (ms): %d\n" % (loadTime - startTime) )
@@ -332,8 +332,11 @@ class SolverSystem():
                 if self.level_of_accuracy == MAX_LEVEL_ACCURACY:
                     self.solutionToParts(doc)
                     break
-                self.prepareRestart()
+                #self.prepareRestart()
+                self.solutionToParts(doc)
+                self.loadSystem(doc)
             else:
+                self.solutionToParts(doc)
                 break
         self.mySOLVER_SPIN_ACCURACY = SOLVER_SPIN_ACCURACY
         self.mySOLVER_POS_ACCURACY = SOLVER_POS_ACCURACY
@@ -341,24 +344,19 @@ class SolverSystem():
 
     def solveSystem(self,doc):
         Msg( "\n===== Start Solving System ====== \n" )
-        if a2plib.isPartialProcessing():
-            Msg( "Solvermode = partialProcessing !\n")
-            mode = 'partial'
-        else:
-            Msg( "Solvermode = solve all Parts at once !\n")
-            mode = 'magnetic'
+        Msg( "Solvermode = partial + recursive unfixing!\n")
+        mode = 'partial'
 
-        systemSolved = self.solveSystemWithMode(doc,mode)
+        systemSolved = self.solveAccuracySteps(doc)
         if self.status == "loadingDependencyError":
             return
 
-        if not systemSolved and mode == 'partial':
-            Msg( "Could not solve system with partial processing, switch to 'magnetic' mode  \n" )
-            mode = 'magnetic'
-            systemSolved = self.solveSystemWithMode(doc,mode)
+        if not systemSolved:
+            Msg( "Could not solve system, try a reload()\n" )
+            systemSolved = self.solveAccuracySteps(doc)
         if systemSolved:
             self.status = "solved"
-            Msg( "===== System solved ! by using mode {} =====".format(mode) )
+            Msg( "===== System solved using partial + recursive unfixing =====")
         else:
             self.status = "unsolved"
             Msg( "===== Could not solve system ====== \n" )
@@ -381,18 +379,11 @@ class SolverSystem():
             Msg( "{} ".format(e.label) )
         Msg("):\n")
 
-    def calculateChain(self, doc, mode):
+    def calculateChain(self, doc):
         self.stepCount = 0
-        
-        if mode == 'magnetic':
-            workList = []
-            workList.extend(self.rigids)
-            solutionFound = self.calculateWorkList(doc, workList, mode)
-            return solutionFound
         
         # mode is 'partial' now definitely!
         workList = []
-        solverStage = PARTIAL_SOLVE_STAGE1
 
         # load initial worklist with all fixed parts...
         for rig in self.rigids:
@@ -400,50 +391,29 @@ class SolverSystem():
                 workList.append(rig);
         self.printList("Initial-Worklist", workList)
 
-        # Do all necessary solverStages...
-        while solverStage != PARTIAL_SOLVE_END:
+        while True:
             addList = []
             for rig in workList:
-                addList.extend(rig.getCandidates(solverStage))
+                addList.extend(rig.getCandidates())
             addList = set(addList)
-            Msg("\n")
-            Msg("solverStage = {}\n".format(solverStage))
             self.printList("AddList", addList)
-            Msg("solve them!\n")
-            if len(addList) == 0:
-                solverStage += 1
-                continue
-            # Eliminate duplicates
-            workList.extend(addList)
-            solutionFound = self.calculateWorkList(doc, workList, mode, solverStage)
-            if solverStage == PARTIAL_SOLVE_STAGE2:
-                solverStage = PARTIAL_SOLVE_STAGE1
-            if not solutionFound: return False
+            if len(addList) > 0:
+                workList.extend(addList)
+                solutionFound = self.calculateWorkList(doc, workList)
+                if not solutionFound: return False
+            else:
+                break
 
         return True
 
-    def calculateWorkList(self, doc, workList, mode, solverStage=None):
-        if mode == "partial":
-            if solverStage != None and solverStage == PARTIAL_SOLVE_STAGE1:
-                reqPosAccuracy = self.mySOLVER_POS_ACCURACY *0.01
-                reqSpinAccuracy = self.mySOLVER_SPIN_ACCURACY *0.01
-            elif solverStage != None and solverStage == PARTIAL_SOLVE_STAGE2:
-                reqPosAccuracy = self.mySOLVER_POS_ACCURACY *0.1
-                reqSpinAccuracy = self.mySOLVER_SPIN_ACCURACY *0.1
-            else:
-                reqPosAccuracy = self.mySOLVER_POS_ACCURACY
-                reqSpinAccuracy = self.mySOLVER_SPIN_ACCURACY
-        else:
-            reqPosAccuracy = self.mySOLVER_POS_ACCURACY
-            reqSpinAccuracy = self.mySOLVER_SPIN_ACCURACY
-                
-        
-        
-        if A2P_DEBUG_LEVEL >= A2P_DEBUG_1:
-            self.printList("WorkList", workList)
+    def calculateWorkList(self, doc, workList):
+        reqPosAccuracy = self.mySOLVER_POS_ACCURACY
+        reqSpinAccuracy = self.mySOLVER_SPIN_ACCURACY
 
         for rig in workList:
             rig.enableDependencies(workList)
+        for rig in workList:
+            rig.calcSpinBasicDataDepsEnabled()
 
         self.lastPositionError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
         self.lastAxisError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
@@ -469,9 +439,6 @@ class SolverSystem():
             # Perform the move
             for w in workList:
                 w.move(doc)
-                # Enable those 2 lines to see the computation progress on screen
-                #w.applySolution(doc, self)
-                #FreeCADGui.updateGui()
 
             # The accuracy is good, apply the solution to FreeCAD's objects
             if (maxPosError <= reqPosAccuracy and
@@ -489,16 +456,39 @@ class SolverSystem():
                     maxPosError  >= self.lastPositionError or
                     maxAxisError >= self.lastAxisError
                     ):
-                    if mode == 'magnetic':
+                    enlargedWorkList = False
+                    # search for unsolved dependencies...
+                    tempfixedRigids = []
+                    for rig in workList:
+                        if rig.tempfixed: tempfixedRigids.append(rig)
+                    for rig in workList:
+                        if rig.fixed or rig.tempfixed: continue
+                        if rig.maxAxisError >= maxAxisError or rig.maxPosError >= maxPosError:
+                            for r in rig.linkedRigids:
+                                r.tempfixed = False
+                                if r in tempfixedRigids:
+                                    Msg("unfixed Rigid {}\n".format(r.label))
+                                    enlargedWorkList = True
+                    
+                    if enlargedWorkList:
+                        self.lastPositionError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
+                        self.lastAxisError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
+                        self.convergencyCounter = 0
+                        continue
+                    else:            
+                        Msg('\n')
+                        Msg('convergency-conter: {}\n'.format(self.convergencyCounter))
                         Msg( "System not solvable, convergency is incorrect!\n" )
-                    return False
+                        return False
+                
+                
+                
                 self.lastPositionError = maxPosError
                 self.lastAxisError = maxAxisError
                 self.convergencyCounter = 0
 
             if self.stepCount > SOLVER_MAXSTEPS:
-                if mode == 'magnetic':
-                    Msg( "Reached max calculations count ({})\n".format(SOLVER_MAXSTEPS) )
+                Msg( "Reached max calculations count ({})\n".format(SOLVER_MAXSTEPS) )
                 return False
         return True
 
@@ -521,7 +511,7 @@ def solveConstraints_MoviMode( doc, cache=None ):
     '''
     Test solving mode. Solver does only some steps.
     You can view the movement of parts on screen.
-    Used for approving of dependencies for correct operations
+    Used for approving correct function of dependencies
     '''
     doc.openTransaction("a2p_systemSolving")
     ss = SolverSystem()
