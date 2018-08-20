@@ -163,6 +163,7 @@ class Rigid():
     def getCandidates(self, solverStage = None):
         candidates = []
         
+        '''
         if solverStage == PARTIAL_SOLVE_STAGE1:
             for linkedRig in self.linkedRigids:
                 if not linkedRig.tempfixed:
@@ -172,13 +173,6 @@ class Rigid():
         elif solverStage == PARTIAL_SOLVE_STAGE2:
             for linkedRig in self.linkedRigids:
                 if not linkedRig.tempfixed:
-                    '''
-                    Msg( "Rigid {} isFullyConstrainedByFixed: {}\n".format(
-                            linkedRig.objectName,
-                            linkedRig.isFullyConstrainedByFixedRigids()
-                            )
-                        )
-                    '''
                     if linkedRig.isFullyConstrainedByFixedRigids():
                         candidates.append(linkedRig)
 
@@ -192,9 +186,10 @@ class Rigid():
             pass
 
         elif solverStage == PARTIAL_SOLVE_STAGE5:
-            for linkedRig in self.linkedRigids:
-                if linkedRig.tempfixed: continue
-                candidates.append(linkedRig)
+        '''
+        for linkedRig in self.linkedRigids:
+            if linkedRig.tempfixed: continue
+            candidates.append(linkedRig)
 
         return set(candidates)
     
@@ -250,6 +245,18 @@ class Rigid():
         _currentRigid = FreeCAD.ActiveDocument.getObject(self.objectName)
         return _currentRigid.Shape.BoundBox.Center
     
+    def calcSpinCenterDepsEnabled(self):
+        newSpinCenter = Base.Vector(self.spinCenter)
+        countRefPoints = 0
+        for dep in self.dependencies:
+            if dep.Enabled:
+                if dep.refPoint != None:
+                    newSpinCenter = newSpinCenter.add(dep.refPoint)
+                    countRefPoints += 1
+        if countRefPoints > 0:
+            newSpinCenter.multiply(1.0/countRefPoints)
+            self.spinCenter = newSpinCenter
+
     def calcSpinCenter(self):
         newSpinCenter = Base.Vector(0,0,0)
         countRefPoints = 0
@@ -260,6 +267,44 @@ class Rigid():
         if countRefPoints > 0:
             newSpinCenter.multiply(1.0/countRefPoints)
             self.spinCenter = newSpinCenter
+
+    def calcSpinBasicDataDepsEnabled(self):
+        xmin = 0
+        xmax = 0
+        ymin = 0
+        ymax = 0
+        zmin = 0
+        zmax = 0
+        for dep in self.dependencies:
+            if dep.Enabled:
+                if dep.refPoint.x < xmin: xmin=dep.refPoint.x
+                if dep.refPoint.x > xmax: xmax=dep.refPoint.x
+                if dep.refPoint.y < ymin: ymin=dep.refPoint.y
+                if dep.refPoint.y > ymax: ymax=dep.refPoint.y
+                if dep.refPoint.z < zmin: zmin=dep.refPoint.z
+                if dep.refPoint.z > zmax: zmax=dep.refPoint.z
+        self.refPointsBoundBoxSize = math.sqrt( (xmax-xmin)**2 + (ymax-ymin)**2 + (zmax-zmin)**2 )
+        x = (xmax+xmin)/2.0
+        y = (ymax+ymin)/2.0
+        z = (zmax+zmin)/2.0
+        self.spinCenter = Base.Vector(x,y,z)
+        
+    def calcRefPointsBoundBoxSizeDepsEnabled(self):
+        xmin = 0
+        xmax = 0
+        ymin = 0
+        ymax = 0
+        zmin = 0
+        zmax = 0
+        for dep in self.dependencies:
+            if dep.Enabled:
+                if dep.refPoint.x < xmin: xmin=dep.refPoint.x
+                if dep.refPoint.x > xmax: xmax=dep.refPoint.x
+                if dep.refPoint.y < ymin: ymin=dep.refPoint.y
+                if dep.refPoint.y > ymax: ymax=dep.refPoint.y
+                if dep.refPoint.z < zmin: zmin=dep.refPoint.z
+                if dep.refPoint.z > zmax: zmax=dep.refPoint.z
+        self.refPointsBoundBoxSize = math.sqrt( (xmax-xmin)**2 + (ymax-ymin)**2 + (zmax-zmin)**2 )
 
     def calcRefPointsBoundBoxSize(self):
         xmin = 0
