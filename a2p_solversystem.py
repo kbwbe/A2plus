@@ -53,11 +53,12 @@ import os, sys
 from os.path import expanduser
 
 
-SOLVER_MAXSTEPS = 300000
+SOLVER_MAXSTEPS = 30000
 SOLVER_POS_ACCURACY = 1.0e-1  # gets to smaller values during solving
 SOLVER_SPIN_ACCURACY = 1.0e-1 # gets to smaller values during solving
 
-SOLVER_STEPS_CONVERGENCY_CHECK = 1000
+SOLVER_STEPS_CONVERGENCY_CHECK = 100 #200
+SOLVER_CONVERGENCY_FACTOR = 0.99
 SOLVER_CONVERGENCY_ERROR_INIT_VALUE = 1.0e+20
 MAX_LEVEL_ACCURACY = 4  #accuracy reached is 1.0e-MAX_LEVEL_ACCURACY
 
@@ -446,45 +447,45 @@ class SolverSystem():
                 # The accuracy is good, we're done here
                 goodAccuracy = True
                 # Mark the rigids as tempfixed and add its constrained rigids to pending list to be processed next
-                DebugMsg(A2P_DEBUG_1, "{} counts \n".format(calcCount) )
+                #DebugMsg(A2P_DEBUG_1, "{} counts \n".format(calcCount) )
                 for r in workList:
                     r.applySolution(doc, self)
                     r.tempfixed = True
 
             if self.convergencyCounter > SOLVER_STEPS_CONVERGENCY_CHECK:
                 if (
-                    maxPosError  >= self.lastPositionError or
-                    maxAxisError >= self.lastAxisError
+                    maxPosError  >= SOLVER_CONVERGENCY_FACTOR * self.lastPositionError or
+                    maxAxisError >= SOLVER_CONVERGENCY_FACTOR * self.lastAxisError
                     ):
-                    enlargedWorkList = False
+                    foundRigidToUnfix = False
                     # search for unsolved dependencies...
-                    tempfixedRigids = []
-                    for rig in workList:
-                        if rig.tempfixed: tempfixedRigids.append(rig)
                     for rig in workList:
                         if rig.fixed or rig.tempfixed: continue
-                        if rig.maxAxisError >= maxAxisError or rig.maxPosError >= maxPosError:
+                        #if rig.maxAxisError >= maxAxisError or rig.maxPosError >= maxPosError:
+                        if rig.maxAxisError > reqSpinAccuracy or rig.maxPosError > reqPosAccuracy:
                             for r in rig.linkedRigids:
-                                r.tempfixed = False
-                                if r in tempfixedRigids:
-                                    Msg("unfixed Rigid {}\n".format(r.label))
-                                    enlargedWorkList = True
+                                if r.tempfixed and not r.fixed:
+                                    r.tempfixed = False
+                                    #Msg("unfixed Rigid {}\n".format(r.label))
+                                    foundRigidToUnfix = True
                     
-                    if enlargedWorkList:
+                    if foundRigidToUnfix:
                         self.lastPositionError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
                         self.lastAxisError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
                         self.convergencyCounter = 0
+                        '''
                         Msg("restart with some unfixed parts\n")
-                        tempfixedRigids = []
-                        for rig in workList:
-                            if rig.tempfixed: tempfixedRigids.append(rig)
-                        self.printList("temfixed parts:", tempfixedRigids)
                         unfixedRigids = []
                         for rig in workList:
                             if not rig.tempfixed: unfixedRigids.append(rig)
                         self.printList("unfixed parts:", unfixedRigids)
+                        tempfixedRigids = []
+                        for rig in workList:
+                            if rig.tempfixed: tempfixedRigids.append(rig)
+                        self.printList("temfixed parts:", tempfixedRigids)
                         Msg("\n")
-                        
+                        FreeCADGui.updateGui()
+                        '''
                         continue
                     else:            
                         Msg('\n')
