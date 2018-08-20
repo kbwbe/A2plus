@@ -42,7 +42,7 @@ class CircularEdgeSelectionGate2:
         s1 = SelectionExObject(doc, obj, sub)
         return CircularEdgeSelected(s1)
 
-def parseSelection(selection, objectToUpdate=None, callSolveConstraints=True, lockRotation = False):
+def parseSelection(selection, objectToUpdate=None, callSolveConstraints=True, lockRotation = False): #, lockRotationAngle = 0.0):
     validSelection = False
     if len(selection) == 2:
         s1, s2 = selection
@@ -70,6 +70,7 @@ def parseSelection(selection, objectToUpdate=None, callSolveConstraints=True, lo
         c.directionConstraint = ["none","aligned","opposed"]
         c.addProperty("App::PropertyDistance","offset","ConstraintInfo")
         c.addProperty("App::PropertyBool","lockRotation","ConstraintInfo").lockRotation = lockRotation
+        #c.addProperty("App::PropertyAngle","lockRotationAngle","ConstraintInfo").lockRotationAngle = lockRotationAngle
 
         c.setEditorMode('Type',1)
         for prop in ["Object1","Object2","SubElement1","SubElement2"]:

@@ -112,12 +112,21 @@ class Rigid():
         #dof are useful only for animation at the moment? maybe it can be used to set tempfixed property
     def prepareRestart(self):
         self.tempfixed = self.fixed
+        self.calcSpinCenter()
+        self.calcRefPointsBoundBoxSize()
         for d in self.dependencies:
             d.Done = False
             d.disable()
 
     def countDependencies(self):
         return len(self.dependencies)
+    
+    def countDependenciesEnabled(self):
+        counter = 0
+        for dep in self.dependencies:
+            if dep.Enabled:
+                counter+=1
+        return counter
             
     def enableDependencies(self, workList):
         for dep in self.dependencies:
@@ -166,8 +175,8 @@ class Rigid():
         if solverStage == PARTIAL_SOLVE_STAGE1:
             if not self.tempfixed: #skip already fixed objs
                 #print 'current dof = ', rig.currentDOF()
-                #DebugMsg(A2P_DEBUG_1, "    {}\n".format(self.label))
-                a = self.label
+                DebugMsg(A2P_DEBUG_1, "    eval {}\n".format(self.label))
+                
                 if self.linkedTempFixedDOF()==0: #found a fully constrained obj to tempfixed rigids
                     for j in self.depsPerLinkedRigids.keys(): #look on each linked obj
                         if j.tempfixed: #the linked rigid is already fixed
@@ -186,9 +195,9 @@ class Rigid():
             #enable only involved dep, then set them as tempfixed        
             
             if not self.tempfixed: #skip already fixed objs  
-                                
+                DebugMsg(A2P_DEBUG_1, "    eval {}\n".format(self.label))                
                 if self.areAllParentTempFixed(): #linked only to fixed rigids                                                
-                    DebugMsg(A2P_DEBUG_1, "    {}\n".format(self.label))
+                    
                     #print rig.linkedRigids 
                     if not self.checkIfAllDone():                              
                         #all linked rigid are tempfixed, so solve it now    
@@ -261,9 +270,17 @@ class Rigid():
             d.clear()
         self.dependencies = []
         self.superRigid = None
+    
+    def returnIfsolved(self):
+        if self.tempfixed: 
+        #if self.fixed:
+            return True
+        else:
+            return False
 
     def applySolution(self, doc, solver):
-        if self.tempfixed: return
+        #if self.returnIfsolved(): return
+        if self.fixed: return
 
         # Update FreeCAD's placements if deltaPlacement above Tolerances
         base1 = self.placement.Base
@@ -274,13 +291,46 @@ class Rigid():
         axis2 = self.savedPlacement.Rotation.Axis
         angle = math.degrees(axis2.getAngle(axis1))
 
-        if absPosMove >= solver.mySOLVER_POS_ACCURACY*1e-2 or angle >= solver.mySOLVER_SPIN_ACCURACY*1e-1:
+        if absPosMove >= solver.mySOLVER_POS_ACCURACY * 0.1 or angle >= solver.mySOLVER_SPIN_ACCURACY * 0.1:
             ob1 = doc.getObject(self.objectName)
             ob1.Placement = self.placement
 
     def getRigidCenter(self):
         _currentRigid = FreeCAD.ActiveDocument.getObject(self.objectName)
         return _currentRigid.Shape.BoundBox.Center
+    
+    def calcSpinCenterDepsEnabled(self):
+        newSpinCenter = Base.Vector(self.spinCenter)
+        countRefPoints = 0
+        for dep in self.dependencies:
+            if dep.Enabled:
+                if dep.refPoint != None:
+                    newSpinCenter = newSpinCenter.add(dep.refPoint)
+                    countRefPoints += 1
+        if countRefPoints > 0:
+            newSpinCenter.multiply(1.0/countRefPoints)
+            self.spinCenter = newSpinCenter
+    
+    def calcSpinBasicDataDepsEnabled(self):
+        xmin = 0
+        xmax = 0
+        ymin = 0
+        ymax = 0
+        zmin = 0
+        zmax = 0
+        for dep in self.dependencies:
+            if dep.Enabled:
+                if dep.refPoint.x < xmin: xmin=dep.refPoint.x
+                if dep.refPoint.x > xmax: xmax=dep.refPoint.x
+                if dep.refPoint.y < ymin: ymin=dep.refPoint.y
+                if dep.refPoint.y > ymax: ymax=dep.refPoint.y
+                if dep.refPoint.z < zmin: zmin=dep.refPoint.z
+                if dep.refPoint.z > zmax: zmax=dep.refPoint.z
+        self.refPointsBoundBoxSize = math.sqrt( (xmax-xmin)**2 + (ymax-ymin)**2 + (zmax-zmin)**2 )
+        x = (xmax+xmin)/2.0
+        y = (ymax+ymin)/2.0
+        z = (zmax+zmin)/2.0
+        self.spinCenter = Base.Vector(x,y,z)
     
     def calcSpinCenter(self):
         newSpinCenter = Base.Vector(0,0,0)
@@ -293,6 +343,18 @@ class Rigid():
             newSpinCenter.multiply(1.0/countRefPoints)
             self.spinCenter = newSpinCenter
 
+    def calcBoundBoxSize(self, doc):
+        obj = doc.getObject(self.objectName)
+        sizes = []
+        sizes.append(obj.Shape.BoundBox.XMin)
+        sizes.append(obj.Shape.BoundBox.XMax)
+        sizes.append(obj.Shape.BoundBox.YMin)
+        sizes.append(obj.Shape.BoundBox.YMax)
+        sizes.append(obj.Shape.BoundBox.ZMin)
+        sizes.append(obj.Shape.BoundBox.ZMax)
+        
+        return sizes
+    
     def calcRefPointsBoundBoxSize(self):
         xmin = 0
         xmax = 0
@@ -311,6 +373,7 @@ class Rigid():
 
     def calcMoveData(self, doc, solver):
         if self.tempfixed: return
+        
         
         depRefPoints = []
         depMoveVectors = [] #collect Data to compute central movement of rigid
@@ -380,6 +443,7 @@ class Rigid():
 
     def move(self,doc):
         if self.tempfixed: return
+        
         #
         #Linear moving of a rigid
         moveDist = Base.Vector(0,0,0)
@@ -412,14 +476,6 @@ class Rigid():
                 self.applyPlacementStep(pl)
 
 
-    def checkIfInvolved(self):
-        '''
-        check if the rigid has some dependencies enabled
-        '''
-        for dep in self.dependencies:
-            if dep.Enabled:
-                return True
-        return False
     
     def currentDOF(self):
         '''
@@ -483,7 +539,7 @@ class Rigid():
         else:
             Msg("    is not Fixed and has {} DegreesOfFreedom\n".format(self.currentDOF()))
         for rig in self.depsPerLinkedRigids.keys():
-            Msg("    Depends on Rigid = {}\n".format(rig.label))
+            Msg("    Depends on Rigid = {} fixed = {}\n".format(rig.label,rig.tempfixed))
             for dep in self.depsPerLinkedRigids[rig]:
                 Msg("        {}\n".format(dep) )
             Msg("        DOF Position free with this rigid = {}\n".format( len(self.dofPOSPerLinkedRigids[rig])))
