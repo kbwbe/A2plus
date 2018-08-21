@@ -25,7 +25,7 @@
 import FreeCAD, FreeCADGui
 from a2plib import *
 import Part
-import os, numpy
+import os, copy, numpy
 from random import random, choice
 from FreeCAD import  Base
 import time
@@ -49,22 +49,38 @@ def muxObjectsWithKeys(objsIn, withColor=False):
     faceColors = []
     muxInfo = [] # List of keys, not used at moment...
 
-    for obj in objsIn:
+    print("MUX: objsIn:", len(objsIn))
+    for o, obj in enumerate(objsIn):
+        print("MUX: obj:",o, " len(DiffuseCol):", len(obj.ViewObject.DiffuseColor), " len(Faces):",  len(obj.Shape.Faces))
         # Save Computing time, store this before the for..enumerate loop later...
-        colorFlag = ( len(obj.ViewObject.DiffuseColor) < len(obj.Shape.Faces) )
+        colorFlag = ( len(obj.ViewObject.DiffuseColor) < len(obj.Shape.Faces) )    # one or more color tuples per obj ?
         shapeCol = obj.ViewObject.ShapeColor
-        diffuseCol = obj.ViewObject.DiffuseColor
+        shapeTsp = round( float(obj.ViewObject.Transparency/100), 2 )              # alpha value for DiffuseColor
+        diffuseCol = copy.deepcopy(obj.ViewObject.DiffuseColor)
 
         # now start the loop with use of the stored values..(much faster)
         for i, face in enumerate(obj.Shape.Faces):
             faces.append(face)
+            print("MUX: i(Faces)=", i, face)
+
             if withColor:
                 if colorFlag:
-                    faceColors.append(shapeCol)
+                    c = (shapeCol[0],shapeCol[1],shapeCol[2],shapeTsp)        # change shapeColor to
+                                                                              # reflect diffuseColor with
+                                                                              # alpha = reverse transparency
+                    print("MUX: color mode sC(*): origCol:", shapeCol, "\n     changedCol:               ", c)
+                    faceColors.append(c)
                 else:
-                    faceColors.append(diffuseCol[i])
+                    if i < len(diffuseCol):                                   # otherwise "index out of range" error
+                        print("MUX: color mode dC[i]:", diffuseCol[i])        # <- DiffuseColor has to be properly
+                        faceColors.append(diffuseCol[i])                      # <- set up by calling function
+                    else:
+                        print("MUX: color mode dC[0]:", diffuseCol[0])
+                        faceColors.append(diffuseCol[0])
 
     shell = Part.makeShell(faces)
+    print("MUX: result:", shell)
+    print("MUX: faceColors:\n", faceColors)                                     # has result all faces' color values?
     if withColor:
         return muxInfo, shell, faceColors
     else:
