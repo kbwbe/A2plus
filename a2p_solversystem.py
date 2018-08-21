@@ -50,15 +50,15 @@ from a2p_dependencies import Dependency
 from a2p_rigid import Rigid
 import os, sys
 from os.path import expanduser
-#from test.test_MimeWriter import OUTPUT
 
 
 SOLVER_MAXSTEPS = 300000
 SOLVER_POS_ACCURACY = 1.0e-1  # gets to smaller values during solving
-SOLVER_SPIN_ACCURACY = 1.0e-1 # gets to smaller values during solving
+#SOLVER_SPIN_ACCURACY = 1.0e-4 # gets to smaller values during solving
 
 SOLVER_STEPS_CONVERGENCY_CHECK = 1000
 SOLVER_CONVERGENCY_ERROR_INIT_VALUE = 1.0e+20
+SOLVER_CONVERGENCY_FACTOR = 0.99
 MAX_LEVEL_ACCURACY = 4  #accuracy reached is 1.0e-MAX_LEVEL_ACCURACY
 
 from a2plib import (
@@ -83,7 +83,7 @@ class SolverSystem():
         self.rigids = []        # list of rigid bodies
         self.constraints = []
         self.objectNames = []
-        self.mySOLVER_SPIN_ACCURACY = SOLVER_SPIN_ACCURACY
+        #self.mySOLVER_SPIN_ACCURACY = SOLVER_SPIN_ACCURACY
         self.mySOLVER_POS_ACCURACY = SOLVER_POS_ACCURACY
         self.lastPositionError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
         self.lastAxisError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
@@ -108,7 +108,7 @@ class SolverSystem():
 
     def loadSystem(self,doc):
         
-        #import sys;sys.path.append(r'C:\Users\Turro\.p2\pool\plugins\org.python.pydev.core_6.4.4.201807281807\pysrc')
+        import sys;sys.path.append(r'C:\Users\Turro\.p2\pool\plugins\org.python.pydev.core_6.4.4.201807281807\pysrc')
         #import pydevd;pydevd.settrace()
         self.clear()
         self.doc = doc
@@ -141,7 +141,7 @@ class SolverSystem():
                 fx,
                 ob1.Placement
                 )
-            rig.spinCenter = ob1.Shape.BoundBox.Center
+            #rig.spinCenter = ob1.Shape.BoundBox.Center
             self.rigids.append(rig)
         #
         #link constraints to rigids using dependencies
@@ -187,14 +187,17 @@ class SolverSystem():
             rig.calcSpinCenter()
             rig.calcRefPointsBoundBoxSize()
             
-        numdep = 0
+        self.numdep = 0
         self.retrieveDOFInfo() #function only once used here at this place in whole program
         for rig in self.rigids:
             rig.currentDOF()
             rig.beautyDOFPrint()
-            numdep+=rig.countDependencies()
-        Msg( 'there are {} dependencies\n'.format(numdep/2))       
+            self.numdep+=rig.countDependencies()
+        Msg( 'there are {} dependencies\n'.format(self.numdep/2))       
         self.status = "loaded"
+        self.calcSpinAccuracy(True)
+        
+        
 
     def retrieveDOFInfo(self):
         '''
@@ -304,58 +307,110 @@ class SolverSystem():
         #str = "file://",out_file
         #WebGui.openBrowser(str.__str__()) 
 
-    def calcMoveData(self,doc):
+#     def calcMoveData(self,doc):
+#         for rig in self.rigids:
+#             rig.calcMoveData(doc, self)
+            
+    def calcSpinAccuracy(self, init=False):
+        #first find the max boundsize
+        xmin = 0.0
+        xmax = 0.0
+        ymin = 0.0
+        ymax = 0.0
+        zmin = 0.0
+        zmax = 0.0
+        
         for rig in self.rigids:
-            rig.calcMoveData(doc, self)
-
+            tmplist = rig.calcBoundBoxSize(self.doc)
+            xmin = min(xmin,tmplist[0])
+            xmax = max(xmax,tmplist[1])
+            ymin = min(ymin,tmplist[2])
+            ymax = max(ymax,tmplist[3])
+            zmin = min(zmin,tmplist[4])
+            zmax = max(zmax,tmplist[5])
+        
+        vec1 = Base.Vector(xmin,ymin,zmin)
+        vec2 = Base.Vector(xmax,ymax,zmax)
+        assemblysize = vec1.distanceToPoint(vec2)
+        #print 'Assembly size = ', assemblysize
+        #accuracydivider = 1000.0 * (10**self.level_of_accuracy)
+        #for a in range(self.level_of_accuracy):
+        #    accuracydivider*=10
+        
+        #self.mySOLVER_POS_ACCURACY= assemblysize / accuracydivider            
+        self.mySOLVER_SPIN_ACCURACY = math.degrees(math.atan(self.mySOLVER_POS_ACCURACY / assemblysize))
+        #self.mySOLVER_SPIN_ACCURACY = math.degrees(math.atan(1 / accuracydivider))
+        #self.mySOLVER_SPIN_ACCURACY = self.mySOLVER_POS_ACCURACY
+        
     def prepareRestart(self):
+        #self.mySOLVER_POS_ACCURACY = SOLVER_POS_ACCURACY
+        #self.calcSpinAccuracy()
+        Msg('\nPOS ACCURACY: {}\n'.format(self.mySOLVER_POS_ACCURACY))
+        Msg('SPIN ACCURACY: {}\n'.format(self.mySOLVER_SPIN_ACCURACY))
         for rig in self.rigids:
             rig.prepareRestart()
-        self.partialSolverCurrentStage = PARTIAL_SOLVE_STAGE1
+        #self.partialSolverCurrentStage = PARTIAL_SOLVE_STAGE1
 
-    def solveSystemWithMode(self,doc, mode):
+    def solveSystemWithMode(self,doc):
         self.level_of_accuracy=1
-
         startTime = int(round(time.time() * 1000))
         self.loadSystem(doc)
         if self.status == "loadingDependencyError":
             return
+        
+        self.progress_bar.start("Solving Assembly...",self.numdep*2+1)  
+        
+        self.progress_bar.next()
+        
         self.assignParentship(doc)
         self.prepareRestart()
         loadTime = int(round(time.time() * 1000))
         while True:
-            systemSolved = self.calculateChain(doc, mode)
+             
+#             self.progress_bar.next()       
+#             FreeCADGui.updateGui()
+            systemSolved = self.calculateChain(doc)
             totalTime = int(round(time.time() * 1000))
             DebugMsg(A2P_DEBUG_1, "Total steps used: %d\n" %  self.stepCount)
             DebugMsg(A2P_DEBUG_1, "LoadTime (ms): %d\n" % (loadTime - startTime) )
             DebugMsg(A2P_DEBUG_1, "CalcTime (ms): %d\n" % (totalTime - loadTime) )
             DebugMsg(A2P_DEBUG_1, "TotalTime (ms): %d\n" % (totalTime - startTime) )
             if systemSolved:
-                self.mySOLVER_SPIN_ACCURACY *= 1e-1
-                self.mySOLVER_POS_ACCURACY *= 1e-1
+                #self.mySOLVER_SPIN_ACCURACY *= 1e-1
+                
                 Msg( '--->LEVEL OF ACCURACY :{} DONE!\n'.format(self.level_of_accuracy) )
-                self.level_of_accuracy+=1
-                if self.level_of_accuracy == MAX_LEVEL_ACCURACY:
-                    self.solutionToParts(doc)
-                    #FreeCADGui.updateGui()
+                self.level_of_accuracy+=1 
+                               
+                #FreeCADGui.updateGui()
+                if self.level_of_accuracy == MAX_LEVEL_ACCURACY: 
+                    self.solutionToParts(doc)                   
                     break
+                
+                self.mySOLVER_POS_ACCURACY *= 1e-1
+                self.calcSpinAccuracy()
                 self.prepareRestart()
             else:
                 break
-        self.mySOLVER_SPIN_ACCURACY = SOLVER_SPIN_ACCURACY
-        self.mySOLVER_POS_ACCURACY = SOLVER_POS_ACCURACY
+        #self.mySOLVER_SPIN_ACCURACY = SOLVER_SPIN_ACCURACY
+        self.progress_bar.stop()
         return systemSolved
 
     def solveSystem(self,doc):
         Msg( "\n===== Start Solving System ====== \n" )
-        if a2plib.isPartialProcessing():
-            Msg( "Solvermode = partialProcessing !\n")
-            mode = 'partial'
-        else:
-            Msg( "Solvermode = solve all Parts at once !\n")
-            mode = 'magnetic'
-
-        systemSolved = self.solveSystemWithMode(doc,mode)
+        self.progress_bar = FreeCAD.Base.ProgressIndicator() 
+        
+#         if a2plib.isPartialProcessing():
+#             Msg( "Solvermode = partialProcessing !\n")
+#             mode = 'partial'            
+#         else:
+#             Msg( "Solvermode = solve all Parts at once !\n")
+#             mode = 'Progressive magnetic'
+#         
+        systemSolved = self.solveSystemWithMode(doc)
+        
+                            
+        FreeCADGui.updateGui()
+        
         if self.status == "loadingDependencyError":
             return
 
@@ -363,10 +418,13 @@ class SolverSystem():
         #    Msg( "Could not solve system with partial processing, switch to 'magnetic' mode  \n" )
         #    mode = 'magnetic'
         #    systemSolved = self.solveSystemWithMode(doc,mode)
+        
+        
+        
         if systemSolved:
             
             self.status = "solved"
-            Msg( "===== System solved ! by using mode {} =====".format(mode) )
+            Msg( "===== System solved !  =====" )
         else:
             self.status = "unsolved"
             Msg( "===== Could not solve system ====== \n" )
@@ -389,85 +447,66 @@ class SolverSystem():
             Msg( "{} ".format(e.label) )
         Msg("):\n")
 
-    def calculateChain(self, doc, mode):
+    def calculateChain(self, doc):
         self.stepCount = 0
-        haveMore = True
-        workList = []
-        #workList.extend(self.rigids)
-        self.partialSolverCurrentStage = PARTIAL_SOLVE_STAGE1
-        if mode == 'partial':
-            # start from fixed rigids and its children
-            
-            while self.partialSolverCurrentStage != PARTIAL_SOLVE_END:
-                #print "evaluating stage = ", self.partialSolverCurrentStage
-                DebugMsg(A2P_DEBUG_1, "Evaluating stage = {}\n".format(self.partialSolverCurrentStage))
-                DebugMsg(A2P_DEBUG_1, "Tempfixed objs:\n")
-                if A2P_DEBUG_LEVEL>=A2P_DEBUG_1:
-                    for i in self.rigids:
-                        if i.tempfixed:
-                            DebugMsg(A2P_DEBUG_1,"    {}\n".format(i.label))
-                DebugMsg(A2P_DEBUG_1, "End of Tempfixed objs\n")
-                
-                while True: 
-                    somethingFound = False
-                    workList=[] 
-                    myCounter = len(self.rigids)                  
-                    for rig in self.rigids:
-                        #somethingFound = False
-                        workList.extend(rig.getCandidates(self.partialSolverCurrentStage))
-                        myCounter-=1
-                        workList = list(set(workList))
-                        if ((self.partialSolverCurrentStage==PARTIAL_SOLVE_STAGE5) and (myCounter>0)):
-                            continue
-                        if len(workList)> 0:
-                            somethingFound = True
-                            solutionFound = self.calculateWorkList(doc, workList, mode)
-                            #solutionFound = True
-                            if not solutionFound: 
-                                return False
-                            else:
-                                #partial system successfully solved, set as Done and disable
-                                #print 'Solution found'
-                                #FreeCADGui.updateGui()
-                                for rig in workList:
-                                    if self.partialSolverCurrentStage == PARTIAL_SOLVE_STAGE1:
-                                        rig.tempfixed=True
-                                    for dep in rig.dependencies:
-                                        if dep.Enabled:
-                                            dep.Done = True
-                                            dep.disable()
-                                            #rig.tempfixed = True
-                                workList=[]
-                    if not somethingFound:
-                        self.partialSolverCurrentStage +=1
-                        workList = []
-                        break 
-                        
-                        
-                    
-        else:
-            # all dependencies, set all as done=false
-            workList = []
-            workList.extend(self.rigids)
-            self.partialSolverCurrentStage = PARTIAL_SOLVE_END
-            for rig in self.rigids:
-                rig.tempfixed = rig.fixed
-                for dep in rig.dependencies:
-                    dep.Done = False
-                    dep.Enabled = True
-            
-            solutionFound = self.calculateWorkList(doc, workList, mode)
-            if not solutionFound: return False
         
+        self.partialSolverCurrentStage = PARTIAL_SOLVE_STAGE1
+        #mainWorklist = []
+        while self.partialSolverCurrentStage != PARTIAL_SOLVE_END:
+            #print "evaluating stage = ", self.partialSolverCurrentStage
+            DebugMsg(A2P_DEBUG_1, "Evaluating stage = {}\n".format(self.partialSolverCurrentStage))
+            DebugMsg(A2P_DEBUG_1, "Tempfixed objs:\n")
+            if A2P_DEBUG_LEVEL>=A2P_DEBUG_1:
+                for i in self.rigids:
+                    if i.tempfixed:
+                        DebugMsg(A2P_DEBUG_1,"    {}\n".format(i.label))
+            DebugMsg(A2P_DEBUG_1, "End of Tempfixed objs\n")
+            
+            while True: 
+                somethingFound = False
+                #mainWorklist = []
+                workList=[]                     
+                myCounter = len(self.rigids) 
+                numdep=0                 
+                for rig in self.rigids:
+                    #somethingFound = False
+                    workList.extend(rig.getCandidates(self.partialSolverCurrentStage))
+                    myCounter-=1
+                    workList = list(set(workList))
+                    #mainWorklist.extend(workList)
+                    #mainWorklist = list(set(mainWorklist))
+                    if ((self.partialSolverCurrentStage==PARTIAL_SOLVE_STAGE5) and (myCounter>0)):
+                        continue
+                    if len(workList)> 0:
+                        somethingFound = True
+                        #if mode == 'partial':
+                        solutionFound = self.calculateWorkList(doc, workList)
+                        #else:
+                        #    solutionFound = self.calculateWorkList(doc, mainWorklist, mode)                                
+                        #solutionFound = True
+                        if not solutionFound: 
+                            return False
+                        else:                                      
+                            workList=[]
+                if not somethingFound:
+                    self.partialSolverCurrentStage +=1
+                    workList = []
+                    break 
+                                
         return True
 
-    def calculateWorkList(self, doc, workList, mode):
+    def calculateWorkList(self, doc, workList):
         #print 'calculate worklist'
+        reqPosAccuracy = self.mySOLVER_POS_ACCURACY
+        reqSpinAccuracy = self.mySOLVER_SPIN_ACCURACY
         if A2P_DEBUG_LEVEL >= A2P_DEBUG_1:
             self.printList("WorkList", workList)
 
         for rig in workList:
             rig.enableDependencies(workList)
+            
+        for rig in workList:
+            rig.calcSpinBasicDataDepsEnabled()
 
         self.lastPositionError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
         self.lastAxisError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
@@ -483,10 +522,7 @@ class SolverSystem():
             self.stepCount += 1
             self.convergencyCounter += 1
             # First calculate all the movement vectors
-            for w in workList:
-                #if w.checkIfInvolved():
-                    #for dep in w.dependencies:
-                    #    dep.calcRefPoints(dep.index)
+            for w in workList:                
                 w.calcMoveData(doc, self)
                 if w.maxPosError > maxPosError:
                     maxPosError = w.maxPosError
@@ -509,30 +545,54 @@ class SolverSystem():
                 DebugMsg(A2P_DEBUG_1, "{} counts \n".format(calcCount) )
                 #self.prnPlacement()
                 
+                
                 for r in workList:                    
-                    r.applySolution(doc, self)                        
+                    #r.applySolution(doc, self) 
+                    #r.applySolution(doc,self)                                     
                     if self.partialSolverCurrentStage == PARTIAL_SOLVE_STAGE1:
                         #print r.label , ' set as Tempfixed'
                         r.tempfixed = True
-                    elif r.checkIfAllDone():
+                    if r.checkIfAllDone():
                         r.tempfixed = True
-                 
-                    
-                #self.prnPlacement()
+                    for dep in r.dependencies:
+                        if dep.Enabled:
+                            self.progress_bar.next()
+                            dep.Done = True
+                            dep.disable()
             if self.convergencyCounter > SOLVER_STEPS_CONVERGENCY_CHECK:
                 if (
-                    maxPosError  >= self.lastPositionError   or
-                    maxAxisError >= self.lastAxisError 
-                    ):
-                    Msg( "System not solvable, convergency is incorrect!\n" )
-                    return False
+                    maxPosError  >= SOLVER_CONVERGENCY_FACTOR * self.lastPositionError or
+                    maxAxisError >= SOLVER_CONVERGENCY_FACTOR * self.lastAxisError
+                    ):     
+                    
+                    foundRigidToUnfix = False
+                    # search for unsolved dependencies...
+                    for rig in workList:
+                        if rig.maxAxisError > reqSpinAccuracy or rig.maxPosError > reqPosAccuracy:
+                            for r in rig.linkedRigids:
+                                if r.tempfixed and not r.fixed:
+                                    r.tempfixed = False
+                                    #Msg("unfixed Rigid {}\n".format(r.label))
+                                    foundRigidToUnfix = True
+                    
+                    if foundRigidToUnfix:
+                        self.lastPositionError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
+                        self.lastAxisError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
+                        self.convergencyCounter = 0
+                        continue
+                    else:            
+                        Msg('\n')
+                        Msg('convergency-conter: {}\n'.format(self.convergencyCounter))
+                        Msg( "System not solvable, convergency is incorrect!\n" )
+                        return False
+                
+                
+                
                 self.lastPositionError = maxPosError
                 self.lastAxisError = maxAxisError
                 self.convergencyCounter = 0
-                
 
             if self.stepCount > SOLVER_MAXSTEPS:
-                
                 Msg( "Reached max calculations count ({})\n".format(SOLVER_MAXSTEPS) )
                 return False
         return True
@@ -542,88 +602,7 @@ class SolverSystem():
             rig.applySolution(doc, self);
             
             
-    '''def calculateChainByPartialStage(self, currentstage): 
-        outputRigidList = []       
-        
-        if currentstage == PARTIAL_SOLVE_STAGE1:  
-            #solve all rigid fully constrained to tempfixed rigids, enable only involved dep, then set them as tempfixed        
-            for rig in self.rigids:
-                if not rig.tempfixed: #skip already fixed objs
-                    #print 'current dof = ', rig.currentDOF()
-                    DebugMsg(A2P_DEBUG_1, "    {}\n".format(rig.label))
-                    if rig.linkedTempFixedDOF()==0: #found a fully constrained obj to tempfixed rigids
-                        for j in rig.depsPerLinkedRigids.keys(): #look on each linked obj
-                            if j.tempfixed: #the linked rigid is already fixed
-                                for dep in rig.depsPerLinkedRigids[j]: 
-                                    #enable involved dep
-                                    if not dep.Done and not dep.Enabled:
-                                        dep.enable([dep.currentRigid, dep.dependedRigid])
-                                        outputRigidList.extend([dep.currentRigid, dep.dependedRigid])                                        
-                                        DebugMsg(A2P_DEBUG_1, "        {}\n".format(dep))
-                        #if len(outputRigidList)>0: #found something!
-                            #print '        Solve them!'                            
-                        outputRigidList = list(set(outputRigidList))
-                        if len(outputRigidList)>0:
-                            return outputRigidList#something match, return it to solver
-            
-            self.partialSolverCurrentStage = PARTIAL_SOLVE_STAGE2
-            return [] #nothing match, jump to next stage
-         
-        elif currentstage == PARTIAL_SOLVE_STAGE2:  
-            #solve all rigid constrained ONLY to tempfixed rigid, 
-            #enable only involved dep, then set them as tempfixed        
-            for rig in self.rigids:
-                if not rig.tempfixed: #skip already fixed objs  
-                                    
-                    if rig.areAllParentTempFixed(): #linked only to fixed rigids                                                
-                        DebugMsg(A2P_DEBUG_1, "    {}\n".format(rig.label))
-                        #print rig.linkedRigids 
-                        if not rig.checkIfAllDone():                              
-                            #all linked rigid are tempfixed, so solve it now    
-                            #print rig.label
-                            for j in rig.depsPerLinkedRigids.keys(): #look again on each linked obj
-                                #outputRigidList.append(j)
-                                #print 'Rigid ', j.label
-                                for dep in rig.depsPerLinkedRigids[j]: 
-                                    
-                                    #enable involved dep
-                                    if not dep.Done and not dep.Enabled:
-                                        dep.enable([dep.currentRigid, dep.dependedRigid])
-                                        outputRigidList.extend([dep.currentRigid, dep.dependedRigid])
-                                        #self.solvedCounter += 1
-                                        DebugMsg(A2P_DEBUG_1, "        {}\n".format(dep))
-                    outputRigidList = list(set(outputRigidList))
-                    if len(outputRigidList)>0:
-                        return outputRigidList#something match, return it to solver
-            
-            self.partialSolverCurrentStage = PARTIAL_SOLVE_STAGE3
-            return []#nothing match, jump to next stage                       
-                            
-        elif currentstage == PARTIAL_SOLVE_STAGE3:
-            self.partialSolverCurrentStage = PARTIAL_SOLVE_STAGE4
-            return []
-        
-        elif currentstage == PARTIAL_SOLVE_STAGE4:
-            self.partialSolverCurrentStage = PARTIAL_SOLVE_STAGE5
-            return []        
-        
-        elif currentstage == PARTIAL_SOLVE_STAGE5: 
-            #enable all dep not marked as done
-            tmpfound = False
-            for rig in self.rigids:
-                if not rig.tempfixed:
-                    for dep in rig.dependencies:
-                        if not dep.Done and not dep.Enabled:
-                            dep.enable([dep.currentRigid, dep.dependedRigid])
-                            DebugMsg(A2P_DEBUG_1, "        {}\n".format(dep))
-                            outputRigidList.extend([dep.currentRigid, dep.dependedRigid])
-                            #tmpfound = True
-            
-            self.partialSolverCurrentStage = PARTIAL_SOLVE_END  
-            return list(set(outputRigidList))
-        else:
-            return []'''
-
+ 
 #------------------------------------------------------------------------------
 def solveConstraints( doc, cache=None ):
     doc.openTransaction("a2p_systemSolving")
