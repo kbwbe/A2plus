@@ -269,6 +269,8 @@ class Rigid():
             self.spinCenter = newSpinCenter
 
     def calcSpinBasicDataDepsEnabled(self):
+        newSpinCenter = Base.Vector(0,0,0)
+        countRefPoints = 0
         xmin = 0
         xmax = 0
         ymin = 0
@@ -277,17 +279,21 @@ class Rigid():
         zmax = 0
         for dep in self.dependencies:
             if dep.Enabled:
+                newSpinCenter = newSpinCenter.add(dep.refPoint)
+                countRefPoints += 1
                 if dep.refPoint.x < xmin: xmin=dep.refPoint.x
                 if dep.refPoint.x > xmax: xmax=dep.refPoint.x
                 if dep.refPoint.y < ymin: ymin=dep.refPoint.y
                 if dep.refPoint.y > ymax: ymax=dep.refPoint.y
                 if dep.refPoint.z < zmin: zmin=dep.refPoint.z
                 if dep.refPoint.z > zmax: zmax=dep.refPoint.z
-        self.refPointsBoundBoxSize = math.sqrt( (xmax-xmin)**2 + (ymax-ymin)**2 + (zmax-zmin)**2 )
-        x = (xmax+xmin)/2.0
-        y = (ymax+ymin)/2.0
-        z = (zmax+zmin)/2.0
-        self.spinCenter = Base.Vector(x,y,z)
+        vmin = Base.Vector(xmin,ymin,zmin)
+        vmax = Base.Vector(xmax,ymax,zmax)
+        self.refPointsBoundBoxSize = vmax.sub(vmin).Length
+
+        if countRefPoints > 0:
+            newSpinCenter.multiply(1.0/countRefPoints)
+            self.spinCenter = newSpinCenter
         
     def calcRefPointsBoundBoxSizeDepsEnabled(self):
         xmin = 0
