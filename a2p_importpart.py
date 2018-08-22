@@ -140,8 +140,9 @@ def filterImpParts(obj):
             impPartsOut.append(obj)                  # top level within Group
         elif hasattr(obj,"a2p_Version"):             # assem item
             impPartsOut.append(obj)
-        elif obj.subassemblyImport == True:          # assem item
-            impPartsOut.append(obj)
+        elif hasattr(obj,"subassemblyImport"):
+            if obj.subassemblyImport == True:        # assem item
+                impPartsOut.append(obj)
         else:
             pass                                     # more odd PF cases?? BaseFeature in body??
     else:
