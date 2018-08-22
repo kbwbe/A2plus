@@ -24,7 +24,7 @@
 
 import FreeCADGui,FreeCAD
 from PySide import QtGui, QtCore
-import os, copy, time
+import os, copy, time, sys
 import a2plib
 from a2p_MuxAssembly import muxObjectsWithKeys, createTopoInfo, Proxy_muxAssemblyObj
 from a2p_viewProviderProxies import *
@@ -34,6 +34,8 @@ from a2plib import (
     appVersionStr,
     AUTOSOLVE_ENABLED
     )
+
+PYVERSION =  sys.version_info[0]
 
 class ObjectCache:
     '''
@@ -140,8 +142,9 @@ def filterImpParts(obj):
             impPartsOut.append(obj)                  # top level within Group
         elif hasattr(obj,"a2p_Version"):             # assem item
             impPartsOut.append(obj)
-        elif obj.subassemblyImport == True:          # assem item
-            impPartsOut.append(obj)
+        elif hasattr(obj,"subassemblyImport"):
+            if obj.subassemblyImport == True:        # assem item
+                impPartsOut.append(obj)
         else:
             pass                                     # more odd PF cases?? BaseFeature in body??
     else:
@@ -203,7 +206,10 @@ def importPartFromFile(_doc, filename, importToCache=False):
     else:
         partName = a2plib.findUnusedObjectName( importDoc.Label, document=doc )
         partLabel = a2plib.findUnusedObjectLabel( importDoc.Label, document=doc )
-        newObj = doc.addObject("Part::FeaturePython",str(partName.encode('utf-8')))
+        if PYVERSION < 3:
+            newObj = doc.addObject( "Part::FeaturePython", partName.encode('utf-8') )
+        else:
+            newObj = doc.addObject( "Part::FeaturePython", str(partName.encode('utf-8')) )    # works on Python 3.6.5
         newObj.Label = partLabel
 
 
