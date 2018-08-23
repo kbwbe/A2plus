@@ -102,7 +102,8 @@ class SolverSystem():
 
     def getRigid(self,objectName):
         '''get a Rigid by objectName'''
-        rigs = [r for r in self.rigids if r.objectName == objectName]
+        #igs = [r for r in self.rigids if r.objectName == objectName]
+        rigs = [r for r in self.rigids if objectName in r.objectName]
         if len(rigs) > 0: return rigs[0]
         return None
 
@@ -191,11 +192,11 @@ class SolverSystem():
         self.retrieveDOFInfo() #function only once used here at this place in whole program
         for rig in self.rigids:
             rig.currentDOF()
-            rig.beautyDOFPrint()
+            #rig.beautyDOFPrint()
             self.numdep+=rig.countDependencies()
         Msg( 'there are {} dependencies\n'.format(self.numdep/2))       
         self.status = "loaded"
-        self.calcSpinAccuracy(True)
+        self.calcSpinAccuracy()
         
         
 
@@ -357,12 +358,12 @@ class SolverSystem():
         if self.status == "loadingDependencyError":
             return
         
-        self.progress_bar.start("Solving Assembly...",(self.numdep/2)*(MAX_LEVEL_ACCURACY-1))  
+        #self.progress_bar.start("Solving Assembly...",(self.numdep/2)*(MAX_LEVEL_ACCURACY-1)+1)  
         
         #self.progress_bar.next()
         
         self.assignParentship(doc)
-        self.prepareRestart()
+        #self.prepareRestart()
         loadTime = int(round(time.time() * 1000))
         while True:
              
@@ -389,17 +390,18 @@ class SolverSystem():
                     break
                 
                 self.mySOLVER_POS_ACCURACY *= 1e-1
-                self.calcSpinAccuracy()
-                self.prepareRestart()
+                self.loadSystem(doc)
+                #self.calcSpinAccuracy()
+                #self.prepareRestart()
             else:
                 break
         #self.mySOLVER_SPIN_ACCURACY = SOLVER_SPIN_ACCURACY
-        self.progress_bar.stop()
+        #self.progress_bar.stop()
         return systemSolved
 
     def solveSystem(self,doc):
         Msg( "\n===== Start Solving System ====== \n" )
-        self.progress_bar = FreeCAD.Base.ProgressIndicator() 
+        #self.progress_bar = FreeCAD.Base.ProgressIndicator() 
         
 #         if a2plib.isPartialProcessing():
 #             Msg( "Solvermode = partialProcessing !\n")
@@ -548,16 +550,21 @@ class SolverSystem():
                 
                 
                 for r in workList:                    
-                    r.applySolution(doc,self)   
+                    r.applySolution(doc,self) 
+                    FreeCADGui.updateGui()  
                     for dep in r.dependencies:
                         if dep.Enabled:
-                            self.progress_bar.next()
+                            #self.progress_bar.next()
                             dep.Done = True
                             dep.disable()                                  
                     if self.partialSolverCurrentStage == PARTIAL_SOLVE_STAGE1 or r.checkIfAllDone():
                         r.tempfixed = True
+                    elif self.partialSolverCurrentStage == PARTIAL_SOLVE_STAGE2 and r.checkIfAllDone():
+                        r.tempfixed = True
                         #Msg("Fixed Rigid {}\n".format(r.label))
-                    
+                if self.partialSolverCurrentStage == PARTIAL_SOLVE_STAGE3:
+                    if len(workList)==2:
+                        workList[0].mergeRigid(self,workList[1])
                     
             if self.convergencyCounter > SOLVER_STEPS_CONVERGENCY_CHECK:
                 if (
@@ -574,6 +581,7 @@ class SolverSystem():
                                     r.tempfixed = False
                                     #Msg("unfixed Rigid {}\n".format(r.label))
                                     foundRigidToUnfix = True
+                                    #foundRigidToUnfix = False
                     
                     if foundRigidToUnfix:
                         self.lastPositionError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
