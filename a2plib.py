@@ -101,8 +101,6 @@ def setTransparency():
         # Transparency is already saved, no need to set transparency again
         return
 
-#    SAVED_TRANSPARENCY = []                # reset it or not? better not, no need to do so.
-
     for obj in doc.Objects:
         if hasattr(obj,'ViewObject'):
             if hasattr(obj.ViewObject,'Transparency'):
@@ -111,10 +109,12 @@ def setTransparency():
                     print("setTransparency: ShapeColor and Transparency detected:\n", \
                         obj.ViewObject.DiffuseColor)
                 else:
-                   print("setTransparency: muxed assembly detected:\n", \
+                    print("setTransparency: muxed assembly detected:\n", \
                        obj.ViewObject.DiffuseColor)
-                print("setTransparency: anyway, we save all color & transparency to be on the safe side"
-                SAVED_TRANSPARENCY.append((obj.Name, obj.ViewObject.Transparency, obj.ViewObject.DiffuseColor))
+                print("setTransparency: anyway, we save all color & transparency to be on the safe side")
+                SAVED_TRANSPARENCY.append(
+                    (obj.Name, obj.ViewObject.Transparency, obj.ViewObject.DiffuseColor)
+                    )
                 obj.ViewObject.Transparency = 80
 #------------------------------------------------------------------------------
 def restoreTransparency():

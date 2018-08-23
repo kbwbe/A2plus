@@ -787,10 +787,18 @@ FreeCADGui.addCommand('a2p_isolateCommand', a2p_isolateCommand())
 
 class a2p_ToggleTransparencyCommand:
     def Activated(self, checked):
+        doc = FreeCAD.ActiveDocument
+
         if a2plib.isTransparencyEnabled():
             a2plib.restoreTransparency()
+            for o in doc.Objects:
+                FreeCADGui.Selection.addSelection(o)
+            FreeCADGui.Selection.clearSelection()
         else:
             a2plib.setTransparency()
+            for o in doc.Objects:
+                FreeCADGui.Selection.addSelection(o)
+            FreeCADGui.Selection.clearSelection()
 
     def IsChecked(self):
         return a2plib.isTransparencyEnabled()
