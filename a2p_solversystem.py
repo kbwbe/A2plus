@@ -49,7 +49,7 @@ from a2plib import (
 from a2p_dependencies import Dependency
 from a2p_rigid import Rigid
 import os, sys
-from os.path import expanduser
+#from os.path import expanduser
 
 
 SOLVER_MAXSTEPS = 60000

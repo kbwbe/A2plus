@@ -64,7 +64,7 @@ from a2p_libDOF import (
     SystemZAxis
     )
 import os, sys
-from collada import common
+
 
 
 SPINSTEP_DIVISOR = 12.0
