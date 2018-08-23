@@ -53,7 +53,7 @@ from os.path import expanduser
 
 
 SOLVER_MAXSTEPS = 60000
-SOLVER_POS_ACCURACY = 1.0e-1  # gets to smaller values during solving
+SOLVER_POS_ACCURACY = 1.0e-2  # gets to smaller values during solving
 #SOLVER_SPIN_ACCURACY = 1.0e-4 # gets to smaller values during solving
 
 SOLVER_STEPS_CONVERGENCY_CHECK = 1000
@@ -357,10 +357,10 @@ class SolverSystem():
         self.loadSystem(doc)
         if self.status == "loadingDependencyError":
             return
-        
-        #self.progress_bar.start("Solving Assembly...",(self.numdep/2)*(MAX_LEVEL_ACCURACY-1)+1)  
-        
-        #self.progress_bar.next()
+        self.progress_bar = FreeCAD.Base.ProgressIndicator()
+        self.progress_bar.start("Solving Assembly...",(self.numdep/2)*(MAX_LEVEL_ACCURACY-1)) 
+        #for i in range(100):        
+        #    self.progress_bar.next()
         
         self.assignParentship(doc)
         #self.prepareRestart()
@@ -382,21 +382,25 @@ class SolverSystem():
                 Msg('SPIN ACCURACY: {}\n'.format(self.mySOLVER_SPIN_ACCURACY))
                 Msg( '--->LEVEL OF ACCURACY :{} DONE!\n'.format(self.level_of_accuracy) )
                 
+                
+                #self.solutionToParts(doc)
                 self.level_of_accuracy+=1 
+                
                                
                 #FreeCADGui.updateGui()
                 if self.level_of_accuracy == MAX_LEVEL_ACCURACY: 
-                    #self.solutionToParts(doc)                   
+                                       
                     break
                 
                 self.mySOLVER_POS_ACCURACY *= 1e-1
+                
                 self.loadSystem(doc)
                 #self.calcSpinAccuracy()
                 #self.prepareRestart()
             else:
                 break
         #self.mySOLVER_SPIN_ACCURACY = SOLVER_SPIN_ACCURACY
-        #self.progress_bar.stop()
+        self.progress_bar.stop()
         return systemSolved
 
     def solveSystem(self,doc):
@@ -494,6 +498,12 @@ class SolverSystem():
                             workList=[]
                 if not somethingFound:
                     self.partialSolverCurrentStage +=1
+                    if self.partialSolverCurrentStage == PARTIAL_SOLVE_STAGE3:
+                        self.mySOLVER_POS_ACCURACY *= 1e-1
+                        self.calcSpinAccuracy()
+                    elif self.partialSolverCurrentStage == PARTIAL_SOLVE_STAGE4:
+                        self.mySOLVER_POS_ACCURACY *= 10
+                        self.calcSpinAccuracy()
                     workList = []
                     break 
                                 
@@ -540,8 +550,8 @@ class SolverSystem():
                 #FreeCADGui.updateGui()
 
             # The accuracy is good, apply the solution to FreeCAD's objects
-            if (maxPosError < 0.9 * self.mySOLVER_POS_ACCURACY and
-                maxAxisError < 0.9 * self.mySOLVER_SPIN_ACCURACY):
+            if (maxPosError <  self.mySOLVER_POS_ACCURACY and
+                maxAxisError <  self.mySOLVER_SPIN_ACCURACY):
                 # The accuracy is good, we're done here
                 goodAccuracy = True
                 # Mark the rigids as tempfixed and add its constrained rigids to pending list to be processed next
@@ -551,13 +561,13 @@ class SolverSystem():
                 
                 for r in workList:                    
                     r.applySolution(doc,self) 
-                    FreeCADGui.updateGui()  
+                    #FreeCADGui.updateGui()  
                     for dep in r.dependencies:
                         if dep.Enabled:
-                            #self.progress_bar.next()
+                            self.progress_bar.next()
                             dep.Done = True
                             dep.disable()                                  
-                    if self.partialSolverCurrentStage == PARTIAL_SOLVE_STAGE1 or r.checkIfAllDone():
+                    if self.partialSolverCurrentStage == PARTIAL_SOLVE_STAGE1:
                         r.tempfixed = True
                     elif self.partialSolverCurrentStage == PARTIAL_SOLVE_STAGE2 and r.checkIfAllDone():
                         r.tempfixed = True
@@ -578,8 +588,11 @@ class SolverSystem():
                         if rig.maxAxisError > self.mySOLVER_SPIN_ACCURACY or rig.maxPosError > self.mySOLVER_POS_ACCURACY:
                             for r in rig.linkedRigids:
                                 if r.tempfixed and not r.fixed:
+                                    Msg("unfixed Rigid {}\n".format(r.label))
                                     r.tempfixed = False
-                                    #Msg("unfixed Rigid {}\n".format(r.label))
+                                    #for dep in r.dependencies:
+                                    #    print dep
+                                    
                                     foundRigidToUnfix = True
                                     #foundRigidToUnfix = False
                     
