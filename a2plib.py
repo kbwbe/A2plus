@@ -494,3 +494,24 @@ def getAxis(obj, subElementName):
             axis =  edge.Curve.Axis
     return axis # may be none!
 #------------------------------------------------------------------------------
+def isA2pPart(obj):
+    result = False
+    if hasattr(obj,"Content"):
+        if 'importPart' in obj.Content:
+            result = True
+    return result
+
+def isA2pConstraint(obj): 
+    result = False
+    if hasattr(obj,"Content"):
+        if ('ConstraintInfo' in obj.Content) or ('ConstraintNfo'in obj.Content):
+            result = True
+    return result
+
+def isA2pObject(obj):
+    result = False
+    if isA2pPart(obj) or isA2pConstraint(obj):
+        result = True
+    return result
+#------------------------------------------------------------------------------
+
