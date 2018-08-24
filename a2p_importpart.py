@@ -246,7 +246,7 @@ def importPartFromFile(_doc, filename, importToCache=False):
         newObj.ViewObject.DiffuseColor = copy.deepcopy(tmpObj.ViewObject.DiffuseColor)
         print("importPartFromFile: initial DiffuseColor:\n", newObj.ViewObject.DiffuseColor)
 
-        shapeTsp = round( float(shapeTsp100/100), 2 )                         # setup DiffuseColor properly from Part
+        shapeTsp = round( float(shapeTsp100/100.0), 2 )                       # setup DiffuseColor properly from Part
         print("importPartFromFile: initial transparency:", shapeTsp)
         print("importPartFromFile: initial shapeColor:  ", shapeCol)
         print("importPartFromFile: DiffuseColor objects:", len(newObj.ViewObject.DiffuseColor))
@@ -409,7 +409,7 @@ def updateImportedParts(doc):
 
                     origDiffCol = copy.deepcopy(obj.ViewObject.DiffuseColor)        # DECIMAL ISSUE with transparency !!!
 
-                    origTsp = round( float(obj.ViewObject.Transparency/100), 2 )
+                    origTsp = round( float(obj.ViewObject.Transparency/100.0), 2 )
                     origShapeCol = obj.ViewObject.ShapeColor
                     print("updateImportedParts: orig Transparency:", origTsp)
                     print("updateImportedParts: orig ShapeColor:  ", origShapeCol)
@@ -504,7 +504,7 @@ def duplicateImportedPart( part ):
 
     newObj.ViewObject.ShapeColor = shapeCol = part.ViewObject.ShapeColor              # likely to override DiffuseColor if
     newObj.ViewObject.Transparency = shapeTsp100 = part.ViewObject.Transparency       # called later and most likely gray
-    shapeTsp = round( float(shapeTsp100/100), 2 )
+    shapeTsp = round( float(shapeTsp100/100.0), 2 )
     print("duplicateImportedPart: duplicated transparency:", shapeTsp)
     print("duplicateImportedPart: duplicated shapeColor:  ", shapeCol)
 

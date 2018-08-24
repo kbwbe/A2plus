@@ -55,7 +55,7 @@ def muxObjectsWithKeys(objsIn, withColor=False):
         # Save Computing time, store this before the for..enumerate loop later...
         colorFlag = ( len(obj.ViewObject.DiffuseColor) < len(obj.Shape.Faces) )    # one or more color tuples per obj ?
         shapeCol = obj.ViewObject.ShapeColor
-        shapeTsp = round( float(obj.ViewObject.Transparency/100), 2 )              # alpha value for DiffuseColor
+        shapeTsp = round( float(obj.ViewObject.Transparency/100.0), 2 )            # alpha value for DiffuseColor
         diffuseCol = copy.deepcopy(obj.ViewObject.DiffuseColor)
 
         # now start the loop with use of the stored values..(much faster)
