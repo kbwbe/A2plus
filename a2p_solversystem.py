@@ -53,13 +53,13 @@ import os, sys
 
 
 SOLVER_MAXSTEPS = 60000
-SOLVER_POS_ACCURACY = 1.0e-2  # gets to smaller values during solving
+SOLVER_POS_ACCURACY = 1.0e-1  # gets to smaller values during solving
 #SOLVER_SPIN_ACCURACY = 1.0e-4 # gets to smaller values during solving
 
 SOLVER_STEPS_CONVERGENCY_CHECK = 1000
 SOLVER_CONVERGENCY_ERROR_INIT_VALUE = 1.0e+20
 SOLVER_CONVERGENCY_FACTOR = 0.99
-MAX_LEVEL_ACCURACY = 5  #accuracy reached is 1.0e-MAX_LEVEL_ACCURACY
+MAX_LEVEL_ACCURACY = 10  #accuracy reached is 1.0e-MAX_LEVEL_ACCURACY
 
 from a2plib import (
     PARTIAL_SOLVE_STAGE1,
@@ -196,7 +196,7 @@ class SolverSystem():
             self.numdep+=rig.countDependencies()
         Msg( 'there are {} dependencies\n'.format(self.numdep/2))       
         self.status = "loaded"
-        self.calcSpinAccuracy()
+        
         
         
 
@@ -333,6 +333,8 @@ class SolverSystem():
         vec1 = Base.Vector(xmin,ymin,zmin)
         vec2 = Base.Vector(xmax,ymax,zmax)
         assemblysize = vec1.distanceToPoint(vec2)
+        if float(assemblysize) / self.mySOLVER_POS_ACCURACY > 10e7:
+            return False 
         #print 'Assembly size = ', assemblysize
         #accuracydivider = 1000.0 * (10**self.level_of_accuracy)
         #for a in range(self.level_of_accuracy):
@@ -342,6 +344,8 @@ class SolverSystem():
         self.mySOLVER_SPIN_ACCURACY = math.degrees(math.atan(self.mySOLVER_POS_ACCURACY / assemblysize))
         #self.mySOLVER_SPIN_ACCURACY = math.degrees(math.atan(1 / accuracydivider))
         #self.mySOLVER_SPIN_ACCURACY = self.mySOLVER_POS_ACCURACY
+        return True
+        
         
     def prepareRestart(self):
         #self.mySOLVER_POS_ACCURACY = SOLVER_POS_ACCURACY
@@ -353,12 +357,15 @@ class SolverSystem():
 
     def solveSystemWithMode(self,doc):
         self.level_of_accuracy=1
+        
         startTime = int(round(time.time() * 1000))
         self.loadSystem(doc)
         if self.status == "loadingDependencyError":
             return
-        self.progress_bar = FreeCAD.Base.ProgressIndicator()
-        self.progress_bar.start("Solving Assembly...",(self.numdep/2)*(MAX_LEVEL_ACCURACY-1)) 
+        self.mySOLVER_POS_ACCURACY = SOLVER_POS_ACCURACY
+        self.calcSpinAccuracy()
+#         self.progress_bar = FreeCAD.Base.ProgressIndicator()
+#         self.progress_bar.start("Solving Assembly...",(self.numdep/2)*(MAX_LEVEL_ACCURACY-1)) 
         #for i in range(100):        
         #    self.progress_bar.next()
         
@@ -392,7 +399,9 @@ class SolverSystem():
                                        
                     break
                 
-                self.mySOLVER_POS_ACCURACY *= 1e-1
+                self.mySOLVER_POS_ACCURACY *= 1.0e-1
+                if not self.calcSpinAccuracy():
+                    break
                 
                 self.loadSystem(doc)
                 #self.calcSpinAccuracy()
@@ -400,7 +409,7 @@ class SolverSystem():
             else:
                 break
         #self.mySOLVER_SPIN_ACCURACY = SOLVER_SPIN_ACCURACY
-        self.progress_bar.stop()
+        #self.progress_bar.stop()
         return systemSolved
 
     def solveSystem(self,doc):
@@ -459,6 +468,9 @@ class SolverSystem():
         self.stepCount = 0
         
         self.partialSolverCurrentStage = PARTIAL_SOLVE_STAGE1
+        if self.level_of_accuracy <3:
+            self.mySOLVER_POS_ACCURACY *= 1.0e-1
+        self.calcSpinAccuracy()
         #mainWorklist = []
         while self.partialSolverCurrentStage != PARTIAL_SOLVE_END:
             #print "evaluating stage = ", self.partialSolverCurrentStage
@@ -498,10 +510,10 @@ class SolverSystem():
                             workList=[]
                 if not somethingFound:
                     self.partialSolverCurrentStage +=1
-                    if self.partialSolverCurrentStage == PARTIAL_SOLVE_STAGE3:
-                        self.mySOLVER_POS_ACCURACY *= 1e-1
-                        self.calcSpinAccuracy()
-                    elif self.partialSolverCurrentStage == PARTIAL_SOLVE_STAGE4:
+#                     if self.partialSolverCurrentStage == PARTIAL_SOLVE_STAGE3:
+#                         self.mySOLVER_POS_ACCURACY *= 1e-1
+#                         self.calcSpinAccuracy()
+                    if (self.partialSolverCurrentStage == PARTIAL_SOLVE_STAGE4) and (self.level_of_accuracy <3) :
                         self.mySOLVER_POS_ACCURACY *= 10
                         self.calcSpinAccuracy()
                     workList = []
@@ -550,8 +562,8 @@ class SolverSystem():
                 #FreeCADGui.updateGui()
 
             # The accuracy is good, apply the solution to FreeCAD's objects
-            if (maxPosError <  self.mySOLVER_POS_ACCURACY and
-                maxAxisError <  self.mySOLVER_SPIN_ACCURACY):
+            if (maxPosError <  0.5 * self.mySOLVER_POS_ACCURACY and
+                maxAxisError <  0.5 * self.mySOLVER_SPIN_ACCURACY):
                 # The accuracy is good, we're done here
                 goodAccuracy = True
                 # Mark the rigids as tempfixed and add its constrained rigids to pending list to be processed next
@@ -564,7 +576,7 @@ class SolverSystem():
                     #FreeCADGui.updateGui()  
                     for dep in r.dependencies:
                         if dep.Enabled:
-                            self.progress_bar.next()
+                            #self.progress_bar.next()
                             dep.Done = True
                             dep.disable()                                  
                     if self.partialSolverCurrentStage == PARTIAL_SOLVE_STAGE1:
