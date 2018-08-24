@@ -736,7 +736,7 @@ class a2p_ToggleAutoSolveCommand:
 
     def GetResources(self):
         return {
-            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_autoSolve.svg',
+            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_ToggleAutoSolve.svg',
             'MenuText':     'toggle AutoSolve',
             'ToolTip':      toolTipMessage,
             'Checkable':    self.IsChecked()
@@ -755,7 +755,7 @@ class a2p_TogglePartialProcessingCommand:
 
     def GetResources(self):
         return {
-            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_partialProcessing.svg',
+            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_TogglePartial.svg',
             'MenuText':     'toggle partial processing',
             'ToolTip':      'toggle partial processing',
             'Checkable':    self.IsChecked()
@@ -813,7 +813,7 @@ class a2p_repairTreeViewCommand:
 
     def GetResources(self):
         return {
-            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_treeview.svg',
+            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_RepairTree.svg',
             'MenuText':     'repair treeView',
             'ToolTip':      toolTipMessage
             }
