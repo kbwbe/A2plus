@@ -138,7 +138,7 @@ def filterImpParts(obj):
             if (plmGlobal != plmLocal):
                 obj.Placement = plmGlobal
             impPartsOut.append(obj)                  # top level within Group
-        elif 'importPart' in obj.Content:            # imported part
+        elif a2plib.isA2pPart(obj):                  # imported part
             impPartsOut.append(obj)
         else:
             pass                                     # more odd PF cases?? BaseFeature in body??
