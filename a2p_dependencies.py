@@ -141,6 +141,15 @@ class Dependency():
             self.Type
             )
 
+    def setCurrentRigid(self, rigid):
+        if self.currentRigid != rigid:
+            self.currentRigid = rigid
+
+    def setDependedRigid(self, rigid):
+        if self.dependedRigid != rigid:
+            self.dependedRigid = rigid
+            
+
     @staticmethod
     def Create(doc, constraint, solver, rigid1, rigid2):
         DebugMsg(
