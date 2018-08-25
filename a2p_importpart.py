@@ -37,8 +37,6 @@ from a2plib import (
 
 PYVERSION =  sys.version_info[0]
 
-PYVERSION =  sys.version_info[0]
-
 class ObjectCache:
     '''
     An assembly could use multiple instances of then same importPart.
