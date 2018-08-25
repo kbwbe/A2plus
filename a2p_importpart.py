@@ -140,10 +140,12 @@ def filterImpParts(obj):
             if (plmGlobal != plmLocal):
                 obj.Placement = plmGlobal
             impPartsOut.append(obj)                  # top level within Group
-        elif hasattr(obj,"a2p_Version"):             # assem item
+        elif ('importPart' in obj.Content):          # new identification of A2plus objects
+            impPartsOut.append(obj)
+        elif hasattr(obj,"a2p_Version"):             # former identification of A2plus objects
             impPartsOut.append(obj)
         elif hasattr(obj,"subassemblyImport"):
-            if obj.subassemblyImport == True:        # assem item
+            if obj.subassemblyImport == True:        # another possible assembly item
                 impPartsOut.append(obj)
         else:
             pass                                     # more odd PF cases?? BaseFeature in body??
