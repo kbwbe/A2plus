@@ -417,11 +417,11 @@ def updateImportedParts(doc):
                     print("updateImportedParts: orig ShapeColor:  ", origShapeCol)
                     print("updateImportedParts: orig DiffuseColor:\n", origDiffCol)
 
-                    # user may have changed color+transparency in the active document
-                    #  if updateColors == True, these changes will be taken as new
+                    # user may have changed color+transparency in the active assembly
+                    #  if updateColors == False, these changes are taken as new
                     print( "updateImportedParts: one shape or even more?", len(origDiffCol) )
-                    if obj.updateColors:
-                        print("updateImportedParts: updateColors is ACTIVE:")
+                    if (obj.updateColors == False):
+                        print("updateImportedParts: updateColors is INactive: taking up actual color changes")
                         if len(origDiffCol) == 1 :
                            obj.ViewObject.DiffuseColor = (origShapeCol[0], origShapeCol[1], origShapeCol[2], origTsp)
 
@@ -430,9 +430,9 @@ def updateImportedParts(doc):
                         else:
                            print("updateImportedParts: muxed assembly, orig DiffuseColor is kept as new,")
                            print("updateImportedParts:  ShapeColor and Transparency aren't usable any more")
-                    #  if updateColors == False, colors+transparencies are recovered from source file
+                    #  if updateColors == True, colors+transparencies are recovered from source file
                     else:
-                        print("updateImportedParts: updateColors is INactive: recovery from orig source file:")
+                        print("updateImportedParts: updateColors is ACTIVE: recovering colors from orig source file:")
                         obj.ViewObject.ShapeColor = newObject.ViewObject.ShapeColor
                         obj.ViewObject.Transparency = newObject.ViewObject.Transparency    # can be 0.0 -- rely on DiffuseColor
                         obj.ViewObject.DiffuseColor = copy.deepcopy(newObject.ViewObject.DiffuseColor)
