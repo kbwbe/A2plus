@@ -140,7 +140,7 @@ def filterImpParts(obj):
             if (plmGlobal != plmLocal):
                 obj.Placement = plmGlobal
             impPartsOut.append(obj)                  # top level within Group
-        elif hasattr(obj,"a2p_Version"):             # assem item
+        elif 'importPart' in obj.Content:            # assem item
             impPartsOut.append(obj)
         elif hasattr(obj,"subassemblyImport"):
             if obj.subassemblyImport == True:        # assem item
