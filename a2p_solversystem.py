@@ -90,6 +90,7 @@ class SolverSystem():
         self.convergencyCounter = 0
         self.status = "created"
         self.partialSolverCurrentStage = 0
+        self.failurecounter = 5
 
     def clear(self):
         for r in self.rigids:
@@ -99,6 +100,7 @@ class SolverSystem():
         self.constraints = []
         self.objectNames = []
         self.partialSolverCurrentStage = PARTIAL_SOLVE_STAGE1
+        self.failurecounter = 5
 
     def getRigid(self,objectName):
         '''get a Rigid by objectName'''
@@ -333,7 +335,7 @@ class SolverSystem():
         vec1 = Base.Vector(xmin,ymin,zmin)
         vec2 = Base.Vector(xmax,ymax,zmax)
         assemblysize = vec1.distanceToPoint(vec2)
-        if float(assemblysize) / self.mySOLVER_POS_ACCURACY > 10e7:
+        if float(assemblysize) / self.mySOLVER_POS_ACCURACY > 1e7:
             return False 
         #print 'Assembly size = ', assemblysize
         #accuracydivider = 1000.0 * (10**self.level_of_accuracy)
@@ -357,7 +359,7 @@ class SolverSystem():
 
     def solveSystemWithMode(self,doc):
         self.level_of_accuracy=1
-        
+        self.failurecounter = 5
         startTime = int(round(time.time() * 1000))
         self.loadSystem(doc)
         if self.status == "loadingDependencyError":
@@ -404,6 +406,7 @@ class SolverSystem():
                     break
                 
                 self.loadSystem(doc)
+                self.failurecounter = 5
                 #self.calcSpinAccuracy()
                 #self.prepareRestart()
             else:
@@ -468,8 +471,8 @@ class SolverSystem():
         self.stepCount = 0
         
         self.partialSolverCurrentStage = PARTIAL_SOLVE_STAGE1
-        if self.level_of_accuracy <3:
-            self.mySOLVER_POS_ACCURACY *= 1.0e-1
+        
+        self.mySOLVER_POS_ACCURACY *= 1.0e-1
         self.calcSpinAccuracy()
         #mainWorklist = []
         while self.partialSolverCurrentStage != PARTIAL_SOLVE_END:
@@ -513,7 +516,7 @@ class SolverSystem():
 #                     if self.partialSolverCurrentStage == PARTIAL_SOLVE_STAGE3:
 #                         self.mySOLVER_POS_ACCURACY *= 1e-1
 #                         self.calcSpinAccuracy()
-                    if (self.partialSolverCurrentStage == PARTIAL_SOLVE_STAGE4) and (self.level_of_accuracy <3) :
+                    if (self.partialSolverCurrentStage == PARTIAL_SOLVE_STAGE4) :
                         self.mySOLVER_POS_ACCURACY *= 10
                         self.calcSpinAccuracy()
                     workList = []
@@ -562,8 +565,8 @@ class SolverSystem():
                 #FreeCADGui.updateGui()
 
             # The accuracy is good, apply the solution to FreeCAD's objects
-            if (maxPosError <  0.5 * self.mySOLVER_POS_ACCURACY and
-                maxAxisError <  0.5 * self.mySOLVER_SPIN_ACCURACY):
+            if (maxPosError <   self.mySOLVER_POS_ACCURACY and
+                maxAxisError <  self.mySOLVER_SPIN_ACCURACY):
                 # The accuracy is good, we're done here
                 goodAccuracy = True
                 # Mark the rigids as tempfixed and add its constrained rigids to pending list to be processed next
@@ -573,7 +576,7 @@ class SolverSystem():
                 
                 for r in workList:                    
                     r.applySolution(doc,self) 
-                    #FreeCADGui.updateGui()  
+                    FreeCADGui.updateGui()  
                     for dep in r.dependencies:
                         if dep.Enabled:
                             #self.progress_bar.next()
@@ -592,12 +595,18 @@ class SolverSystem():
                 if (
                     maxPosError  >= self.lastPositionError or
                     maxAxisError >= self.lastAxisError
-                    ):     
+                    ): 
+                    #self.failurecounter -= 1
+                    #print "Decreasing self.failurecounter"
+                    #if self.failurecounter == 0:    
                     
                     foundRigidToUnfix = False
                     # search for unsolved dependencies...
                     for rig in workList:
                         if rig.maxAxisError > self.mySOLVER_SPIN_ACCURACY or rig.maxPosError > self.mySOLVER_POS_ACCURACY:
+                            Msg("Error on Rigid {}\n".format(rig.label))
+                            Msg("    PosError {}\n".format(rig.maxPosError))
+                            Msg("    AxisError {}\n".format(rig.maxAxisError))
                             for r in rig.linkedRigids:
                                 if r.tempfixed and not r.fixed:
                                     Msg("unfixed Rigid {}\n".format(r.label))
@@ -607,7 +616,7 @@ class SolverSystem():
                                     
                                     foundRigidToUnfix = True
                                     #foundRigidToUnfix = False
-                    
+                
                     if foundRigidToUnfix:
                         self.lastPositionError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
                         self.lastAxisError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
@@ -618,7 +627,7 @@ class SolverSystem():
                         Msg('convergency-conter: {}\n'.format(self.convergencyCounter))
                         Msg( "System not solvable, convergency is incorrect!\n" )
                         return False
-                
+            
                 
                 
                 self.lastPositionError = maxPosError

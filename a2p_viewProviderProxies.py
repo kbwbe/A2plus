@@ -215,11 +215,11 @@ def create_constraint_mirror( constraintObj, iconPath, origLabel= '', mirrorLabe
                 )
             if pName == 'directionConstraint':
                 v =  constraintObj.directionConstraint
-                if v != "none": #then updating a document with mirrors
+                if v != "auto": #then updating a document with mirrors
                     cMirror.directionConstraint =  ["aligned","opposed"]
                     cMirror.directionConstraint = v
                 else:
-                    cMirror.directionConstraint =  ["none","aligned","opposed"]
+                    cMirror.directionConstraint =  ["aligned","opposed", "auto"]
             else:
                 setattr( cMirror, pName, getattr( constraintObj, pName) )
             if constraintObj.getEditorMode(pName) == ['ReadOnly']:

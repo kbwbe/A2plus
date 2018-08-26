@@ -70,7 +70,7 @@ def parseSelection(selection, objectToUpdate=None):
         c.addProperty("App::PropertyString","SubElement2","ConstraintInfo").SubElement2 = cParms[1][1]
 
         c.addProperty("App::PropertyEnumeration","directionConstraint", "ConstraintInfo")
-        c.directionConstraint = ["none","aligned","opposed"]
+        c.directionConstraint = ["aligned","opposed","auto"]
 
         c.setEditorMode('Type',1)
         for prop in ["Object1","Object2","SubElement1","SubElement2"]:
