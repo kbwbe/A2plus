@@ -24,7 +24,7 @@
 
 import FreeCADGui,FreeCAD
 from PySide import QtGui, QtCore
-import os, copy, time
+import os, copy, time, sys
 import a2plib
 from a2p_MuxAssembly import muxObjectsWithKeys, createTopoInfo, Proxy_muxAssemblyObj
 from a2p_viewProviderProxies import *
@@ -34,6 +34,8 @@ from a2plib import (
     appVersionStr,
     AUTOSOLVE_ENABLED
     )
+
+PYVERSION =  sys.version_info[0]
 
 class ObjectCache:
     '''
@@ -185,6 +187,9 @@ def importPartFromFile(_doc, filename, importToCache=False):
     #-------------------------------------------
     #if any([ 'importPart' in obj.Content for obj in importDoc.Objects]) and not len(visibleObjects) == 1:
     subAssemblyImport = False
+    print("importPartFromFile: importableObjects:\n", importableObjects)
+    if len(importableObjects) == 1:
+        print("importPartFromFile: first and only file:", importableObjects[0])
     if len(importableObjects) > 1:
         subAssemblyImport = True
 
@@ -198,7 +203,10 @@ def importPartFromFile(_doc, filename, importToCache=False):
     else:
         partName = a2plib.findUnusedObjectName( importDoc.Label, document=doc )
         partLabel = a2plib.findUnusedObjectLabel( importDoc.Label, document=doc )
-        newObj = doc.addObject("Part::FeaturePython",partName.encode('utf-8'))
+        if PYVERSION < 3:
+            newObj = doc.addObject( "Part::FeaturePython", partName.encode('utf-8') )
+        else:
+            newObj = doc.addObject( "Part::FeaturePython", str(partName.encode('utf-8')) )    # works on Python 3.6.5
         newObj.Label = partLabel
 
 
@@ -213,23 +221,49 @@ def importPartFromFile(_doc, filename, importToCache=False):
     newObj.addProperty("App::PropertyBool","subassemblyImport","importPart").subassemblyImport = subAssemblyImport
     newObj.setEditorMode("subassemblyImport",1)
     newObj.addProperty("App::PropertyBool","updateColors","importPart").updateColors = True
+    newObj.ViewObject.addDisplayMode(coin.SoGroup(),"Flat Lines")
     #
     if subAssemblyImport:
         newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor = muxObjectsWithKeys(importableObjects, withColor=True)
+#        newObj.ViewObject.ShapeColor = newObj.ViewObject.DiffuseColor
+        print("importPartFromFile: assembly's DiffuseColor after MUX:\n", newObj.ViewObject.DiffuseColor)
         #newObj.muxInfo, newObj.Shape = muxObjectsWithKeys(importDoc, withColor=False)
     else:
         tmpObj = importableObjects[0]
         newObj.Shape = tmpObj.Shape.copy()
-        newObj.ViewObject.ShapeColor = tmpObj.ViewObject.ShapeColor
-        if appVersionStr() <= '000.016': #FC0.17: DiffuseColor overrides ShapeColor !
-            newObj.ViewObject.DiffuseColor = tmpObj.ViewObject.DiffuseColor
+        for p in tmpObj.ViewObject.PropertiesList: #assuming that the user may change the appearance of parts differently depending on the assembly.
+            if hasattr(tmpObj.ViewObject, p) and \
+                (p not in ['DiffuseColor','Proxy','MappedColors','DisplayMode','DisplayModeBody']) :
+                setattr(newObj.ViewObject, p, getattr(tmpObj.ViewObject, p))
+
+        newObj.ViewObject.ShapeColor = shapeCol = tmpObj.ViewObject.ShapeColor
+        newObj.ViewObject.Transparency = shapeTsp100 = tmpObj.ViewObject.Transparency
+
+#        if appVersionStr() <= '000.016': #FC0.17: DiffuseColor overrides ShapeColor !
+        newObj.ViewObject.DiffuseColor = copy.deepcopy(tmpObj.ViewObject.DiffuseColor)
+        print("importPartFromFile: initial DiffuseColor:\n", newObj.ViewObject.DiffuseColor)
+
+        shapeTsp = round( (shapeTsp100/100.0), 2 )                       # setup DiffuseColor properly from Part
+        print("importPartFromFile: initial transparency:", shapeTsp)
+        print("importPartFromFile: initial shapeColor:  ", shapeCol)
+        print("importPartFromFile: DiffuseColor objects:", len(newObj.ViewObject.DiffuseColor))
+        if ( len(newObj.ViewObject.DiffuseColor) == 1 ) :
+            newObj.ViewObject.DiffuseColor = (shapeCol[0],shapeCol[1],shapeCol[2],shapeTsp)
+            print("importPartFromFile: from initial values combined DiffuseColor:\n", \
+                newObj.ViewObject.DiffuseColor)
+        else:
+            print("importPartFromFile: muxed assembly, initial DiffuseColor is taken")
+
         newObj.muxInfo = createTopoInfo(tmpObj)
-        newObj.ViewObject.Transparency = tmpObj.ViewObject.Transparency
 
     newObj.Proxy = Proxy_muxAssemblyObj()
     newObj.ViewObject.Proxy = ImportedPartViewProviderProxy()
 
     doc.recompute()
+
+#    if len(newObj.ViewObject.DiffuseColor) > 1:                              # don't know if needed,
+#        # force-reset colors if changed                                      # borrowed from Arch WB
+#        newObj.ViewObject.DiffuseColor = newObj.ViewObject.DiffuseColor
 
     if importToCache:
         objectCache.add(newObj.sourceFile, newObj)
@@ -263,7 +297,10 @@ class a2p_ImportPartCommand():
             )
         dialog.setNameFilter("Supported Formats (*.FCStd);;All files (*.*)")
         if dialog.exec_():
-            filename = unicode(dialog.selectedFiles()[0])
+            if PYVERSION < 3:
+                filename = unicode(dialog.selectedFiles()[0])
+            else:
+                filename = str(dialog.selectedFiles()[0])
         else:
             return
 
