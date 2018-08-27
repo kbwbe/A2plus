@@ -162,35 +162,9 @@ class Rigid():
 
     def getCandidates(self, solverStage = None):
         candidates = []
-        
-        '''
-        if solverStage == PARTIAL_SOLVE_STAGE1:
-            for linkedRig in self.linkedRigids:
-                if not linkedRig.tempfixed:
-                    if self.isFullyConstrainedByRigid(linkedRig):
-                        candidates.append(linkedRig)
-        
-        elif solverStage == PARTIAL_SOLVE_STAGE2:
-            for linkedRig in self.linkedRigids:
-                if not linkedRig.tempfixed:
-                    if linkedRig.isFullyConstrainedByFixedRigids():
-                        candidates.append(linkedRig)
-
-        elif solverStage == PARTIAL_SOLVE_STAGE3:
-            for linkedRig in self.linkedRigids:
-                if linkedRig.tempfixed: continue
-                if linkedRig.areAllParentTempFixed():
-                    candidates.append(linkedRig)
-        
-        elif solverStage == PARTIAL_SOLVE_STAGE4:
-            pass
-
-        elif solverStage == PARTIAL_SOLVE_STAGE5:
-        '''
         for linkedRig in self.linkedRigids:
             if linkedRig.tempfixed: continue
             candidates.append(linkedRig)
-
         return set(candidates)
     
     def addChildrenByDistance(self, addList, distance):
@@ -328,74 +302,6 @@ class Rigid():
             if dep.refPoint.z > zmax: zmax=dep.refPoint.z
         self.refPointsBoundBoxSize = math.sqrt( (xmax-xmin)**2 + (ymax-ymin)**2 + (zmax-zmin)**2 )
 
-    '''
-    def calcMoveData(self, doc, solver):
-        if self.tempfixed or self.fixed: return
-        depRefPoints = []
-        depMoveVectors = [] #collect Data to compute central movement of rigid
-        #
-        self.maxPosError = 0.0
-        self.maxAxisError = 0.0
-        self.countSpinVectors = 0
-        self.moveVectorSum = Base.Vector(0,0,0)
-
-        for dep in self.dependencies:
-            refPoint, moveVector = dep.getMovement()
-            if refPoint is None or moveVector is None: continue     # Should not happen
-
-            depRefPoints.append(refPoint)
-            depMoveVectors.append(moveVector)
-
-            # Calculate max move error
-            if moveVector.Length > self.maxPosError: self.maxPosError = moveVector.Length
-
-            # Accomulate all the movements for later average calculations
-            self.moveVectorSum = self.moveVectorSum.add(moveVector)
-
-        # Calculate the average of all the movements
-        if len(depMoveVectors) > 0:
-            self.moveVectorSum = self.moveVectorSum.multiply(1.0/len(depMoveVectors))
-
-        #compute rotation caused by refPoint-attractions and axes mismatch
-        if len(depMoveVectors) > 0 and self.spinCenter != None:
-            self.spin = Base.Vector(0,0,0)
-
-            #realMoveVectorSum = FreeCAD.Vector(self.moveVectorSum)
-            #realMoveVectorSum.multiply(WEIGHT_LINEAR_MOVE)
-            for i in range(0, len(depRefPoints)):
-                try:
-                    vec1 = depRefPoints[i].sub(self.spinCenter) # 'aka Radius'
-                    vec2 = depMoveVectors[i].sub(self.moveVectorSum) # 'aka Force'
-                    axis = vec1.cross(vec2) #torque-vector
-
-                    vec1.normalize()
-                    vec1.multiply(self.refPointsBoundBoxSize)
-                    vec3 = vec1.add(vec2)
-                    beta = vec3.getAngle(vec1)
-
-                    axis.normalize()
-                    axis.multiply(math.degrees(beta)*WEIGHT_REFPOINT_ROTATION) #here use degrees
-                    self.spin = self.spin.add(axis)
-                    self.countSpinVectors += 1
-                except:
-                    pass #numerical exception above, no spin !
-
-            #adjust axis' of the dependencies //FIXME (align,opposed,none)
-
-            for dep in self.dependencies:
-                rotation = dep.getRotation(solver)
-
-                if rotation is None: continue       # No rotation for that dep
-
-                # Accumulate all rotations for later average calculation
-                self.spin = self.spin.add(rotation)
-                self.countSpinVectors += 1
-
-                # Calculate max rotation error
-                axisErr = self.spin.Length
-                if axisErr > self.maxAxisError : self.maxAxisError = axisErr
-    '''
-
     def calcMoveData(self, doc, solver):
         if self.tempfixed or self.fixed: return
         depRefPoints = []      #collect Data to compute central movement of rigid
@@ -425,22 +331,6 @@ class Rigid():
             self.moveVectorSum = self.moveVectorSum.multiply(1.0/len(depMoveVectors))
 
         #compute rotation caused by refPoint-attractions
-        '''
-        depRefPoints = []      #collect Data to compute central movement of rigid
-        depMoveVectors = []    #collect Data to compute central movement of rigid
-        
-        for dep in self.dependencies:
-            if dep.Type not in (
-                "planesParallel",
-                "angledPlanes"
-                ):
-                refPoint, moveVector = dep.getMovement()
-                if refPoint is None or moveVector is None: continue     # Should not happen
-    
-                depRefPoints.append(refPoint)
-                depMoveVectors.append(moveVector)
-        '''
-            
         if len(depMoveVectors) >= 2:
             self.spin = Base.Vector(0,0,0)
             tmpSpinCenter = depRefPoints[0] # assume rigid spinning around first depRefPoint
