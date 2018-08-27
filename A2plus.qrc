@@ -13,6 +13,7 @@
         <file>icons/a2p_flipConstraint.svg</file>
         <file>icons/a2p_help.svg</file>
         <file>icons/a2p_ImportPart.svg</file>
+        <file>icons/a2p_ConvertPart.svg</file>
         <file>icons/a2p_ImportPart_Update.svg</file>
         <file>icons/a2p_Isolate_Element.svg</file>
         <file>icons/a2p_lockRotation.svg</file>
@@ -27,13 +28,15 @@
         <file>icons/a2p_PointIdentity.svg</file>
         <file>icons/a2p_PointOnLineConstraint.svg</file>
         <file>icons/a2p_PointOnPlaneConstraint.svg</file>
-        <file>icons/a2p_preferences.svg</file>
         <file>icons/a2p_SimpleAssemblyShape.svg</file>
         <file>icons/a2p_solver.svg</file>
         <file>icons/a2p_SphericalSurfaceConstraint.svg</file>
         <file>icons/a2p_stop.svg</file>
         <file>icons/a2p_ToggleTranparency.svg</file>
+        <file>icons/a2p_ToggleAutoSolve.svg</file>
+        <file>icons/a2p_TogglePartial.svg</file>
         <file>icons/a2p_treeview.svg</file>
+        <file>icons/a2p_RepairTree.svg</file>
         <file>icons/a2p_ViewConnection.svg</file>
         <file>icons/a2p_workbench.svg</file>
         <file>icons/preferences-a2plus.svg</file>

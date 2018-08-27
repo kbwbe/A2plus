@@ -40,7 +40,11 @@ class ImportedPartViewProviderProxy:
     def claimChildren(self):
         if hasattr(self,'Object'):
             try:
-                return self.Object.InList
+                children = list()
+                for obj in self.Object.InList:
+                    if a2plib.isA2pObject(obj):
+                        children.append(obj)
+                return children
             except:
                 #FreeCAD has already deleted self.Object !!
                 return[]

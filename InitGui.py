@@ -44,6 +44,7 @@ class a2pWorkbench (Workbench):
             import a2p_Resources3
         import a2plib #QtCore.QResource.registerResource happens in assembly2lib
         import a2p_importpart
+        import a2p_convertPart
         import a2p_CircularEdgeConnection
         import a2p_planesParallelConstraint
         import a2p_planeConstraint
@@ -61,6 +62,7 @@ class a2pWorkbench (Workbench):
             'a2p_updateImportedParts',
             'a2p_movePart',
             'a2p_duplicatePart',
+            'a2p_ConvertPart',
             'a2p_editImportedPart',
             ]
         constraintCommands = [
@@ -157,6 +159,7 @@ class a2pWorkbench (Workbench):
                       'a2p_movePart',
                       'a2p_duplicatePart',
                       'a2p_editImportedPart',
+                      'a2p_ConvertPart',
                       'a2p_DeleteConnectionsCommand',
                       'a2p_ToggleTransparencyCommand'
                       ]
