@@ -52,6 +52,10 @@ RED = (1.0,0.0,0.0)
 GREEN = (0.0,1.0,0.0)
 BLUE = (0.0,0.0,1.0)
 
+# Activate a Testmode, solving does only some steps,
+# you can see Movement of parts on screen
+A2P_MOVIMODE        = False 
+
 # DEFINE DEBUG LEVELS FOR CONSOLE OUTPUT
 A2P_DEBUG_NONE      = 0
 A2P_DEBUG_1         = 1
@@ -59,6 +63,14 @@ A2P_DEBUG_2         = 2
 A2P_DEBUG_3         = 3
 
 A2P_DEBUG_LEVEL = A2P_DEBUG_NONE
+
+PARTIAL_SOLVE_STAGE1 = 1    #solve all rigid fully constrained to tempfixed rigid, enable only involved dep, then set them as tempfixed
+PARTIAL_SOLVE_STAGE2 = 2    #solve all rigid constrained only to tempfixed rigids, it doesn't matter if fully constrained or not. 
+                            #in case more than one tempfixed rigid
+PARTIAL_SOLVE_STAGE3 = 3    #repeat stage 1 and stage2 as there are rigids that match
+PARTIAL_SOLVE_STAGE4 = 4    #look for block of rigids, if a rigid is fully constrained to one rigid, solve them and create a superrigid (disabled at the moment)
+PARTIAL_SOLVE_STAGE5 = 5    #take all remaining rigid and dependencies not done and try to solve them all together
+PARTIAL_SOLVE_END = 6
 
 
 #------------------------------------------------------------------------------
@@ -482,3 +494,24 @@ def getAxis(obj, subElementName):
             axis =  edge.Curve.Axis
     return axis # may be none!
 #------------------------------------------------------------------------------
+def isA2pPart(obj):
+    result = False
+    if hasattr(obj,"Content"):
+        if 'importPart' in obj.Content:
+            result = True
+    return result
+
+def isA2pConstraint(obj): 
+    result = False
+    if hasattr(obj,"Content"):
+        if ('ConstraintInfo' in obj.Content) or ('ConstraintNfo'in obj.Content):
+            result = True
+    return result
+
+def isA2pObject(obj):
+    result = False
+    if isA2pPart(obj) or isA2pConstraint(obj):
+        result = True
+    return result
+#------------------------------------------------------------------------------
+
