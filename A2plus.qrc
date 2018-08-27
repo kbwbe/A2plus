@@ -1,0 +1,44 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/a2p_AngleConstraint.svg</file>
+        <file>icons/a2p_autoSolve.svg</file>
+        <file>icons/a2p_AxialConstraint.svg</file>
+        <file>icons/a2p_checkAssembly.svg</file>
+        <file>icons/a2p_CircularEdgeConstraint.svg</file>
+        <file>icons/a2p_degreesOfFreedomAnimation.svg</file>
+        <file>icons/a2p_DeleteConnections.svg</file>
+        <file>icons/a2p_DuplicatePart.svg</file>
+        <file>icons/a2p_EditPart.svg</file>
+        <file>icons/a2p_EditUndo.svg</file>
+        <file>icons/a2p_flipConstraint.svg</file>
+        <file>icons/a2p_help.svg</file>
+        <file>icons/a2p_ImportPart.svg</file>
+        <file>icons/a2p_ConvertPart.svg</file>
+        <file>icons/a2p_ImportPart_Update.svg</file>
+        <file>icons/a2p_Isolate_Element.svg</file>
+        <file>icons/a2p_lockRotation.svg</file>
+        <file>icons/a2p_MovePart.svg</file>
+        <file>icons/a2p_partialProcessing.svg</file>
+        <file>icons/a2p_partsInfo.svg</file>
+        <file>icons/a2p_partsList.svg</file>
+        <file>icons/a2p_pause.svg</file>
+        <file>icons/a2p_PlaneCoincidentConstraint.svg</file>
+        <file>icons/a2p_PlanesParallelConstraint.svg</file>
+        <file>icons/a2p_play.svg</file>
+        <file>icons/a2p_PointIdentity.svg</file>
+        <file>icons/a2p_PointOnLineConstraint.svg</file>
+        <file>icons/a2p_PointOnPlaneConstraint.svg</file>
+        <file>icons/a2p_SimpleAssemblyShape.svg</file>
+        <file>icons/a2p_solver.svg</file>
+        <file>icons/a2p_SphericalSurfaceConstraint.svg</file>
+        <file>icons/a2p_stop.svg</file>
+        <file>icons/a2p_ToggleTranparency.svg</file>
+        <file>icons/a2p_ToggleAutoSolve.svg</file>
+        <file>icons/a2p_TogglePartial.svg</file>
+        <file>icons/a2p_treeview.svg</file>
+        <file>icons/a2p_RepairTree.svg</file>
+        <file>icons/a2p_ViewConnection.svg</file>
+        <file>icons/a2p_workbench.svg</file>
+        <file>icons/preferences-a2plus.svg</file>
+    </qresource>
+</RCC>

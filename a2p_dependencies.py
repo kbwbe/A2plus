@@ -46,6 +46,26 @@ from a2plib import (
     A2P_DEBUG_2,
     A2P_DEBUG_3,
     )
+
+import a2p_libDOF
+from a2p_libDOF import (
+    SystemOrigin,
+    SystemXAxis,
+    SystemYAxis,
+    SystemZAxis,
+    initPosDOF,
+    initRotDOF,
+    AxisAlignment,
+    AxisDistance,
+    PlaneOffset,
+    LockRotation,
+    AngleAlignment,
+    PointIdentity,
+    create_Axis,
+    cleanAxis,
+    create_Axis2Points
+    
+    )
 import os, sys
 
 #------------------------------------------------------------------------------
@@ -54,6 +74,7 @@ class Dependency():
         self.Enabled = False
         self.Type = None
         self.refType = refType
+        self.isPointConstraint = False
         self.refPoint = None
         self.refAxisEnd = None
         self.direction = None
@@ -65,6 +86,7 @@ class Dependency():
         self.dependedRigid = None
         self.constraint = constraint    # TODO: remove, probably not needed
         self.axisRotationEnabled = axisRotation
+        self.lockRotation = False
 
         self.Type = constraint.Type
         try:
@@ -79,12 +101,17 @@ class Dependency():
             self.angle = constraint.angle
         except:
             pass # not all constraints do have angle-Property
-
+        try:
+            self.lockRotation = constraint.lockRotation
+        except:
+            pass # not all constraints do have lockRotation
 
     def clear(self):
         self.Type = None
+        self.Enabled = False
         self.refType = None
         self.refPoint = None
+        self.isPointConstraint = None
         self.refAxisEnd = None
         self.direction = None
         self.offset = None
@@ -95,6 +122,7 @@ class Dependency():
         self.dependedRigid = None
         self.constraint = None
         self.axisRotationEnabled = False
+        self.lockRotation = False
 
     def __str__(self):
         return "Dependencies between {}-{}, type {}".format(
@@ -308,13 +336,17 @@ class Dependency():
         self.foreignDependency.Enabled = False
 
     def getMovement(self):
-        raise NotImplementedError("Dependecly class {} doesn't implement movement, use inherited classes instead!".format(self.__class__.__name__))
+        raise NotImplementedError("Dependency class {} doesn't implement movement, use inherited classes instead!".format(self.__class__.__name__))
+
+    def calcDOF(self, _dofRot, _dofPos, _pointconstraints = []):
+        raise NotImplementedError("Dependency class {} doesn't implement calcDOF, use inherited classes instead!".format(self.__class__.__name__))
+
 
     def getRotation(self, solver):
         if not self.Enabled: return None
         if not self.axisRotationEnabled: return None
 
-        # The rotation is the same for all dependinties that enabled it
+        # The rotation is the same for all dependencies that enabled it
         # Special dependency cases are implemented in its own class
 
         axis = None # Rotation axis to be returned
@@ -368,6 +400,7 @@ class Dependency():
 class DependencyPointIdentity(Dependency):
     def __init__(self, constraint, refType):
         Dependency.__init__(self, constraint, refType, False)
+        self.isPointConstraint = True
 
     def getMovement(self):
         if not self.Enabled: return None, None
@@ -375,9 +408,23 @@ class DependencyPointIdentity(Dependency):
         moveVector = self.foreignDependency.refPoint.sub(self.refPoint)
         return self.refPoint, moveVector
 
+    def calcDOF(self, _dofPos, _dofRot, _pointconstraints=[]):
+        #PointIdentity, PointOnLine, PointOnPlane, Spherical Constraints:
+        #    PointIdentityPos()    needs to know the point constrained as vector, the dofpos array, the rigid center point as vector and
+        #                        the pointconstraints which stores all point constraints of the rigid
+        #    PointIdentityRot()    needs to know the point constrained as vector, the dofrot array, and
+        #                        the pointconstraints which stores all point constraints of the rigid
+        # These constraint have to be the last evaluated in the chain of constraints.
+            
+        tmpaxis = cleanAxis(create_Axis(self.refPoint, self.currentRigid.getRigidCenter()))
+        #dofpos = PointIdentityPos(tmpaxis,_dofPos,_pointconstraints)
+        #dofrot = PointIdentityRot(tmpaxis,_dofRot,_pointconstraints)
+        return PointIdentity(tmpaxis, _dofPos, _dofRot, _pointconstraints)
+
 class DependencyPointOnLine(Dependency):
     def __init__(self, constraint, refType):
         Dependency.__init__(self, constraint, refType, False)
+        self.isPointConstraint = True
 
     def getMovement(self):
         if not self.Enabled: return None, None
@@ -402,11 +449,25 @@ class DependencyPointOnLine(Dependency):
 
         else:
             raise NotImplementedError("Wrong refType for class {}".format(self.__class__.__name__))
+            
+    def calcDOF(self, _dofPos, _dofRot, _pointconstraints=[]):
+        #PointIdentity, PointOnLine, PointOnPlane, Spherical Constraints:
+        #    PointIdentityPos()    needs to know the point constrained as vector, the dofpos array, the rigid center point as vector and
+        #                        the pointconstraints which stores all point constraints of the rigid
+        #    PointIdentityRot()    needs to know the point constrained as vector, the dofrot array, and
+        #                        the pointconstraints which stores all point constraints of the rigid
+        # These constraint have to be the last evaluated in the chain of c    
+        tmpaxis = cleanAxis(create_Axis(self.refPoint, self.currentRigid.getRigidCenter()))
+        #dofpos = PointIdentityPos(tmpaxis,_dofPos,_pointconstraints)
+        #dofrot = PointIdentityRot(tmpaxis,_dofRot,_pointconstraints)
+        return PointIdentity(tmpaxis, _dofPos, _dofRot, _pointconstraints)
+               
 
 
 class DependencyPointOnPlane(Dependency):
     def __init__(self, constraint, refType):
         Dependency.__init__(self, constraint, refType, False)
+        self.isPointConstraint = True
 
     def getMovement(self):
         if not self.Enabled: return None, None
@@ -433,29 +494,74 @@ class DependencyPointOnPlane(Dependency):
         else:
             raise NotImplementedError("Wrong refType for class {}".format(self.__class__.__name__))
 
+    def calcDOF(self, _dofPos, _dofRot, _pointconstraints=[]):
+        #PointIdentity, PointOnLine, PointOnPlane, Spherical Constraints:
+        #    PointIdentityPos()    needs to know the point constrained as vector, the dofpos array, the rigid center point as vector and
+        #                        the pointconstraints which stores all point constraints of the rigid
+        #    PointIdentityRot()    needs to know the point constrained as vector, the dofrot array, and
+        #                        the pointconstraints which stores all point constraints of the rigid
+        # These constraint have to be the last evaluated in the chain of constraints.
+               
+        tmpaxis = cleanAxis(create_Axis(self.refPoint, self.currentRigid.getRigidCenter()))
+        
+        #dofpos = PointIdentityPos(tmpaxis,_dofPos,_pointconstraints)
+        #dofrot = PointIdentityRot(tmpaxis,_dofRot,_pointconstraints)
+        return PointIdentity(tmpaxis, _dofPos, _dofRot, _pointconstraints)
+        
 class DependencyCircularEdge(Dependency):
     def __init__(self, constraint, refType):
         Dependency.__init__(self, constraint, refType, True)
+        self.isPointConstraint = False
 
     def getMovement(self):
         if not self.Enabled: return None, None
 
         moveVector = self.foreignDependency.refPoint.sub(self.refPoint)
         return self.refPoint, moveVector
+      
+    def calcDOF(self, _dofPos, _dofRot, _pointconstraints=[]):
+        #function used to determine the dof lost due to this constraint
+        #CircularEdgeConstraint:
+        #    AxisAlignment()    needs to know the axis normal to circle (stored in dep as refpoint and refAxisEnd) and the dofrot array
+        #    AxisDistance()     needs to know the axis normal to circle (stored in dep as refpoint and refAxisEnd) and the dofpos array
+        #    PlaneOffset()      needs to know the axis normal to circle (stored in dep as refpoint and refAxisEnd) and the dofpos array
+        #    LockRotation()     need to know if LockRotation is True or False and the array dofrot
+        #
+        #    honestly speaking this would be simplified like this:
+        #    if LockRotation:
+        #        dofpos = []
+        #        dofrot = []
+        #    else:
+        #        dofpos = []
+        #        dofrot = AxisAlignment(ConstraintAxis, dofrot)
+        if self.lockRotation:
+            return [], []
+        else:
+            tmpaxis = cleanAxis(create_Axis2Points(self.refPoint,self.refAxisEnd))
+            return [], AxisAlignment(tmpaxis,_dofRot)
 
 class DependencyParallelPlanes(Dependency):
     def __init__(self, constraint, refType):
         Dependency.__init__(self, constraint, refType, True)
+        self.isPointConstraint = False
 
     def getMovement(self):
         if not self.Enabled: return None, None
 
         return self.refPoint, Base.Vector(0,0,0)
+            
+    def calcDOF(self, _dofPos, _dofRot, _pointconstraints=[]):
+        #PlanesParallelConstraint:
+        #    AxisAlignment()    needs to know the axis normal to the plane constrained (stored in dep as refpoint and refAxisEnd) and the dofrot array
+        tmpaxis = cleanAxis(create_Axis2Points(self.refPoint,self.refAxisEnd))
+        tmpaxis.Direction.Length = 2.0
+        return _dofPos, AxisAlignment(tmpaxis,_dofRot)
 
 class DependencyAngledPlanes(Dependency):
     def __init__(self, constraint, refType):
         Dependency.__init__(self, constraint, refType, True)
-
+        self.isPointConstraint = False
+        
     def getMovement(self):
         if not self.Enabled: return None, None
 
@@ -486,10 +592,18 @@ class DependencyAngledPlanes(Dependency):
                 axis = Base.Vector(x,y,z)
         #DebugMsg(A2P_DEBUG_3, "{} - rotate by {}\n".format(self, axis.Length))
         return axis
+    
+    def calcDOF(self, _dofPos, _dofRot, _pointconstraints=[]):
+        #AngleBetweenPlanesConstraint
+        #    AngleAlignment()   needs to know the axis normal to plane constrained (stored in dep as refpoint and refAxisEnd) and the dofrot array
+        tmpaxis = cleanAxis(create_Axis2Points(self.refPoint,self.refAxisEnd))
+        tmpaxis.Direction.Length = 2.0
+        return _dofPos, AngleAlignment(tmpaxis,_dofRot)
 
 class DependencyPlane(Dependency):
     def __init__(self, constraint, refType):
         Dependency.__init__(self, constraint, refType, True)
+        self.isPointConstraint = False
 
     def getMovement(self):
         if not self.Enabled: return None, None
@@ -503,9 +617,22 @@ class DependencyPlane(Dependency):
         #DebugMsg(A2P_DEBUG_3,"{} - move by {}\n".format(self, moveVector.Length))
         return self.refPoint, moveVector
 
+    def calcDOF(self, _dofPos, _dofRot, _pointconstraints=[]):
+        #PlaneCoincident:
+        #    AxisAlignment()    needs to know the axis normal to the plane constrained (stored in dep as refpoint and refAxisEnd) and the dofrot array
+        #    PlaneOffset()      needs to know the axis normal to the plane constrained (stored in dep as refpoint and refAxisEnd) and the dofpos array
+        tmpaxis = cleanAxis(create_Axis2Points(self.refPoint,self.refAxisEnd))
+        
+        # the axis used on axisalignment isn't a real axis but a random axis normal to the plane
+        #set it to length = 2 instead of normalize it
+        pos = PlaneOffset(tmpaxis,_dofPos)
+        tmpaxis.Direction.Length = 2.0
+        return pos, AxisAlignment(tmpaxis,_dofRot)
+
 class DependencyAxial(Dependency):
     def __init__(self, constraint, refType):
         Dependency.__init__(self, constraint, refType, True)
+        self.isPointConstraint = False
 
     def getMovement(self):
         if not self.Enabled: return None, None
@@ -515,6 +642,18 @@ class DependencyAxial(Dependency):
         dot = vec1.dot(destinationAxis)
         parallelToAxisVec = destinationAxis.normalize().multiply(dot)
         moveVector = vec1.sub(parallelToAxisVec)
-        #DebugMsg(A2P_DEBUG_3, "{} - move by {}\n".format(self, moveVector.Length))
         return self.refPoint, moveVector
+    
+    
+    def calcDOF(self, _dofPos, _dofRot, _pointconstraints=[]):
+    #AxialConstraint:
+    #    AxisAlignment()    needs to know the axis normal to circle (stored in dep as refpoint and refAxisEnd) and the dofrot array
+    #    AxisDistance()     needs to know the axis normal to circle (stored in dep as refpoint and refAxisEnd) and the dofpos array
+    #    LockRotation()     need to know if LockRotation is True or False and the array dofrot
+        tmpaxis = cleanAxis(create_Axis2Points(self.refPoint,self.refAxisEnd))
+        
+        if self.lockRotation:
+            return AxisDistance(tmpaxis,_dofPos), []
+        else:
+            return AxisDistance(tmpaxis,_dofPos), AxisAlignment(tmpaxis,_dofRot)
     
