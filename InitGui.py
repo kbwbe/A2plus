@@ -89,7 +89,8 @@ class a2pWorkbench (Workbench):
             ]
         miscCommands = [
             'a2p_SimpleAssemblyShapeCommand',
-            'a2p_repairTreeViewCommand'
+            'a2p_repairTreeViewCommand',
+            'a2p_FlipConstraintDirectionCommand'
             ]
 
         self.appendToolbar(

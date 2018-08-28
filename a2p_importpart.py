@@ -827,3 +827,35 @@ FreeCADGui.addCommand('a2p_repairTreeViewCommand', a2p_repairTreeViewCommand())
 def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
     ''' updating constraints, deactivated at moment'''
     return
+
+
+class a2p_FlipConstraintDirectionCommand:
+
+    def Activated(self):
+        a2p_FlipConstraintDirection()
+
+    def GetResources(self):
+        return {
+            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_flipConstraint.svg',
+            'MenuText':     'flip last constraint direction',
+            'ToolTip':      'flip last constraint direction'
+            
+            }
+FreeCADGui.addCommand('a2p_FlipConstraintDirectionCommand', a2p_FlipConstraintDirectionCommand())
+
+def a2p_FlipConstraintDirection():
+    ''' updating constraints, deactivated at moment'''
+    constraints = [ obj for obj in FreeCAD.ActiveDocument.Objects 
+                        if 'ConstraintInfo' in obj.Content ]
+    if len(constraints) == 0:
+        QtGui.QMessageBox.information(  QtGui.qApp.activeWindow(), "Command Aborted", 'Flip aborted since no assembly2 constraints in active document.')
+        return
+    lastConstraintAdded = constraints[-1]
+    try:
+        if lastConstraintAdded.directionConstraint == 'aligned':
+            lastConstraintAdded.directionConstraint = 'opposed'
+        else:
+            lastConstraintAdded.directionConstraint = 'aligned'
+    except:
+        pass
+
