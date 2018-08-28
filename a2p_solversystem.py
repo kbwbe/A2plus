@@ -335,8 +335,7 @@ class SolverSystem():
         vec1 = Base.Vector(xmin,ymin,zmin)
         vec2 = Base.Vector(xmax,ymax,zmax)
         assemblysize = vec1.distanceToPoint(vec2)
-        if float(assemblysize) / self.mySOLVER_POS_ACCURACY > 1e8:
-            return False 
+         
         #print 'Assembly size = ', assemblysize
         #accuracydivider = 1000.0 * (10**self.level_of_accuracy)
         #for a in range(self.level_of_accuracy):
@@ -349,7 +348,10 @@ class SolverSystem():
             return False
         #self.mySOLVER_SPIN_ACCURACY = math.degrees(math.atan(1 / accuracydivider))
         #self.mySOLVER_SPIN_ACCURACY = self.mySOLVER_POS_ACCURACY
-        return True
+        if float(assemblysize) / self.mySOLVER_POS_ACCURACY > 1e8:
+            return False
+        else:
+            return True
         
         
     def prepareRestart(self):
