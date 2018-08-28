@@ -238,6 +238,7 @@ def AxisAlignment(axisa , dofrot, pointconstraints = None, dbg=True):
             else:# (axisa.Direction.Length == 2):
                 #ok return the dofrot
                 #dofrot[0].Direction.Length = 1
+
                 return dofrot
 
         elif check_ifParallel(axisa, dofrot[0]):
@@ -249,9 +250,11 @@ def AxisAlignment(axisa , dofrot, pointconstraints = None, dbg=True):
             elif (axisa.Direction.Length == 2):
                 #ok return the dofrot
                 #dofrot[0].Direction.Length = 1
+
                 return dofrot
             else:
                 return []
+
         else:
             #the axis locks permanently the rotation so DOFRot=[]
             return []
@@ -289,6 +292,7 @@ def AngleAlignment(axisa , dofrot, pointconstraints = None, dbg=True):
             else:# (axisa.Direction.Length == 2):
                 #ok return the dofrot
                 #dofrot[0].Direction.Length = 1
+
                 return dofrot
 
         elif check_ifParallel(axisa, dofrot[0]):
@@ -300,9 +304,11 @@ def AngleAlignment(axisa , dofrot, pointconstraints = None, dbg=True):
             elif (axisa.Direction.Length == 2):
                 #ok return the dofrot
                 #dofrot[0].Direction.Length = 1
+
                 return dofrot
             else:
                 return []
+
         else:
             #the axis locks permanently the rotation so DOFRot=[]
             return []
@@ -461,9 +467,6 @@ def PointIdentity(axisa, dofpos, dofrot, pointconstraints, dbg=False):
             tmpdofrot = dofrot
 
     return tmpdofpos , tmpdofrot
-
-
-
 
 
 
