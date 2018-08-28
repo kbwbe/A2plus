@@ -95,9 +95,9 @@ def cleanAxis(axisa):
     axis=FreeCAD.Axis(axisa)
     axis.Base = zeroIfLessThanTol(axis.Base)
     axis.Direction.normalize()
-    axis.Direction = zeroIfLessThanTol(axis.Direction)    
+    axis.Direction = zeroIfLessThanTol(axis.Direction)
     return axis
-    
+
 def copynorm_AxisToOrigin(axisa, dbg=False):
     offset = SystemOrigin.sub(axisa.Base)
     axisb = FreeCAD.Axis(axisa)
@@ -238,8 +238,9 @@ def AxisAlignment(axisa , dofrot, pointconstraints = None, dbg=True):
             else:# (axisa.Direction.Length == 2):
                 #ok return the dofrot
                 #dofrot[0].Direction.Length = 1
-                return dofrot  
-            
+
+                return dofrot
+
         elif check_ifParallel(axisa, dofrot[0]):
             #the stored axis isn't a specific axis so check if parallel
             if (dofrot[0].Direction.Length == 2):
@@ -249,9 +250,11 @@ def AxisAlignment(axisa , dofrot, pointconstraints = None, dbg=True):
             elif (axisa.Direction.Length == 2):
                 #ok return the dofrot
                 #dofrot[0].Direction.Length = 1
-                return dofrot  
+
+                return dofrot
             else:
-                return []      
+                return []
+
         else:
             #the axis locks permanently the rotation so DOFRot=[]
             return []
@@ -273,7 +276,7 @@ def LockRotation(enabled, dofrot, pointconstraints = None, dbg=True):
         return dofrot
 
 #then Angle Alignment which takes an axis as arguments and operates according to the remaining dof
-#the axis is the normal of the angled plane, that said it acts exaclty as axis alignment, meybe I'll remove it
+#the axis is the normal of the angled plane, that said it acts exactly as axis alignment, maybe I'll remove it
 #this basic constraint affects only rotation DOF
 def AngleAlignment(axisa , dofrot, pointconstraints = None, dbg=True):
     currentDOFROTnum = len(dofrot)
@@ -289,8 +292,9 @@ def AngleAlignment(axisa , dofrot, pointconstraints = None, dbg=True):
             else:# (axisa.Direction.Length == 2):
                 #ok return the dofrot
                 #dofrot[0].Direction.Length = 1
-                return dofrot  
-            
+
+                return dofrot
+
         elif check_ifParallel(axisa, dofrot[0]):
             #the stored axis isn't a specific axis so check if parallel
             if (dofrot[0].Direction.Length == 2):
@@ -300,9 +304,11 @@ def AngleAlignment(axisa , dofrot, pointconstraints = None, dbg=True):
             elif (axisa.Direction.Length == 2):
                 #ok return the dofrot
                 #dofrot[0].Direction.Length = 1
-                return dofrot  
+
+                return dofrot
             else:
-                return []      
+                return []
+
         else:
             #the axis locks permanently the rotation so DOFRot=[]
             return []
@@ -363,7 +369,7 @@ def PlaneOffset(axisa, dofpos, pointconstraints = [], dbg=False):
     elif currentDOFPOSnum == 1 : #partially locked on position so compare to the given axis
         if check_ifParallel(axisa,dofpos[0]):
             #the axis are parallel, so #the axis locks permanently the position so DOFPos=[]
-            return []         
+            return []
         else:
             #as the axes are not parallel, the constraint is redundant as it locks a direction already locked, skip it
             return dofpos
@@ -403,7 +409,7 @@ def PointIdentity(axisa, dofpos, dofrot, pointconstraints, dbg=False):
         return [], dofrot
     else:
         currentDOFPOSnum = len(dofpos)
-                
+
         if currentDOFPOSnum <= 2 : #already locked on position so ignore it
             tmpdofpos = []
 
@@ -411,8 +417,8 @@ def PointIdentity(axisa, dofpos, dofrot, pointconstraints, dbg=False):
             #if there is only 1 pointidentity do nothing, as single point constraint doesn't lock anything just store the point
             if len(pointconstraints) == 1:
                 tmpdofpos = dofpos
-            else: 
-                
+            else:
+
                 #check again the count of the point constraint
                 if len(pointconstraints) >= 2:
                     #there are 3 unique points so the object is fully constrained DOFPOS=0
@@ -422,7 +428,7 @@ def PointIdentity(axisa, dofpos, dofrot, pointconstraints, dbg=False):
         else:
             #this shouldn't happens...ignore it and return the current dofrot
             tmpdofpos = dofpos
-        
+
         currentDOFROTnum = len(dofrot)
         if currentDOFROTnum == 0 : #already locked on rotation so ignore it
             tmpdofrot = []
@@ -439,7 +445,7 @@ def PointIdentity(axisa, dofpos, dofrot, pointconstraints, dbg=False):
             else:
             #the pointidentity locks permanently
                 tmpdofrot = []
-        
+
         elif currentDOFROTnum == 3 : #no constraints on rotation the point identity does nothing on its own
         #here I have to insert the point on pointconstraint, only if the point is not coincident to some point already stored in pointconstraint
         #return back here
@@ -453,18 +459,15 @@ def PointIdentity(axisa, dofpos, dofrot, pointconstraints, dbg=False):
                 #this is a circularedge constraint with an axis with Base on pointA and Direction pointconstraint[0] to pointconstraints[1]
                 #so DOFROT as circular edge always locks all 3 axes in position
                 tmpAxis = create_Axis2Points(pointconstraints[0],pointconstraints[1])
-                tmpAxis = cleanAxis(tmpAxis)                
+                tmpAxis = cleanAxis(tmpAxis)
                 tmpdofrot = AxisAlignment(tmpAxis, dofrot)
 
         else:
             #this shouldn't happens...ignore it and return the current dofrot
             tmpdofrot = dofrot
-    
+
     return tmpdofpos , tmpdofrot
 
-
-
-    
 
 
 #in the end there are the toolbar constraints, those are simply a combination of the ones above
@@ -511,7 +514,7 @@ if __name__ == "__main__":
     pass
     '''
     AXIS1=FreeCAD.Axis()
-    
+
     AXIS1.Base = FreeCAD.Vector(2,10,12)
     AXIS1.Direction = AXIS1.Direction.add(SystemXAxis.Direction)
     AXIS2=FreeCAD.Axis()
@@ -520,7 +523,7 @@ if __name__ == "__main__":
     AXIS3=FreeCAD.Axis()
     AXIS3.Base = SystemOrigin
     AXIS3.Direction = AXIS3.Direction.add(SystemZAxis.Direction)
-    
+
     #print "Axis Normal to plane defined by 2 axes = " , normal_2Axis(AXIS1,AXIS2))
     print AXIS1
     print "Axes defining a plane normal to given axis = " , make_planeNormal(AXIS1)
@@ -533,4 +536,3 @@ if __name__ == "__main__":
     print copynorm_AxisToOrigin(dfdfdf)
     print create_Axis2Points(FreeCAD.Vector(1.0,1.0,1.0), FreeCAD.Vector(3,3,3))
     '''
-

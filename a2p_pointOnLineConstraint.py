@@ -131,7 +131,7 @@ class a2p_PointOnLineConstraintCommand:
     def GetResources(self): 
         return {
              'Pixmap' : path_a2p + '/icons/a2p_PointOnLineConstraint.svg', 
-             'MenuText': 'Add PointOnPlane constraint', 
+             'MenuText': 'Add PointOnLine constraint', 
              'ToolTip': toolTipText
              } 
 
