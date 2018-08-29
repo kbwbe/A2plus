@@ -79,8 +79,8 @@ class a2pWorkbench (Workbench):
             ]
         solverCommands = [
             'a2p_SolverCommand',
-            'a2p_ToggleAutoSolveCommand',
-            'a2p_TogglePartialProcessingCommand',
+            'a2p_ToggleAutoSolveCommand'
+            #'a2p_TogglePartialProcessingCommand',
             ]
         viewCommands = [
             'a2p_ViewConnectionsCommand',

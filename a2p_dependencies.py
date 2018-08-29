@@ -577,19 +577,23 @@ class DependencyAngledPlanes(Dependency):
         foreignAxis = foreignDep.refAxisEnd.sub(foreignDep.refPoint)
         recentAngle = math.degrees(foreignAxis.getAngle(rigAxis))
         deltaAngle = abs(self.angle.Value) - recentAngle
-        if abs(deltaAngle) < 1e-6:
-            # do not change spin, not necessary..
-            axis = None
-        else:
-            try:
-                axis = rigAxis.cross(foreignAxis)
-                axis.normalize()
-                axis.multiply(math.degrees(-deltaAngle))
-            except: #axis = Vector(0,0,0) and cannot be normalized...
-                x = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
-                y = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
-                z = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
-                axis = Base.Vector(x,y,z)
+        try:
+            axis = rigAxis.cross(foreignAxis)
+            axis.normalize()
+            axis.multiply(-deltaAngle)
+            '''
+            print (
+                "Axis: {}, Length: {} RecentAngle: {} deltaAngle: {}".format(
+                    axis,
+                    axis.Length,
+                    recentAngle,
+                    deltaAngle
+                    )
+                )
+            '''
+        except: #axis = Vector(0,0,0) and cannot be normalized...
+            #print ("Exception in angledPlanes.getRotation\n")
+            pass
         #DebugMsg(A2P_DEBUG_3, "{} - rotate by {}\n".format(self, axis.Length))
         return axis
     
