@@ -111,7 +111,7 @@ def setTransparency():
                 else:
                     DebugMsg(A2P_DEBUG_3,"a2p setTransparency: muxed assembly detected:\n{}" \
                        .format(obj.ViewObject.DiffuseColor))
-                Msg("A2P setTransparency: We save all color & transparency to be on the safe side")
+                DebugMsg(A2P_DEBUG_3,"A2P setTransparency: Saving transparency!\n")
                 SAVED_TRANSPARENCY.append(
                     (obj.Name, obj.ViewObject.Transparency, obj.ViewObject.DiffuseColor)
                     )
@@ -137,8 +137,6 @@ def getSelectedConstraint():
     # Check that constraint is selected
     selection = [s for s in FreeCADGui.Selection.getSelection() if s.Document == FreeCAD.ActiveDocument ]
     if len(selection) == 0: return None
-
-    doc = FreeCAD.ActiveDocument
     connectionToView = selection[0]
 
     if not 'ConstraintInfo' in connectionToView.Content and not 'ConstraintNfo' in connectionToView.Content:
@@ -312,7 +310,6 @@ class ConstraintSelectionObserver:
         FreeCADGui.Control.showDialog( self.taskDialog )
 
     def addSelection( self, docName, objName, sub, pnt ):
-        obj = FreeCAD.ActiveDocument.getObject(objName)
         self.selections.append( SelectionRecord( docName, objName, sub ))
         if len(self.selections) == 2:
             self.stopSelectionObservation()

@@ -86,9 +86,9 @@ def globalVisibility(doc, imp):
     else:
         for parent in imp.InList:
             if not parent.ViewObject.Visibility:
-               return parent.ViewObject.Visibility
+                return parent.ViewObject.Visibility
             else:
-               return globalVisibility(doc, parent)
+                return globalVisibility(doc, parent)
 
 def getImpPartsFromDoc(doc, visibleOnly = True):
     objsIn = doc.Objects
@@ -293,7 +293,6 @@ def importPartFromFile(_doc, filename, importToCache=False):
 class a2p_ImportPartCommand():
 
     def GetResources(self):
-        import a2plib
         return {'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_ImportPart.svg',
                 'Accel' : "Shift+A", # a default shortcut (optional)
                 'MenuText': "add Part from external file",
@@ -352,7 +351,6 @@ Check your settings of A2plus preferences.
         if importedObject and not importedObject.fixedPosition:
             PartMover( view, importedObject )
         else:
-            from PySide import QtCore
             self.timer = QtCore.QTimer()
             QtCore.QObject.connect(self.timer, QtCore.SIGNAL("timeout()"), self.GuiViewFit)
             self.timer.start( 200 ) #0.2 seconds
@@ -437,13 +435,13 @@ def updateImportedParts(doc):
                     if (obj.updateColors == False):
                         DebugMsg(A2P_DEBUG_3,"a2p updateImportedParts: updateColors is INactive: taking up actual color changes\n")
                         if len(origDiffCol) == 1 :
-                           obj.ViewObject.DiffuseColor = (origShapeCol[0], origShapeCol[1], origShapeCol[2], origTsp)
+                            obj.ViewObject.DiffuseColor = (origShapeCol[0], origShapeCol[1], origShapeCol[2], origTsp)
 
-                           DebugMsg(A2P_DEBUG_3,"                         from orig values combined DiffuseColor:\n" \
+                            DebugMsg(A2P_DEBUG_3,"                         from orig values combined DiffuseColor:\n" \
                                .format(obj.ViewObject.DiffuseColor))
                         else:
-                           DebugMsg(A2P_DEBUG_3,"a2p updateImportedParts: muxed assembly, orig DiffuseColor is kept as new,\n")
-                           DebugMsg(A2P_DEBUG_3,"a2p updateImportedParts:  ShapeColor and Transparency aren't usable any more\n")
+                            DebugMsg(A2P_DEBUG_3,"a2p updateImportedParts: muxed assembly, orig DiffuseColor is kept as new,\n")
+                            DebugMsg(A2P_DEBUG_3,"a2p updateImportedParts:  ShapeColor and Transparency aren't usable any more\n")
                     #  if updateColors == True, default, colors+transparencies are recovered from source file
                     else:
                         DebugMsg(
@@ -462,7 +460,6 @@ def updateImportedParts(doc):
 
                     obj.Placement = savedPlacement # restore the old placement
 
-    print("")
     mw = FreeCADGui.getMainWindow()
     mdi = mw.findChild(QtGui.QMdiArea)
     sub = mdi.activeSubWindow()
