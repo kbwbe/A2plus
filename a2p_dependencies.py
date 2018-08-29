@@ -682,12 +682,9 @@ class DependencyAngledPlanes(Dependency):
             try:
                 axis = rigAxis.cross(foreignAxis)
                 axis.normalize()
-                axis.multiply(math.degrees(-deltaAngle))
+                axis.multiply(-deltaAngle)
             except: #axis = Vector(0,0,0) and cannot be normalized...
-                x = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
-                y = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
-                z = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
-                axis = Base.Vector(x,y,z)
+                pass
         #DebugMsg(A2P_DEBUG_3, "{} - rotate by {}\n".format(self, axis.Length))
         return axis
     
