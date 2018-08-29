@@ -223,20 +223,31 @@ def DebugMsg(level, tx):
         FreeCAD.Console.PrintMessage(tx)
 
 #------------------------------------------------------------------------------
+def drawSphere(center, color):
+    doc = FreeCAD.ActiveDocument
+    s = Part.makeSphere(2.0,center)
+    sphere = doc.addObject("Part::Feature","Sphere")
+    sphere.Shape = s
+    sphere.ViewObject.ShapeColor = color
+    doc.recompute()
+#------------------------------------------------------------------------------
 def drawVector(fromPoint,toPoint, color):
     if fromPoint == toPoint: return
     doc = FreeCAD.ActiveDocument
 
-    l = Part.Line(fromPoint,toPoint)
-    line = doc.addObject("Part::Feature","ArrowTail")
+    l = Part.LineSegment()
+    l.StartPoint = fromPoint
+    l.EndPoint = toPoint
+    line = doc.addObject("Part::Feature","Line")
     line.Shape = l.toShape()
     line.ViewObject.LineColor = color
-    line.ViewObject.LineWidth = 6
-    #doc.recompute()
+    line.ViewObject.LineWidth = 1
+
+    
     c = Part.makeCone(0,1,4)
     cone = doc.addObject("Part::Feature","ArrowHead")
     cone.Shape = c
-    cone.ViewObject.ShapeColor = (1.0,0.0,0.0)
+    cone.ViewObject.ShapeColor = color
     #
     mov = Base.Vector(0,0,0)
     zAxis = Base.Vector(0,0,-1)
@@ -246,7 +257,6 @@ def drawVector(fromPoint,toPoint, color):
     cone.Placement = conePlacement.multiply(cone.Placement)
     cone.Placement.move(toPoint)
     doc.recompute()
-
 #------------------------------------------------------------------------------
 def findUnusedObjectName(base, counterStart=1, fmt='%03i', document=None):
     if document == None:

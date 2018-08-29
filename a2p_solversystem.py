@@ -53,11 +53,11 @@ import os, sys
 from os.path import expanduser
 
 
-SOLVER_MAXSTEPS = 30000
+SOLVER_MAXSTEPS = 50000
 SOLVER_POS_ACCURACY = 1.0e-1  # gets to smaller values during solving
 SOLVER_SPIN_ACCURACY = 1.0e-1 # gets to smaller values during solving
 
-SOLVER_STEPS_CONVERGENCY_CHECK = 100 #200
+SOLVER_STEPS_CONVERGENCY_CHECK = 150 #200
 SOLVER_CONVERGENCY_FACTOR = 0.99
 SOLVER_CONVERGENCY_ERROR_INIT_VALUE = 1.0e+20
 MAX_LEVEL_ACCURACY = 4  #accuracy reached is 1.0e-MAX_LEVEL_ACCURACY
@@ -187,13 +187,16 @@ class SolverSystem():
             rig.calcSpinCenter()
             rig.calcRefPointsBoundBoxSize()
             
+        '''
         numdep = 0
         self.retrieveDOFInfo() #function only once used here at this place in whole program
         for rig in self.rigids:
             rig.currentDOF()
             #rig.beautyDOFPrint()
             numdep+=rig.countDependencies()
-        Msg( 'there are {} dependencies\n'.format(numdep/2))       
+        Msg( 'there are {} dependencies\n'.format(numdep/2))  
+        '''
+     
         self.status = "loaded"
 
     def retrieveDOFInfo(self):
@@ -345,16 +348,10 @@ class SolverSystem():
 
     def solveSystem(self,doc):
         Msg( "\n===== Start Solving System ====== \n" )
-        Msg( "Solvermode = partial + recursive unfixing!\n")
-        mode = 'partial'
 
         systemSolved = self.solveAccuracySteps(doc)
         if self.status == "loadingDependencyError":
             return
-
-        if not systemSolved:
-            Msg( "Could not solve system, try a reload()\n" )
-            systemSolved = self.solveAccuracySteps(doc)
         if systemSolved:
             self.status = "solved"
             Msg( "===== System solved using partial + recursive unfixing =====")
@@ -382,22 +379,20 @@ class SolverSystem():
 
     def calculateChain(self, doc):
         self.stepCount = 0
-        
-        # mode is 'partial' now definitely!
         workList = []
 
         # load initial worklist with all fixed parts...
         for rig in self.rigids:
             if rig.fixed:
                 workList.append(rig);
-        self.printList("Initial-Worklist", workList)
+        #self.printList("Initial-Worklist", workList)
 
         while True:
             addList = []
             for rig in workList:
                 addList.extend(rig.getCandidates())
             addList = set(addList)
-            self.printList("AddList", addList)
+            #self.printList("AddList", addList)
             if len(addList) > 0:
                 workList.extend(addList)
                 solutionFound = self.calculateWorkList(doc, workList)
@@ -473,27 +468,12 @@ class SolverSystem():
                         self.lastPositionError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
                         self.lastAxisError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
                         self.convergencyCounter = 0
-                        '''
-                        Msg("restart with some unfixed parts\n")
-                        unfixedRigids = []
-                        for rig in workList:
-                            if not rig.tempfixed: unfixedRigids.append(rig)
-                        self.printList("unfixed parts:", unfixedRigids)
-                        tempfixedRigids = []
-                        for rig in workList:
-                            if rig.tempfixed: tempfixedRigids.append(rig)
-                        self.printList("temfixed parts:", tempfixedRigids)
-                        Msg("\n")
-                        FreeCADGui.updateGui()
-                        '''
                         continue
                     else:            
                         Msg('\n')
                         Msg('convergency-conter: {}\n'.format(self.convergencyCounter))
                         Msg( "System not solvable, convergency is incorrect!\n" )
                         return False
-                
-                
                 
                 self.lastPositionError = maxPosError
                 self.lastAxisError = maxAxisError
@@ -530,7 +510,7 @@ def solveConstraints_MoviMode( doc, cache=None ):
     ss.loadSystem(doc)
     for rig in ss.rigids:
         rig.enableDependencies(ss.rigids)
-    for i in range(0,10):
+    for i in range(0,5):
         for r in ss.rigids:
             r.calcMoveData(doc, ss)
         for r in ss.rigids:

@@ -103,12 +103,12 @@ def getImpPartsFromDoc(doc, visibleOnly = True):
                         if hasattr(imp,'ViewObject') and imp.ViewObject.isVisible() and \
                            hasattr(imp.Tip,'ViewObject') and imp.Tip.ViewObject.isVisible():
                             gv = globalVisibility(doc, imp)
-                            if gv: 
+                            if gv:
                                 vizParts.append(imp)
-                    else: 
+                    else:
                         if hasattr(imp,'ViewObject') and imp.ViewObject.isVisible():
                             gv = globalVisibility(doc, imp)
-                            if gv: 
+                            if gv:
                                 vizParts.append(imp)
                 impPartsOut.extend(vizParts)
             else:
@@ -123,7 +123,7 @@ def filterImpParts(obj):
         pass
     elif obj.isDerivedFrom("PartDesign::Body"):
         # we want bodies that are top level in the document or top level in a container(App::Part)
-        # we don't want bodies that are inside other bodies.  
+        # we don't want bodies that are inside other bodies.
         if ((not(obj.InList)) or  \
             ((len(obj.InList) == 1) and (obj.InList[0].hasExtension("App::GroupExtension")))):  #top of group
             plmGlobal = obj.getGlobalPlacement();
@@ -131,15 +131,15 @@ def filterImpParts(obj):
             if (plmGlobal != plmLocal):
                 obj.Placement = plmGlobal             # should obj be a copy here?  not in orig doc - maybe no problem?
             impPartsOut.append(obj)
-    elif obj.hasExtension("App::GroupExtension"):     # App::Part container.  GroupEx contents are already in list, 
-        pass                                          # don't need to find them      
+    elif obj.hasExtension("App::GroupExtension"):     # App::Part container.  GroupEx contents are already in list,
+        pass                                          # don't need to find them
     elif obj.isDerivedFrom("Part::Feature"):
         if not(obj.InList):
             plmGlobal = obj.getGlobalPlacement();
             plmLocal  = obj.Placement;
             if (plmGlobal != plmLocal):
                 obj.Placement = plmGlobal
-            impPartsOut.append(obj)                  # top level in within Document 
+            impPartsOut.append(obj)                  # top level in within Document
         elif (len(obj.InList) == 1) and (obj.InList[0].hasExtension("App::GroupExtension")):
             plmGlobal = obj.getGlobalPlacement();
             plmLocal  = obj.Placement;
@@ -419,7 +419,7 @@ def updateImportedParts(doc):
                     importUpdateConstraintSubobjects( doc, obj, newObject ) # do this before changing shape and mux
                     if hasattr(newObject, 'muxInfo'):
                         obj.muxInfo = newObject.muxInfo
-                    # save Placement because following newObject.Shape.copy() ist resetting it to zeroes...
+                    # save Placement because following newObject.Shape.copy() isn't resetting it to zeroes...
                     savedPlacement  = obj.Placement
                     obj.Shape = newObject.Shape.copy()
 
@@ -552,7 +552,7 @@ FreeCADGui.addCommand('a2p_duplicatePart', a2p_DuplicatePartCommand())
 class a2p_EditPartCommand:
     def Activated(self):
         selection = [s for s in FreeCADGui.Selection.getSelection() if s.Document == FreeCAD.ActiveDocument ]
-        if len(selection) == 0: 
+        if len(selection) == 0:
             a2plib.Msg("First select a part to be edited!\n")
             return # user selected nothing!
         obj = selection[0]
