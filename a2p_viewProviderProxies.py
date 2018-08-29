@@ -40,7 +40,11 @@ class ImportedPartViewProviderProxy:
     def claimChildren(self):
         if hasattr(self,'Object'):
             try:
-                return self.Object.InList
+                children = list()
+                for obj in self.Object.InList:
+                    if a2plib.isA2pObject(obj):
+                        children.append(obj)
+                return children
             except:
                 #FreeCAD has already deleted self.Object !!
                 return[]
@@ -73,8 +77,11 @@ class ImportedPartViewProviderProxy:
         return None
 
     def attach(self, vobj):
+        default = coin.SoGroup()
+        vobj.addDisplayMode(default, "Standard")
         self.object_Name = vobj.Object.Name
         self.Object = vobj.Object
+        
 
     def setupContextMenu(self, ViewObject, popup_menu):
         pass
@@ -215,11 +222,13 @@ def create_constraint_mirror( constraintObj, iconPath, origLabel= '', mirrorLabe
                 )
             if pName == 'directionConstraint':
                 v =  constraintObj.directionConstraint
-                if v != "none": #then updating a document with mirrors
+                if v != "auto": #then updating a document with mirrors
                     cMirror.directionConstraint =  ["aligned","opposed"]
                     cMirror.directionConstraint = v
                 else:
-                    cMirror.directionConstraint =  ["none","aligned","opposed"]
+
+                    cMirror.directionConstraint =  ["aligned","opposed"]
+
             else:
                 setattr( cMirror, pName, getattr( constraintObj, pName) )
             if constraintObj.getEditorMode(pName) == ['ReadOnly']:

@@ -176,7 +176,7 @@ class Rigid():
         if solverStage == PARTIAL_SOLVE_STAGE1:
             if not self.tempfixed: #skip already fixed objs
                 #print 'current dof = ', rig.currentDOF()
-                DebugMsg(A2P_DEBUG_1, "    eval {}\n".format(self.label))
+                DebugMsg(A2P_DEBUG_2, "    eval {}\n".format(self.label))
                 
                 if self.linkedTempFixedDOF()==0: #found a fully constrained obj to tempfixed rigids
                     for j in self.depsPerLinkedRigids.keys(): #look on each linked obj
@@ -186,7 +186,7 @@ class Rigid():
                                 if not dep.Done and not dep.Enabled:
                                     #dep.enable([dep.currentRigid, dep.dependedRigid])
                                     candidates.extend([dep.currentRigid, dep.dependedRigid])                                        
-                                    DebugMsg(A2P_DEBUG_1, "        {}\n".format(dep))
+                                    DebugMsg(A2P_DEBUG_2, "        {}\n".format(dep))
                     #if len(outputRigidList)>0: #found something!
                         #print '        Solve them!'                            
             
@@ -196,7 +196,7 @@ class Rigid():
             #enable only involved dep, then set them as tempfixed        
             
             if not self.tempfixed: #skip already fixed objs  
-                DebugMsg(A2P_DEBUG_1, "    eval {}\n".format(self.label))                
+                DebugMsg(A2P_DEBUG_2, "    eval {}\n".format(self.label))                
                 if self.areAllParentTempFixed(): #linked only to fixed rigids                                                
                     
                     #print rig.linkedRigids 
@@ -213,7 +213,7 @@ class Rigid():
                                     #dep.enable([dep.currentRigid, dep.dependedRigid])
                                     candidates.extend([dep.currentRigid, dep.dependedRigid])
                                     #self.solvedCounter += 1
-                                    DebugMsg(A2P_DEBUG_1, "        {}\n".format(dep))
+                                    DebugMsg(A2P_DEBUG_2, "        {}\n".format(dep))
             
         
         elif solverStage == PARTIAL_SOLVE_STAGE3:

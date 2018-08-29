@@ -52,13 +52,17 @@ RED = (1.0,0.0,0.0)
 GREEN = (0.0,1.0,0.0)
 BLUE = (0.0,0.0,1.0)
 
+# Activate a Testmode, solving does only some steps,
+# you can see Movement of parts on screen
+A2P_MOVIMODE        = False 
+
 # DEFINE DEBUG LEVELS FOR CONSOLE OUTPUT
 A2P_DEBUG_NONE      = 0
 A2P_DEBUG_1         = 1
 A2P_DEBUG_2         = 2
 A2P_DEBUG_3         = 3
 
-A2P_DEBUG_LEVEL = A2P_DEBUG_1
+A2P_DEBUG_LEVEL = A2P_DEBUG_NONE
 
 PARTIAL_SOLVE_STAGE1 = 1    #solve all rigid fully constrained to tempfixed rigid, enable only involved dep, then set them as tempfixed
 PARTIAL_SOLVE_STAGE2 = 2    #solve all rigid constrained only to tempfixed rigids, it doesn't matter if fully constrained or not. 
@@ -208,20 +212,31 @@ def DebugMsg(level, tx):
         FreeCAD.Console.PrintMessage(tx)
 
 #------------------------------------------------------------------------------
+def drawSphere(center, color):
+    doc = FreeCAD.ActiveDocument
+    s = Part.makeSphere(2.0,center)
+    sphere = doc.addObject("Part::Feature","Sphere")
+    sphere.Shape = s
+    sphere.ViewObject.ShapeColor = color
+    doc.recompute()
+#------------------------------------------------------------------------------
 def drawVector(fromPoint,toPoint, color):
     if fromPoint == toPoint: return
     doc = FreeCAD.ActiveDocument
 
-    l = Part.Line(fromPoint,toPoint)
-    line = doc.addObject("Part::Feature","ArrowTail")
+    l = Part.LineSegment()
+    l.StartPoint = fromPoint
+    l.EndPoint = toPoint
+    line = doc.addObject("Part::Feature","Line")
     line.Shape = l.toShape()
     line.ViewObject.LineColor = color
-    line.ViewObject.LineWidth = 6
-    #doc.recompute()
+    line.ViewObject.LineWidth = 1
+
+    
     c = Part.makeCone(0,1,4)
     cone = doc.addObject("Part::Feature","ArrowHead")
     cone.Shape = c
-    cone.ViewObject.ShapeColor = (1.0,0.0,0.0)
+    cone.ViewObject.ShapeColor = color
     #
     mov = Base.Vector(0,0,0)
     zAxis = Base.Vector(0,0,-1)
@@ -231,7 +246,6 @@ def drawVector(fromPoint,toPoint, color):
     cone.Placement = conePlacement.multiply(cone.Placement)
     cone.Placement.move(toPoint)
     doc.recompute()
-
 #------------------------------------------------------------------------------
 def findUnusedObjectName(base, counterStart=1, fmt='%03i', document=None):
     if document == None:
@@ -490,3 +504,24 @@ def getAxis(obj, subElementName):
             axis =  edge.Curve.Axis
     return axis # may be none!
 #------------------------------------------------------------------------------
+def isA2pPart(obj):
+    result = False
+    if hasattr(obj,"Content"):
+        if 'importPart' in obj.Content:
+            result = True
+    return result
+
+def isA2pConstraint(obj): 
+    result = False
+    if hasattr(obj,"Content"):
+        if ('ConstraintInfo' in obj.Content) or ('ConstraintNfo'in obj.Content):
+            result = True
+    return result
+
+def isA2pObject(obj):
+    result = False
+    if isA2pPart(obj) or isA2pConstraint(obj):
+        result = True
+    return result
+#------------------------------------------------------------------------------
+

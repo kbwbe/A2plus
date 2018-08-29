@@ -40,20 +40,16 @@ class Proxy_muxAssemblyObj:
 def createTopoInfo(obj): #deactivated at moment...
     return []
 
-def muxObjectsWithKeys(doc, withColor=False):
+def muxObjectsWithKeys(objsIn, withColor=False):
     '''
-    combines all the imported shape object in doc into one shape,
-    ist able to import colors
+    combines all the objects in objsIn into one shape,
+    is able to import colors
     '''
     faces = []
     faceColors = []
     muxInfo = [] # List of keys, not used at moment...
 
-    visibleObjects = [ obj for obj in doc.Objects
-                       if hasattr(obj,'ViewObject') and obj.ViewObject.isVisible()
-                       and hasattr(obj,'Shape') and len(obj.Shape.Faces) > 0 and 'Body' not in obj.Name]
-
-    for obj in visibleObjects:
+    for obj in objsIn:
         # Save Computing time, store this before the for..enumerate loop later...
         colorFlag = ( len(obj.ViewObject.DiffuseColor) < len(obj.Shape.Faces) )
         shapeCol = obj.ViewObject.ShapeColor
@@ -74,6 +70,7 @@ def muxObjectsWithKeys(doc, withColor=False):
     else:
         return muxInfo, shell
 
+#NOTE: muxObjects is never called in A2plus
 def muxObjects(doc, mode=0):
     'combines all the imported shape object in doc into one shape'
     faces = []
@@ -118,6 +115,8 @@ class ViewProviderSimpleAssemblyShape:
         return a2plib.path_a2p + '/icons/SimpleAssemblyShape.svg'
 
     def attach(self, obj):
+        default = coin.SoGroup()
+        obj.addDisplayMode(default, "Standard")
         self.object_Name = obj.Object.Name
         self.Object = obj.Object
 

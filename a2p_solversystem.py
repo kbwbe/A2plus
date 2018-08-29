@@ -90,6 +90,7 @@ class SolverSystem():
         self.convergencyCounter = 0
         self.status = "created"
         self.partialSolverCurrentStage = 0
+        self.failurecounter = 5
 
     def clear(self):
         for r in self.rigids:
@@ -99,6 +100,7 @@ class SolverSystem():
         self.constraints = []
         self.objectNames = []
         self.partialSolverCurrentStage = PARTIAL_SOLVE_STAGE1
+        self.failurecounter = 5
 
     def getRigid(self,objectName):
         '''get a Rigid by objectName'''
@@ -109,8 +111,8 @@ class SolverSystem():
 
     def loadSystem(self,doc):
         
-        import sys;sys.path.append(r'C:\Users\Turro\.p2\pool\plugins\org.python.pydev.core_6.4.4.201807281807\pysrc')
-        #import pydevd;pydevd.settrace()
+        
+        
         self.clear()
         self.doc = doc
         self.status = "loading"
@@ -194,7 +196,7 @@ class SolverSystem():
             rig.currentDOF()
             #rig.beautyDOFPrint()
             self.numdep+=rig.countDependencies()
-        Msg( 'there are {} dependencies\n'.format(self.numdep/2))       
+        #Msg( 'there are {} dependencies\n'.format(self.numdep/2))       
         self.status = "loaded"
         
         
@@ -269,7 +271,7 @@ class SolverSystem():
     def visualizeHierarchy(self):
         #modified hierarchy file name and path, now the html file is in the same folder with the same filename of the assembly
         out_file = os.path.splitext(self.doc.FileName)[0] + '_asm_hierarchy.html'
-        Msg("Writing visual hierarchy to: {}\n".format(out_file))
+        #Msg("Writing visual hierarchy to: {}\n".format(out_file))
         f = open(out_file, "w")
 
         f.write("<!DOCTYPE html>\n")
@@ -333,18 +335,23 @@ class SolverSystem():
         vec1 = Base.Vector(xmin,ymin,zmin)
         vec2 = Base.Vector(xmax,ymax,zmax)
         assemblysize = vec1.distanceToPoint(vec2)
-        if float(assemblysize) / self.mySOLVER_POS_ACCURACY > 10e7:
-            return False 
+         
         #print 'Assembly size = ', assemblysize
         #accuracydivider = 1000.0 * (10**self.level_of_accuracy)
         #for a in range(self.level_of_accuracy):
         #    accuracydivider*=10
         
-        #self.mySOLVER_POS_ACCURACY= assemblysize / accuracydivider            
-        self.mySOLVER_SPIN_ACCURACY = math.degrees(math.atan(self.mySOLVER_POS_ACCURACY / assemblysize))
+        #self.mySOLVER_POS_ACCURACY= assemblysize / accuracydivider 
+        if assemblysize!= 0:           
+            self.mySOLVER_SPIN_ACCURACY = math.degrees(math.atan(self.mySOLVER_POS_ACCURACY / assemblysize))
+        else:
+            return False
         #self.mySOLVER_SPIN_ACCURACY = math.degrees(math.atan(1 / accuracydivider))
         #self.mySOLVER_SPIN_ACCURACY = self.mySOLVER_POS_ACCURACY
-        return True
+        if float(assemblysize) / self.mySOLVER_POS_ACCURACY > 1e8:
+            return False
+        else:
+            return True
         
         
     def prepareRestart(self):
@@ -357,7 +364,7 @@ class SolverSystem():
 
     def solveSystemWithMode(self,doc):
         self.level_of_accuracy=1
-        
+        self.failurecounter = 5
         startTime = int(round(time.time() * 1000))
         self.loadSystem(doc)
         if self.status == "loadingDependencyError":
@@ -385,9 +392,7 @@ class SolverSystem():
             if systemSolved:
                 #self.mySOLVER_SPIN_ACCURACY *= 1e-1
                 
-                Msg('\nPOS ACCURACY: {}\n'.format(self.mySOLVER_POS_ACCURACY))
-                Msg('SPIN ACCURACY: {}\n'.format(self.mySOLVER_SPIN_ACCURACY))
-                Msg( '--->LEVEL OF ACCURACY :{} DONE!\n'.format(self.level_of_accuracy) )
+                
                 
                 
                 #self.solutionToParts(doc)
@@ -396,14 +401,21 @@ class SolverSystem():
                                
                 #FreeCADGui.updateGui()
                 if self.level_of_accuracy == MAX_LEVEL_ACCURACY: 
-                                       
+                    Msg('POS ACCURACY: %0.8f mm\t\tSPIN ACCURACY: %0.8f deg ' % (self.mySOLVER_POS_ACCURACY, self.mySOLVER_SPIN_ACCURACY))
+                    #Msg('SPIN ACCURACY: {}\n'.format(self.mySOLVER_SPIN_ACCURACY))
+                    Msg( '--->LEVEL OF ACCURACY :{} DONE!\n'.format(self.level_of_accuracy) )                   
                     break
                 
                 self.mySOLVER_POS_ACCURACY *= 1.0e-1
                 if not self.calcSpinAccuracy():
+                    Msg('POS ACCURACY: %0.8f mm\t\tSPIN ACCURACY: %0.8f deg ' % (self.mySOLVER_POS_ACCURACY, self.mySOLVER_SPIN_ACCURACY))
+                    #Msg('SPIN ACCURACY: {}\n'.format(self.mySOLVER_SPIN_ACCURACY))
+                    Msg( '--->LEVEL OF ACCURACY :{} DONE!\n'.format(self.level_of_accuracy) ) 
+                    Msg( "TotalTime (ms): %d\n" % (totalTime - startTime))
                     break
                 
                 self.loadSystem(doc)
+                #self.failurecounter = 5
                 #self.calcSpinAccuracy()
                 #self.prepareRestart()
             else:
@@ -413,7 +425,7 @@ class SolverSystem():
         return systemSolved
 
     def solveSystem(self,doc):
-        Msg( "\n===== Start Solving System ====== \n" )
+        Msg( "\n\n===== Start Solving System ====== \n" )
         #self.progress_bar = FreeCAD.Base.ProgressIndicator() 
         
 #         if a2plib.isPartialProcessing():
@@ -422,7 +434,9 @@ class SolverSystem():
 #         else:
 #             Msg( "Solvermode = solve all Parts at once !\n")
 #             mode = 'Progressive magnetic'
-#         
+#       
+        import sys;sys.path.append(r'C:\Users\turrini_valerio\Documents\tools\eclipse\eclipse\plugins\org.python.pydev.core_6.4.4.201807281807\pysrc')
+        #import pydevd;pydevd.settrace()   
         systemSolved = self.solveSystemWithMode(doc)
         
                             
@@ -441,7 +455,11 @@ class SolverSystem():
         if systemSolved:
             
             self.status = "solved"
-            Msg( "===== System solved !  =====" )
+            Msg( "===== System solved !  =====\n" )
+            try:
+                doc.recompute()
+            except:
+                pass
         else:
             self.status = "unsolved"
             Msg( "===== Could not solve system ====== \n" )
@@ -468,8 +486,8 @@ class SolverSystem():
         self.stepCount = 0
         
         self.partialSolverCurrentStage = PARTIAL_SOLVE_STAGE1
-        if self.level_of_accuracy <3:
-            self.mySOLVER_POS_ACCURACY *= 1.0e-1
+        
+        self.mySOLVER_POS_ACCURACY *= 1.0e-1
         self.calcSpinAccuracy()
         #mainWorklist = []
         while self.partialSolverCurrentStage != PARTIAL_SOLVE_END:
@@ -513,7 +531,7 @@ class SolverSystem():
 #                     if self.partialSolverCurrentStage == PARTIAL_SOLVE_STAGE3:
 #                         self.mySOLVER_POS_ACCURACY *= 1e-1
 #                         self.calcSpinAccuracy()
-                    if (self.partialSolverCurrentStage == PARTIAL_SOLVE_STAGE4) and (self.level_of_accuracy <3) :
+                    if (self.partialSolverCurrentStage == PARTIAL_SOLVE_STAGE4) :
                         self.mySOLVER_POS_ACCURACY *= 10
                         self.calcSpinAccuracy()
                     workList = []
@@ -562,8 +580,8 @@ class SolverSystem():
                 #FreeCADGui.updateGui()
 
             # The accuracy is good, apply the solution to FreeCAD's objects
-            if (maxPosError <  0.5 * self.mySOLVER_POS_ACCURACY and
-                maxAxisError <  0.5 * self.mySOLVER_SPIN_ACCURACY):
+            if (maxPosError <   self.mySOLVER_POS_ACCURACY and
+                maxAxisError <  self.mySOLVER_SPIN_ACCURACY):
                 # The accuracy is good, we're done here
                 goodAccuracy = True
                 # Mark the rigids as tempfixed and add its constrained rigids to pending list to be processed next
@@ -592,12 +610,18 @@ class SolverSystem():
                 if (
                     maxPosError  >= self.lastPositionError or
                     maxAxisError >= self.lastAxisError
-                    ):     
+                    ): 
+                    #self.failurecounter -= 1
+                    #print "Decreasing self.failurecounter"
+                    #if self.failurecounter == 0:    
                     
                     foundRigidToUnfix = False
                     # search for unsolved dependencies...
                     for rig in workList:
                         if rig.maxAxisError > self.mySOLVER_SPIN_ACCURACY or rig.maxPosError > self.mySOLVER_POS_ACCURACY:
+                            Msg("Error on Rigid {}\n".format(rig.label))
+                            Msg("    PosError {}\n".format(rig.maxPosError))
+                            Msg("    AxisError {}\n".format(rig.maxAxisError))
                             for r in rig.linkedRigids:
                                 if r.tempfixed and not r.fixed:
                                     Msg("unfixed Rigid {}\n".format(r.label))
@@ -607,7 +631,7 @@ class SolverSystem():
                                     
                                     foundRigidToUnfix = True
                                     #foundRigidToUnfix = False
-                    
+                
                     if foundRigidToUnfix:
                         self.lastPositionError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
                         self.lastAxisError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
@@ -618,7 +642,7 @@ class SolverSystem():
                         Msg('convergency-conter: {}\n'.format(self.convergencyCounter))
                         Msg( "System not solvable, convergency is incorrect!\n" )
                         return False
-                
+            
                 
                 
                 self.lastPositionError = maxPosError

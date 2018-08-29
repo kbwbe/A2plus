@@ -35,8 +35,6 @@ from a2plib import (
     AUTOSOLVE_ENABLED
     )
 
-
-
 class ObjectCache:
     '''
     An assembly could use multiple instances of then same importPart.
@@ -74,7 +72,79 @@ class ObjectCache:
 
 objectCache = ObjectCache()
 
+def globalVisibility(doc, imp):
+    if not imp.InList:
+        return imp.ViewObject.Visibility
+    else:
+        for parent in imp.InList:
+            if not parent.ViewObject.Visibility:
+               return parent.ViewObject.Visibility
+            else:
+               return globalVisibility(doc, parent)
 
+def getImpPartsFromDoc(doc, visibleOnly = True):
+    objsIn = doc.Objects
+    impPartsOut = list()
+    for obj in objsIn:
+        impPartList = filterImpParts(obj)
+        if (impPartList):
+            if (visibleOnly):
+                vizParts = list()
+                for imp in impPartList:
+                    if imp.isDerivedFrom("PartDesign::Body"):
+                        if hasattr(imp,'ViewObject') and imp.ViewObject.isVisible() and \
+                           hasattr(imp.Tip,'ViewObject') and imp.Tip.ViewObject.isVisible():
+                            gv = globalVisibility(doc, imp)
+                            if gv:
+                                vizParts.append(imp)
+                    else:
+                        if hasattr(imp,'ViewObject') and imp.ViewObject.isVisible():
+                            gv = globalVisibility(doc, imp)
+                            if gv:
+                                vizParts.append(imp)
+                impPartsOut.extend(vizParts)
+            else:
+                impPartsOut.extend(impPartList)
+    return impPartsOut
+
+def filterImpParts(obj):
+    impPartsOut = list()
+    if obj.isDerivedFrom("Sketcher::SketchObject"):
+        pass
+    elif obj.isDerivedFrom("PartDesign::Feature"):
+        pass
+    elif obj.isDerivedFrom("PartDesign::Body"):
+        # we want bodies that are top level in the document or top level in a container(App::Part)
+        # we don't want bodies that are inside other bodies.
+        if ((not(obj.InList)) or  \
+            ((len(obj.InList) == 1) and (obj.InList[0].hasExtension("App::GroupExtension")))):  #top of group
+            plmGlobal = obj.getGlobalPlacement();
+            plmLocal  = obj.Placement;
+            if (plmGlobal != plmLocal):
+                obj.Placement = plmGlobal             # should obj be a copy here?  not in orig doc - maybe no problem?
+            impPartsOut.append(obj)
+    elif obj.hasExtension("App::GroupExtension"):     # App::Part container.  GroupEx contents are already in list,
+        pass                                          # don't need to find them
+    elif obj.isDerivedFrom("Part::Feature"):
+        if not(obj.InList):
+            plmGlobal = obj.getGlobalPlacement();
+            plmLocal  = obj.Placement;
+            if (plmGlobal != plmLocal):
+                obj.Placement = plmGlobal
+            impPartsOut.append(obj)                  # top level in within Document
+        elif (len(obj.InList) == 1) and (obj.InList[0].hasExtension("App::GroupExtension")):
+            plmGlobal = obj.getGlobalPlacement();
+            plmLocal  = obj.Placement;
+            if (plmGlobal != plmLocal):
+                obj.Placement = plmGlobal
+            impPartsOut.append(obj)                  # top level within Group
+        elif a2plib.isA2pPart(obj):                  # imported part
+            impPartsOut.append(obj)
+        else:
+            pass                                     # more odd PF cases?? BaseFeature in body??
+    else:
+        pass                                         # garbage objects - Origins, Axis, etc
+    return impPartsOut
 
 
 def importPartFromFile(_doc, filename, importToCache=False):
@@ -93,13 +163,14 @@ def importPartFromFile(_doc, filename, importToCache=False):
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Value Error", msg )
             return
     #-------------------------------------------
-    # Get a list of the visible Objects
+    # Get a list of the importable Objects
     #-------------------------------------------
-    visibleObjects = [ obj for obj in importDoc.Objects
-                    if hasattr(obj,'ViewObject') and obj.ViewObject.isVisible()
-                    and hasattr(obj,'Shape') and len(obj.Shape.Faces) > 0 and 'Body' not in obj.Name]
 
-    if visibleObjects == None or len(visibleObjects) == 0:
+    importableObjects = list()
+    importableObjects.extend(getImpPartsFromDoc(importDoc))            #visible parts only
+#    importableObjects.extend(getImpPartsFromDoc(importDoc, False))     #take invisible parts too
+
+    if importableObjects == None or len(importableObjects) == 0:
         msg = "No visible Part to import found. Aborting operation"
         QtGui.QMessageBox.information(
             QtGui.QApplication.activeWindow(),
@@ -108,12 +179,13 @@ def importPartFromFile(_doc, filename, importToCache=False):
             )
         return
 
+    #TODO: allow import multiple parts as separate items
     #-------------------------------------------
     # Discover whether we are importing a subassembly or a single part
     #-------------------------------------------
     #if any([ 'importPart' in obj.Content for obj in importDoc.Objects]) and not len(visibleObjects) == 1:
     subAssemblyImport = False
-    if len(visibleObjects) > 1:
+    if len(importableObjects) > 1:
         subAssemblyImport = True
 
     #-------------------------------------------
@@ -143,15 +215,16 @@ def importPartFromFile(_doc, filename, importToCache=False):
     newObj.addProperty("App::PropertyBool","updateColors","importPart").updateColors = True
     #
     if subAssemblyImport:
-        newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor = muxObjectsWithKeys(importDoc, withColor=True)
+        newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor = muxObjectsWithKeys(importableObjects, withColor=True)
         #newObj.muxInfo, newObj.Shape = muxObjectsWithKeys(importDoc, withColor=False)
     else:
-        tmpObj = visibleObjects[0]
+        tmpObj = importableObjects[0]
         newObj.Shape = tmpObj.Shape.copy()
         newObj.ViewObject.ShapeColor = tmpObj.ViewObject.ShapeColor
         if appVersionStr() <= '000.016': #FC0.17: DiffuseColor overrides ShapeColor !
             newObj.ViewObject.DiffuseColor = tmpObj.ViewObject.DiffuseColor
         newObj.muxInfo = createTopoInfo(tmpObj)
+        newObj.ViewObject.Transparency = tmpObj.ViewObject.Transparency
 
     newObj.Proxy = Proxy_muxAssemblyObj()
     newObj.ViewObject.Proxy = ImportedPartViewProviderProxy()
@@ -208,7 +281,12 @@ Check your settings of A2plus preferences.
                 )
             return
 
+        #TODO: change for multi separate part import
         importedObject = importPartFromFile(doc, filename)
+
+        if not importedObject:
+            a2plib.Msg("imported Object is empty/none\n")
+            return
 
         mw = FreeCADGui.getMainWindow()
         mdi = mw.findChild(QtGui.QMdiArea)
@@ -216,8 +294,9 @@ Check your settings of A2plus preferences.
         if sub != None:
             sub.showMaximized()
 
-
-        if not importedObject.fixedPosition: #will be true for the first imported part
+# WF: how will this work for multiple imported objects?
+#     only A2p AI's will have property "fixedPosition"
+        if importedObject and not importedObject.fixedPosition:
             PartMover( view, importedObject )
         else:
             from PySide import QtCore
@@ -284,10 +363,11 @@ def updateImportedParts(doc):
                     importUpdateConstraintSubobjects( doc, obj, newObject )# do this before changing shape and mux
                     if hasattr(newObject, 'muxInfo'):
                         obj.muxInfo = newObject.muxInfo
-                    # save Placement becaause following newObject.Shape.copy() ist resetting it to zeroes...
+                    # save Placement because following newObject.Shape.copy() isn't resetting it to zeroes...
                     savedPlacement  = obj.Placement
                     obj.Shape = newObject.Shape.copy()
                     obj.ViewObject.DiffuseColor = copy.copy(newObject.ViewObject.DiffuseColor)
+                    obj.ViewObject.Transparency = newObject.ViewObject.Transparency
                     obj.Placement = savedPlacement # restore the old placement
 
     mw = FreeCADGui.getMainWindow()
@@ -349,6 +429,7 @@ def duplicateImportedPart( part ):
         if hasattr(newObj.ViewObject, p) and p not in ['DiffuseColor','Proxy','MappedColors']:
             setattr(newObj.ViewObject, p, getattr( part.ViewObject, p))
     newObj.ViewObject.DiffuseColor = copy.copy( part.ViewObject.DiffuseColor )
+    newObj.ViewObject.Transparency = part.ViewObject.Transparency
     newObj.Proxy = Proxy_importPart()
     newObj.ViewObject.Proxy = ImportedPartViewProviderProxy()
     newObj.Placement.Base = part.Placement.Base
@@ -377,6 +458,9 @@ FreeCADGui.addCommand('a2p_duplicatePart', a2p_DuplicatePartCommand())
 class a2p_EditPartCommand:
     def Activated(self):
         selection = [s for s in FreeCADGui.Selection.getSelection() if s.Document == FreeCAD.ActiveDocument ]
+        if len(selection) == 0:
+            a2plib.Msg("First select a part to be edited!\n")
+            return # user selected nothing!
         obj = selection[0]
         FreeCADGui.Selection.clearSelection() # very imporant! Avoid Editing the assembly the part was called from!
         fileNameWithinProjectFile = a2plib.findSourceFileInProject(obj.sourceFile)
@@ -394,6 +478,7 @@ This is not allowed when using preference
                 msg
                 )
             return
+        #TODO: WF fails if "use folder" = false here
         docs = FreeCAD.listDocuments().values()
         docFilenames = [ d.FileName for d in docs ]
         if not fileNameWithinProjectFile in docFilenames :
@@ -481,6 +566,13 @@ class DeleteConnectionsCommand:
     def Activated(self):
         selection = [s for s in FreeCADGui.Selection.getSelection() if s.Document == FreeCAD.ActiveDocument ]
         #if len(selection) == 1: not required as this check is done in initGui
+        # WF: still get 'list index out of range' if nothing selected.
+        if len(selection) != 1:
+            QtGui.QMessageBox.critical(
+                QtGui.QApplication.activeWindow(),
+               "Selection Error",
+               "Select exactly 1 Part")
+            return
         part = selection[0]
         deleteList = []
         for c in FreeCAD.ActiveDocument.Objects:
@@ -644,7 +736,7 @@ class a2p_ToggleAutoSolveCommand:
 
     def GetResources(self):
         return {
-            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_autoSolve.svg',
+            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_ToggleAutoSolve.svg',
             'MenuText':     'toggle AutoSolve',
             'ToolTip':      toolTipMessage,
             'Checkable':    self.IsChecked()
@@ -663,7 +755,7 @@ class a2p_TogglePartialProcessingCommand:
 
     def GetResources(self):
         return {
-            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_partialProcessing.svg',
+            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_TogglePartial.svg',
             'MenuText':     'toggle partial processing',
             'ToolTip':      'toggle partial processing',
             'Checkable':    self.IsChecked()
@@ -721,7 +813,7 @@ class a2p_repairTreeViewCommand:
 
     def GetResources(self):
         return {
-            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_treeview.svg',
+            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_RepairTree.svg',
             'MenuText':     'repair treeView',
             'ToolTip':      toolTipMessage
             }
@@ -735,3 +827,35 @@ FreeCADGui.addCommand('a2p_repairTreeViewCommand', a2p_repairTreeViewCommand())
 def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
     ''' updating constraints, deactivated at moment'''
     return
+
+
+class a2p_FlipConstraintDirectionCommand:
+
+    def Activated(self):
+        a2p_FlipConstraintDirection()
+
+    def GetResources(self):
+        return {
+            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_flipConstraint.svg',
+            'MenuText':     'flip last constraint direction',
+            'ToolTip':      'flip last constraint direction'
+            
+            }
+FreeCADGui.addCommand('a2p_FlipConstraintDirectionCommand', a2p_FlipConstraintDirectionCommand())
+
+def a2p_FlipConstraintDirection():
+    ''' updating constraints, deactivated at moment'''
+    constraints = [ obj for obj in FreeCAD.ActiveDocument.Objects 
+                        if 'ConstraintInfo' in obj.Content ]
+    if len(constraints) == 0:
+        QtGui.QMessageBox.information(  QtGui.qApp.activeWindow(), "Command Aborted", 'Flip aborted since no assembly2 constraints in active document.')
+        return
+    lastConstraintAdded = constraints[-1]
+    try:
+        if lastConstraintAdded.directionConstraint == 'aligned':
+            lastConstraintAdded.directionConstraint = 'opposed'
+        else:
+            lastConstraintAdded.directionConstraint = 'aligned'
+    except:
+        pass
+

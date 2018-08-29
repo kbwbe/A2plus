@@ -303,7 +303,7 @@ class Dependency():
 
         axis = None # Rotation axis to be returned
 
-        if self.direction != "none":
+        if self.direction != "none" or self.direction != "auto":
             rigAxis = self.refAxisEnd.sub(self.refPoint)
             foreignDep = self.foreignDependency
             foreignAxis = foreignDep.refAxisEnd.sub(foreignDep.refPoint)
