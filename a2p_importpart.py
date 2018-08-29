@@ -359,7 +359,8 @@ FreeCADGui.addCommand('a2p_ImportPart',a2p_ImportPartCommand())
 
 def updateImportedParts(doc):
     objectCache.cleanUp(doc)
-    for obj in doc.Objects:
+    for o,obj in enumerate(doc.Objects):
+        print("updateImportedParts: obj:", o)
         if hasattr(obj, 'sourceFile'):
             if not hasattr( obj, 'timeLastImport'):
                 obj.addProperty("App::PropertyFloat", "timeLastImport","importPart") #should default to zero which will force update.
@@ -388,7 +389,9 @@ def updateImportedParts(doc):
 
             if os.path.exists( obj.sourceFile ):
                 newPartCreationTime = os.path.getmtime( obj.sourceFile )
-                if ( newPartCreationTime > obj.timeLastImport or
+                print("updateImportedParts: newPartCreationTime:", newPartCreationTime)
+                print("updateImportedParts: obj.timeLastImport: ", obj.timeLastImport)
+                if ( newPartCreationTime >= obj.timeLastImport or
                     obj.a2p_Version != A2P_VERSION
                     ):
                     if not objectCache.isCached(obj.sourceFile): # Load every changed object one time to cache
@@ -400,13 +403,44 @@ def updateImportedParts(doc):
                     importUpdateConstraintSubobjects( doc, obj, newObject )# do this before changing shape and mux
                     if hasattr(newObject, 'muxInfo'):
                         obj.muxInfo = newObject.muxInfo
-                    # save Placement becaause following newObject.Shape.copy() ist resetting it to zeroes...
+                    # save Placement because following newObject.Shape.copy() ist resetting it to zeroes...
                     savedPlacement  = obj.Placement
                     obj.Shape = newObject.Shape.copy()
-                    obj.ViewObject.DiffuseColor = copy.copy(newObject.ViewObject.DiffuseColor)
-                    obj.ViewObject.Transparency = newObject.ViewObject.Transparency
+
+                    origDiffCol = copy.deepcopy(obj.ViewObject.DiffuseColor)        # DECIMAL ISSUE with transparency !!!
+
+                    origTsp = round( float(obj.ViewObject.Transparency/100.0), 2 )
+                    origShapeCol = obj.ViewObject.ShapeColor
+                    print("updateImportedParts: orig Transparency:", origTsp)
+                    print("updateImportedParts: orig ShapeColor:  ", origShapeCol)
+                    print("updateImportedParts: orig DiffuseColor:\n", origDiffCol)
+
+                    # user may have changed color+transparency in the active assembly
+                    #  if updateColors == False, these changes are taken as new
+                    print( "updateImportedParts: one shape or even more?", len(origDiffCol) )
+                    if (obj.updateColors == False):
+                        print("updateImportedParts: updateColors is INactive: taking up actual color changes")
+                        if len(origDiffCol) == 1 :
+                           obj.ViewObject.DiffuseColor = (origShapeCol[0], origShapeCol[1], origShapeCol[2], origTsp)
+
+                           print("                     from orig values combined DiffuseColor:\n", \
+                               obj.ViewObject.DiffuseColor)
+                        else:
+                           print("updateImportedParts: muxed assembly, orig DiffuseColor is kept as new,")
+                           print("updateImportedParts:  ShapeColor and Transparency aren't usable any more")
+                    #  if updateColors == True, default, colors+transparencies are recovered from source file
+                    else:
+                        print("updateImportedParts: updateColors is ACTIVE: recovering colors from orig source file:")
+                        obj.ViewObject.ShapeColor = newObject.ViewObject.ShapeColor
+                        obj.ViewObject.Transparency = newObject.ViewObject.Transparency    # can be 0.0 -- rely on DiffuseColor
+                        obj.ViewObject.DiffuseColor = copy.deepcopy(newObject.ViewObject.DiffuseColor)
+                        print("updateImportedParts: from file recovered Transparency:", newObject.ViewObject.Transparency)
+                        print("updateImportedParts: from file recovered ShapeColor:\n", newObject.ViewObject.ShapeColor)
+                        print("updateImportedParts: from file recovered DiffuseColor:\n", newObject.ViewObject.DiffuseColor)
+
                     obj.Placement = savedPlacement # restore the old placement
 
+    print("")
     mw = FreeCADGui.getMainWindow()
     mdi = mw.findChild(QtGui.QMdiArea)
     sub = mdi.activeSubWindow()
@@ -415,6 +449,7 @@ def updateImportedParts(doc):
     objectCache.cleanUp(doc)
     a2p_solversystem.autoSolveConstraints(doc)
     doc.recompute()
+
 
 
 class a2p_UpdateImportedPartsCommand:
