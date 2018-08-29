@@ -104,7 +104,17 @@ def setTransparency():
     for obj in doc.Objects:
         if hasattr(obj,'ViewObject'):
             if hasattr(obj.ViewObject,'Transparency'):
-                SAVED_TRANSPARENCY.append((obj.Name, obj.ViewObject.Transparency))
+#                if hasattr(obj.ViewObject,'DiffuseColor'):
+                if ( len(obj.ViewObject.DiffuseColor) == 1 ) :
+                    DebugMsg(A2P_DEBUG_3,"a2p setTransparency:  ONE ShapeColor and Transparency detected:\n{}" \
+                        .format(obj.ViewObject.DiffuseColor))
+                else:
+                    DebugMsg(A2P_DEBUG_3,"a2p setTransparency: muxed assembly detected:\n{}" \
+                       .format(obj.ViewObject.DiffuseColor))
+                Msg("A2P setTransparency: We save all color & transparency to be on the safe side")
+                SAVED_TRANSPARENCY.append(
+                    (obj.Name, obj.ViewObject.Transparency, obj.ViewObject.DiffuseColor)
+                    )
                 obj.ViewObject.Transparency = 80
 #------------------------------------------------------------------------------
 def restoreTransparency():
@@ -116,6 +126,7 @@ def restoreTransparency():
         obj = doc.getObject(setting[0])
         if obj is not None:
             obj.ViewObject.Transparency = setting[1]
+            obj.ViewObject.DiffuseColor = setting[2]
     SAVED_TRANSPARENCY = []
 #------------------------------------------------------------------------------
 def isTransparencyEnabled():
@@ -509,6 +520,10 @@ def isA2pPart(obj):
     if hasattr(obj,"Content"):
         if 'importPart' in obj.Content:
             result = True
+    elif hasattr(obj,"a2p_Version"):          # keep old assembly item identification in,
+        result = True                         #  -> otherwise toggle transparency won't work
+    elif hasattr(obj,"subassemblyImport"):    # another possible assembly item
+        result = True
     return result
 
 def isA2pConstraint(obj): 
