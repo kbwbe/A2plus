@@ -106,12 +106,12 @@ def setTransparency():
             if hasattr(obj.ViewObject,'Transparency'):
 #                if hasattr(obj.ViewObject,'DiffuseColor'):
                 if ( len(obj.ViewObject.DiffuseColor) == 1 ) :
-                    print("setTransparency: ShapeColor and Transparency detected:\n", \
-                        obj.ViewObject.DiffuseColor)
+                    DebugMsg(A2P_DEBUG_3,"a2p setTransparency:  ONE ShapeColor and Transparency detected:\n{}" \
+                        .format(obj.ViewObject.DiffuseColor))
                 else:
-                    print("setTransparency: muxed assembly detected:\n", \
-                       obj.ViewObject.DiffuseColor)
-                print("setTransparency: anyway, we save all color & transparency to be on the safe side")
+                    DebugMsg(A2P_DEBUG_3,"a2p setTransparency: muxed assembly detected:\n{}" \
+                       .format(obj.ViewObject.DiffuseColor))
+                Msg("A2P setTransparency: We save all color & transparency to be on the safe side")
                 SAVED_TRANSPARENCY.append(
                     (obj.Name, obj.ViewObject.Transparency, obj.ViewObject.DiffuseColor)
                     )
