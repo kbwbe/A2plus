@@ -49,9 +49,10 @@ def muxObjectsWithKeys(objsIn, withColor=False):
     faceColors = []
     muxInfo = [] # List of keys, not used at moment...
 
-    print("MUX: objsIn:", len(objsIn))
+    Msg("A2P MUX: Objects to process: {}\n".format(len(objsIn)))
     for o, obj in enumerate(objsIn):
-        print("MUX: obj:",o, " len(DiffuseCol):", len(obj.ViewObject.DiffuseColor), " len(Faces):",  len(obj.Shape.Faces))
+        DebugMsg(A2P_DEBUG_3,"a2p MUX: obj: {}, len(DiffuseCol): {}, len(Faces): {}\n" \
+            .format(o,len(obj.ViewObject.DiffuseColor),len(obj.Shape.Faces)))
         # Save Computing time, store this before the for..enumerate loop later...
         colorFlag = ( len(obj.ViewObject.DiffuseColor) < len(obj.Shape.Faces) )    # one or more color tuples per obj ?
         shapeCol = obj.ViewObject.ShapeColor
@@ -61,26 +62,31 @@ def muxObjectsWithKeys(objsIn, withColor=False):
         # now start the loop with use of the stored values..(much faster)
         for i, face in enumerate(obj.Shape.Faces):
             faces.append(face)
-            print("MUX: i(Faces)=", i, face)
+            DebugMsg(A2P_DEBUG_3,"a2p MUX: i(Faces)={}\n{}\n".format(i,face))
 
             if withColor:
                 if colorFlag:
                     c = (shapeCol[0],shapeCol[1],shapeCol[2],shapeTsp)        # change shapeColor to
                                                                               # reflect diffuseColor with
                                                                               # alpha = reverse transparency
-                    print("MUX: color mode sC(*): origCol:", shapeCol, "\n     changedCol:               ", c)
+                    DebugMsg(
+                        A2P_DEBUG_3,
+                        "a2p MUX: color mode shapeColor: origCol:\n{}\nchangedCol:\n{}\n" \
+                            .format(shapeCol,c)
+                        )
                     faceColors.append(c)
                 else:
-                    if i < len(diffuseCol):                                   # otherwise "index out of range" error
-                        print("MUX: color mode dC[i]:", diffuseCol[i])        # <- DiffuseColor has to be properly
-                        faceColors.append(diffuseCol[i])                      # <- set up by calling function
+                    if i < len(diffuseCol):                                          # otherwise "index out of range" error
+                        DebugMsg(A2P_DEBUG_3,"a2p MUX: color mode diffuseColor[i]: {}\n" \
+                            .format(diffuseCol[i]))                                  # <- DiffuseColor has to be properly
+                        faceColors.append(diffuseCol[i])                             # <- set up by calling function
                     else:
-                        print("MUX: color mode dC[0]:", diffuseCol[0])
+                        DebugMsg(A2P_DEBUG_3,"a2p MUX: color mode diffuseColor[0]: {}\n".format(diffuseCol[0]))
                         faceColors.append(diffuseCol[0])
 
     shell = Part.makeShell(faces)
-    print("MUX: result:", shell)
-    print("MUX: faceColors:\n", faceColors)                                     # has result all faces' color values?
+    Msg("A2P MUX: result: {}\n".format(shell))
+    DebugMsg(A2P_DEBUG_3,"a2p MUX: faceColors:\n{}\n".format(faceColors))            # has result all faces' color values?
     if withColor:
         return muxInfo, shell, faceColors
     else:
