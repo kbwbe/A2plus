@@ -59,7 +59,7 @@ SOLVER_POS_ACCURACY = 1.0e-1  # gets to smaller values during solving
 SOLVER_STEPS_CONVERGENCY_CHECK = 1000
 SOLVER_CONVERGENCY_ERROR_INIT_VALUE = 1.0e+20
 SOLVER_CONVERGENCY_FACTOR = 0.99
-MAX_LEVEL_ACCURACY = 10  #accuracy reached is 1.0e-MAX_LEVEL_ACCURACY
+MAX_LEVEL_ACCURACY = 6  #accuracy reached is 1.0e-MAX_LEVEL_ACCURACY
 
 from a2plib import (
     PARTIAL_SOLVE_STAGE1,
@@ -348,7 +348,7 @@ class SolverSystem():
             return False
         #self.mySOLVER_SPIN_ACCURACY = math.degrees(math.atan(1 / accuracydivider))
         #self.mySOLVER_SPIN_ACCURACY = self.mySOLVER_POS_ACCURACY
-        if float(assemblysize) / self.mySOLVER_POS_ACCURACY > 1e8:
+        if float(assemblysize) / self.mySOLVER_POS_ACCURACY > 1e7:
             return False
         else:
             return True
@@ -396,25 +396,32 @@ class SolverSystem():
                 
                 
                 #self.solutionToParts(doc)
-                self.level_of_accuracy+=1 
+                 
                 
-                               
+                Msg('POS ACCURACY: %0.8f mm\t\tSPIN ACCURACY: %0.8f deg ' % (self.mySOLVER_POS_ACCURACY, self.mySOLVER_SPIN_ACCURACY))
+                    #Msg('SPIN ACCURACY: {}\n'.format(self.mySOLVER_SPIN_ACCURACY))
+                Msg( '--->LEVEL OF ACCURACY :{} DONE!\n'.format(self.level_of_accuracy) ) 
+                 
+                self.level_of_accuracy+=1
+                self.mySOLVER_POS_ACCURACY *= 1.0e-1              
                 #FreeCADGui.updateGui()
-                if self.level_of_accuracy == MAX_LEVEL_ACCURACY: 
-                    Msg('POS ACCURACY: %0.8f mm\t\tSPIN ACCURACY: %0.8f deg ' % (self.mySOLVER_POS_ACCURACY, self.mySOLVER_SPIN_ACCURACY))
-                    #Msg('SPIN ACCURACY: {}\n'.format(self.mySOLVER_SPIN_ACCURACY))
-                    Msg( '--->LEVEL OF ACCURACY :{} DONE!\n'.format(self.level_of_accuracy) )                   
+                if self.level_of_accuracy == MAX_LEVEL_ACCURACY or not self.calcSpinAccuracy():
+                    Msg( "TotalTime (ms): %d\n" % (totalTime - startTime)) 
+#                     Msg('POS ACCURACY: %0.8f mm\t\tSPIN ACCURACY: %0.8f deg ' % (self.mySOLVER_POS_ACCURACY, self.mySOLVER_SPIN_ACCURACY))
+#                     #Msg('SPIN ACCURACY: {}\n'.format(self.mySOLVER_SPIN_ACCURACY))
+#                     Msg( '--->LEVEL OF ACCURACY :{} DONE!\n'.format(self.level_of_accuracy) )                   
                     break
                 
-                self.mySOLVER_POS_ACCURACY *= 1.0e-1
-                if not self.calcSpinAccuracy():
-                    Msg('POS ACCURACY: %0.8f mm\t\tSPIN ACCURACY: %0.8f deg ' % (self.mySOLVER_POS_ACCURACY, self.mySOLVER_SPIN_ACCURACY))
-                    #Msg('SPIN ACCURACY: {}\n'.format(self.mySOLVER_SPIN_ACCURACY))
-                    Msg( '--->LEVEL OF ACCURACY :{} DONE!\n'.format(self.level_of_accuracy) ) 
-                    Msg( "TotalTime (ms): %d\n" % (totalTime - startTime))
-                    break
                 
                 self.loadSystem(doc)
+                    
+#                     Msg('POS ACCURACY: %0.8f mm\t\tSPIN ACCURACY: %0.8f deg ' % (self.mySOLVER_POS_ACCURACY, self.mySOLVER_SPIN_ACCURACY))
+#                     #Msg('SPIN ACCURACY: {}\n'.format(self.mySOLVER_SPIN_ACCURACY))
+#                     Msg( '--->LEVEL OF ACCURACY :{} DONE!\n'.format(self.level_of_accuracy) ) 
+#                     Msg( "TotalTime (ms): %d\n" % (totalTime - startTime))
+                    #break
+                
+                
                 #self.failurecounter = 5
                 #self.calcSpinAccuracy()
                 #self.prepareRestart()
@@ -574,10 +581,10 @@ class SolverSystem():
 
             # Perform the move
             for w in workList:                
-                w.move(doc)
+                w.move(doc, self)
                 # Enable those 2 lines to see the computation progress on screen
-                #w.applySolution(doc, self)
-                #FreeCADGui.updateGui()
+#                 w.applySolution(doc, self)
+#                 FreeCADGui.updateGui()
 
             # The accuracy is good, apply the solution to FreeCAD's objects
             if (maxPosError <   self.mySOLVER_POS_ACCURACY and

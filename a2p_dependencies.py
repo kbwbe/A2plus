@@ -303,29 +303,37 @@ class Dependency():
 
         axis = None # Rotation axis to be returned
 
-        if self.direction != "none" or self.direction != "auto":
+        if self.direction != "none" and self.direction != "auto":
             rigAxis = self.refAxisEnd.sub(self.refPoint)
             foreignDep = self.foreignDependency
             foreignAxis = foreignDep.refAxisEnd.sub(foreignDep.refPoint)
             #
             #do we have wrong alignment of axes ??
             dot = rigAxis.dot(foreignAxis)
-            if abs(dot + 1.0) < solver.mySOLVER_SPIN_ACCURACY*1e-1: #both axes nearly aligned but false orientation...
-                x = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
-                y = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
-                z = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
+            if abs(dot + 1.0) <= solver.mySOLVER_SPIN_ACCURACY*1e-2: #both axes nearly aligned but false orientation...
+                x = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-3,solver.mySOLVER_SPIN_ACCURACY*1e-3)
+                y = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-3,solver.mySOLVER_SPIN_ACCURACY*1e-3)
+                z = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-3,solver.mySOLVER_SPIN_ACCURACY*1e-3)
                 disturbVector = Base.Vector(x,y,z)
                 foreignAxis = foreignAxis.add(disturbVector)
 
             #axis = foreignAxis.cross(rigAxis)
             axis = rigAxis.cross(foreignAxis)
+            
             try:
+#                 axis.x += 0.1
+#                 axis.y += 0.1
+#                 axis.z += 0.1
                 axis.normalize()
                 angle = foreignAxis.getAngle(rigAxis)
                 axis.multiply(math.degrees(angle))
             except:
+                #print 'exception angle'
                 axis = None
-
+            
+            
+            
+            
         else: #if dep.direction... (== none)
             rigAxis = self.refAxisEnd.sub(self.refPoint)
             foreignDep = self.foreignDependency
@@ -669,25 +677,24 @@ class DependencyAngledPlanes(Dependency):
         if not self.Enabled: return None
 
         axis = None # Rotation axis to be returned
-
         rigAxis = self.refAxisEnd.sub(self.refPoint)
         foreignDep = self.foreignDependency
         foreignAxis = foreignDep.refAxisEnd.sub(foreignDep.refPoint)
-        recentAngle = math.degrees(foreignAxis.getAngle(rigAxis))
+        recentAngle = math.degrees(foreignAxis.getAngle(rigAxis))        
+        axis = rigAxis.cross(foreignAxis)
         deltaAngle = abs(self.angle.Value) - recentAngle
-        if abs(deltaAngle) < solver.mySOLVER_SPIN_ACCURACY:
-            # do not change spin, not necessary..
-            axis = None
-        else:
-            try:
-                axis = rigAxis.cross(foreignAxis)
-                axis.normalize()
-                axis.multiply(math.degrees(-deltaAngle))
-            except: #axis = Vector(0,0,0) and cannot be normalized...
-                x = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
-                y = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
-                z = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
-                axis = Base.Vector(x,y,z)
+        axis.x +=1.0
+        axis.y +=1.0
+        axis.z +=1.0
+        axis.normalize()
+        axis.multiply(-deltaAngle)
+        #except: #axis = Vector(0,0,0) and cannot be normalized...
+        #    print 'exception on angle getrotation'
+        #    pass
+#             x = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
+#             y = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
+#             z = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
+#             axis = Base.Vector(x,y,z)
         #DebugMsg(A2P_DEBUG_3, "{} - rotate by {}\n".format(self, axis.Length))
         return axis
     

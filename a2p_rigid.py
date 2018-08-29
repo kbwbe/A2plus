@@ -505,7 +505,7 @@ class Rigid():
                     axisErr = self.spin.Length
                     if axisErr > self.maxAxisError : self.maxAxisError = axisErr
 
-    def move(self,doc):
+    def move(self,doc, solver):
         if self.tempfixed: return
         
         #
@@ -519,9 +519,9 @@ class Rigid():
         center = None
         rotation = None
         if (self.spin != None and self.spin.Length != 0.0 and self.countSpinVectors != 0):
-            spinAngle = self.spin.Length / self.countSpinVectors
+            spinAngle = self.spin.Length / float(self.countSpinVectors)
             if spinAngle>15.0: spinAngle=15.0 # do not accept more degrees
-            if spinAngle> 1e-8:
+            if spinAngle> solver.mySOLVER_SPIN_ACCURACY*1e-3:
                 try:
                     spinStep = spinAngle/(SPINSTEP_DIVISOR) #it was 250.0
                     self.spin.normalize()
