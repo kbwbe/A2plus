@@ -369,6 +369,7 @@ class Dependency():
             #axis = foreignAxis.cross(rigAxis)
             axis = rigAxis.cross(foreignAxis)
             try:
+                axis.multipy(1.0e6)
                 axis.normalize()
                 angle = foreignAxis.getAngle(rigAxis)
                 axis.multiply(math.degrees(angle))

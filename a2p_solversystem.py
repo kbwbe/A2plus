@@ -187,15 +187,13 @@ class SolverSystem():
             rig.calcSpinCenter()
             rig.calcRefPointsBoundBoxSize()
             
-        '''
         numdep = 0
         self.retrieveDOFInfo() #function only once used here at this place in whole program
         for rig in self.rigids:
             rig.currentDOF()
-            #rig.beautyDOFPrint()
+            rig.beautyDOFPrint()
             numdep+=rig.countDependencies()
         Msg( 'there are {} dependencies\n'.format(numdep/2))  
-        '''
      
         self.status = "loaded"
 

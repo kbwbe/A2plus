@@ -366,6 +366,7 @@ class Rigid():
                     vec3 = vec1.add(vec2)
                     beta = vec3.getAngle(vec1)
 
+                    axis.multiply(1.0e6)
                     axis.normalize()
                     axis.multiply(math.degrees(beta)*WEIGHT_REFPOINT_ROTATION) #here use degrees
                     self.spin = self.spin.add(axis)
@@ -407,14 +408,14 @@ class Rigid():
         if (self.spin != None and self.spin.Length != 0.0 and self.countSpinVectors != 0):
             spinAngle = self.spin.Length / self.countSpinVectors
             if spinAngle>15.0: spinAngle=15.0 # do not accept more degrees
-            if spinAngle> 1e-8:
-                try:
-                    spinStep = spinAngle/(SPINSTEP_DIVISOR) #it was 250.0
-                    self.spin.normalize()
-                    rotation = FreeCAD.Rotation(self.spin, spinStep)
-                    center = self.spinCenter
-                except:
-                    pass
+            try:
+                spinStep = spinAngle/(SPINSTEP_DIVISOR) #it was 250.0
+                self.spin.multiply(1.0e6)
+                self.spin.normalize()
+                rotation = FreeCAD.Rotation(self.spin, spinStep)
+                center = self.spinCenter
+            except:
+                pass
 
         if center != None and rotation != None:
             pl = FreeCAD.Placement(moveDist,rotation,center)
