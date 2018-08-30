@@ -694,28 +694,14 @@ class DependencyAngledPlanes(Dependency):
         #print 'OppositeAngle= ', 180 + math.degrees(rigAxis.getAngle(foreignAxis))  
         #rigAxis.multiply(-1.0)  
         axis = rigAxis.cross(foreignAxis)
-        deltaAngle = abs(self.angle.Value) - recentAngle
-        #axis.x +=1.0
-        #axis.y +=1.0
-        #axis.z +=1.0
+        deltaAngle = abs(self.angle.Value) - recentAngle        
         try: 
             axis.multiply(1.0e10)
             axis.normalize()
             axis.multiply(-deltaAngle)
-        except:
-            
-            print 'Exception Angle'
+        except:            
+            #print 'Exception Angle'
             pass
-            #axis.multiply(10**6)
-            #axis.normalize()
-        #axis.multiply(-deltaAngle)
-        #except: #axis = Vector(0,0,0) and cannot be normalized...
-        #    print 'exception on angle getrotation'
-        #    pass
-#             x = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
-#             y = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
-#             z = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
-#             axis = Base.Vector(x,y,z)
         #DebugMsg(A2P_DEBUG_3, "{} - rotate by {}\n".format(self, axis.Length))
         return axis
     
