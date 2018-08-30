@@ -303,7 +303,7 @@ class Rigid():
             axis2 = self.savedPlacement[ind].Rotation.Axis
             angle = math.degrees(axis2.getAngle(axis1))
 
-            if absPosMove >= solver.mySOLVER_POS_ACCURACY * 0.1 or angle >= solver.mySOLVER_SPIN_ACCURACY * 0.1:
+            if absPosMove >= solver.mySOLVER_POS_ACCURACY * 0.01 or angle >= solver.mySOLVER_SPIN_ACCURACY * 0.01:
                 #for objname in self.objectName:
                 obj = doc.getObject(self.objectName[ind])            
                 obj.Placement = self.placement[ind]
@@ -471,24 +471,59 @@ class Rigid():
 
             #realMoveVectorSum = FreeCAD.Vector(self.moveVectorSum)
             #realMoveVectorSum.multiply(WEIGHT_LINEAR_MOVE)
-            for i in range(0, len(depRefPoints)):
+            for i in range(0,len(depRefPoints)):
                 try:
                     vec1 = depRefPoints[i].sub(self.spinCenter) # 'aka Radius'
                     vec2 = depMoveVectors[i].sub(self.moveVectorSum) # 'aka Force'
                     axis = vec1.cross(vec2) #torque-vector
-
+                    vec1.multiply(1.0e10)
                     vec1.normalize()
                     vec1.multiply(self.refPointsBoundBoxSize)
                     vec3 = vec1.add(vec2)
                     beta = vec3.getAngle(vec1)
-
+                    axis.multiply(1.0e10)
                     axis.normalize()
                     axis.multiply(math.degrees(beta)*WEIGHT_REFPOINT_ROTATION) #here use degrees
                     self.spin = self.spin.add(axis)
                     self.countSpinVectors += 1
                 except:
+                    #print 'Exception CalcMoveData()'
                     pass #numerical exception above, no spin !
-
+            
+#             for i in range(len(depRefPoints)):
+#                 
+#                 vec1 = depRefPoints[i].sub(self.spinCenter) # 'aka Radius'
+#                 vec2 = depMoveVectors[i].sub(self.moveVectorSum) # 'aka Force'
+#                 axis = vec1.cross(vec2) #torque-vector
+#                 try: 
+#                     axis.multiply(1.0e6) <== this is faster !
+#                     axis.normalize() #<== is still able to fail. Needs to be inside of try section...
+#                     axis.multiply(-deltaAngle)
+#                 except:
+#                     pass
+#                 
+#                 
+#                 
+#                 try:
+#                     vec1.normalize()
+#                 except:
+#                     vec1.multiply(10**6)
+#                     print i,'-->',vec1.Length
+#                     vec1.normalize()
+#                 vec1.multiply(self.refPointsBoundBoxSize)
+#                 vec3 = vec1.add(vec2)
+#                 beta = vec3.getAngle(vec1)
+#                 try:
+#                     axis.normalize()
+#                 except:
+#                     axis.multiply(10**6)
+#                     axis.normalize()
+#                 axis.multiply(math.degrees(beta)*WEIGHT_REFPOINT_ROTATION) #here use degrees
+#                 self.spin = self.spin.add(axis)
+#                 self.countSpinVectors += 1
+                
+            
+            
             #adjust axis' of the dependencies //FIXME (align,opposed,none)
 
             for dep in self.dependencies:
@@ -502,8 +537,8 @@ class Rigid():
                     self.countSpinVectors += 1
     
                     # Calculate max rotation error
-                    axisErr = self.spin.Length
-                    if axisErr > self.maxAxisError : self.maxAxisError = axisErr
+                    self.maxAxisError = max(self.spin.Length, self.maxAxisError)
+                    #if axisErr > self.maxAxisError : self.maxAxisError = axisErr
 
     def move(self,doc, solver):
         if self.tempfixed: return
@@ -521,20 +556,22 @@ class Rigid():
         if (self.spin != None and self.spin.Length != 0.0 and self.countSpinVectors != 0):
             spinAngle = self.spin.Length / float(self.countSpinVectors)
             if spinAngle>15.0: spinAngle=15.0 # do not accept more degrees
-            if spinAngle> solver.mySOLVER_SPIN_ACCURACY*1e-3:
+            if spinAngle> solver.mySOLVER_SPIN_ACCURACY*1.0e-3:
                 try:
                     spinStep = spinAngle/(SPINSTEP_DIVISOR) #it was 250.0
+                    self.spin.multiply(1.0e10)
                     self.spin.normalize()
                     rotation = FreeCAD.Rotation(self.spin, spinStep)
                     center = self.spinCenter
                 except:
+                    print 'Exception SpinAngle'
                     pass
 
         if center != None and rotation != None:
             pl = FreeCAD.Placement(moveDist,rotation,center)
             self.applyPlacementStep(pl)
         else:
-            if moveDist.Length > 1e-8:
+            if moveDist.Length > 1.0e-10:
                 pl = FreeCAD.Placement()
                 pl.move(moveDist)
                 self.applyPlacementStep(pl)

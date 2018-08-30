@@ -59,7 +59,7 @@ SOLVER_POS_ACCURACY = 1.0e-1  # gets to smaller values during solving
 SOLVER_STEPS_CONVERGENCY_CHECK = 1000
 SOLVER_CONVERGENCY_ERROR_INIT_VALUE = 1.0e+20
 SOLVER_CONVERGENCY_FACTOR = 0.99
-MAX_LEVEL_ACCURACY = 6  #accuracy reached is 1.0e-MAX_LEVEL_ACCURACY
+MAX_LEVEL_ACCURACY = 10  #accuracy reached is 1.0e-MAX_LEVEL_ACCURACY
 
 from a2plib import (
     PARTIAL_SOLVE_STAGE1,
@@ -347,8 +347,8 @@ class SolverSystem():
         else:
             return False
         #self.mySOLVER_SPIN_ACCURACY = math.degrees(math.atan(1 / accuracydivider))
-        #self.mySOLVER_SPIN_ACCURACY = self.mySOLVER_POS_ACCURACY
-        if float(assemblysize) / self.mySOLVER_POS_ACCURACY > 1e7:
+        self.mySOLVER_SPIN_ACCURACY = self.mySOLVER_POS_ACCURACY
+        if float(assemblysize) / self.mySOLVER_POS_ACCURACY > 1e8:
             return False
         else:
             return True
@@ -364,7 +364,7 @@ class SolverSystem():
 
     def solveSystemWithMode(self,doc):
         self.level_of_accuracy=1
-        self.failurecounter = 5
+        #self.failurecounter = 5
         startTime = int(round(time.time() * 1000))
         self.loadSystem(doc)
         if self.status == "loadingDependencyError":
@@ -494,8 +494,8 @@ class SolverSystem():
         
         self.partialSolverCurrentStage = PARTIAL_SOLVE_STAGE1
         
-        self.mySOLVER_POS_ACCURACY *= 1.0e-1
-        self.calcSpinAccuracy()
+        #self.mySOLVER_POS_ACCURACY *= 1.0e-1
+        #self.calcSpinAccuracy()
         #mainWorklist = []
         while self.partialSolverCurrentStage != PARTIAL_SOLVE_END:
             #print "evaluating stage = ", self.partialSolverCurrentStage
@@ -538,9 +538,9 @@ class SolverSystem():
 #                     if self.partialSolverCurrentStage == PARTIAL_SOLVE_STAGE3:
 #                         self.mySOLVER_POS_ACCURACY *= 1e-1
 #                         self.calcSpinAccuracy()
-                    if (self.partialSolverCurrentStage == PARTIAL_SOLVE_STAGE4) :
-                        self.mySOLVER_POS_ACCURACY *= 10
-                        self.calcSpinAccuracy()
+#                     if (self.partialSolverCurrentStage == PARTIAL_SOLVE_STAGE4) :
+#                         self.mySOLVER_POS_ACCURACY *= 10
+#                         self.calcSpinAccuracy()
                     workList = []
                     break 
                                 
@@ -627,8 +627,8 @@ class SolverSystem():
                     for rig in workList:
                         if rig.maxAxisError > self.mySOLVER_SPIN_ACCURACY or rig.maxPosError > self.mySOLVER_POS_ACCURACY:
                             Msg("Error on Rigid {}\n".format(rig.label))
-                            Msg("    PosError {}\n".format(rig.maxPosError))
-                            Msg("    AxisError {}\n".format(rig.maxAxisError))
+                            Msg("    PosError {}  | Accuracy {}\n".format(rig.maxPosError, self.mySOLVER_POS_ACCURACY))
+                            Msg("    AxisError {} | Accuracy {}\n".format(rig.maxAxisError, self.mySOLVER_SPIN_ACCURACY))
                             for r in rig.linkedRigids:
                                 if r.tempfixed and not r.fixed:
                                     Msg("unfixed Rigid {}\n".format(r.label))

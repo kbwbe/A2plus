@@ -310,26 +310,33 @@ class Dependency():
             #
             #do we have wrong alignment of axes ??
             dot = rigAxis.dot(foreignAxis)
-            if abs(dot + 1.0) <= solver.mySOLVER_SPIN_ACCURACY*1e-2: #both axes nearly aligned but false orientation...
-                x = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-3,solver.mySOLVER_SPIN_ACCURACY*1e-3)
-                y = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-3,solver.mySOLVER_SPIN_ACCURACY*1e-3)
-                z = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-3,solver.mySOLVER_SPIN_ACCURACY*1e-3)
+            if abs(dot + 1.0) <= solver.mySOLVER_SPIN_ACCURACY: #both axes nearly aligned but false orientation...
+                x = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
+                y = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
+                z = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
                 disturbVector = Base.Vector(x,y,z)
                 foreignAxis = foreignAxis.add(disturbVector)
 
             #axis = foreignAxis.cross(rigAxis)
             axis = rigAxis.cross(foreignAxis)
+            angle = foreignAxis.getAngle(rigAxis)
             
-            try:
-#                 axis.x += 0.1
-#                 axis.y += 0.1
-#                 axis.z += 0.1
+#             try:
+# #                 axis.x += 0.1
+# #                 axis.y += 0.1
+# #                 axis.z += 0.1
+#                 axis.normalize()
+#                 
+#             except:
+#                 #print 'exception angle'
+#                 axis = None
+            try: 
+                axis.multiply(1.0e10)
                 axis.normalize()
-                angle = foreignAxis.getAngle(rigAxis)
                 axis.multiply(math.degrees(angle))
-            except:
-                #print 'exception angle'
-                axis = None
+            except: 
+                print 'exception angle'
+                axis = None               
             
             
             
@@ -347,6 +354,7 @@ class Dependency():
                 foreignAxis.multiply(-1.0)
                 axis = rigAxis.cross(foreignAxis)
             try:
+                axis.multiply(1.0e10)
                 axis.normalize()
                 angle = foreignAxis.getAngle(rigAxis)
                 axis.multiply(math.degrees(angle))
@@ -683,11 +691,20 @@ class DependencyAngledPlanes(Dependency):
         recentAngle = math.degrees(foreignAxis.getAngle(rigAxis))        
         axis = rigAxis.cross(foreignAxis)
         deltaAngle = abs(self.angle.Value) - recentAngle
-        axis.x +=1.0
-        axis.y +=1.0
-        axis.z +=1.0
-        axis.normalize()
-        axis.multiply(-deltaAngle)
+        #axis.x +=1.0
+        #axis.y +=1.0
+        #axis.z +=1.0
+        try: 
+            axis.multiply(1.0e10)
+            axis.normalize()
+            axis.multiply(-deltaAngle)
+        except:
+            
+            print 'Exception Angle'
+            pass
+            #axis.multiply(10**6)
+            #axis.normalize()
+        #axis.multiply(-deltaAngle)
         #except: #axis = Vector(0,0,0) and cannot be normalized...
         #    print 'exception on angle getrotation'
         #    pass
