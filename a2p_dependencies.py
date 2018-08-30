@@ -309,13 +309,13 @@ class Dependency():
             foreignAxis = foreignDep.refAxisEnd.sub(foreignDep.refPoint)
             #
             #do we have wrong alignment of axes ??
-            dot = rigAxis.dot(foreignAxis)
-            if abs(dot + 1.0) <= solver.mySOLVER_SPIN_ACCURACY: #both axes nearly aligned but false orientation...
-                x = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
-                y = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
-                z = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
-                disturbVector = Base.Vector(x,y,z)
-                foreignAxis = foreignAxis.add(disturbVector)
+#             dot = rigAxis.dot(foreignAxis)
+#             if abs(dot + 1.0) <= solver.mySOLVER_SPIN_ACCURACY: #both axes nearly aligned but false orientation...
+#                 x = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
+#                 y = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
+#                 z = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
+#                 disturbVector = Base.Vector(x,y,z)
+#                 foreignAxis = foreignAxis.add(disturbVector)
 
             #axis = foreignAxis.cross(rigAxis)
             axis = rigAxis.cross(foreignAxis)
@@ -688,7 +688,11 @@ class DependencyAngledPlanes(Dependency):
         rigAxis = self.refAxisEnd.sub(self.refPoint)
         foreignDep = self.foreignDependency
         foreignAxis = foreignDep.refAxisEnd.sub(foreignDep.refPoint)
-        recentAngle = math.degrees(foreignAxis.getAngle(rigAxis))        
+        recentAngle = math.degrees(foreignAxis.getAngle(rigAxis)) 
+        #print 'RealAngle= ', recentAngle 
+        #rigAxis.multiply(-1.0)  
+        #print 'OppositeAngle= ', 180 + math.degrees(rigAxis.getAngle(foreignAxis))  
+        #rigAxis.multiply(-1.0)  
         axis = rigAxis.cross(foreignAxis)
         deltaAngle = abs(self.angle.Value) - recentAngle
         #axis.x +=1.0

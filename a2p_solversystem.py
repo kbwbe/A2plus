@@ -598,7 +598,7 @@ class SolverSystem():
                 
                 for r in workList:                    
                     r.applySolution(doc,self) 
-                    #FreeCADGui.updateGui()  
+                    FreeCADGui.updateGui()  
                     for dep in r.dependencies:
                         if dep.Enabled:
                             #self.progress_bar.next()
