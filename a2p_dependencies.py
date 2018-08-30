@@ -87,6 +87,7 @@ class Dependency():
         self.constraint = constraint    # TODO: remove, probably not needed
         self.axisRotationEnabled = axisRotation
         self.lockRotation = False
+        self.useRefPointSpin = True
 
         self.Type = constraint.Type
         try:
@@ -401,6 +402,7 @@ class DependencyPointIdentity(Dependency):
     def __init__(self, constraint, refType):
         Dependency.__init__(self, constraint, refType, False)
         self.isPointConstraint = True
+        self.useRefPointSpin = True
 
     def getMovement(self):
         if not self.Enabled: return None, None
@@ -425,6 +427,7 @@ class DependencyPointOnLine(Dependency):
     def __init__(self, constraint, refType):
         Dependency.__init__(self, constraint, refType, False)
         self.isPointConstraint = True
+        self.useRefPointSpin = True
 
     def getMovement(self):
         if not self.Enabled: return None, None
@@ -468,6 +471,7 @@ class DependencyPointOnPlane(Dependency):
     def __init__(self, constraint, refType):
         Dependency.__init__(self, constraint, refType, False)
         self.isPointConstraint = True
+        self.useRefPointSpin = True
 
     def getMovement(self):
         if not self.Enabled: return None, None
@@ -512,6 +516,7 @@ class DependencyCircularEdge(Dependency):
     def __init__(self, constraint, refType):
         Dependency.__init__(self, constraint, refType, True)
         self.isPointConstraint = False
+        self.useRefPointSpin = True
 
     def getMovement(self):
         if not self.Enabled: return None, None
@@ -544,6 +549,7 @@ class DependencyParallelPlanes(Dependency):
     def __init__(self, constraint, refType):
         Dependency.__init__(self, constraint, refType, True)
         self.isPointConstraint = False
+        self.useRefPointSpin = False
 
     def getMovement(self):
         if not self.Enabled: return None, None
@@ -561,6 +567,7 @@ class DependencyAngledPlanes(Dependency):
     def __init__(self, constraint, refType):
         Dependency.__init__(self, constraint, refType, True)
         self.isPointConstraint = False
+        self.useRefPointSpin = False
         
     def getMovement(self):
         if not self.Enabled: return None, None
@@ -608,6 +615,7 @@ class DependencyPlane(Dependency):
     def __init__(self, constraint, refType):
         Dependency.__init__(self, constraint, refType, True)
         self.isPointConstraint = False
+        self.useRefPointSpin = False
 
     def getMovement(self):
         if not self.Enabled: return None, None
@@ -637,6 +645,7 @@ class DependencyAxial(Dependency):
     def __init__(self, constraint, refType):
         Dependency.__init__(self, constraint, refType, True)
         self.isPointConstraint = False
+        self.useRefPointSpin = True
 
     def getMovement(self):
         if not self.Enabled: return None, None
