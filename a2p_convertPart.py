@@ -35,6 +35,7 @@ from a2plib import (
     appVersionStr,
     AUTOSOLVE_ENABLED
     )
+from a2p_FaceLister import makeFaceList
 
 class Proxy_convertPart:
     def execute(self, shape):
@@ -50,6 +51,11 @@ def convertToImportedPart(doc, obj):
 #        msg = obj.Name + " was not converted."
 #        FreeCADGui.Console.Message(msg)
 #    for oe in objExpand:
+
+    #faceList test starts here for 3 lines
+    doc = FreeCAD.activeDocument()
+    objList = doc.Objects
+    makeFaceList(doc,objList)
     
     #partName = obj.Name
     partName = a2plib.findUnusedObjectName( obj.Label, document=doc )

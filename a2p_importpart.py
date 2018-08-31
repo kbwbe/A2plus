@@ -40,6 +40,7 @@ from a2plib import (
     A2P_DEBUG_2,
     A2P_DEBUG_3
     )
+from a2p_FaceLister import makeFaceList
 
 PYVERSION =  sys.version_info[0]
 
@@ -186,6 +187,9 @@ def importPartFromFile(_doc, filename, importToCache=False):
             msg
             )
         return
+
+    #faceList test starts here for 1 line
+    makeFaceList(importDoc,importableObjects)
 
     #TODO: allow import multiple parts as separate items
     #-------------------------------------------
