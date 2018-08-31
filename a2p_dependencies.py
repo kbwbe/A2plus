@@ -307,35 +307,14 @@ class Dependency():
             rigAxis = self.refAxisEnd.sub(self.refPoint)
             foreignDep = self.foreignDependency
             foreignAxis = foreignDep.refAxisEnd.sub(foreignDep.refPoint)
-            #
-            #do we have wrong alignment of axes ??
-#             dot = rigAxis.dot(foreignAxis)
-#             if abs(dot + 1.0) <= solver.mySOLVER_SPIN_ACCURACY: #both axes nearly aligned but false orientation...
-#                 x = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
-#                 y = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
-#                 z = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
-#                 disturbVector = Base.Vector(x,y,z)
-#                 foreignAxis = foreignAxis.add(disturbVector)
-
-            #axis = foreignAxis.cross(rigAxis)
             axis = rigAxis.cross(foreignAxis)
             angle = foreignAxis.getAngle(rigAxis)
-            
-#             try:
-# #                 axis.x += 0.1
-# #                 axis.y += 0.1
-# #                 axis.z += 0.1
-#                 axis.normalize()
-#                 
-#             except:
-#                 #print 'exception angle'
-#                 axis = None
             try: 
-                axis.multiply(1.0e10)
+                axis.multiply(1.0e15)
                 axis.normalize()
                 axis.multiply(math.degrees(angle))
             except: 
-                print 'exception angle'
+                #Msg('Exception dep.getRotation() Axis = {}'.format(axis))
                 axis = None               
             
             
@@ -354,7 +333,7 @@ class Dependency():
                 foreignAxis.multiply(-1.0)
                 axis = rigAxis.cross(foreignAxis)
             try:
-                axis.multiply(1.0e10)
+                axis.multiply(1.0e15)
                 axis.normalize()
                 angle = foreignAxis.getAngle(rigAxis)
                 axis.multiply(math.degrees(angle))
@@ -689,20 +668,16 @@ class DependencyAngledPlanes(Dependency):
         foreignDep = self.foreignDependency
         foreignAxis = foreignDep.refAxisEnd.sub(foreignDep.refPoint)
         recentAngle = math.degrees(foreignAxis.getAngle(rigAxis)) 
-        #print 'RealAngle= ', recentAngle 
-        #rigAxis.multiply(-1.0)  
-        #print 'OppositeAngle= ', 180 + math.degrees(rigAxis.getAngle(foreignAxis))  
-        #rigAxis.multiply(-1.0)  
         axis = rigAxis.cross(foreignAxis)
         deltaAngle = abs(self.angle.Value) - recentAngle        
         try: 
-            axis.multiply(1.0e10)
+            axis.multiply(1.0e15)
             axis.normalize()
             axis.multiply(-deltaAngle)
         except:            
-            #print 'Exception Angle'
+            #Msg('Exception AngledPlanes getRotation() Axis = {}'.format(axis))
             pass
-        #DebugMsg(A2P_DEBUG_3, "{} - rotate by {}\n".format(self, axis.Length))
+        DebugMsg(A2P_DEBUG_3, "{} - rotate by {}\n".format(self, axis.Length))
         return axis
     
     def calcDOF(self, _dofPos, _dofRot, _pointconstraints=[]):

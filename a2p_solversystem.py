@@ -90,7 +90,7 @@ class SolverSystem():
         self.convergencyCounter = 0
         self.status = "created"
         self.partialSolverCurrentStage = 0
-        self.failurecounter = 5
+        self.unfixedRigid = False
 
     def clear(self):
         for r in self.rigids:
@@ -347,7 +347,7 @@ class SolverSystem():
         else:
             return False
         #self.mySOLVER_SPIN_ACCURACY = math.degrees(math.atan(1 / accuracydivider))
-        self.mySOLVER_SPIN_ACCURACY = self.mySOLVER_POS_ACCURACY
+        #self.mySOLVER_SPIN_ACCURACY = self.mySOLVER_POS_ACCURACY
         if float(assemblysize) / self.mySOLVER_POS_ACCURACY > 1e8:
             return False
         else:
@@ -364,13 +364,20 @@ class SolverSystem():
 
     def solveSystemWithMode(self,doc):
         self.level_of_accuracy=1
+        self.unfixedRigid = False
         #self.failurecounter = 5
         startTime = int(round(time.time() * 1000))
         self.loadSystem(doc)
         if self.status == "loadingDependencyError":
             return
+        
+        for rig in self.rigids:
+            #rig.currentDOF()
+            rig.beautyDOFPrint()
+        
         self.mySOLVER_POS_ACCURACY = SOLVER_POS_ACCURACY
         self.calcSpinAccuracy()
+        
 #         self.progress_bar = FreeCAD.Base.ProgressIndicator()
 #         self.progress_bar.start("Solving Assembly...",(self.numdep/2)*(MAX_LEVEL_ACCURACY-1)) 
         #for i in range(100):        
@@ -395,7 +402,7 @@ class SolverSystem():
                 
                 
                 
-                #self.solutionToParts(doc)
+                self.solutionToParts(doc)
                  
                 
                 Msg('POS ACCURACY: %0.8f mm\t\tSPIN ACCURACY: %0.8f deg ' % (self.mySOLVER_POS_ACCURACY, self.mySOLVER_SPIN_ACCURACY))
@@ -404,7 +411,7 @@ class SolverSystem():
                  
                 self.level_of_accuracy+=1
                 self.mySOLVER_POS_ACCURACY *= 1.0e-1              
-                #FreeCADGui.updateGui()
+                FreeCADGui.updateGui()
                 if self.level_of_accuracy == MAX_LEVEL_ACCURACY or not self.calcSpinAccuracy():
                     Msg( "TotalTime (ms): %d\n" % (totalTime - startTime)) 
 #                     Msg('POS ACCURACY: %0.8f mm\t\tSPIN ACCURACY: %0.8f deg ' % (self.mySOLVER_POS_ACCURACY, self.mySOLVER_SPIN_ACCURACY))
@@ -412,7 +419,7 @@ class SolverSystem():
 #                     Msg( '--->LEVEL OF ACCURACY :{} DONE!\n'.format(self.level_of_accuracy) )                   
                     break
                 
-                
+                self.unfixedRigid = False
                 self.loadSystem(doc)
                     
 #                     Msg('POS ACCURACY: %0.8f mm\t\tSPIN ACCURACY: %0.8f deg ' % (self.mySOLVER_POS_ACCURACY, self.mySOLVER_SPIN_ACCURACY))
@@ -460,7 +467,10 @@ class SolverSystem():
         
         
         if systemSolved:
-            
+            if self.unfixedRigid:
+                #Retry....
+                self.solveSystemWithMode(doc)
+            self.solutionToParts(doc)
             self.status = "solved"
             Msg( "===== System solved !  =====\n" )
             try:
@@ -597,8 +607,8 @@ class SolverSystem():
                 
                 
                 for r in workList:                    
-                    r.applySolution(doc,self) 
-                    FreeCADGui.updateGui()  
+#                     r.applySolution(doc,self) 
+#                     FreeCADGui.updateGui()  
                     for dep in r.dependencies:
                         if dep.Enabled:
                             #self.progress_bar.next()
@@ -635,7 +645,7 @@ class SolverSystem():
                                     r.tempfixed = False
                                     #for dep in r.dependencies:
                                     #    print dep
-                                    
+                                    self.unfixedRigid = True
                                     foundRigidToUnfix = True
                                     #foundRigidToUnfix = False
                 

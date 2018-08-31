@@ -303,27 +303,27 @@ class Rigid():
             axis2 = self.savedPlacement[ind].Rotation.Axis
             angle = math.degrees(axis2.getAngle(axis1))
 
-            if absPosMove >= solver.mySOLVER_POS_ACCURACY * 0.01 or angle >= solver.mySOLVER_SPIN_ACCURACY * 0.01:
+            #if absPosMove >= solver.mySOLVER_POS_ACCURACY * 0.01 or angle >= solver.mySOLVER_SPIN_ACCURACY * 0.01:
                 #for objname in self.objectName:
-                obj = doc.getObject(self.objectName[ind])            
-                obj.Placement = self.placement[ind]
+            obj = doc.getObject(self.objectName[ind])            
+            obj.Placement = self.placement[ind]
 
     def getRigidCenter(self):
         _currentRigid = FreeCAD.ActiveDocument.getObject(self.objectName[0])
         return _currentRigid.Shape.BoundBox.Center
     
-    def calcSpinCenterDepsEnabled(self):
-        newSpinCenter = Base.Vector(self.spinCenter)
-        countRefPoints = 0
-        for dep in self.dependencies:
-            if dep.Enabled:
-                if dep.refPoint != None:
-                    newSpinCenter = newSpinCenter.add(dep.refPoint)
-                    countRefPoints += 1
-        if countRefPoints > 0:
-            newSpinCenter.multiply(1.0/countRefPoints)
-            self.spinCenter = newSpinCenter
-    
+#     def calcSpinCenterDepsEnabled(self):
+#         newSpinCenter = Base.Vector(self.spinCenter)
+#         countRefPoints = 0
+#         for dep in self.dependencies:
+#             if dep.Enabled:
+#                 if dep.refPoint != None:
+#                     newSpinCenter = newSpinCenter.add(dep.refPoint)
+#                     countRefPoints += 1
+#         if countRefPoints > 0:
+#             newSpinCenter.multiply(1.0/countRefPoints)
+#             self.spinCenter = newSpinCenter
+#     
 #     def calcSpinBasicDataDepsEnabled(self):
 #         xmin = 0
 #         xmax = 0
@@ -476,18 +476,18 @@ class Rigid():
                     vec1 = depRefPoints[i].sub(self.spinCenter) # 'aka Radius'
                     vec2 = depMoveVectors[i].sub(self.moveVectorSum) # 'aka Force'
                     axis = vec1.cross(vec2) #torque-vector
-                    vec1.multiply(1.0e10)
+                    vec1.multiply(1.0e15)
                     vec1.normalize()
                     vec1.multiply(self.refPointsBoundBoxSize)
                     vec3 = vec1.add(vec2)
                     beta = vec3.getAngle(vec1)
-                    axis.multiply(1.0e10)
+                    axis.multiply(1.0e15)
                     axis.normalize()
                     axis.multiply(math.degrees(beta)*WEIGHT_REFPOINT_ROTATION) #here use degrees
                     self.spin = self.spin.add(axis)
                     self.countSpinVectors += 1
                 except:
-                    #print 'Exception CalcMoveData()'
+                    #Msg('Exception rig.calcMoveData() Vec1= {} -- Axis = {}'.format(vec1,axis))
                     pass #numerical exception above, no spin !
             
 #             for i in range(len(depRefPoints)):
@@ -556,25 +556,25 @@ class Rigid():
         if (self.spin != None and self.spin.Length != 0.0 and self.countSpinVectors != 0):
             spinAngle = self.spin.Length / float(self.countSpinVectors)
             if spinAngle>15.0: spinAngle=15.0 # do not accept more degrees
-            if spinAngle> solver.mySOLVER_SPIN_ACCURACY*1.0e-3:
-                try:
-                    spinStep = spinAngle/(SPINSTEP_DIVISOR) #it was 250.0
-                    self.spin.multiply(1.0e10)
-                    self.spin.normalize()
-                    rotation = FreeCAD.Rotation(self.spin, spinStep)
-                    center = self.spinCenter
-                except:
-                    print 'Exception SpinAngle'
-                    pass
+#             if spinAngle> solver.mySOLVER_SPIN_ACCURACY*1.0e-3:
+            try:
+                spinStep = spinAngle/(SPINSTEP_DIVISOR) #it was 250.0
+                self.spin.multiply(1.0e15)
+                self.spin.normalize()
+                rotation = FreeCAD.Rotation(self.spin, spinStep)
+                center = self.spinCenter
+            except:
+                #Msg('Exception SpinAngle rig.move() spin = {}'.format(axis))
+                pass
 
         if center != None and rotation != None:
             pl = FreeCAD.Placement(moveDist,rotation,center)
             self.applyPlacementStep(pl)
         else:
-            if moveDist.Length > 1.0e-10:
-                pl = FreeCAD.Placement()
-                pl.move(moveDist)
-                self.applyPlacementStep(pl)
+            #if moveDist.Length > 1.0e-10:
+            pl = FreeCAD.Placement()
+            pl.move(moveDist)
+            self.applyPlacementStep(pl)
 
 
     
