@@ -83,6 +83,7 @@ class SolverSystem():
         self.rigids = []        # list of rigid bodies
         self.constraints = []
         self.objectNames = []
+        #self.dependencies = []
         #self.mySOLVER_SPIN_ACCURACY = SOLVER_SPIN_ACCURACY
         self.mySOLVER_POS_ACCURACY = SOLVER_POS_ACCURACY
         self.lastPositionError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
@@ -93,14 +94,21 @@ class SolverSystem():
         self.unfixedRigid = False
 
     def clear(self):
+        self.doc = None
         for r in self.rigids:
             r.clear()
         self.stepCount = 0
+        self.status = "created"
+        #self.dependencies.clear()
         self.rigids = []
         self.constraints = []
         self.objectNames = []
         self.partialSolverCurrentStage = PARTIAL_SOLVE_STAGE1
-        self.failurecounter = 5
+        self.lastPositionError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
+        self.lastAxisError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
+        self.unfixedRigid = False
+        self.convergencyCounter = 0
+        
 
     def getRigid(self,objectName):
         '''get a Rigid by objectName'''
@@ -109,20 +117,11 @@ class SolverSystem():
         if len(rigs) > 0: return rigs[0]
         return None
 
-    def loadSystem(self,doc):
-        
-        
-        
+    def loadSystem(self,doc):   
         self.clear()
         self.doc = doc
         self.status = "loading"
-        #
-        self.convergencyCounter = 0
-        self.lastPositionError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
-        self.lastAxisError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
-        #
         self.constraints = [ obj for obj in doc.Objects if 'ConstraintInfo' in obj.Content]
-        #
         # Extract all the objectnames which are affected by constraints..
         self.objectNames = []
         for c in self.constraints:
@@ -348,7 +347,7 @@ class SolverSystem():
             return False
         #self.mySOLVER_SPIN_ACCURACY = math.degrees(math.atan(1 / accuracydivider))
         #self.mySOLVER_SPIN_ACCURACY = self.mySOLVER_POS_ACCURACY
-        if float(assemblysize) / self.mySOLVER_POS_ACCURACY > 1e8:
+        if float(assemblysize) / self.mySOLVER_POS_ACCURACY > 1e9:
             return False
         else:
             return True
@@ -371,9 +370,9 @@ class SolverSystem():
         if self.status == "loadingDependencyError":
             return
         
-        for rig in self.rigids:
-            #rig.currentDOF()
-            rig.beautyDOFPrint()
+#         for rig in self.rigids:
+#             #rig.currentDOF()
+#             rig.beautyDOFPrint()
         
         self.mySOLVER_POS_ACCURACY = SOLVER_POS_ACCURACY
         self.calcSpinAccuracy()
@@ -508,15 +507,14 @@ class SolverSystem():
         #self.calcSpinAccuracy()
         #mainWorklist = []
         while self.partialSolverCurrentStage != PARTIAL_SOLVE_END:
-            #print "evaluating stage = ", self.partialSolverCurrentStage
-            DebugMsg(A2P_DEBUG_1, "Evaluating stage = {}\n".format(self.partialSolverCurrentStage))
-            DebugMsg(A2P_DEBUG_1, "Tempfixed objs:\n")
+            
+            #Msg("Evaluating stage = {}\n".format(self.partialSolverCurrentStage))
+            #Msg("Tempfixed objs:\n")
             if A2P_DEBUG_LEVEL>=A2P_DEBUG_1:
                 for i in self.rigids:
                     if i.tempfixed:
-                        DebugMsg(A2P_DEBUG_1,"    {}\n".format(i.label))
-            DebugMsg(A2P_DEBUG_1, "End of Tempfixed objs\n")
-            
+                        Msg("    {}\n".format(i.label))
+            #Msg("End of Tempfixed objs\n")
             while True: 
                 somethingFound = False
                 #mainWorklist = []
