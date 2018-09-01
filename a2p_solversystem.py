@@ -187,15 +187,13 @@ class SolverSystem():
             rig.calcSpinCenter()
             rig.calcRefPointsBoundBoxSize()
             
-        '''
         numdep = 0
         self.retrieveDOFInfo() #function only once used here at this place in whole program
         for rig in self.rigids:
             rig.currentDOF()
-            #rig.beautyDOFPrint()
+            rig.beautyDOFPrint()
             numdep+=rig.countDependencies()
         Msg( 'there are {} dependencies\n'.format(numdep/2))  
-        '''
      
         self.status = "loaded"
 
@@ -510,7 +508,7 @@ def solveConstraints_MoviMode( doc, cache=None ):
     ss.loadSystem(doc)
     for rig in ss.rigids:
         rig.enableDependencies(ss.rigids)
-    for i in range(0,5):
+    for i in range(0,20):
         for r in ss.rigids:
             r.calcMoveData(doc, ss)
         for r in ss.rigids:

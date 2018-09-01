@@ -104,7 +104,17 @@ def setTransparency():
     for obj in doc.Objects:
         if hasattr(obj,'ViewObject'):
             if hasattr(obj.ViewObject,'Transparency'):
-                SAVED_TRANSPARENCY.append((obj.Name, obj.ViewObject.Transparency))
+#                if hasattr(obj.ViewObject,'DiffuseColor'):
+                if ( len(obj.ViewObject.DiffuseColor) == 1 ) :
+                    DebugMsg(A2P_DEBUG_3,"a2p setTransparency:  ONE ShapeColor and Transparency detected:\n{}" \
+                        .format(obj.ViewObject.DiffuseColor))
+                else:
+                    DebugMsg(A2P_DEBUG_3,"a2p setTransparency: muxed assembly detected:\n{}" \
+                       .format(obj.ViewObject.DiffuseColor))
+                DebugMsg(A2P_DEBUG_3,"A2P setTransparency: Saving transparency!\n")
+                SAVED_TRANSPARENCY.append(
+                    (obj.Name, obj.ViewObject.Transparency, obj.ViewObject.DiffuseColor)
+                    )
                 obj.ViewObject.Transparency = 80
 #------------------------------------------------------------------------------
 def restoreTransparency():
@@ -116,6 +126,7 @@ def restoreTransparency():
         obj = doc.getObject(setting[0])
         if obj is not None:
             obj.ViewObject.Transparency = setting[1]
+            obj.ViewObject.DiffuseColor = setting[2]
     SAVED_TRANSPARENCY = []
 #------------------------------------------------------------------------------
 def isTransparencyEnabled():
@@ -126,8 +137,6 @@ def getSelectedConstraint():
     # Check that constraint is selected
     selection = [s for s in FreeCADGui.Selection.getSelection() if s.Document == FreeCAD.ActiveDocument ]
     if len(selection) == 0: return None
-
-    doc = FreeCAD.ActiveDocument
     connectionToView = selection[0]
 
     if not 'ConstraintInfo' in connectionToView.Content and not 'ConstraintNfo' in connectionToView.Content:
@@ -301,7 +310,6 @@ class ConstraintSelectionObserver:
         FreeCADGui.Control.showDialog( self.taskDialog )
 
     def addSelection( self, docName, objName, sub, pnt ):
-        obj = FreeCAD.ActiveDocument.getObject(objName)
         self.selections.append( SelectionRecord( docName, objName, sub ))
         if len(self.selections) == 2:
             self.stopSelectionObservation()
@@ -509,6 +517,10 @@ def isA2pPart(obj):
     if hasattr(obj,"Content"):
         if 'importPart' in obj.Content:
             result = True
+    elif hasattr(obj,"a2p_Version"):          # keep old assembly item identification in,
+        result = True                         #  -> otherwise toggle transparency won't work
+    elif hasattr(obj,"subassemblyImport"):    # another possible assembly item
+        result = True
     return result
 
 def isA2pConstraint(obj): 

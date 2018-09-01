@@ -304,8 +304,10 @@ class Rigid():
 
     def calcMoveData(self, doc, solver):
         if self.tempfixed or self.fixed: return
-        depRefPoints = []      #collect Data to compute central movement of rigid
-        depMoveVectors = []    #collect Data to compute central movement of rigid
+        depRefPoints = []               #collect Data to compute central movement of rigid
+        depMoveVectors = []             #all moveVectors
+        depRefPoints_Spin = []          #refPoints, relevant for spin generation...
+        depMoveVectors_Spin = []        #depMoveVectors, relevant for spin generation...
         #
         self.maxPosError = 0.0
         self.maxAxisError = 0.0
@@ -319,7 +321,17 @@ class Rigid():
 
             depRefPoints.append(refPoint)
             depMoveVectors.append(moveVector)
-
+            
+            if dep.useRefPointSpin:
+                depRefPoints_Spin.append(refPoint)
+                depMoveVectors_Spin.append(moveVector)
+            
+            '''
+            if not self.tempfixed:
+                a2plib.drawSphere(refPoint, a2plib.RED)
+                a2plib.drawVector(refPoint, refPoint.add(moveVector), a2plib.RED)
+            '''
+                
             # Calculate max move error
             if moveVector.Length > self.maxPosError: self.maxPosError = moveVector.Length
 
@@ -330,21 +342,23 @@ class Rigid():
         if len(depMoveVectors) > 0:
             self.moveVectorSum = self.moveVectorSum.multiply(1.0/len(depMoveVectors))
 
+
         #compute rotation caused by refPoint-attractions
-        if len(depMoveVectors) >= 2:
+        if len(depMoveVectors_Spin) >= 2:
+            #FIXME
             self.spin = Base.Vector(0,0,0)
-            tmpSpinCenter = depRefPoints[0] # assume rigid spinning around first depRefPoint
+            tmpSpinCenter = depRefPoints_Spin[0] # assume rigid spinning around first depRefPoint
             
             # Eliminate the offset of depRefPoint[0] from all depMoveVectors
-            offsetVector = Base.Vector(depMoveVectors[0]) # make a copy
-            for i in range(0, len(depMoveVectors)):
-                depMoveVectors[i] = depMoveVectors[i].sub(offsetVector)
+            offsetVector = Base.Vector(depMoveVectors_Spin[0]) # make a copy
+            for i in range(0, len(depMoveVectors_Spin)):
+                depMoveVectors_Spin[i] = depMoveVectors_Spin[i].sub(offsetVector)
 
-            for i in range(1, len(depRefPoints)): # do not use index 0, rigid is assumed spinning around this point
+            for i in range(1, len(depRefPoints_Spin)): # do not use index 0, rigid is assumed spinning around this point
                 try:
-                    vec1 = depRefPoints[i].sub(tmpSpinCenter) # 'aka Radius'
+                    vec1 = depRefPoints_Spin[i].sub(tmpSpinCenter) # 'aka Radius'
                     #if vec1.Length < 1e-6: continue
-                    vec2 = depMoveVectors[i] # 'aka Force'
+                    vec2 = depMoveVectors_Spin[i] # 'aka Force'
                     axis = vec1.cross(vec2) #torque-vector
 
                     vec1.normalize()
@@ -352,6 +366,7 @@ class Rigid():
                     vec3 = vec1.add(vec2)
                     beta = vec3.getAngle(vec1)
 
+                    axis.multiply(1.0e6)
                     axis.normalize()
                     axis.multiply(math.degrees(beta)*WEIGHT_REFPOINT_ROTATION) #here use degrees
                     self.spin = self.spin.add(axis)
@@ -360,7 +375,7 @@ class Rigid():
                     pass #numerical exception above, no spin !
 
         #compute rotation caused by axis' of the dependencies //FIXME (align,opposed,none)
-        if len(depMoveVectors) > 0:
+        if len(self.dependencies) > 0:
             if self.spin == None: self.spin = Base.Vector(0,0,0)
             
             for dep in self.dependencies:
@@ -393,14 +408,14 @@ class Rigid():
         if (self.spin != None and self.spin.Length != 0.0 and self.countSpinVectors != 0):
             spinAngle = self.spin.Length / self.countSpinVectors
             if spinAngle>15.0: spinAngle=15.0 # do not accept more degrees
-            if spinAngle> 1e-8:
-                try:
-                    spinStep = spinAngle/(SPINSTEP_DIVISOR) #it was 250.0
-                    self.spin.normalize()
-                    rotation = FreeCAD.Rotation(self.spin, spinStep)
-                    center = self.spinCenter
-                except:
-                    pass
+            try:
+                spinStep = spinAngle/(SPINSTEP_DIVISOR) #it was 250.0
+                self.spin.multiply(1.0e6)
+                self.spin.normalize()
+                rotation = FreeCAD.Rotation(self.spin, spinStep)
+                center = self.spinCenter
+            except:
+                pass
 
         if center != None and rotation != None:
             pl = FreeCAD.Placement(moveDist,rotation,center)
