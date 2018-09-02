@@ -32,7 +32,8 @@ from a2p_versionmanagement import SubAssemblyWalk, A2P_VERSION
 import a2p_solversystem
 from a2plib import (
     appVersionStr,
-    AUTOSOLVE_ENABLED
+    AUTOSOLVE_ENABLED,
+    STOP_CURRENT_SOLVE_ACTION,
     )
 
 class ObjectCache:
@@ -859,3 +860,26 @@ def a2p_FlipConstraintDirection():
     except:
         pass
 
+
+class a2p_stopSolvingCommand:
+
+    def Activated(self):
+        a2p_stopSolving()
+
+    def GetResources(self):
+        return {
+            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_stop.svg',
+            'MenuText':     'stop current solving action',
+            'ToolTip':      'stop current solving action'
+            
+            }
+FreeCADGui.addCommand('a2p_stopSolvingCommand', a2p_stopSolvingCommand())
+
+def a2p_stopSolving():
+    ''' interrupt current solving'''
+    #global STOP_CURRENT_SOLVE_ACTION
+    #print STOP_CURRENT_SOLVE_ACTION
+    a2plib.STOP_CURRENT_SOLVE_ACTION = True
+    #print STOP_CURRENT_SOLVE_ACTION
+    
+    return

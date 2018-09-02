@@ -35,6 +35,8 @@ USE_PROJECTFILE = preferences.GetBool('useProjectFolder', False)
 PARTIAL_PROCESSING_ENABLED = preferences.GetBool('usePartialSolver', True)
 AUTOSOLVE_ENABLED = preferences.GetBool('autoSolve', False)
 
+STOP_CURRENT_SOLVE_ACTION = False
+
 SAVED_TRANSPARENCY = []
 
 DEBUGPROGRAM = 1

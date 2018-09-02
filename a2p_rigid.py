@@ -178,7 +178,7 @@ class Rigid():
         if solverStage == PARTIAL_SOLVE_STAGE1:
             if not self.tempfixed: #skip already fixed objs
                 #print 'current dof = ', rig.currentDOF()
-                #Msg("    eval {}\n".format(self.label))
+                DebugMsg(A2P_DEBUG_1,"    eval {}\n".format(self.label))
                 
                 if self.linkedTempFixedDOF()==0: #found a fully constrained obj to tempfixed rigids
                     for j in self.depsPerLinkedRigids.keys(): #look on each linked obj
@@ -188,7 +188,7 @@ class Rigid():
                                 if not dep.Done and not dep.Enabled:
                                     #dep.enable([dep.currentRigid, dep.dependedRigid])
                                     candidates.extend([dep.currentRigid, dep.dependedRigid])                                        
-                                    #Msg("        {}\n".format(dep))
+                                    DebugMsg(A2P_DEBUG_1,"        {}\n".format(dep))
                     #if len(outputRigidList)>0: #found something!
                         #print '        Solve them!'                            
             
@@ -198,7 +198,7 @@ class Rigid():
             #enable only involved dep, then set them as tempfixed        
             
             if not self.tempfixed: #skip already fixed objs  
-                #Msg("    eval {}\n".format(self.label))                
+                DebugMsg(A2P_DEBUG_1,"    eval {}\n".format(self.label))                
                 if self.areAllParentTempFixed(): #linked only to fixed rigids                                                
                     
                     #print rig.linkedRigids 
@@ -215,19 +215,25 @@ class Rigid():
                                     #dep.enable([dep.currentRigid, dep.dependedRigid])
                                     candidates.extend([dep.currentRigid, dep.dependedRigid])
                                     #self.solvedCounter += 1
-                                    #Msg("        {}\n".format(dep))
+                                    DebugMsg(A2P_DEBUG_1,"        {}\n".format(dep))
             
         
         elif solverStage == PARTIAL_SOLVE_STAGE3:
             if not self.tempfixed:
-                #Msg("    eval {}\n".format(self.label))
+                DebugMsg(A2P_DEBUG_1,"    eval {}\n".format(self.label))
                 for rig in self.linkedRigids:
                     if not rig.tempfixed:
-                        if (len(self.dofPOSPerLinkedRigids[rig]) + len(self.dofROTPerLinkedRigids[rig])) == 0:
+#                         print 'Check Merging ', self.label,' ',rig.label
+#                         print 'dofPOS self to rig ', len(self.dofPOSPerLinkedRigids[rig])
+#                         print 'dofROT self to rig ', len(self.dofROTPerLinkedRigids[rig])
+#                         print 'dofPOS rig to self ', len(rig.dofPOSPerLinkedRigids[self])
+#                         print 'dofROT rig to self ', len(rig.dofROTPerLinkedRigids[self])
+                        if (len(self.dofPOSPerLinkedRigids[rig]) + len(self.dofROTPerLinkedRigids[rig])) == 0: #\
+                            #or (len(rig.dofPOSPerLinkedRigids[self]) + len(rig.dofROTPerLinkedRigids[self])) == 0:
                             #rig is fully constrained 
                             candidates.append(self)
                             candidates.append(rig)
-                            #Msg("        {}\n".format(candidates))
+                            DebugMsg(A2P_DEBUG_1,"        {}".format(rig.label))
                             return candidates 
                 
             return candidates
@@ -240,7 +246,7 @@ class Rigid():
 
         elif solverStage == PARTIAL_SOLVE_STAGE5:
             if not self.checkIfAllDone():
-                #Msg("        {}\n".format(self.label))
+                DebugMsg(A2P_DEBUG_1,"        {}\n".format(self.label))
                 candidates.extend([self])
                 
 
@@ -604,12 +610,12 @@ class Rigid():
                     #if vec1.Length < 1e-6: continue
                     vec2 = depMoveVectors_Spin[i] # 'aka Force'
                     axis = vec1.cross(vec2) #torque-vector
-                    vec1.multiply(1.0e6)
+                    vec1.multiply(1.0e10)
                     vec1.normalize()
                     vec1.multiply(self.refPointsBoundBoxSize)
                     vec3 = vec1.add(vec2)
                     beta = vec3.getAngle(vec1)
-                    axis.multiply(1.0e6)
+                    axis.multiply(1.0e10)
                     axis.normalize()
                     axis.multiply(math.degrees(beta)*WEIGHT_REFPOINT_ROTATION) #here use degrees
                     self.spin = self.spin.add(axis)
@@ -652,11 +658,11 @@ class Rigid():
         rotation = None
         if (self.spin != None and self.spin.Length != 0.0 and self.countSpinVectors != 0):
             spinAngle = self.spin.Length / float(self.countSpinVectors)
-            if spinAngle>15.0: spinAngle=15.0 # do not accept more degrees
+            #if spinAngle>15.0: spinAngle=15.0 # do not accept more degrees
             #if spinAngle> solver.mySOLVER_SPIN_ACCURACY*1.0e-3:
             try:
-                spinStep = spinAngle/5.0 #(SPINSTEP_DIVISOR) #it was 250.0
-                self.spin.multiply(1.0e6)
+                spinStep = spinAngle/SPINSTEP_DIVISOR #it was 250.0
+                self.spin.multiply(1.0e10)
                 self.spin.normalize()
                 rotation = FreeCAD.Rotation(self.spin, spinStep)
                 center = self.spinCenter
@@ -666,7 +672,7 @@ class Rigid():
                 rotation = None
                 pass
 
-        if center != None or rotation != None:
+        if center != None and rotation != None:
             pl = FreeCAD.Placement(moveDist,rotation,center)
             self.applyPlacementStep(pl)
         else:
@@ -675,6 +681,42 @@ class Rigid():
             pl.move(moveDist)
             self.applyPlacementStep(pl)
 
+
+    def retrieveDOFInfo(self):
+        if not self.tempfixed:  #skip already fixed objs
+            self.depsPerLinkedRigids.clear()
+            self.dofPOSPerLinkedRigids.clear()
+            self.dofROTPerLinkedRigids.clear()
+            for linkedRig in self.linkedRigids:
+                tmplinkedDeps = []
+                tmpLinkedPointDeps = []
+                for dep in self.dependencies:
+                    if linkedRig==dep.dependedRigid:
+                        #be sure pointconstraints are at the end of the list
+                        if dep.isPointConstraint :
+                            tmpLinkedPointDeps.append(dep)
+                        else:
+                            tmplinkedDeps.append(dep)
+                #add at the end the point constraints
+                tmpLinkedPointDeps = list(set(tmpLinkedPointDeps))                
+                tmplinkedDeps.extend(tmpLinkedPointDeps)
+                tmplinkedDeps = list(set(tmplinkedDeps)) 
+                self.depsPerLinkedRigids[linkedRig] = tmplinkedDeps
+        
+            #dofPOSPerLinkedRigid is a dict where for each 
+            for linkedRig in self.depsPerLinkedRigids.keys():
+                linkedRig.pointConstraints = []
+                _dofPos = a2p_libDOF.initPosDOF #each rigid has DOF for position        
+                _dofRot = a2p_libDOF.initRotDOF #each rigid has DOF for rotation
+                for dep in self.depsPerLinkedRigids[linkedRig]:
+                    _dofPos, _dofRot = dep.calcDOF(_dofPos,_dofRot, linkedRig.pointConstraints)
+                self.dofPOSPerLinkedRigids[linkedRig] = _dofPos
+                self.dofROTPerLinkedRigids[linkedRig] = _dofRot
+            
+            #ok each rigid has a dict for each linked objects,
+            #so we now know the list of linked objects and which 
+            #dof rot and pos both limits.
+            
 
     
     def currentDOF(self):
@@ -748,16 +790,26 @@ class Rigid():
 
     def mergeRigid(self, solver, rigid):
         #function which includes a rigid in another
-        
+        #print 'Try to merge ', self.label,' ', rigid.label
         #first insert the rigid object name in the current objectname
         if rigid.objectName in self.objectName or self.objectName in rigid.objectName:
             return
-        self.objectName.extend(rigid.objectName)
         
+        self.objectName.extend(rigid.objectName)
+        #print 'Merging ', self.label,' ', rigid.label
+        selflabel = self.label
         #print '    merge ', rigid.label , ' in ', self.label
-        self.label += '#' + rigid.label
-        self.placement.extend(rigid.placement)
-        self.savedPlacement.extend(rigid.savedPlacement)
+        self.label += '&&' + rigid.label
+        
+        
+        
+        
+#         print '    Dep in self ', selflabel
+#         for i in self.dependencies:
+#             print '            ',i
+#         print '    Dep in rigid ' , rigid.label
+#         for i in rigid.dependencies:
+#             print '            ',i
         
         #now merge all dependencies
         self.dependencies.extend(rigid.dependencies)
@@ -775,16 +827,39 @@ class Rigid():
                 #dep.setCurrentRigid(self)          
             #print '        ', dep
         
+#         print '    Dep in fused obj '
+#         for i in self.dependencies:
+#             print '        ',i
+        
+        
+        self.placement.extend(rigid.placement)
+        self.savedPlacement.extend(rigid.savedPlacement)
+        
+        
         
         self.linkedRigids.extend(rigid.linkedRigids)
         self.linkedRigids.remove(self)
         self.linkedRigids.remove(rigid)
-        self.dofPOSPerLinkedRigids.update(rigid.dofPOSPerLinkedRigids)
-        del self.dofPOSPerLinkedRigids[self]
-        del self.dofPOSPerLinkedRigids[rigid]
-        self.dofROTPerLinkedRigids.update(rigid.dofROTPerLinkedRigids)
-        del self.dofROTPerLinkedRigids[self]
-        del self.dofROTPerLinkedRigids[rigid]
+        self.linkedRigids = list(set(self.linkedRigids))
+        
+        #self.retrieveDOFInfo()
+        
+#         
+#         
+#         self.dofPOSPerLinkedRigids.update(rigid.dofPOSPerLinkedRigids)
+#         del self.dofPOSPerLinkedRigids[self]
+#         del self.dofPOSPerLinkedRigids[rigid]
+#         self.dofROTPerLinkedRigids.update(rigid.dofROTPerLinkedRigids)
+#         del self.dofROTPerLinkedRigids[self]
+#         del self.dofROTPerLinkedRigids[rigid]
+#         self.depsPerLinkedRigids.update(rigid.depsPerLinkedRigids)
+#         del self.depsPerLinkedRigids[self]
+#         del self.depsPerLinkedRigids[rigid]
+        
+#         print self.linkedRigids
+#         print self.depsPerLinkedRigids.keys()
+#         print self.dofPOSPerLinkedRigids.keys()
+#         print self.dofROTPerLinkedRigids.keys()
         
         for rig in solver.rigids:
             for ind in range(len(rig.linkedRigids)):
@@ -792,15 +867,25 @@ class Rigid():
                     rig.linkedRigids[ind] = self
             rig.linkedRigids = list(set(rig.linkedRigids))
 
-            for ind in range(len(rig.dofPOSPerLinkedRigids)):
-                if rigid in rig.dofPOSPerLinkedRigids.keys():
-                    rig.dofPOSPerLinkedRigids[self] = rig.dofPOSPerLinkedRigids[rigid]
-                    del rig.dofPOSPerLinkedRigids[rigid]
+
+
+#             for ind in range(len(rig.dofPOSPerLinkedRigids)):
+#                 if rigid in rig.dofPOSPerLinkedRigids.keys():
+#                     rig.dofPOSPerLinkedRigids[self] = rig.dofPOSPerLinkedRigids[rigid]
+#                     del rig.dofPOSPerLinkedRigids[rigid]
                     
-            for ind in range(len(rig.dofROTPerLinkedRigids)):
-                if rigid in rig.dofROTPerLinkedRigids.keys():
-                    rig.dofROTPerLinkedRigids[self] = rig.dofROTPerLinkedRigids[rigid]
-                    del rig.dofROTPerLinkedRigids[rigid]
+            for ind in range(len(rig.depsPerLinkedRigids)):
+                if rigid in rig.depsPerLinkedRigids.keys():
+                    rig.depsPerLinkedRigids[self] = rig.depsPerLinkedRigids[rigid]
+                    del rig.depsPerLinkedRigids[rigid]
                     
+#             for ind in range(len(rig.dofROTPerLinkedRigids)):
+#                 if rigid in rig.dofROTPerLinkedRigids.keys():
+#                     rig.dofROTPerLinkedRigids[self] = rig.dofROTPerLinkedRigids[rigid]
+#                     del rig.dofROTPerLinkedRigids[rigid]
         solver.rigids.remove(rigid)
+        for rig in solver.rigids:
+            rig.retrieveDOFInfo()
+                    
+        
         self.calcSpinCenter()

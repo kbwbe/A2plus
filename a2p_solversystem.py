@@ -45,10 +45,12 @@ from a2plib import (
     A2P_DEBUG_1,
     A2P_DEBUG_2,
     A2P_DEBUG_3,
+    STOP_CURRENT_SOLVE_ACTION,
     )
 from a2p_dependencies import Dependency
 from a2p_rigid import Rigid
 import os, sys
+import a2p_libDOF
 #from os.path import expanduser
 
 
@@ -209,38 +211,42 @@ class SolverSystem():
         then for each linked object compile a dict where each linked object has its dof position
         then for each linked object compile a dict where each linked object has its dof rotation
         '''
-        for rig in self.rigids:   
+        for rig in self.rigids:
+            rig.retrieveDOFInfo()   
                      
-            if not rig.tempfixed:  #skip already fixed objs
-
-                for linkedRig in rig.linkedRigids:
-                    tmplinkedDeps = []
-                    tmpLinkedPointDeps = []
-                    for dep in rig.dependencies:
-                        if linkedRig==dep.dependedRigid:
-                            #be sure pointconstraints are at the end of the list
-                            if dep.isPointConstraint :
-                                tmpLinkedPointDeps.append(dep)
-                            else:
-                                tmplinkedDeps.append(dep)
-                    #add at the end the point constraints
-                    tmplinkedDeps.extend(tmpLinkedPointDeps) 
-                    rig.depsPerLinkedRigids[linkedRig] = tmplinkedDeps
-            
-                #dofPOSPerLinkedRigid is a dict where for each 
-                for linkedRig in rig.depsPerLinkedRigids.keys():
-                    linkedRig.pointConstraints = []
-                    _dofPos = linkedRig.posDOF
-                    _dofRot = linkedRig.rotDOF
-                    for dep in rig.depsPerLinkedRigids[linkedRig]:
-                        _dofPos, _dofRot = dep.calcDOF(_dofPos,_dofRot, linkedRig.pointConstraints)
-                    rig.dofPOSPerLinkedRigids[linkedRig] = _dofPos
-                    rig.dofROTPerLinkedRigids[linkedRig] = _dofRot
-                
-                #ok each rigid has a dict for each linked objects,
-                #so we now know the list of linked objects and which 
-                #dof rot and pos both limits.
-            
+#             if not rig.tempfixed:  #skip already fixed objs
+# 
+#                 for linkedRig in rig.linkedRigids:
+#                     tmplinkedDeps = []
+#                     tmpLinkedPointDeps = []
+#                     for dep in rig.dependencies:
+#                         if linkedRig==dep.dependedRigid:
+#                             #be sure pointconstraints are at the end of the list
+#                             if dep.isPointConstraint :
+#                                 tmpLinkedPointDeps.append(dep)
+#                             else:
+#                                 tmplinkedDeps.append(dep)
+#                     #add at the end the point constraints
+#                     tmpLinkedPointDeps = list(set(tmpLinkedPointDeps))
+#                     tmplinkedDeps = list(set(tmplinkedDeps))
+#                     tmplinkedDeps.extend(tmpLinkedPointDeps)
+#                      
+#                     rig.depsPerLinkedRigids[linkedRig] = tmplinkedDeps
+#             
+#                 #dofPOSPerLinkedRigid is a dict where for each 
+#                 for linkedRig in rig.depsPerLinkedRigids.keys():
+#                     linkedRig.pointConstraints = []
+#                     _dofPos = a2p_libDOF.initPosDOF #each rigid has DOF for position        
+#                     _dofRot = a2p_libDOF.initRotDOF #each rigid has DOF for rotation
+#                     for dep in rig.depsPerLinkedRigids[linkedRig]:
+#                         _dofPos, _dofRot = dep.calcDOF(_dofPos,_dofRot, linkedRig.pointConstraints)
+#                     rig.dofPOSPerLinkedRigids[linkedRig] = _dofPos
+#                     rig.dofROTPerLinkedRigids[linkedRig] = _dofRot
+#                 
+#                 #ok each rigid has a dict for each linked objects,
+#                 #so we now know the list of linked objects and which 
+#                 #dof rot and pos both limits.
+#             
 
 
     # TODO: maybe instead of traversing from the root every time, save a list of objects on current distance
@@ -346,8 +352,8 @@ class SolverSystem():
         else:
             return False
         #self.mySOLVER_SPIN_ACCURACY = math.degrees(math.atan(1 / accuracydivider))
-        #self.mySOLVER_SPIN_ACCURACY = self.mySOLVER_POS_ACCURACY
-        if float(assemblysize) / self.mySOLVER_POS_ACCURACY > 1e9:
+        self.mySOLVER_SPIN_ACCURACY = self.mySOLVER_POS_ACCURACY
+        if float(assemblysize) / self.mySOLVER_POS_ACCURACY > 1e8:
             return False
         else:
             return True
@@ -361,17 +367,20 @@ class SolverSystem():
             rig.prepareRestart()
         #self.partialSolverCurrentStage = PARTIAL_SOLVE_STAGE1
 
-    def solveSystemWithMode(self,doc):
+    def solveSystemWithMode(self,doc, animated):
         self.level_of_accuracy=1
+        self.AllStepCount = 0
+        if animated:
+            self.level_of_accuracy = MAX_LEVEL_ACCURACY-1
+        
         self.unfixedRigid = False
-        #self.failurecounter = 5
         startTime = int(round(time.time() * 1000))
         self.loadSystem(doc)
         if self.status == "loadingDependencyError":
             return
         
 #         for rig in self.rigids:
-#             #rig.currentDOF()
+#             rig.currentDOF()
 #             rig.beautyDOFPrint()
         
         self.mySOLVER_POS_ACCURACY = SOLVER_POS_ACCURACY
@@ -406,13 +415,13 @@ class SolverSystem():
                 
                 Msg('POS ACCURACY: %0.8f mm\t\tSPIN ACCURACY: %0.8f deg ' % (self.mySOLVER_POS_ACCURACY, self.mySOLVER_SPIN_ACCURACY))
                     #Msg('SPIN ACCURACY: {}\n'.format(self.mySOLVER_SPIN_ACCURACY))
-                Msg( '--->LEVEL OF ACCURACY :{} DONE!\n'.format(self.level_of_accuracy) ) 
-                 
+                Msg( '--->LEVEL OF ACCURACY :{} DONE!  in {} steps\n'.format(self.level_of_accuracy, self.stepCount) ) 
+                self.AllStepCount += self.stepCount 
                 self.level_of_accuracy+=1
                 self.mySOLVER_POS_ACCURACY *= 1.0e-1              
                 FreeCADGui.updateGui()
                 if self.level_of_accuracy == MAX_LEVEL_ACCURACY or not self.calcSpinAccuracy():
-                    Msg( "TotalTime (ms): %d\n" % (totalTime - startTime)) 
+                    Msg( "Total Time (ms): %d -- Total Steps: %d\n" % (totalTime - startTime, self.AllStepCount)) 
 #                     Msg('POS ACCURACY: %0.8f mm\t\tSPIN ACCURACY: %0.8f deg ' % (self.mySOLVER_POS_ACCURACY, self.mySOLVER_SPIN_ACCURACY))
 #                     #Msg('SPIN ACCURACY: {}\n'.format(self.mySOLVER_SPIN_ACCURACY))
 #                     Msg( '--->LEVEL OF ACCURACY :{} DONE!\n'.format(self.level_of_accuracy) )                   
@@ -437,7 +446,7 @@ class SolverSystem():
         #self.progress_bar.stop()
         return systemSolved
 
-    def solveSystem(self,doc):
+    def solveSystem(self,doc, animated):
         Msg( "\n\n===== Start Solving System ====== \n" )
         #self.progress_bar = FreeCAD.Base.ProgressIndicator() 
         
@@ -450,7 +459,7 @@ class SolverSystem():
 #       
         import sys;sys.path.append(r'C:\Users\turrini_valerio\Documents\tools\eclipse\eclipse\plugins\org.python.pydev.core_6.4.4.201807281807\pysrc')
         #import pydevd;pydevd.settrace()   
-        systemSolved = self.solveSystemWithMode(doc)
+        systemSolved = self.solveSystemWithMode(doc, animated)
         
                             
         #FreeCADGui.updateGui()
@@ -520,7 +529,12 @@ class SolverSystem():
                 #mainWorklist = []
                 workList=[]                     
                 myCounter = len(self.rigids) 
-                numdep=0                 
+                numdep=0  
+                
+#                 for rig in self.rigids:
+#                     rig.currentDOF()
+#                     rig.beautyDOFPrint()
+                               
                 for rig in self.rigids:
                     #somethingFound = False
                     workList.extend(rig.getCandidates(self.partialSolverCurrentStage))
@@ -534,6 +548,12 @@ class SolverSystem():
                         somethingFound = True
                         #if mode == 'partial':
                         solutionFound = self.calculateWorkList(doc, workList)
+                        
+#                         global STOP_CURRENT_SOLVE_ACTION
+#                         print STOP_CURRENT_SOLVE_ACTION
+#                         STOP_CURRENT_SOLVE_ACTION = False 
+#                         print STOP_CURRENT_SOLVE_ACTION
+                        
                         #else:
                         #    solutionFound = self.calculateWorkList(doc, mainWorklist, mode)                                
                         #solutionFound = True
@@ -551,13 +571,16 @@ class SolverSystem():
 #                         self.calcSpinAccuracy()
                     workList = []
                     break 
-                                
+                              
         return True
 
     def calculateWorkList(self, doc, workList):
         #print 'calculate worklist'
         #reqPosAccuracy = self.mySOLVER_POS_ACCURACY
         #reqSpinAccuracy = self.mySOLVER_SPIN_ACCURACY
+        #global STOP_CURRENT_SOLVE_ACTION
+        #print STOP_CURRENT_SOLVE_ACTION
+        #stop = global STOP_CURRENT_SOLVE_ACTION
         if A2P_DEBUG_LEVEL >= A2P_DEBUG_1:
             self.printList("WorkList", workList)
 
@@ -576,7 +599,9 @@ class SolverSystem():
         while not goodAccuracy:
             maxPosError = 0.0
             maxAxisError = 0.0
-
+            if a2plib.STOP_CURRENT_SOLVE_ACTION:
+                a2plib.STOP_CURRENT_SOLVE_ACTION = False
+                return False
             calcCount += 1
             self.stepCount += 1
             self.convergencyCounter += 1
@@ -591,8 +616,9 @@ class SolverSystem():
             for w in workList:                
                 w.move(doc, self)
                 # Enable those 2 lines to see the computation progress on screen
-#                 w.applySolution(doc, self)
-#                 FreeCADGui.updateGui()
+                if A2P_DEBUG_LEVEL==A2P_DEBUG_2:
+                    w.applySolution(doc, self)
+                    FreeCADGui.updateGui()
 
             # The accuracy is good, apply the solution to FreeCAD's objects
             if (maxPosError <   self.mySOLVER_POS_ACCURACY and
@@ -605,8 +631,8 @@ class SolverSystem():
                 
                 
                 for r in workList:                    
-#                     r.applySolution(doc,self) 
-#                     FreeCADGui.updateGui()  
+                    r.applySolution(doc,self) 
+                    #FreeCADGui.updateGui()  
                     for dep in r.dependencies:
                         if dep.Enabled:
                             #self.progress_bar.next()
@@ -616,7 +642,7 @@ class SolverSystem():
                         r.tempfixed = True
                     elif self.partialSolverCurrentStage == PARTIAL_SOLVE_STAGE2 and r.checkIfAllDone():
                         r.tempfixed = True
-                        #Msg("Fixed Rigid {}\n".format(r.label))
+                        DebugMsg(A2P_DEBUG_2,"Fixed Rigid {}\n".format(r.label))
                 if self.partialSolverCurrentStage == PARTIAL_SOLVE_STAGE3:
                     if len(workList)==2:
                         workList[0].mergeRigid(self,workList[1])
@@ -641,16 +667,23 @@ class SolverSystem():
                                 if r.tempfixed and not r.fixed:
                                     Msg("unfixed Rigid {}\n".format(r.label))
                                     r.tempfixed = False
+                                    #workList.append(r)
                                     #for dep in r.dependencies:
-                                    #    print dep
+                                    #    dep.Done = False
                                     self.unfixedRigid = True
                                     foundRigidToUnfix = True
                                     #foundRigidToUnfix = False
-                
+                            
                     if foundRigidToUnfix:
                         self.lastPositionError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
                         self.lastAxisError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
                         self.convergencyCounter = 0
+                        #workList = list(set(workList))
+#                         for rig in workList:
+#                             rig.enableDependencies(workList)
+#             
+#                         for rig in workList:
+#                             rig.calcSpinBasicDataDepsEnabled()
                         continue
                     else:            
                         Msg('\n')
@@ -676,10 +709,10 @@ class SolverSystem():
             
  
 #------------------------------------------------------------------------------
-def solveConstraints( doc, cache=None ):
+def solveConstraints( doc, animated = False , cache=None ):
     doc.openTransaction("a2p_systemSolving")
     ss = SolverSystem()
-    ss.solveSystem(doc)
+    ss.solveSystem(doc, animated)
     doc.commitTransaction()
     #try:
         #doc.recompute()
