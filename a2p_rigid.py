@@ -325,13 +325,11 @@ class Rigid():
             if dep.useRefPointSpin:
                 depRefPoints_Spin.append(refPoint)
                 depMoveVectors_Spin.append(moveVector)
-            
             '''
             if not self.tempfixed:
                 a2plib.drawSphere(refPoint, a2plib.RED)
                 a2plib.drawVector(refPoint, refPoint.add(moveVector), a2plib.RED)
-            '''
-                
+            ''' 
             # Calculate max move error
             if moveVector.Length > self.maxPosError: self.maxPosError = moveVector.Length
 

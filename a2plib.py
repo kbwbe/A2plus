@@ -478,6 +478,13 @@ def getPos(obj, subElementName):
             pos = getObjectFaceFromName(obj, subElementName).Faces[0].BoundBox.Center
             # axial constraint for Planes
             # pos = surface.Position
+        elif str(surface) == "<Cylinder object>":
+            center = surface.Center
+            bb = face.BoundBox
+            if bb.isInside(center):
+                pos = center
+            else:
+                pos = bb.getIntersectionPoint(center, surface.Axis)
         elif all( hasattr(surface,a) for a in ['Axis','Center','Radius'] ):
             pos = surface.Center
         elif str(surface).startswith('<SurfaceOfRevolution'):
