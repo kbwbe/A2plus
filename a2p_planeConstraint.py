@@ -22,6 +22,7 @@
 #*                                                                         *
 #***************************************************************************
 
+import math
 from a2plib import *
 from pivy import coin
 from PySide import QtGui
@@ -69,8 +70,23 @@ def parseSelection(selection, objectToUpdate=None):
         c.addProperty("App::PropertyString","SubElement2","ConstraintInfo").SubElement2 = cParms[1][1]
         c.addProperty('App::PropertyDistance','offset',"ConstraintInfo")
 
+        doc = FreeCAD.activeDocument()
+        ob1 = doc.getObject(c.Object1)
+        ob2 = doc.getObject(c.Object2)
+        plane1 = getObjectFaceFromName(ob1, c.SubElement1)
+        plane2 = getObjectFaceFromName(ob2, c.SubElement2)
+        normal1 = plane1.Surface.Axis
+        normal2 = plane2.Surface.Axis
+        angle = math.degrees(normal1.getAngle(normal2))
+
         c.addProperty("App::PropertyEnumeration","directionConstraint", "ConstraintInfo")
-        c.directionConstraint = ["none","aligned","opposed"]
+        #c.directionConstraint = ["none","aligned","opposed"]
+        c.directionConstraint = ["aligned","opposed"]
+        
+        if angle <= 90.0:
+            c.directionConstraint = "aligned"
+        else:
+            c.directionConstraint = "opposed"
 
         c.setEditorMode('Type',1)
         for prop in ["Object1","Object2","SubElement1","SubElement2"]:
