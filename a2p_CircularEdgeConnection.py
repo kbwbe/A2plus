@@ -22,6 +22,7 @@
 #*                                                                         *
 #***************************************************************************
 
+import math
 import FreeCAD, FreeCADGui
 from a2plib import *
 #from lib3D import *
@@ -66,8 +67,23 @@ def parseSelection(selection, objectToUpdate=None, callSolveConstraints=True, lo
         c.addProperty("App::PropertyString","Object2","ConstraintInfo").Object2 = cParms[1][0]
         c.addProperty("App::PropertyString","SubElement2","ConstraintInfo").SubElement2 = cParms[1][1]
 
+        doc = FreeCAD.activeDocument()        
+        ob1 = doc.getObject(c.Object1)
+        ob2 = doc.getObject(c.Object2)
+        circleEdge1 = getObjectEdgeFromName(ob1, c.SubElement1)
+        circleEdge2 = getObjectEdgeFromName(ob2, c.SubElement2)
+        axis1 = circleEdge1.Curve.Axis
+        axis2 = circleEdge2.Curve.Axis
+        angle = math.degrees(axis1.getAngle(axis2))
+
         c.addProperty("App::PropertyEnumeration","directionConstraint", "ConstraintInfo")
-        c.directionConstraint = ["none","aligned","opposed"]
+        c.directionConstraint = ["aligned","opposed"]
+        
+        if angle <= 90.0:
+            c.directionConstraint = "aligned"
+        else:
+            c.directionConstraint = "opposed"
+        
         c.addProperty("App::PropertyDistance","offset","ConstraintInfo")
         c.addProperty("App::PropertyBool","lockRotation","ConstraintInfo").lockRotation = lockRotation
 
