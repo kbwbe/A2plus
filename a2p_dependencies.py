@@ -87,6 +87,7 @@ class Dependency():
         self.constraint = constraint    # TODO: remove, probably not needed
         self.axisRotationEnabled = axisRotation
         self.lockRotation = False
+        self.useRefPointSpin = True
 
         self.Type = constraint.Type
         try:
@@ -368,6 +369,7 @@ class Dependency():
             #axis = foreignAxis.cross(rigAxis)
             axis = rigAxis.cross(foreignAxis)
             try:
+                axis.multiply(1.0e6)
                 axis.normalize()
                 angle = foreignAxis.getAngle(rigAxis)
                 axis.multiply(math.degrees(angle))
@@ -387,6 +389,7 @@ class Dependency():
                 foreignAxis.multiply(-1.0)
                 axis = rigAxis.cross(foreignAxis)
             try:
+                axis.multiply(1.0e6)
                 axis.normalize()
                 angle = foreignAxis.getAngle(rigAxis)
                 axis.multiply(math.degrees(angle))
@@ -401,6 +404,7 @@ class DependencyPointIdentity(Dependency):
     def __init__(self, constraint, refType):
         Dependency.__init__(self, constraint, refType, False)
         self.isPointConstraint = True
+        self.useRefPointSpin = True
 
     def getMovement(self):
         if not self.Enabled: return None, None
@@ -425,6 +429,7 @@ class DependencyPointOnLine(Dependency):
     def __init__(self, constraint, refType):
         Dependency.__init__(self, constraint, refType, False)
         self.isPointConstraint = True
+        self.useRefPointSpin = True
 
     def getMovement(self):
         if not self.Enabled: return None, None
@@ -468,6 +473,7 @@ class DependencyPointOnPlane(Dependency):
     def __init__(self, constraint, refType):
         Dependency.__init__(self, constraint, refType, False)
         self.isPointConstraint = True
+        self.useRefPointSpin = True
 
     def getMovement(self):
         if not self.Enabled: return None, None
@@ -512,6 +518,7 @@ class DependencyCircularEdge(Dependency):
     def __init__(self, constraint, refType):
         Dependency.__init__(self, constraint, refType, True)
         self.isPointConstraint = False
+        self.useRefPointSpin = True
 
     def getMovement(self):
         if not self.Enabled: return None, None
@@ -544,6 +551,7 @@ class DependencyParallelPlanes(Dependency):
     def __init__(self, constraint, refType):
         Dependency.__init__(self, constraint, refType, True)
         self.isPointConstraint = False
+        self.useRefPointSpin = False
 
     def getMovement(self):
         if not self.Enabled: return None, None
@@ -561,6 +569,7 @@ class DependencyAngledPlanes(Dependency):
     def __init__(self, constraint, refType):
         Dependency.__init__(self, constraint, refType, True)
         self.isPointConstraint = False
+        self.useRefPointSpin = False
         
     def getMovement(self):
         if not self.Enabled: return None, None
@@ -577,19 +586,23 @@ class DependencyAngledPlanes(Dependency):
         foreignAxis = foreignDep.refAxisEnd.sub(foreignDep.refPoint)
         recentAngle = math.degrees(foreignAxis.getAngle(rigAxis))
         deltaAngle = abs(self.angle.Value) - recentAngle
-        if abs(deltaAngle) < 1e-6:
-            # do not change spin, not necessary..
-            axis = None
-        else:
-            try:
-                axis = rigAxis.cross(foreignAxis)
-                axis.normalize()
-                axis.multiply(math.degrees(-deltaAngle))
-            except: #axis = Vector(0,0,0) and cannot be normalized...
-                x = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
-                y = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
-                z = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
-                axis = Base.Vector(x,y,z)
+        try:
+            axis = rigAxis.cross(foreignAxis)
+            axis.normalize()
+            axis.multiply(-deltaAngle)
+            '''
+            print (
+                "Axis: {}, Length: {} RecentAngle: {} deltaAngle: {}".format(
+                    axis,
+                    axis.Length,
+                    recentAngle,
+                    deltaAngle
+                    )
+                )
+            '''
+        except: #axis = Vector(0,0,0) and cannot be normalized...
+            #print ("Exception in angledPlanes.getRotation\n")
+            pass
         #DebugMsg(A2P_DEBUG_3, "{} - rotate by {}\n".format(self, axis.Length))
         return axis
     
@@ -604,6 +617,7 @@ class DependencyPlane(Dependency):
     def __init__(self, constraint, refType):
         Dependency.__init__(self, constraint, refType, True)
         self.isPointConstraint = False
+        self.useRefPointSpin = False
 
     def getMovement(self):
         if not self.Enabled: return None, None
@@ -633,6 +647,7 @@ class DependencyAxial(Dependency):
     def __init__(self, constraint, refType):
         Dependency.__init__(self, constraint, refType, True)
         self.isPointConstraint = False
+        self.useRefPointSpin = True
 
     def getMovement(self):
         if not self.Enabled: return None, None

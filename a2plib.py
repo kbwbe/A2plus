@@ -104,7 +104,17 @@ def setTransparency():
     for obj in doc.Objects:
         if hasattr(obj,'ViewObject'):
             if hasattr(obj.ViewObject,'Transparency'):
-                SAVED_TRANSPARENCY.append((obj.Name, obj.ViewObject.Transparency))
+#                if hasattr(obj.ViewObject,'DiffuseColor'):
+                if ( len(obj.ViewObject.DiffuseColor) == 1 ) :
+                    DebugMsg(A2P_DEBUG_3,"a2p setTransparency:  ONE ShapeColor and Transparency detected:\n{}" \
+                        .format(obj.ViewObject.DiffuseColor))
+                else:
+                    DebugMsg(A2P_DEBUG_3,"a2p setTransparency: muxed assembly detected:\n{}" \
+                       .format(obj.ViewObject.DiffuseColor))
+                DebugMsg(A2P_DEBUG_3,"A2P setTransparency: Saving transparency!\n")
+                SAVED_TRANSPARENCY.append(
+                    (obj.Name, obj.ViewObject.Transparency, obj.ViewObject.DiffuseColor)
+                    )
                 obj.ViewObject.Transparency = 80
 #------------------------------------------------------------------------------
 def restoreTransparency():
@@ -116,6 +126,7 @@ def restoreTransparency():
         obj = doc.getObject(setting[0])
         if obj is not None:
             obj.ViewObject.Transparency = setting[1]
+            obj.ViewObject.DiffuseColor = setting[2]
     SAVED_TRANSPARENCY = []
 #------------------------------------------------------------------------------
 def isTransparencyEnabled():
@@ -126,8 +137,6 @@ def getSelectedConstraint():
     # Check that constraint is selected
     selection = [s for s in FreeCADGui.Selection.getSelection() if s.Document == FreeCAD.ActiveDocument ]
     if len(selection) == 0: return None
-
-    doc = FreeCAD.ActiveDocument
     connectionToView = selection[0]
 
     if not 'ConstraintInfo' in connectionToView.Content and not 'ConstraintNfo' in connectionToView.Content:
@@ -212,20 +221,31 @@ def DebugMsg(level, tx):
         FreeCAD.Console.PrintMessage(tx)
 
 #------------------------------------------------------------------------------
+def drawSphere(center, color):
+    doc = FreeCAD.ActiveDocument
+    s = Part.makeSphere(2.0,center)
+    sphere = doc.addObject("Part::Feature","Sphere")
+    sphere.Shape = s
+    sphere.ViewObject.ShapeColor = color
+    doc.recompute()
+#------------------------------------------------------------------------------
 def drawVector(fromPoint,toPoint, color):
     if fromPoint == toPoint: return
     doc = FreeCAD.ActiveDocument
 
-    l = Part.Line(fromPoint,toPoint)
-    line = doc.addObject("Part::Feature","ArrowTail")
+    l = Part.LineSegment()
+    l.StartPoint = fromPoint
+    l.EndPoint = toPoint
+    line = doc.addObject("Part::Feature","Line")
     line.Shape = l.toShape()
     line.ViewObject.LineColor = color
-    line.ViewObject.LineWidth = 6
-    #doc.recompute()
+    line.ViewObject.LineWidth = 1
+
+    
     c = Part.makeCone(0,1,4)
     cone = doc.addObject("Part::Feature","ArrowHead")
     cone.Shape = c
-    cone.ViewObject.ShapeColor = (1.0,0.0,0.0)
+    cone.ViewObject.ShapeColor = color
     #
     mov = Base.Vector(0,0,0)
     zAxis = Base.Vector(0,0,-1)
@@ -235,7 +255,6 @@ def drawVector(fromPoint,toPoint, color):
     cone.Placement = conePlacement.multiply(cone.Placement)
     cone.Placement.move(toPoint)
     doc.recompute()
-
 #------------------------------------------------------------------------------
 def findUnusedObjectName(base, counterStart=1, fmt='%03i', document=None):
     if document == None:
@@ -291,7 +310,6 @@ class ConstraintSelectionObserver:
         FreeCADGui.Control.showDialog( self.taskDialog )
 
     def addSelection( self, docName, objName, sub, pnt ):
-        obj = FreeCAD.ActiveDocument.getObject(objName)
         self.selections.append( SelectionRecord( docName, objName, sub ))
         if len(self.selections) == 2:
             self.stopSelectionObservation()
@@ -460,6 +478,16 @@ def getPos(obj, subElementName):
             pos = getObjectFaceFromName(obj, subElementName).Faces[0].BoundBox.Center
             # axial constraint for Planes
             # pos = surface.Position
+        elif str(surface) == "<Cylinder object>":
+            pos = surface.Center
+            '''
+            center = surface.Center
+            bb = face.BoundBox
+            if bb.isInside(center):
+                pos = center
+            else:
+                pos = bb.getIntersectionPoint(center, surface.Axis)
+            '''
         elif all( hasattr(surface,a) for a in ['Axis','Center','Radius'] ):
             pos = surface.Center
         elif str(surface).startswith('<SurfaceOfRevolution'):
@@ -499,6 +527,10 @@ def isA2pPart(obj):
     if hasattr(obj,"Content"):
         if 'importPart' in obj.Content:
             result = True
+    elif hasattr(obj,"a2p_Version"):          # keep old assembly item identification in,
+        result = True                         #  -> otherwise toggle transparency won't work
+    elif hasattr(obj,"subassemblyImport"):    # another possible assembly item
+        result = True
     return result
 
 def isA2pConstraint(obj): 
