@@ -610,7 +610,7 @@ class Rigid():
                     #if vec1.Length < 1e-6: continue
                     vec2 = depMoveVectors_Spin[i] # 'aka Force'
                     axis = vec1.cross(vec2) #torque-vector
-                    vec1.multiply(1.0e10)
+                    vec1.multiply(1.0e6)
                     vec1.normalize()
                     vec1.multiply(self.refPointsBoundBoxSize)
                     vec3 = vec1.add(vec2)
@@ -662,7 +662,7 @@ class Rigid():
             #if spinAngle> solver.mySOLVER_SPIN_ACCURACY*1.0e-3:
             try:
                 spinStep = spinAngle/SPINSTEP_DIVISOR #it was 250.0
-                self.spin.multiply(1.0e10)
+                self.spin.multiply(1.0e6)
                 self.spin.normalize()
                 rotation = FreeCAD.Rotation(self.spin, spinStep)
                 center = self.spinCenter

@@ -334,7 +334,7 @@ class Dependency():
                 foreignAxis.multiply(-1.0)
                 axis = rigAxis.cross(foreignAxis)
             try:
-                axis.multiply(1.0e15)
+                axis.multiply(1.0e6)
                 axis.normalize()
                 angle = foreignAxis.getAngle(rigAxis)
                 axis.multiply(math.degrees(angle))
@@ -678,7 +678,7 @@ class DependencyAngledPlanes(Dependency):
         axis = rigAxis.cross(foreignAxis)
         deltaAngle = abs(self.angle.Value) - recentAngle        
         try: 
-            axis.multiply(1.0e3)
+            axis.multiply(1.0e6)
             axis.normalize()
             axis.multiply(-deltaAngle)
         except:            
@@ -730,7 +730,7 @@ class DependencyPlane(Dependency):
             if self.direction == "opposed":
                 normal.multiply(-1.0)
             self.refAxisEnd = self.refPoint.add(normal)
-            if abs(self.offset) > 1e-4: #solver.mySOLVER_SPIN_ACCURACY * 1e-1:
+            if abs(self.offset) > 1e-3: #solver.mySOLVER_SPIN_ACCURACY * 1e-1:
                 offsetAdjustVec = Base.Vector(normal.x,normal.y,normal.z)
                 offsetAdjustVec.multiply(self.offset)
                 self.refPoint = self.refPoint.add(offsetAdjustVec)

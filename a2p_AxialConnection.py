@@ -22,6 +22,7 @@
 #*                                                                         *
 #***************************************************************************
 
+import math
 from a2plib import *
 from pivy import coin
 from PySide import QtGui
@@ -64,6 +65,19 @@ def parseSelection(selection, objectToUpdate=None):
         c.addProperty("App::PropertyEnumeration","directionConstraint", "ConstraintInfo")
 
         c.directionConstraint = ["aligned","opposed"]
+        
+        doc = FreeCAD.activeDocument()        
+        ob1 = doc.getObject(c.Object1)
+        ob2 = doc.getObject(c.Object2)
+        axis1 = getAxis(ob1, c.SubElement1)
+        axis2 = getAxis(ob2, c.SubElement2)
+        angle = axis1.getAngle(axis2)*2
+        
+        if angle <= math.pi:
+            c.directionConstraint = "aligned"
+        else:
+            c.directionConstraint = "opposed"
+        
 
         c.addProperty("App::PropertyBool","lockRotation","ConstraintInfo")
 
