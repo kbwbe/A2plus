@@ -58,7 +58,7 @@ SOLVER_MAXSTEPS = 60000
 SOLVER_POS_ACCURACY = 1.0e-1  # gets to smaller values during solving
 #SOLVER_SPIN_ACCURACY = 1.0e-4 # gets to smaller values during solving
 
-SOLVER_STEPS_CONVERGENCY_CHECK = 1000
+SOLVER_STEPS_CONVERGENCY_CHECK = 1500
 SOLVER_CONVERGENCY_ERROR_INIT_VALUE = 1.0e+20
 SOLVER_CONVERGENCY_FACTOR = 0.99
 MAX_LEVEL_ACCURACY = 10  #accuracy reached is 1.0e-MAX_LEVEL_ACCURACY
@@ -353,7 +353,7 @@ class SolverSystem():
             return False
         #self.mySOLVER_SPIN_ACCURACY = math.degrees(math.atan(1 / accuracydivider))
         self.mySOLVER_SPIN_ACCURACY = self.mySOLVER_POS_ACCURACY
-        if float(assemblysize) / self.mySOLVER_POS_ACCURACY > 1e8:
+        if float(assemblysize) / self.mySOLVER_POS_ACCURACY > 1e9:
             return False
         else:
             return True
@@ -458,7 +458,8 @@ class SolverSystem():
 #             mode = 'Progressive magnetic'
 #       
         import sys;sys.path.append(r'C:\Users\turrini_valerio\Documents\tools\eclipse\eclipse\plugins\org.python.pydev.core_6.4.4.201807281807\pysrc')
-        #import pydevd;pydevd.settrace()   
+        #import pydevd;pydevd.settrace()
+        #ciao = 1
         systemSolved = self.solveSystemWithMode(doc, animated)
         
                             
@@ -477,7 +478,7 @@ class SolverSystem():
         if systemSolved:
             if self.unfixedRigid:
                 #Retry....
-                self.solveSystemWithMode(doc)
+                self.solveSystemWithMode(doc, animated)
             self.solutionToParts(doc)
             self.status = "solved"
             Msg( "===== System solved !  =====\n" )

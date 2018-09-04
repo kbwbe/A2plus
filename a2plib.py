@@ -474,13 +474,14 @@ def getPos(obj, subElementName):
             # pos = surface.Position
         
         elif str(surface) == "<Cylinder object>":
-            center = surface.Center
+            pos = surface.Center
+            '''
             bb = face.BoundBox
             if bb.isInside(center):
                 pos = center
             else:
                 pos = bb.getIntersectionPoint(center, surface.Axis)
-                
+            '''    
         elif all( hasattr(surface,a) for a in ['Axis','Center','Radius'] ):
             pos = surface.Center
         elif str(surface).startswith('<SurfaceOfRevolution'):
