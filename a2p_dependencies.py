@@ -755,15 +755,41 @@ class DependencyAxial(Dependency):
         self.useRefPointSpin = True
         self.doc = doc
 
+#     def getMovement(self):
+#         if not self.Enabled: return None, None
+# 
+#         vec1 = self.foreignDependency.refPoint.sub(self.refPoint)
+#         destinationAxis = self.foreignDependency.refAxisEnd.sub(self.foreignDependency.refPoint)
+#         dot = vec1.dot(destinationAxis)
+#         parallelToAxisVec = destinationAxis.normalize().multiply(dot)
+#         moveVector = vec1.sub(parallelToAxisVec)
+#         return self.refPoint, moveVector
     def getMovement(self):
         if not self.Enabled: return None, None
-
+        '''
+        Try to move in shortest direction between the both axes..
+        '''    
         vec1 = self.foreignDependency.refPoint.sub(self.refPoint)
+        ownAxis = self.refAxisEnd.sub(self.refPoint)
         destinationAxis = self.foreignDependency.refAxisEnd.sub(self.foreignDependency.refPoint)
-        dot = vec1.dot(destinationAxis)
-        parallelToAxisVec = destinationAxis.normalize().multiply(dot)
-        moveVector = vec1.sub(parallelToAxisVec)
+        
+        helpPlaneNormal = destinationAxis
+        helpPlanePoint = self.refPoint
+        #project the refPoint difference vector to the helper plane
+        #vector end marks end of moveVector
+        vec2 = Base.Vector(vec1) #make a copy
+        vec2.projectToPlane(helpPlanePoint, helpPlaneNormal)
+        #project this vector to the own axis
+        #This marks the beginning of the moveVecotr
+        dot = vec2.dot(ownAxis)
+        vec3 = Base.Vector(ownAxis)
+        vec3.normalize()
+        vec3.multiply(dot)
+        #Sub both vectors to geht the movevector shortest way between both axes
+        moveVector = vec2.sub(vec3)
         return self.refPoint, moveVector
+    
+    
     
     def calcRefPoints(self, index):
         self.index = index

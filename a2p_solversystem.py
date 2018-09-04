@@ -42,6 +42,7 @@ from a2plib import (
     Msg,
     DebugMsg,
     A2P_DEBUG_LEVEL,
+    A2P_DEBUG_NONE,
     A2P_DEBUG_1,
     A2P_DEBUG_2,
     A2P_DEBUG_3,
@@ -51,6 +52,7 @@ from a2p_dependencies import Dependency
 from a2p_rigid import Rigid
 import os, sys
 import a2p_libDOF
+
 #from os.path import expanduser
 
 
@@ -518,7 +520,7 @@ class SolverSystem():
         #mainWorklist = []
         while self.partialSolverCurrentStage != PARTIAL_SOLVE_END:
             
-            #Msg("Evaluating stage = {}\n".format(self.partialSolverCurrentStage))
+            DebugMsg(A2P_DEBUG_NONE, "Evaluating stage = {}\n".format(self.partialSolverCurrentStage))
             #Msg("Tempfixed objs:\n")
             if A2P_DEBUG_LEVEL>=A2P_DEBUG_1:
                 for i in self.rigids:
@@ -582,7 +584,7 @@ class SolverSystem():
         #global STOP_CURRENT_SOLVE_ACTION
         #print STOP_CURRENT_SOLVE_ACTION
         #stop = global STOP_CURRENT_SOLVE_ACTION
-        if A2P_DEBUG_LEVEL >= A2P_DEBUG_1:
+        if A2P_DEBUG_LEVEL >= A2P_DEBUG_NONE:
             self.printList("WorkList", workList)
 
         for rig in workList:
