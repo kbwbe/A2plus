@@ -508,7 +508,7 @@ def solveConstraints_MoviMode( doc, cache=None ):
     ss.loadSystem(doc)
     for rig in ss.rigids:
         rig.enableDependencies(ss.rigids)
-    for i in range(0,5):
+    for i in range(0,1):
         for r in ss.rigids:
             r.calcMoveData(doc, ss)
         for r in ss.rigids:
