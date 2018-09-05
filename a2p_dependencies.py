@@ -31,6 +31,7 @@ from  FreeCAD import Base
 import a2plib
 from a2plib import (
     drawVector,
+    drawSphere,
     path_a2p,
     getObjectVertexFromName,
     getObjectEdgeFromName,
@@ -45,6 +46,9 @@ from a2plib import (
     A2P_DEBUG_1,
     A2P_DEBUG_2,
     A2P_DEBUG_3,
+    RED,
+    GREEN,
+    BLUE
     )
 
 import a2p_libDOF
@@ -81,10 +85,10 @@ class Dependency():
         self.offset = None
         self.angle = None
         self.foreignDependency = None
-        self.moveVector = None          # TODO: Not used?
+        self.moveVector = None
         self.currentRigid = None
         self.dependedRigid = None
-        self.constraint = constraint    # TODO: remove, probably not needed
+        self.constraint = constraint
         self.axisRotationEnabled = axisRotation
         self.lockRotation = False
         self.useRefPointSpin = True
@@ -293,9 +297,12 @@ class Dependency():
             axis2 = getAxis(ob2, c.SubElement2)
             if dep2.direction == "opposed":
                 axis2.multiply(-1.0)
+                
+            dep1.refPoint = dep1.adjustRefPoints(ob1,c.SubElement1,dep1.refPoint,axis1)    
+            dep2.refPoint = dep2.adjustRefPoints(ob2,c.SubElement2,dep2.refPoint,axis2)    
+                
             dep1.refAxisEnd = dep1.refPoint.add(axis1)
             dep2.refAxisEnd = dep2.refPoint.add(axis2)
-
         else:
             raise NotImplementedError("Constraint type {} was not implemented!".format(c.Type))
 
@@ -310,6 +317,7 @@ class Dependency():
 
         rigid1.dependencies.append(dep1)
         rigid2.dependencies.append(dep2)
+        
 
     def applyPlacement(self, placement):
         if self.refPoint != None:
@@ -649,16 +657,56 @@ class DependencyAxial(Dependency):
         self.isPointConstraint = False
         self.useRefPointSpin = True
 
+    def getMovement1(self):
+        '''
+        backup of getMovement, not active, to be reworked later
+        '''
+        if not self.Enabled: return None, None
+        #Try to move in shortest direction between the both axes..
+        vec1 = self.foreignDependency.refPoint.sub(self.refPoint)
+        ownAxis = self.refAxisEnd.sub(self.refPoint)
+        destinationAxis = self.foreignDependency.refAxisEnd.sub(self.foreignDependency.refPoint)
+        
+        helpPlaneNormal = destinationAxis
+        helpPlanePoint = self.refPoint
+        #project the refPoint difference vector to the helper plane
+        #vector end marks end of moveVector
+        vec2 = Base.Vector(vec1) #make a copy
+        vec2.projectToPlane(helpPlanePoint, helpPlaneNormal)
+        #project this vector to the own axis
+        #This marks the beginning of the moveVecotr
+        dot = vec2.dot(ownAxis)
+        vec3 = Base.Vector(ownAxis)
+        vec3.normalize()
+        vec3.multiply(dot)
+        #Sub both vectors to geht the movevector shortest way between both axes
+        moveVector = vec2.sub(vec3)
+        return self.refPoint, moveVector
+        
     def getMovement(self):
         if not self.Enabled: return None, None
 
         vec1 = self.foreignDependency.refPoint.sub(self.refPoint)
+        axis = self.refAxisEnd.sub(self.refPoint)
         destinationAxis = self.foreignDependency.refAxisEnd.sub(self.foreignDependency.refPoint)
         dot = vec1.dot(destinationAxis)
         parallelToAxisVec = destinationAxis.normalize().multiply(dot)
         moveVector = vec1.sub(parallelToAxisVec)
         return self.refPoint, moveVector
     
+    def adjustRefPoints(self,obj,sub,refPoint,axis):
+        if sub.startswith("Edge"): return refPoint
+        face = getObjectFaceFromName(obj,sub)
+        bbCenter = face.BoundBox.Center
+        if bbCenter.distanceToLine(refPoint,axis) < 1.0e-12:
+            return bbCenter
+        v1 = bbCenter.sub(refPoint)
+        v2 = Base.Vector(axis)
+        v2.normalize()
+        dot = v1.dot(v2)
+        v2.multiply(dot)
+        refPoint = refPoint.add(v2)
+        return refPoint
     
     def calcDOF(self, _dofPos, _dofRot, _pointconstraints=[]):
     #AxialConstraint:
