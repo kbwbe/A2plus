@@ -783,28 +783,47 @@ class DependencyAxial(Dependency):
         #This marks the beginning of the moveVecotr
         dot = vec2.dot(ownAxis)
         vec3 = Base.Vector(ownAxis)
-        vec3.normalize()
-        vec3.multiply(dot)
+        try:
+            vec3.normalize()
+            vec3.multiply(dot)
+        except:
+            pass
         #Sub both vectors to geht the movevector shortest way between both axes
         moveVector = vec2.sub(vec3)
         return self.refPoint, moveVector
     
+    def adjustRefPoints(self,obj,sub,refPoint,axis):
+        if sub.startswith("Edge"): return refPoint
+        face = getObjectFaceFromName(obj,sub)
+        bbCenter = face.BoundBox.Center
+        if bbCenter.distanceToLine(refPoint,axis) < 1.0e-12:
+            return bbCenter
+        v1 = bbCenter.sub(refPoint)
+        v2 = Base.Vector(axis)
+        v2.normalize()
+        dot = v1.dot(v2)
+        v2.multiply(dot)
+        refPoint = refPoint.add(v2)
+        return refPoint
     
     
     def calcRefPoints(self, index):
         self.index = index
         if index==1:
             ob = self.doc.getObject(self.constraint.Object1)
-            self.refPoint = getPos(ob,self.constraint.SubElement1)
-            axis = getAxis(ob, self.constraint.SubElement1)
+            ele = self.constraint.SubElement1
+            self.refPoint = getPos(ob,ele)
+            axis = getAxis(ob, ele)
             
         else:
             ob = self.doc.getObject(self.constraint.Object2)
-            self.refPoint = getPos(ob,self.constraint.SubElement2)
-            axis = getAxis(ob, self.constraint.SubElement2)
+            ele = self.constraint.SubElement2
+            self.refPoint = getPos(ob,ele)
+            axis = getAxis(ob, ele)
             if self.direction == "opposed":
                 axis.multiply(-1.0)
-           
+        
+        self.refPoint = self.adjustRefPoints(ob,ele,self.refPoint,axis)        
         self.refAxisEnd = self.refPoint.add(axis)
         
     
