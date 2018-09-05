@@ -54,13 +54,24 @@ from os.path import expanduser
 
 
 SOLVER_MAXSTEPS = 50000
+
+SOLVER_CONTROLDATA = {
+    #Index:(posAccuracy,spinAccuracy,completeSolvingRequired)
+    1:(0.1,0.1,True),
+    2:(0.01,0.01,True),
+    3:(0.001,0.001,True),
+    4:(0.0001,0.0001,False),
+    5:(0.00001,0.00001,False)
+    }
+#MAX_LEVEL_ACCURACY = 4  #accuracy reached is 1.0e-MAX_LEVEL_ACCURACY
+
+
 SOLVER_POS_ACCURACY = 1.0e-1  # gets to smaller values during solving
 SOLVER_SPIN_ACCURACY = 1.0e-1 # gets to smaller values during solving
 
 SOLVER_STEPS_CONVERGENCY_CHECK = 150 #200
 SOLVER_CONVERGENCY_FACTOR = 0.99
 SOLVER_CONVERGENCY_ERROR_INIT_VALUE = 1.0e+20
-MAX_LEVEL_ACCURACY = 4  #accuracy reached is 1.0e-MAX_LEVEL_ACCURACY
 
 from a2plib import (
     PARTIAL_SOLVE_STAGE1,
@@ -93,6 +104,8 @@ class SolverSystem():
         self.partialSolverCurrentStage = 0
         self.currentstage = 0
         self.solvedCounter = 0
+        self.maxPosError = 0.0
+        self.maxAxisError = 0.0
 
     def clear(self):
         for r in self.rigids:
@@ -315,6 +328,8 @@ class SolverSystem():
 
     def solveAccuracySteps(self,doc):
         self.level_of_accuracy=1
+        self.mySOLVER_POS_ACCURACY = SOLVER_CONTROLDATA[self.level_of_accuracy][0]
+        self.mySOLVER_SPIN_ACCURACY = SOLVER_CONTROLDATA[self.level_of_accuracy][1]
 
         startTime = int(round(time.time() * 1000))
         self.loadSystem(doc)
@@ -325,26 +340,33 @@ class SolverSystem():
         while True:
             systemSolved = self.calculateChain(doc)
             totalTime = int(round(time.time() * 1000))
-            DebugMsg(A2P_DEBUG_1, "Total steps used: %d\n" %  self.stepCount)
-            DebugMsg(A2P_DEBUG_1, "LoadTime (ms): %d\n" % (loadTime - startTime) )
-            DebugMsg(A2P_DEBUG_1, "CalcTime (ms): %d\n" % (totalTime - loadTime) )
-            DebugMsg(A2P_DEBUG_1, "TotalTime (ms): %d\n" % (totalTime - startTime) )
             if systemSolved:
-                self.mySOLVER_SPIN_ACCURACY *= 1e-1
-                self.mySOLVER_POS_ACCURACY *= 1e-1
-                Msg( '--->SOLVED WITH LEVEL OF ACCURACY :{}\n'.format(self.level_of_accuracy) )
                 self.level_of_accuracy+=1
-                if self.level_of_accuracy == MAX_LEVEL_ACCURACY:
+                if self.level_of_accuracy > len(SOLVER_CONTROLDATA):
                     self.solutionToParts(doc)
                     break
                 #self.prepareRestart()
-                self.solutionToParts(doc)
+                self.mySOLVER_POS_ACCURACY = SOLVER_CONTROLDATA[self.level_of_accuracy][0]
+                self.mySOLVER_SPIN_ACCURACY = SOLVER_CONTROLDATA[self.level_of_accuracy][1]
+                #self.solutionToParts(doc)
                 self.loadSystem(doc)
             else:
-                self.solutionToParts(doc)
+                #self.solutionToParts(doc)
+                completeSolvingRequired = SOLVER_CONTROLDATA[self.level_of_accuracy][2]
+                if not completeSolvingRequired: systemSolved = True
                 break
-        self.mySOLVER_SPIN_ACCURACY = SOLVER_SPIN_ACCURACY
-        self.mySOLVER_POS_ACCURACY = SOLVER_POS_ACCURACY
+        self.maxAxisError = 0.0
+        self.maxPosError = 0.0
+        for rig in self.rigids:
+            if rig.maxPosError > self.maxPosError:
+                self.maxPosError = rig.maxPosError
+            if rig.maxAxisError > self.maxAxisError:
+                self.maxAxisError = rig.maxAxisError
+        Msg( 'TARGET   POS-ACCURACY :{}\n'.format(self.mySOLVER_POS_ACCURACY) )
+        Msg( 'REACHED  POS-ACCURACY :{}\n'.format(self.maxPosError) )
+        Msg( 'TARGET  SPIN-ACCURACY :{}\n'.format(self.mySOLVER_SPIN_ACCURACY) )
+        Msg( 'REACHED SPIN-ACCURACY :{}\n'.format(self.maxAxisError) )
+            
         return systemSolved
 
     def solveSystem(self,doc):
