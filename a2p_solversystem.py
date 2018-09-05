@@ -187,6 +187,11 @@ class SolverSystem():
             rig.calcSpinCenter()
             rig.calcRefPointsBoundBoxSize()
             
+        self.retrieveDOFInfo() #function only once used here at this place in whole program
+        self.status = "loaded"
+        
+    def DOF_info_to_console(self):
+        self.loadSystem( FreeCAD.activeDocument() )
         numdep = 0
         self.retrieveDOFInfo() #function only once used here at this place in whole program
         for rig in self.rigids:
@@ -194,8 +199,6 @@ class SolverSystem():
             rig.beautyDOFPrint()
             numdep+=rig.countDependencies()
         Msg( 'there are {} dependencies\n'.format(numdep/2))  
-     
-        self.status = "loaded"
 
     def retrieveDOFInfo(self):
         '''
