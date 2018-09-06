@@ -134,6 +134,7 @@ class a2pWorkbench (Workbench):
             'A2p',
             menuEntries
             )
+        FreeCADGui.addIconPath(':/icons')
         #FreeCADGui.addPreferencePage( a2plib.pathOfModule() + '/GuiA2p/ui/a2p_prefs.ui','A2plus' )
         FreeCADGui.addPreferencePage(
             a2plib.pathOfModule() +
