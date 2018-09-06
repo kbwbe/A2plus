@@ -104,7 +104,7 @@ def parseSelection(selection, objectToUpdate=None):
         c.Proxy = ConstraintObjectProxy()
         c.ViewObject.Proxy = ConstraintViewProviderProxy(
             c,
-            path_a2p + '/icons/a2p_PlaneCoincidentConstraint.svg',
+            ':/icons/a2p_PlaneCoincidentConstraint.svg',
             True, cParms[1][2],
             cParms[0][2],
             extraText

@@ -377,7 +377,7 @@ class SolverSystem():
             return
         if systemSolved:
             self.status = "solved"
-            Msg( "===== System solved using partial + recursive unfixing =====")
+            Msg( "===== System solved using partial + recursive unfixing =====\n")
         else:
             self.status = "unsolved"
             Msg( "===== Could not solve system ====== \n" )
@@ -495,7 +495,7 @@ class SolverSystem():
                     else:            
                         Msg('\n')
                         Msg('convergency-conter: {}\n'.format(self.convergencyCounter))
-                        Msg( "System not solvable, convergency is incorrect!\n" )
+                        Msg( "Calculation stopped, no convergency anymore!\n" )
                         return False
                 
                 self.lastPositionError = maxPosError
