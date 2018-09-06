@@ -331,15 +331,15 @@ class SolverSystem():
         self.mySOLVER_POS_ACCURACY = SOLVER_CONTROLDATA[self.level_of_accuracy][0]
         self.mySOLVER_SPIN_ACCURACY = SOLVER_CONTROLDATA[self.level_of_accuracy][1]
 
-        startTime = int(round(time.time() * 1000))
+        #startTime = int(round(time.time() * 1000))
         self.loadSystem(doc)
         if self.status == "loadingDependencyError":
             return
         self.assignParentship(doc)
-        loadTime = int(round(time.time() * 1000))
+        #loadTime = int(round(time.time() * 1000))
         while True:
             systemSolved = self.calculateChain(doc)
-            totalTime = int(round(time.time() * 1000))
+            #totalTime = int(round(time.time() * 1000))
             if systemSolved:
                 self.level_of_accuracy+=1
                 if self.level_of_accuracy > len(SOLVER_CONTROLDATA):
@@ -465,7 +465,6 @@ class SolverSystem():
                 # The accuracy is good, we're done here
                 goodAccuracy = True
                 # Mark the rigids as tempfixed and add its constrained rigids to pending list to be processed next
-                #DebugMsg(A2P_DEBUG_1, "{} counts \n".format(calcCount) )
                 for r in workList:
                     r.applySolution(doc, self)
                     r.tempfixed = True
@@ -538,7 +537,6 @@ def solveConstraints_MoviMode( doc, cache=None ):
             r.calcMoveData(doc, ss)
         for r in ss.rigids:
             r.move(doc)
-            # Enable those 2 lines to see the computation progress on screen
             r.applySolution(doc, ss)
             FreeCADGui.updateGui()
     doc.commitTransaction()
