@@ -469,7 +469,7 @@ class Rigid():
             return True
     
     def linkedTempFixedDOF(self):
-        pointConstraints = []
+        #pointConstraints = []
         _dofPos = a2p_libDOF.initPosDOF
         _dofRot = a2p_libDOF.initRotDOF
         self.reorderDependencies()

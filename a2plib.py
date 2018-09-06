@@ -191,9 +191,6 @@ def findSourceFileInProject(fullPath):
     projectFolder = os.path.abspath(getProjectFolder()) # get normalized path
     fileName = os.path.basename(fullPath)
     retval = findFile(fileName,projectFolder)
-    DebugMsg(A2P_DEBUG_1,
-        "Found file {}\n".format(retval)
-        )
     return retval
 
 #------------------------------------------------------------------------------

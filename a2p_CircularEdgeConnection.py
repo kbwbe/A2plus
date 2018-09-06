@@ -103,7 +103,7 @@ def parseSelection(selection, objectToUpdate=None, callSolveConstraints=True, lo
         c.Proxy = ConstraintObjectProxy()
         c.ViewObject.Proxy = ConstraintViewProviderProxy(
             c,
-            path_a2p + '/icons/a2p_CircularEdgeConstraint.svg',
+            ':/icons/a2p_CircularEdgeConstraint.svg',
             True,
             cParms[1][2],
             cParms[0][2]

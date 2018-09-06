@@ -127,12 +127,14 @@ class a2pWorkbench (Workbench):
             )
 
         menuEntries = [
-            'a2p_repairTreeViewCommand'
+            'a2p_repairTreeViewCommand',
+            'a2p_Show_DOF_info_Command'
             ]
         self.appendMenu(
             'A2p',
             menuEntries
             )
+        FreeCADGui.addIconPath(':/icons')
         #FreeCADGui.addPreferencePage( a2plib.pathOfModule() + '/GuiA2p/ui/a2p_prefs.ui','A2plus' )
         FreeCADGui.addPreferencePage(
             a2plib.pathOfModule() +

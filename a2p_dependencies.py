@@ -138,15 +138,6 @@ class Dependency():
 
     @staticmethod
     def Create(doc, constraint, solver, rigid1, rigid2):
-        DebugMsg(
-            A2P_DEBUG_2,
-            "Creating dependencies between {}-{}, type {}\n".format(
-                rigid1.label,
-                rigid2.label,
-                constraint.Type
-                )
-            )
-
         c = constraint
 
         if c.Type == "pointIdentity":
@@ -181,7 +172,7 @@ class Dependency():
             ob2 = doc.getObject(c.Object2)
 
             vert1 = getObjectVertexFromName(ob1, c.SubElement1)
-            line2 = getObjectEdgeFromName(ob2, c.SubElement2)
+            #line2 = getObjectEdgeFromName(ob2, c.SubElement2)
             dep1.refPoint = vert1.Point
             dep2.refPoint = getPos(ob2, c.SubElement2)
 
@@ -327,18 +318,9 @@ class Dependency():
 
     def enable(self, workList):
         if self.dependedRigid not in workList:
-            DebugMsg(
-                A2P_DEBUG_2,
-                "{} - not in working list\n".format(self)
-                )
             return
-
         self.Enabled = True
         self.foreignDependency.Enabled = True
-        DebugMsg(
-            A2P_DEBUG_2,
-            "{} - enabled\n".format(self)
-            )
 
     def disable(self):
         self.Enabled = False
@@ -598,20 +580,9 @@ class DependencyAngledPlanes(Dependency):
             axis = rigAxis.cross(foreignAxis)
             axis.normalize()
             axis.multiply(-deltaAngle)
-            '''
-            print (
-                "Axis: {}, Length: {} RecentAngle: {} deltaAngle: {}".format(
-                    axis,
-                    axis.Length,
-                    recentAngle,
-                    deltaAngle
-                    )
-                )
-            '''
         except: #axis = Vector(0,0,0) and cannot be normalized...
             #print ("Exception in angledPlanes.getRotation\n")
             pass
-        #DebugMsg(A2P_DEBUG_3, "{} - rotate by {}\n".format(self, axis.Length))
         return axis
     
     def calcDOF(self, _dofPos, _dofRot, _pointconstraints=[]):
@@ -636,7 +607,6 @@ class DependencyPlane(Dependency):
         dot = vec1.dot(normal1)
         normal1.multiply(dot)
         moveVector = normal1
-        #DebugMsg(A2P_DEBUG_3,"{} - move by {}\n".format(self, moveVector.Length))
         return self.refPoint, moveVector
 
     def calcDOF(self, _dofPos, _dofRot, _pointconstraints=[]):
@@ -674,7 +644,7 @@ class DependencyAxial(Dependency):
         vec2 = Base.Vector(vec1) #make a copy
         vec2.projectToPlane(helpPlanePoint, helpPlaneNormal)
         #project this vector to the own axis
-        #This marks the beginning of the moveVecotr
+        #This marks the beginning of the moveVector
         dot = vec2.dot(ownAxis)
         vec3 = Base.Vector(ownAxis)
         vec3.normalize()
@@ -687,7 +657,7 @@ class DependencyAxial(Dependency):
         if not self.Enabled: return None, None
 
         vec1 = self.foreignDependency.refPoint.sub(self.refPoint)
-        axis = self.refAxisEnd.sub(self.refPoint)
+        #axis = self.refAxisEnd.sub(self.refPoint)
         destinationAxis = self.foreignDependency.refAxisEnd.sub(self.foreignDependency.refPoint)
         dot = vec1.dot(destinationAxis)
         parallelToAxisVec = destinationAxis.normalize().multiply(dot)
