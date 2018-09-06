@@ -25,6 +25,12 @@
 __title__ = 'A2plus assembly Workbench - InitGui file'
 __author__ = 'kbwbe'
 
+import sys
+PyVersion = sys.version_info[0]
+if PyVersion == 2:
+    import a2p_Resources2
+else:
+    import a2p_Resources3
 
 
 class a2pWorkbench (Workbench):
@@ -80,7 +86,8 @@ class a2pWorkbench (Workbench):
         solverCommands = [
             'a2p_SolverCommand',
             'a2p_ToggleAutoSolveCommand',
-            'a2p_FlipConstraintDirectionCommand'
+            'a2p_FlipConstraintDirectionCommand',
+            'a2p_Show_DOF_info_Command'
             #'a2p_TogglePartialProcessingCommand',
             ]
         viewCommands = [
@@ -127,8 +134,7 @@ class a2pWorkbench (Workbench):
             )
 
         menuEntries = [
-            'a2p_repairTreeViewCommand',
-            'a2p_Show_DOF_info_Command'
+            'a2p_repairTreeViewCommand'
             ]
         self.appendMenu(
             'A2p',
