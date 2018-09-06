@@ -614,6 +614,7 @@ class PartMover:
         if info['Button'] == 'BUTTON1' and info['State'] == 'DOWN':
             if not info['ShiftDown'] and not info['CtrlDown']:
                 self.removeCallbacks()
+                FreeCAD.activeDocument().recompute()
     def KeyboardEvent(self, info):
         if info['State'] == 'UP' and info['Key'] == 'ESCAPE':
             if not self.copiedObject:
@@ -954,6 +955,7 @@ class a2p_Show_DOF_info_Command:
 
     def GetResources(self):
         return {
+            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_DOFs.svg',
             'MenuText':     'print detailed DOF informations to console',
             'ToolTip':      'print detailed DOF informations to console'
             }

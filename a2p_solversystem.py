@@ -546,9 +546,12 @@ def solveConstraints( doc, cache=None ):
         solveConstraints_MoviMode(doc, cache=None)
     else:
         solveConstraints_OperationalMode(doc, cache=None) #Normal solver mode
+        FreeCADGui.updateGui()
+        FreeCAD.activeDocument().recompute()
 
 def autoSolveConstraints( doc, cache=None):
     if not a2plib.getAutoSolveState():
+        FreeCAD.activeDocument().recompute() # perhaps a constraint was inserted or edited
         return
     solveConstraints(doc)
 
