@@ -25,6 +25,12 @@
 __title__ = 'A2plus assembly Workbench - InitGui file'
 __author__ = 'kbwbe'
 
+import sys
+PyVersion = sys.version_info[0]
+if PyVersion == 2:
+    import a2p_Resources2
+else:
+    import a2p_Resources3
 
 
 class a2pWorkbench (Workbench):
