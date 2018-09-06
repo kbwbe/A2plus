@@ -83,7 +83,7 @@ def parseSelection(selection, objectToUpdate=None):
         c.Proxy = ConstraintObjectProxy()
         c.ViewObject.Proxy = ConstraintViewProviderProxy(
             c,
-            path_a2p + '/icons/a2p_PointOnPlaneConstraint.svg',
+            ':/icons/a2p_PointOnPlaneConstraint.svg',
             True,
             cParms[1][2],
             cParms[0][2],

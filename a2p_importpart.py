@@ -946,6 +946,24 @@ def a2p_FlipConstraintDirection():
 
 
 
+class a2p_Show_DOF_info_Command:
+
+    def Activated(self):
+        ss = a2p_solversystem.SolverSystem()
+        ss.DOF_info_to_console()
+
+    def GetResources(self):
+        return {
+            'MenuText':     'print detailed DOF informations to console',
+            'ToolTip':      'print detailed DOF informations to console'
+            }
+FreeCADGui.addCommand('a2p_Show_DOF_info_Command', a2p_Show_DOF_info_Command())
+
+
+
+
+
+
 
 def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
     ''' updating constraints, deactivated at moment'''
