@@ -87,7 +87,8 @@ class a2pWorkbench (Workbench):
             'a2p_SolverCommand',
             'a2p_ToggleAutoSolveCommand',
             'a2p_FlipConstraintDirectionCommand',
-            'a2p_Show_DOF_info_Command'
+            'a2p_Show_DOF_info_Command',
+            'a2p_Show_Hierarchy_Command'
             #'a2p_TogglePartialProcessingCommand',
             ]
         viewCommands = [

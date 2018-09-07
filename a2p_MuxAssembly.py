@@ -199,7 +199,12 @@ class a2p_SimpleAssemblyShapeCommand():
                 }
 
     def Activated(self):
-        if FreeCAD.ActiveDocument == None: return
+        if FreeCAD.activeDocument() == None:
+            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
+                                        "No active document found!",
+                                        "You have to open an assembly file first."
+                                    )
+            return
         doc = FreeCAD.ActiveDocument
         createOrUpdateSimpleAssemblyShape(doc)
         doc.recompute()
