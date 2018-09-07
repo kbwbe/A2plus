@@ -276,10 +276,15 @@ class SolverSystem():
                 if rig.fixed: rig.printHierarchy(0)
             Msg(20*"=" + "\n")
 
-        self.visualizeHierarchy()
+        #self.visualizeHierarchy()
 
     def visualizeHierarchy(self):
-        #modified hierarchy file name and path, now the html file is in the same folder with the same filename of the assembly
+        '''
+        generate a html file with constraints structure.
+        
+        The html file is in the same folder 
+        with the same filename of the assembly
+        '''
         out_file = os.path.splitext(self.doc.FileName)[0] + '_asm_hierarchy.html'
         Msg("Writing visual hierarchy to: {}\n".format(out_file))
         f = open(out_file, "w")
@@ -551,7 +556,8 @@ def solveConstraints( doc, cache=None ):
 
 def autoSolveConstraints( doc, cache=None):
     if not a2plib.getAutoSolveState():
-        FreeCAD.activeDocument().recompute() # perhaps a constraint was inserted or edited
+        #FreeCADGui.updateGui()
+        #FreeCAD.activeDocument().recompute() # perhaps a constraint was inserted or edited
         return
     solveConstraints(doc)
 

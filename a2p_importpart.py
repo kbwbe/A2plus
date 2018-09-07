@@ -372,6 +372,14 @@ FreeCADGui.addCommand('a2p_ImportPart',a2p_ImportPartCommand())
 
 
 def updateImportedParts(doc):
+    if doc == None:
+        QtGui.QMessageBox.information(  
+                        QtGui.QApplication.activeWindow(),
+                        "No active document found!",
+                        "Before updating parts, you have to open an assembly file."
+                        )
+        return
+        
     objectCache.cleanUp(doc)
     for o,obj in enumerate(doc.Objects):
         Msg("A2P updateImportedParts: obj: {}\n".format(o))
@@ -393,7 +401,7 @@ def updateImportedParts(doc):
             if replacement == None:
                 QtGui.QMessageBox.critical(  QtGui.QApplication.activeWindow(),
                                             "Source file not found",
-                                            "update of %s aborted!\nUnable to find %s" % (
+                                            "update of {} aborted!\nUnable to find {}".format(
                                                 obj.Name,
                                                 obj.sourceFile
                                                 )
@@ -529,9 +537,23 @@ def duplicateImportedPart( part ):
 
 class a2p_DuplicatePartCommand:
     def Activated(self):
+        if FreeCAD.activeDocument() == None:
+            QtGui.QMessageBox.critical(
+                QtGui.QApplication.activeWindow(),
+               "No active Document error",
+               "First please open an assembly file!"
+               )
+            return
         selection = [s for s in FreeCADGui.Selection.getSelectionEx() if s.Document == FreeCAD.ActiveDocument ]
         if len(selection) == 1:
             PartMover(  FreeCADGui.activeDocument().activeView(), duplicateImportedPart( selection[0].Object ) )
+        else:
+            QtGui.QMessageBox.critical(
+                QtGui.QApplication.activeWindow(),
+               "Selection error",
+               "Before duplicating, first please select a part!"
+               )
+            
 
     def GetResources(self):
         return {
@@ -548,10 +570,24 @@ FreeCADGui.addCommand('a2p_duplicatePart', a2p_DuplicatePartCommand())
 
 class a2p_EditPartCommand:
     def Activated(self):
+        if FreeCAD.activeDocument() == None:
+            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
+                                        "No active document found!",
+                                        "Before editing a part, you have to open an assembly file."
+                                    )
+            return
         selection = [s for s in FreeCADGui.Selection.getSelection() if s.Document == FreeCAD.ActiveDocument ]
-        if len(selection) == 0:
-            a2plib.Msg("First select a part to be edited!\n")
-            return # user selected nothing!
+        if not selection:
+            msg = \
+'''
+You must select a part to edit first.
+'''
+            QtGui.QMessageBox.information(
+                QtGui.QApplication.activeWindow(),
+                "Selection Error",
+                msg
+                )
+            return
         obj = selection[0]
         FreeCADGui.Selection.clearSelection() # very imporant! Avoid Editing the assembly the part was called from!
         fileNameWithinProjectFile = a2plib.findSourceFileInProject(obj.sourceFile)
@@ -635,6 +671,14 @@ class PartMoverSelectionObserver:
 
 class a2p_MovePartCommand:
     def Activated(self):
+        if FreeCAD.activeDocument() == None:
+            QtGui.QMessageBox.critical(
+                QtGui.QApplication.activeWindow(),
+               "No active Document error",
+               "First please open an assembly file!"
+               )
+            return
+            
         selection = [s for s in FreeCADGui.Selection.getSelectionEx() if s.Document == FreeCAD.ActiveDocument ]
         if len(selection) == 1:
             PartMover(  FreeCADGui.activeDocument().activeView(), selection[0].Object )
@@ -645,8 +689,8 @@ class a2p_MovePartCommand:
         return {
             #'Pixmap' : ':/assembly2/icons/MovePart.svg',
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_MovePart.svg',
-            'MenuText': 'move',
-            'ToolTip': 'move part  ( shift+click to copy )'
+            'MenuText': 'move selected part',
+            'ToolTip': 'move selected part'
             }
 
 FreeCADGui.addCommand('a2p_movePart', a2p_MovePartCommand())
@@ -746,6 +790,12 @@ class ViewConnectionsObserver:
 
 class a2p_isolateCommand:
     def Activated(self):
+        if FreeCAD.activeDocument() == None:
+            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
+                                        "No active document found!",
+                                        "You have to open an assembly file first."
+                                    )
+            return
         selection = [s for s in FreeCADGui.Selection.getSelection() if s.Document == FreeCAD.ActiveDocument ]
         FreeCADGui.Selection.clearSelection()
         doc = FreeCAD.ActiveDocument
@@ -785,6 +835,12 @@ FreeCADGui.addCommand('a2p_isolateCommand', a2p_isolateCommand())
 
 class a2p_ToggleTransparencyCommand:
     def Activated(self, checked):
+        if FreeCAD.activeDocument() == None:
+            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
+                                        "No active document found!",
+                                        "You have to open an assembly file first."
+                                    )
+            return
         if a2plib.isTransparencyEnabled():
             a2plib.restoreTransparency()
         else:
@@ -885,7 +941,10 @@ def a2p_repairTreeView():
         parent.Label = parent.Label # trigger an update...
         if m.Proxy != None:
             m.Proxy.disable_onChanged = False
-    #
+
+    global a2p_NeedToSolveSystem
+    a2p_NeedToSolveSystem = False # Solve only once after editing a constraint's property
+
 
 toolTipMessage = \
 '''
@@ -897,10 +956,15 @@ constraints will grouped under
 corresponding parts again
 '''
 
-
 class a2p_repairTreeViewCommand:
 
     def Activated(self):
+        if FreeCAD.activeDocument() == None:
+            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
+                                        "No active document found!",
+                                        "You have to open an assembly file first."
+                                    )
+            return
         a2p_repairTreeView()
 
     def GetResources(self):
@@ -912,11 +976,15 @@ class a2p_repairTreeViewCommand:
 FreeCADGui.addCommand('a2p_repairTreeViewCommand', a2p_repairTreeViewCommand())
 
 
-
-
 class a2p_FlipConstraintDirectionCommand:
 
     def Activated(self):
+        if FreeCAD.activeDocument() == None:
+            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
+                                        "No active document found!",
+                                        "You have to open an assembly file first."
+                                    )
+            return
         a2p_FlipConstraintDirection()
 
     def GetResources(self):
@@ -932,7 +1000,11 @@ def a2p_FlipConstraintDirection():
     constraints = [ obj for obj in FreeCAD.ActiveDocument.Objects 
                         if 'ConstraintInfo' in obj.Content ]
     if len(constraints) == 0:
-        QtGui.QMessageBox.information(  QtGui.qApp.activeWindow(), "Command Aborted", 'Flip aborted since no assembly2 constraints in active document.')
+        QtGui.QMessageBox.information(
+            QtGui.qApp.activeWindow(),
+            "Command Aborted", 
+            'Flip aborted since no a2p constraints in active document.'
+            )
         return
     lastConstraintAdded = constraints[-1]
     try:
@@ -947,9 +1019,40 @@ def a2p_FlipConstraintDirection():
 
 
 
+class a2p_Show_Hierarchy_Command:
+
+    def Activated(self):
+        doc = FreeCAD.activeDocument()
+        if doc == None:
+            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
+                                        "No active document found!",
+                                        "You have to open an assembly file first."
+                                    )
+            return
+        ss = a2p_solversystem.SolverSystem()
+        ss.loadSystem(doc)
+        ss.assignParentship(doc)
+        ss.visualizeHierarchy()
+
+    def GetResources(self):
+        return {
+            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_treeview.svg',
+            'MenuText':     'generate HTML file with detailed constraining structure',
+            'ToolTip':      'generate HTML file with detailed constraining structure'
+            }
+FreeCADGui.addCommand('a2p_Show_Hierarchy_Command', a2p_Show_Hierarchy_Command())
+
+
+
 class a2p_Show_DOF_info_Command:
 
     def Activated(self):
+        if FreeCAD.activeDocument() == None:
+            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
+                                        "No active document found!",
+                                        "You have to open an assembly file first."
+                                    )
+            return
         ss = a2p_solversystem.SolverSystem()
         ss.DOF_info_to_console()
 

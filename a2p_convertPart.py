@@ -99,8 +99,13 @@ class a2p_ConvertPartCommand():
                 }
 
     def Activated(self):
-        if FreeCAD.ActiveDocument == None:
-            return                         #if there is no activeDocument there is nothing to do
+        if FreeCAD.activeDocument() == None:
+            QtGui.QMessageBox.information(
+                QtGui.QApplication.activeWindow(),
+               "No active Document error",
+               "First please open an assembly file!"
+               )
+            return
         doc = FreeCAD.activeDocument()
         selection = FreeCADGui.Selection.getSelection()
         if not selection:
