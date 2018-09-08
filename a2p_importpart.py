@@ -156,11 +156,7 @@ def filterImpPartsFC17FF(obj):
 
 def filterImpPartsFC16(obj):
     impPartsOut = list()
-    if obj.isDerivedFrom("Sketcher::SketchObject"):
-        pass
-    elif obj.isDerivedFrom("PartDesign::Feature"):
-        pass
-    elif obj.isDerivedFrom("Part::Feature"):
+    if obj.isDerivedFrom("Part::Feature"):
         if not(obj.InList):
             impPartsOut.append(obj)                  # top level in within Document
         elif (len(obj.InList) == 1) and (obj.InList[0].hasExtension("App::GroupExtension")):
@@ -175,12 +171,24 @@ def filterImpPartsFC16(obj):
 
 def filterImpParts(obj):
     #test, which FreeCAD version is suitable for object to import
+    if obj.isDerivedFrom("Part::Feature"):
+        try:
+            tmp = obj.getGlobalPlacement()
+            return filterImpPartsFC17FF(obj)
+        except:
+            return filterImpPartsFC16(obj)
+    else:
+        return filterImpPartsFC17FF(obj)
+
+'''
+def filterImpParts(obj):
+    #test, which FreeCAD version is suitable for object to import
     try:
         tmp = obj.getGlobalPlacement()
         return filterImpPartsFC17FF(obj)
     except:
         return filterImpPartsFC16(obj)
-
+'''
 
 
 
