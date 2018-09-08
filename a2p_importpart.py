@@ -115,7 +115,7 @@ def getImpPartsFromDoc(doc, visibleOnly = True):
                 impPartsOut.extend(impPartList)
     return impPartsOut
 
-def filterImpParts(obj):
+def filterImpPartsFC17FF(obj):
     impPartsOut = list()
     if obj.isDerivedFrom("Sketcher::SketchObject"):
         pass
@@ -153,6 +153,35 @@ def filterImpParts(obj):
     else:
         pass                                         # garbage objects - Origins, Axis, etc
     return impPartsOut
+
+def filterImpPartsFC16(obj):
+    impPartsOut = list()
+    if obj.isDerivedFrom("Sketcher::SketchObject"):
+        pass
+    elif obj.isDerivedFrom("PartDesign::Feature"):
+        pass
+    elif obj.isDerivedFrom("Part::Feature"):
+        if not(obj.InList):
+            impPartsOut.append(obj)                  # top level in within Document
+        elif (len(obj.InList) == 1) and (obj.InList[0].hasExtension("App::GroupExtension")):
+            impPartsOut.append(obj)                  # top level within Group
+        elif a2plib.isA2pPart(obj):                  # imported part
+            impPartsOut.append(obj)
+        else:
+            pass                                     # more odd PF cases?? BaseFeature in body??
+    else:
+        pass                                         # garbage objects - Origins, Axis, etc
+    return impPartsOut
+
+def filterImpParts(obj):
+    #test, which FreeCAD version is suitable for object to import
+    try:
+        tmp = obj.getGlobalPlacement()
+        return filterImpPartsFC17FF(obj)
+    except:
+        return filterImpPartsFC16(obj)
+
+
 
 
 def importPartFromFile(_doc, filename, importToCache=False):
