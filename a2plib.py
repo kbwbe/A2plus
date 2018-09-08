@@ -24,7 +24,7 @@
 
 import FreeCAD, FreeCADGui, Part
 from PySide import QtGui, QtCore
-import numpy, os
+import numpy, os, sys
 from a2p_viewProviderProxies import *
 from  FreeCAD import Base
 
@@ -38,11 +38,14 @@ AUTOSOLVE_ENABLED = preferences.GetBool('autoSolve', True)
 SAVED_TRANSPARENCY = []
 
 DEBUGPROGRAM = 1
+PYVERSION = sys.version_info[0]
 
+#these are the wrong resources to register/import.  sb a2p_Resources2.py or a2p_Resources3.py
 path_a2p = os.path.dirname(__file__)
-path_a2p_resources = os.path.join( path_a2p, 'GuiA2p', 'Resources', 'resources.rcc')
-resourcesLoaded = QtCore.QResource.registerResource(path_a2p_resources)
-assert resourcesLoaded
+##path_a2p_resources = os.path.join( path_a2p, 'GuiA2p', 'Resources', 'resources.rcc')
+#path_a2p_resources = os.path.join( path_a2p, 'Gui', 'Resources', 'resources.rcc')
+#resourcesLoaded = QtCore.QResource.registerResource(path_a2p_resources)
+#assert resourcesLoaded
 
 
 

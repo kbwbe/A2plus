@@ -26,7 +26,9 @@ import FreeCADGui,FreeCAD
 from PySide import QtGui, QtCore
 import os, copy, time, sys
 import a2plib
-from a2p_MuxAssembly import muxObjectsWithKeys, createTopoInfo, Proxy_muxAssemblyObj
+import a2p_topo as topo
+from a2p_MuxAssembly import muxObjectsWithKeys, Proxy_muxAssemblyObj
+from a2p_topo import createTopoInfo
 from a2p_viewProviderProxies import *
 from a2p_versionmanagement import SubAssemblyWalk, A2P_VERSION
 import a2p_solversystem
@@ -116,6 +118,9 @@ def getImpPartsFromDoc(doc, visibleOnly = True):
     return impPartsOut
 
 def filterImpPartsFC17FF(obj):
+    '''[part] = filterImpParts(object) - if object is "importable", returns a list containing
+    object. if object is not importable, returns an empty list.  Use of list as return value is
+    for future expansion.'''
     impPartsOut = list()
     if obj.isDerivedFrom("Sketcher::SketchObject"):
         pass
@@ -191,7 +196,6 @@ def filterImpParts(obj):
 '''
 
 
-
 def importPartFromFile(_doc, filename, importToCache=False):
     doc = _doc
     #-------------------------------------------
@@ -211,6 +215,12 @@ def importPartFromFile(_doc, filename, importToCache=False):
     # Get a list of the importable Objects
     #-------------------------------------------
 
+    #<topo>
+    topoInfo = topo.buildTopoMap(importDoc)
+    print("a2p_importpart - topoInfo for " + importDoc.Name + ". " + str(len(topoInfo)))
+    print(topoInfo)
+    #</topo>
+    
     importableObjects = list()
     importableObjects.extend(getImpPartsFromDoc(importDoc))            #visible parts only
 #    importableObjects.extend(getImpPartsFromDoc(importDoc, False))     #take invisible parts too
@@ -277,6 +287,7 @@ def importPartFromFile(_doc, filename, importToCache=False):
         newObj.ViewObject.ShapeColor = tmpObj.ViewObject.ShapeColor
         if appVersionStr() <= '000.016': #FC0.17: DiffuseColor overrides ShapeColor !
             newObj.ViewObject.DiffuseColor = tmpObj.ViewObject.DiffuseColor
+
         newObj.muxInfo = createTopoInfo(tmpObj)
         newObj.ViewObject.Transparency = tmpObj.ViewObject.Transparency
 
@@ -435,8 +446,10 @@ def updateImportedParts(doc):
                     # save Placement because following newObject.Shape.copy() isn't resetting it to zeroes...
                     savedPlacement  = obj.Placement
                     obj.Shape = newObject.Shape.copy()
+
                     obj.ViewObject.DiffuseColor = copy.copy(newObject.ViewObject.DiffuseColor)
                     obj.ViewObject.Transparency = newObject.ViewObject.Transparency
+
                     obj.Placement = savedPlacement # restore the old placement
 
     mw = FreeCADGui.getMainWindow()
@@ -912,10 +925,8 @@ def a2p_repairTreeView():
         parent.Label = parent.Label # trigger an update...
         if m.Proxy != None:
             m.Proxy.disable_onChanged = False
-
     global a2p_NeedToSolveSystem
     a2p_NeedToSolveSystem = False # Solve only once after editing a constraint's property
-
 
 toolTipMessage = \
 '''
@@ -926,6 +937,7 @@ After pressing this button,
 constraints will grouped under
 corresponding parts again
 '''
+
 
 class a2p_repairTreeViewCommand:
 
@@ -945,6 +957,8 @@ class a2p_repairTreeViewCommand:
             'ToolTip':      toolTipMessage
             }
 FreeCADGui.addCommand('a2p_repairTreeViewCommand', a2p_repairTreeViewCommand())
+
+
 
 
 class a2p_FlipConstraintDirectionCommand:
@@ -986,9 +1000,6 @@ def a2p_FlipConstraintDirection():
         a2p_solversystem.autoSolveConstraints(FreeCAD.activeDocument())
     except:
         pass
-
-
-
 
 class a2p_Show_Hierarchy_Command:
 

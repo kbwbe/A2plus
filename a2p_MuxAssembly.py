@@ -24,21 +24,22 @@
 
 import FreeCAD, FreeCADGui
 from a2plib import *
+#<topo>
+from a2p_topo import getParents, getTopoPrefix, createTopoInfo
+#</topo>
 import Part
 import os, copy, numpy
 from random import random, choice
 from FreeCAD import  Base
 import time
 import a2plib
+import a2p_topo as topo
 from PySide import QtGui
 
 
 class Proxy_muxAssemblyObj:
     def execute(self, shape):
         pass
-
-def createTopoInfo(obj): #deactivated at moment...
-    return []
 
 def muxObjectsWithKeys(objsIn, withColor=False):
     '''
@@ -47,7 +48,7 @@ def muxObjectsWithKeys(objsIn, withColor=False):
     '''
     faces = []
     faceColors = []
-    muxInfo = [] # List of keys, not used at moment...
+    muxInfo = [] # List of muxed (objects + subObjCounts)
 
     for obj in objsIn:
         # Save Computing time, store this before the for..enumerate loop later...
@@ -84,8 +85,15 @@ def muxObjects(doc, mode=0):
         objects = doc.Objects
 
     for obj in objects:
-        if 'importPart' in obj.Content:
+#        if 'importPart' in obj.Content:
+        if a2plib.isA2pPart(obj):
             faces = faces + obj.Shape.Faces
+        #<topo>
+            if not hasattr(obj,"muxInfo"):
+                obj.addProperty("App::PropertyStringList","muxInfo","importPart")
+            obj.muxInfo = createTopoInfo(obj)   #this is imperfect for subAssembly w/o topo info!
+        #</topo>                                #doesn't build links back to original file, just within A2p file
+            
     shell = Part.makeShell(faces)
     return shell
 

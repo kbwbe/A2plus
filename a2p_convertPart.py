@@ -27,7 +27,7 @@ from PySide import QtGui, QtCore
 import os, copy, time
 import a2plib
 from a2p_importpart import filterImpParts
-from a2p_MuxAssembly import createTopoInfo
+from a2p_topo import createTopoInfo
 from a2p_viewProviderProxies import *
 from a2p_versionmanagement import SubAssemblyWalk, A2P_VERSION
 import a2p_solversystem
@@ -50,7 +50,7 @@ def convertToImportedPart(doc, obj):
 #        msg = obj.Name + " was not converted."
 #        FreeCADGui.Console.Message(msg)
 #    for oe in objExpand:
-    
+
     #partName = obj.Name
     partName = a2plib.findUnusedObjectName( obj.Label, document=doc )
     partLabel = a2plib.findUnusedObjectLabel( obj.Label, document=doc )
