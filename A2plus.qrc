@@ -40,5 +40,8 @@
         <file>icons/a2p_ViewConnection.svg</file>
         <file>icons/a2p_workbench.svg</file>
         <file>icons/preferences-a2plus.svg</file>
+        <file>icons/a2p_topoCurrent.svg</file>
+        <file>icons/a2p_topoFile.svg</file>
+        <file>icons/a2p_topoUnmap.svg</file>
     </qresource>
 </RCC>
