@@ -1030,8 +1030,8 @@ class a2p_Show_DOF_info_Command:
     def GetResources(self):
         return {
             'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_DOFs.svg',
-            'MenuText':     'print detailed DOF informations to console',
-            'ToolTip':      'print detailed DOF informations to console'
+            'MenuText':     'print detailed DOF information to console',
+            'ToolTip':      'print detailed DOF information to console'
             }
 FreeCADGui.addCommand('a2p_Show_DOF_info_Command', a2p_Show_DOF_info_Command())
 
