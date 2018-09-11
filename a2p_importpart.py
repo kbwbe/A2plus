@@ -115,7 +115,7 @@ def getImpPartsFromDoc(doc, visibleOnly = True):
                 impPartsOut.extend(impPartList)
     return impPartsOut
 
-def filterImpParts(obj):
+def filterImpPartsFC17FF(obj):
     impPartsOut = list()
     if obj.isDerivedFrom("Sketcher::SketchObject"):
         pass
@@ -153,6 +153,43 @@ def filterImpParts(obj):
     else:
         pass                                         # garbage objects - Origins, Axis, etc
     return impPartsOut
+
+def filterImpPartsFC16(obj):
+    impPartsOut = list()
+    if obj.isDerivedFrom("Part::Feature"):
+        if not(obj.InList):
+            impPartsOut.append(obj)                  # top level in within Document
+        elif (len(obj.InList) == 1) and (obj.InList[0].hasExtension("App::GroupExtension")):
+            impPartsOut.append(obj)                  # top level within Group
+        elif a2plib.isA2pPart(obj):                  # imported part
+            impPartsOut.append(obj)
+        else:
+            pass                                     # more odd PF cases?? BaseFeature in body??
+    else:
+        pass                                         # garbage objects - Origins, Axis, etc
+    return impPartsOut
+
+def filterImpParts(obj):
+    #test, which FreeCAD version is suitable for object to import
+    if obj.isDerivedFrom("Part::Feature"):
+        try:
+            tmp = obj.getGlobalPlacement()
+            return filterImpPartsFC17FF(obj)
+        except:
+            return filterImpPartsFC16(obj)
+    else:
+        return filterImpPartsFC17FF(obj)
+
+'''
+def filterImpParts(obj):
+    #test, which FreeCAD version is suitable for object to import
+    try:
+        tmp = obj.getGlobalPlacement()
+        return filterImpPartsFC17FF(obj)
+    except:
+        return filterImpPartsFC16(obj)
+'''
+
 
 
 def importPartFromFile(_doc, filename, importToCache=False):
@@ -233,44 +270,15 @@ def importPartFromFile(_doc, filename, importToCache=False):
     #
     if subAssemblyImport:
         newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor = muxObjectsWithKeys(importableObjects, withColor=True)
-        DebugMsg(
-            A2P_DEBUG_3,
-            "a2p importPartFromFile: assembly's DiffuseColor after MUX:\n{}\n".format(newObj.ViewObject.DiffuseColor)
-            )
-        #newObj.muxInfo, newObj.Shape = muxObjectsWithKeys(importDoc, withColor=False)    # old entry
+        #newObj.muxInfo, newObj.Shape = muxObjectsWithKeys(importDoc, withColor=False)
     else:
         tmpObj = importableObjects[0]
         newObj.Shape = tmpObj.Shape.copy()
-        for p in tmpObj.ViewObject.PropertiesList: #assuming that the user may change the appearance of parts differently depending on the assembly.
-            if hasattr(tmpObj.ViewObject, p) and \
-                (p not in ['DiffuseColor','Proxy','MappedColors','DisplayMode','DisplayModeBody']) :
-                setattr(newObj.ViewObject, p, getattr(tmpObj.ViewObject, p))
-
-        newObj.ViewObject.ShapeColor = shapeCol = tmpObj.ViewObject.ShapeColor
-        newObj.ViewObject.Transparency = shapeTsp100 = tmpObj.ViewObject.Transparency
-
-#        if appVersionStr() <= '000.016': #FC0.17: DiffuseColor overrides ShapeColor !
-        newObj.ViewObject.DiffuseColor = copy.deepcopy(tmpObj.ViewObject.DiffuseColor)
-        DebugMsg(A2P_DEBUG_3,"a2p importPartFromFile: initial DiffuseColor:\n{}\n".format(newObj.ViewObject.DiffuseColor))
-
-        shapeTsp = round( (shapeTsp100/100.0), 2 )                       # setup DiffuseColor properly from Part
-        DebugMsg(A2P_DEBUG_3,"a2p importPartFromFile: initial transparency: {}\n".format(shapeTsp))
-        DebugMsg(A2P_DEBUG_3,"a2p importPartFromFile: initial shapeColor:   {}\n".format(shapeCol))
-        DebugMsg(
-            A2P_DEBUG_3,
-            "a2p importPartFromFile: DiffuseColor objects:\n{}\n".format(len(newObj.ViewObject.DiffuseColor))
-            )
-        if ( len(newObj.ViewObject.DiffuseColor) == 1 ) :
-            newObj.ViewObject.DiffuseColor = (shapeCol[0],shapeCol[1],shapeCol[2],shapeTsp)
-            DebugMsg(
-                A2P_DEBUG_3,
-                "a2p importPartFromFile: from initial values calculated DiffuseColor:\n{}\n" \
-                .format(newObj.ViewObject.DiffuseColor)
-                )
-        else:
-            DebugMsg(A2P_DEBUG_3,"a2p importPartFromFile: muxed assembly, initial DiffuseColor is taken\n")
-
+        newObj.ViewObject.ShapeColor = tmpObj.ViewObject.ShapeColor
+        if appVersionStr() <= '000.016': #FC0.17: DiffuseColor overrides ShapeColor !
+            newObj.ViewObject.DiffuseColor = tmpObj.ViewObject.DiffuseColor
         newObj.muxInfo = createTopoInfo(tmpObj)
+        newObj.ViewObject.Transparency = tmpObj.ViewObject.Transparency
 
     newObj.Proxy = Proxy_muxAssemblyObj()
     newObj.ViewObject.Proxy = ImportedPartViewProviderProxy()
@@ -372,9 +380,16 @@ FreeCADGui.addCommand('a2p_ImportPart',a2p_ImportPartCommand())
 
 
 def updateImportedParts(doc):
+    if doc == None:
+        QtGui.QMessageBox.information(  
+                        QtGui.QApplication.activeWindow(),
+                        "No active document found!",
+                        "Before updating parts, you have to open an assembly file."
+                        )
+        return
+        
     objectCache.cleanUp(doc)
-    for o,obj in enumerate(doc.Objects):
-        Msg("A2P updateImportedParts: obj: {}\n".format(o))
+    for obj in doc.Objects:
         if hasattr(obj, 'sourceFile'):
             if not hasattr( obj, 'timeLastImport'):
                 obj.addProperty("App::PropertyFloat", "timeLastImport","importPart") #should default to zero which will force update.
@@ -393,7 +408,7 @@ def updateImportedParts(doc):
             if replacement == None:
                 QtGui.QMessageBox.critical(  QtGui.QApplication.activeWindow(),
                                             "Source file not found",
-                                            "update of %s aborted!\nUnable to find %s" % (
+                                            "update of {} aborted!\nUnable to find {}".format(
                                                 obj.Name,
                                                 obj.sourceFile
                                                 )
@@ -420,44 +435,8 @@ def updateImportedParts(doc):
                     # save Placement because following newObject.Shape.copy() isn't resetting it to zeroes...
                     savedPlacement  = obj.Placement
                     obj.Shape = newObject.Shape.copy()
-
-                    origDiffCol = copy.deepcopy(obj.ViewObject.DiffuseColor)        # DECIMAL ISSUE with transparency !!!
-
-                    origTsp = round( float(obj.ViewObject.Transparency/100.0), 2 )
-                    origShapeCol = obj.ViewObject.ShapeColor
-                    DebugMsg(A2P_DEBUG_3,"a2p updateImportedParts: orig Transparency: {}\n".format(origTsp))
-                    DebugMsg(A2P_DEBUG_3,"a2p updateImportedParts: orig ShapeColor:   {}\n".format(origShapeCol))
-                    DebugMsg(A2P_DEBUG_3,"a2p updateImportedParts: orig DiffuseColor:\n{}\n".format(origDiffCol))
-
-                    # user may have changed color+transparency in the active assembly
-                    #  if updateColors == False, these changes are taken as new
-                    DebugMsg(A2P_DEBUG_3,"a2p updateImportedParts: one shape or even more? {}\n".format(len(origDiffCol)))
-                    if (obj.updateColors == False):
-                        DebugMsg(A2P_DEBUG_3,"a2p updateImportedParts: updateColors is INactive: taking up actual color changes\n")
-                        if len(origDiffCol) == 1 :
-                            obj.ViewObject.DiffuseColor = (origShapeCol[0], origShapeCol[1], origShapeCol[2], origTsp)
-
-                            DebugMsg(A2P_DEBUG_3,"                         from orig values combined DiffuseColor:\n" \
-                               .format(obj.ViewObject.DiffuseColor))
-                        else:
-                            DebugMsg(A2P_DEBUG_3,"a2p updateImportedParts: muxed assembly, orig DiffuseColor is kept as new,\n")
-                            DebugMsg(A2P_DEBUG_3,"a2p updateImportedParts:  ShapeColor and Transparency aren't usable any more\n")
-                    #  if updateColors == True, default, colors+transparencies are recovered from source file
-                    else:
-                        DebugMsg(
-                            A2P_DEBUG_3,
-                            "a2p updateImportedParts: updateColors is ACTIVE: recovering colors from orig source file:\n"
-                            )
-                        obj.ViewObject.ShapeColor = newObject.ViewObject.ShapeColor
-                        obj.ViewObject.Transparency = newObject.ViewObject.Transparency    # can be 0.0 -- rely on DiffuseColor
-                        obj.ViewObject.DiffuseColor = copy.deepcopy(newObject.ViewObject.DiffuseColor)
-                        DebugMsg(A2P_DEBUG_3,"a2p updateImportedParts: from file recovered Transparency: {}\n" \
-                            .format(newObject.ViewObject.Transparency))
-                        DebugMsg(A2P_DEBUG_3,"a2p updateImportedParts: from file recovered ShapeColor:   {}\n" \
-                            .format(newObject.ViewObject.ShapeColor))
-                        DebugMsg(A2P_DEBUG_3,"a2p updateImportedParts: from file recovered DiffuseColor: {}\n" \
-                            .format(newObject.ViewObject.DiffuseColor))
-
+                    obj.ViewObject.DiffuseColor = copy.copy(newObject.ViewObject.DiffuseColor)
+                    obj.ViewObject.Transparency = newObject.ViewObject.Transparency
                     obj.Placement = savedPlacement # restore the old placement
 
     mw = FreeCADGui.getMainWindow()
@@ -529,9 +508,23 @@ def duplicateImportedPart( part ):
 
 class a2p_DuplicatePartCommand:
     def Activated(self):
+        if FreeCAD.activeDocument() == None:
+            QtGui.QMessageBox.critical(
+                QtGui.QApplication.activeWindow(),
+               "No active Document error",
+               "First please open an assembly file!"
+               )
+            return
         selection = [s for s in FreeCADGui.Selection.getSelectionEx() if s.Document == FreeCAD.ActiveDocument ]
         if len(selection) == 1:
             PartMover(  FreeCADGui.activeDocument().activeView(), duplicateImportedPart( selection[0].Object ) )
+        else:
+            QtGui.QMessageBox.critical(
+                QtGui.QApplication.activeWindow(),
+               "Selection error",
+               "Before duplicating, first please select a part!"
+               )
+            
 
     def GetResources(self):
         return {
@@ -548,10 +541,24 @@ FreeCADGui.addCommand('a2p_duplicatePart', a2p_DuplicatePartCommand())
 
 class a2p_EditPartCommand:
     def Activated(self):
+        if FreeCAD.activeDocument() == None:
+            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
+                                        "No active document found!",
+                                        "Before editing a part, you have to open an assembly file."
+                                    )
+            return
         selection = [s for s in FreeCADGui.Selection.getSelection() if s.Document == FreeCAD.ActiveDocument ]
-        if len(selection) == 0:
-            a2plib.Msg("First select a part to be edited!\n")
-            return # user selected nothing!
+        if not selection:
+            msg = \
+'''
+You must select a part to edit first.
+'''
+            QtGui.QMessageBox.information(
+                QtGui.QApplication.activeWindow(),
+                "Selection Error",
+                msg
+                )
+            return
         obj = selection[0]
         FreeCADGui.Selection.clearSelection() # very imporant! Avoid Editing the assembly the part was called from!
         fileNameWithinProjectFile = a2plib.findSourceFileInProject(obj.sourceFile)
@@ -635,6 +642,14 @@ class PartMoverSelectionObserver:
 
 class a2p_MovePartCommand:
     def Activated(self):
+        if FreeCAD.activeDocument() == None:
+            QtGui.QMessageBox.critical(
+                QtGui.QApplication.activeWindow(),
+               "No active Document error",
+               "First please open an assembly file!"
+               )
+            return
+            
         selection = [s for s in FreeCADGui.Selection.getSelectionEx() if s.Document == FreeCAD.ActiveDocument ]
         if len(selection) == 1:
             PartMover(  FreeCADGui.activeDocument().activeView(), selection[0].Object )
@@ -645,8 +660,8 @@ class a2p_MovePartCommand:
         return {
             #'Pixmap' : ':/assembly2/icons/MovePart.svg',
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_MovePart.svg',
-            'MenuText': 'move',
-            'ToolTip': 'move part  ( shift+click to copy )'
+            'MenuText': 'move selected part',
+            'ToolTip': 'move selected part'
             }
 
 FreeCADGui.addCommand('a2p_movePart', a2p_MovePartCommand())
@@ -746,6 +761,12 @@ class ViewConnectionsObserver:
 
 class a2p_isolateCommand:
     def Activated(self):
+        if FreeCAD.activeDocument() == None:
+            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
+                                        "No active document found!",
+                                        "You have to open an assembly file first."
+                                    )
+            return
         selection = [s for s in FreeCADGui.Selection.getSelection() if s.Document == FreeCAD.ActiveDocument ]
         FreeCADGui.Selection.clearSelection()
         doc = FreeCAD.ActiveDocument
@@ -785,6 +806,12 @@ FreeCADGui.addCommand('a2p_isolateCommand', a2p_isolateCommand())
 
 class a2p_ToggleTransparencyCommand:
     def Activated(self, checked):
+        if FreeCAD.activeDocument() == None:
+            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
+                                        "No active document found!",
+                                        "You have to open an assembly file first."
+                                    )
+            return
         if a2plib.isTransparencyEnabled():
             a2plib.restoreTransparency()
         else:
@@ -885,7 +912,10 @@ def a2p_repairTreeView():
         parent.Label = parent.Label # trigger an update...
         if m.Proxy != None:
             m.Proxy.disable_onChanged = False
-    #
+
+    global a2p_NeedToSolveSystem
+    a2p_NeedToSolveSystem = False # Solve only once after editing a constraint's property
+
 
 toolTipMessage = \
 '''
@@ -897,10 +927,15 @@ constraints will grouped under
 corresponding parts again
 '''
 
-
 class a2p_repairTreeViewCommand:
 
     def Activated(self):
+        if FreeCAD.activeDocument() == None:
+            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
+                                        "No active document found!",
+                                        "You have to open an assembly file first."
+                                    )
+            return
         a2p_repairTreeView()
 
     def GetResources(self):
@@ -912,11 +947,15 @@ class a2p_repairTreeViewCommand:
 FreeCADGui.addCommand('a2p_repairTreeViewCommand', a2p_repairTreeViewCommand())
 
 
-
-
 class a2p_FlipConstraintDirectionCommand:
 
     def Activated(self):
+        if FreeCAD.activeDocument() == None:
+            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
+                                        "No active document found!",
+                                        "You have to open an assembly file first."
+                                    )
+            return
         a2p_FlipConstraintDirection()
 
     def GetResources(self):
@@ -932,7 +971,11 @@ def a2p_FlipConstraintDirection():
     constraints = [ obj for obj in FreeCAD.ActiveDocument.Objects 
                         if 'ConstraintInfo' in obj.Content ]
     if len(constraints) == 0:
-        QtGui.QMessageBox.information(  QtGui.qApp.activeWindow(), "Command Aborted", 'Flip aborted since no assembly2 constraints in active document.')
+        QtGui.QMessageBox.information(
+            QtGui.qApp.activeWindow(),
+            "Command Aborted", 
+            'Flip aborted since no a2p constraints in active document.'
+            )
         return
     lastConstraintAdded = constraints[-1]
     try:
@@ -947,17 +990,48 @@ def a2p_FlipConstraintDirection():
 
 
 
+class a2p_Show_Hierarchy_Command:
+
+    def Activated(self):
+        doc = FreeCAD.activeDocument()
+        if doc == None:
+            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
+                                        "No active document found!",
+                                        "You have to open an assembly file first."
+                                    )
+            return
+        ss = a2p_solversystem.SolverSystem()
+        ss.loadSystem(doc)
+        ss.assignParentship(doc)
+        ss.visualizeHierarchy()
+
+    def GetResources(self):
+        return {
+            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_treeview.svg',
+            'MenuText':     'generate HTML file with detailed constraining structure',
+            'ToolTip':      'generate HTML file with detailed constraining structure'
+            }
+FreeCADGui.addCommand('a2p_Show_Hierarchy_Command', a2p_Show_Hierarchy_Command())
+
+
+
 class a2p_Show_DOF_info_Command:
 
     def Activated(self):
+        if FreeCAD.activeDocument() == None:
+            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
+                                        "No active document found!",
+                                        "You have to open an assembly file first."
+                                    )
+            return
         ss = a2p_solversystem.SolverSystem()
         ss.DOF_info_to_console()
 
     def GetResources(self):
         return {
             'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_DOFs.svg',
-            'MenuText':     'print detailed DOF informations to console',
-            'ToolTip':      'print detailed DOF informations to console'
+            'MenuText':     'print detailed DOF information to console',
+            'ToolTip':      'print detailed DOF information to console'
             }
 FreeCADGui.addCommand('a2p_Show_DOF_info_Command', a2p_Show_DOF_info_Command())
 
