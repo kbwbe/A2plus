@@ -118,7 +118,8 @@ class SolverSystem():
 
     def getRigid(self,objectName):
         '''get a Rigid by objectName'''
-        rigs = [r for r in self.rigids if r.objectName == objectName]
+        #rigs = [r for r in self.rigids if r.objectName == objectName]
+        rigs = [r for r in self.rigids if objectName in r.objectName]
         if len(rigs) > 0: return rigs[0]
         return None
 
@@ -222,36 +223,7 @@ class SolverSystem():
         then for each linked object compile a dict where each linked object has its dof rotation
         '''
         for rig in self.rigids:   
-                     
-            #if not rig.tempfixed:  #skip already fixed objs
-
-            for linkedRig in rig.linkedRigids:
-                tmplinkedDeps = []
-                tmpLinkedPointDeps = []
-                for dep in rig.dependencies:
-                    if linkedRig==dep.dependedRigid:
-                        #be sure pointconstraints are at the end of the list
-                        if dep.isPointConstraint :
-                            tmpLinkedPointDeps.append(dep)
-                        else:
-                            tmplinkedDeps.append(dep)
-                #add at the end the point constraints
-                tmplinkedDeps.extend(tmpLinkedPointDeps) 
-                rig.depsPerLinkedRigids[linkedRig] = tmplinkedDeps
-        
-            #dofPOSPerLinkedRigid is a dict where for each 
-            for linkedRig in rig.depsPerLinkedRigids.keys():
-                linkedRig.pointConstraints = []
-                _dofPos = linkedRig.posDOF
-                _dofRot = linkedRig.rotDOF
-                for dep in rig.depsPerLinkedRigids[linkedRig]:
-                    _dofPos, _dofRot = dep.calcDOF(_dofPos,_dofRot, linkedRig.pointConstraints)
-                rig.dofPOSPerLinkedRigids[linkedRig] = _dofPos
-                rig.dofROTPerLinkedRigids[linkedRig] = _dofRot
-            
-            #ok each rigid has a dict for each linked objects,
-            #so we now know the list of linked objects and which 
-            #dof rot and pos both limits.
+            rig.retrieveDOFInfo()         
             
 
 
@@ -331,7 +303,7 @@ class SolverSystem():
             rig.prepareRestart()
         self.partialSolverCurrentStage = PARTIAL_SOLVE_STAGE1
 
-    def solveAccuracySteps(self,doc):
+    def solveAccuracySteps(self,doc,newsolver=False):
         self.level_of_accuracy=1
         self.mySOLVER_POS_ACCURACY = SOLVER_CONTROLDATA[self.level_of_accuracy][0]
         self.mySOLVER_SPIN_ACCURACY = SOLVER_CONTROLDATA[self.level_of_accuracy][1]
@@ -343,7 +315,14 @@ class SolverSystem():
         self.assignParentship(doc)
         #loadTime = int(round(time.time() * 1000))
         while True:
-            systemSolved = self.calculateChain(doc)
+            systemSolved=True
+            if newsolver:
+                #print("FirstPass")
+                systemSolved= self.calculateChain2(doc,newsolver)
+            
+            if systemSolved:
+                #print("SecondPass")
+                systemSolved = self.calculateChain(doc)
             #totalTime = int(round(time.time() * 1000))
             if systemSolved:
                 self.level_of_accuracy+=1
@@ -374,10 +353,13 @@ class SolverSystem():
             
         return systemSolved
 
-    def solveSystem(self,doc):
+    def solveSystem(self,doc,newsolver=False):
         Msg( "\n===== Start Solving System ====== \n" )
+        
+        #import sys;sys.path.append(r'C:\Users\turrini_valerio\Documents\tools\eclipse\eclipse\plugins\org.python.pydev.core_6.4.4.201807281807\pysrc')
+        #import pydevd;pydevd.settrace()
 
-        systemSolved = self.solveAccuracySteps(doc)
+        systemSolved = self.solveAccuracySteps(doc,newsolver)
         if self.status == "loadingDependencyError":
             return
         if systemSolved:
@@ -405,11 +387,12 @@ class SolverSystem():
             Msg( "{} ".format(e.label) )
         Msg("):\n")
 
-    def calculateChain(self, doc):
+    def calculateChain(self, doc, newsolver=False):
         self.stepCount = 0
         workList = []
 
         # load initial worklist with all fixed parts...
+        
         for rig in self.rigids:
             if rig.fixed:
                 workList.append(rig);
@@ -423,14 +406,38 @@ class SolverSystem():
             #self.printList("AddList", addList)
             if len(addList) > 0:
                 workList.extend(addList)
-                solutionFound = self.calculateWorkList(doc, workList)
+                solutionFound = self.calculateWorkList(doc, workList, newsolver)
                 if not solutionFound: return False
             else:
                 break
 
         return True
+    
+    
+    def calculateChain2(self, doc, newsolver=False):
+        #find fullyconstrained rigid and merge
+        self.stepCount = 0
+        workList = []
+        
+        while True:
+            somethingFound = False
+            for rig in self.rigids:
+                #addList = []
+                workList = []
+                workList.extend(rig.getCandidates2())
+                workList = list(set(workList))
+                #self.printList("AddList", addList)
+                if len(workList) > 0:
+                    somethingFound = True
+#                     workList.extend(addList)
+#                     workList=list(set(workList))
+                    solutionFound = self.calculateWorkList(doc, workList, newsolver)
+                    if not solutionFound: return False
+            if not somethingFound:
+                break
+        return True
 
-    def calculateWorkList(self, doc, workList):
+    def calculateWorkList(self, doc, workList, newsolver=False):
         reqPosAccuracy = self.mySOLVER_POS_ACCURACY
         reqSpinAccuracy = self.mySOLVER_SPIN_ACCURACY
 
@@ -463,6 +470,9 @@ class SolverSystem():
             # Perform the move
             for w in workList:
                 w.move(doc)
+#                 if newsolver and self.stepCount % 20 == 0:
+#                     w.applySolution(doc, self)
+#                     FreeCADGui.updateGui()
 
             # The accuracy is good, apply the solution to FreeCAD's objects
             if (maxPosError <= reqPosAccuracy and
@@ -470,9 +480,18 @@ class SolverSystem():
                 # The accuracy is good, we're done here
                 goodAccuracy = True
                 # Mark the rigids as tempfixed and add its constrained rigids to pending list to be processed next
+                #self.printList('WorkList ->', workList)
                 for r in workList:
                     r.applySolution(doc, self)
-                    r.tempfixed = True
+                    #FreeCADGui.updateGui()
+                    if not newsolver:
+                        r.tempfixed = True
+                
+                if newsolver:
+                    if len(workList)==2:
+                        workList[0].mergeRigid(self,workList[1])
+                    
+                        
 
             if self.convergencyCounter > SOLVER_STEPS_CONVERGENCY_CHECK:
                 if (
@@ -516,14 +535,14 @@ class SolverSystem():
             rig.applySolution(doc, self);
 
 #------------------------------------------------------------------------------
-def solveConstraints_OperationalMode( doc, cache=None ):
+def solveConstraints_OperationalMode( doc, newsolver = False, cache=None ):
     '''
     Normal solving. Parts are moved according
     required level of accuracy
     '''
     doc.openTransaction("a2p_systemSolving")
     ss = SolverSystem()
-    ss.solveSystem(doc)
+    ss.solveSystem(doc, newsolver)
     doc.commitTransaction()
 
 def solveConstraints_MoviMode( doc, cache=None ):
@@ -546,13 +565,20 @@ def solveConstraints_MoviMode( doc, cache=None ):
             FreeCADGui.updateGui()
     doc.commitTransaction()
     
-def solveConstraints( doc, cache=None ):
+def solveConstraints( doc, newsolver = False, cache=None ):
     if A2P_MOVIMODE: #visual solver testmode, some visual solversteps on screen
-        solveConstraints_MoviMode(doc, cache=None)
+        solveConstraints_MoviMode(doc, newsolver, cache=None)
     else:
-        solveConstraints_OperationalMode(doc, cache=None) #Normal solver mode
+        solveConstraints_OperationalMode(doc, newsolver, cache=None) #Normal solver mode
         #FreeCADGui.updateGui()
         #FreeCAD.activeDocument().recompute()
+        
+def newSolveConstraints( doc, cache=None ):
+    doc.openTransaction("a2p_systemSolving")
+    ss = SolverSystem()
+    ss.solveSystem(doc, True)
+    doc.commitTransaction()
+
 
 def autoSolveConstraints( doc, cache=None):
     if not a2plib.getAutoSolveState():
@@ -573,6 +599,21 @@ class a2p_SolverCommand:
             }
 
 FreeCADGui.addCommand('a2p_SolverCommand', a2p_SolverCommand())
+
+class a2p_newSolverCommand:
+    def Activated(self):
+        newSolveConstraints( FreeCAD.ActiveDocument ) #the new iterative solver
+
+    def GetResources(self):
+        return {
+            'Pixmap' : path_a2p + '/icons/a2p_solver.svg',
+            'MenuText': 'Solve with Merge + master',
+            'ToolTip': 'Solve Assembly 2 constraints Merge + Master Way'
+            }
+
+
+FreeCADGui.addCommand('a2p_newSolverCommand', a2p_newSolverCommand())
+
 #------------------------------------------------------------------------------
 
 
