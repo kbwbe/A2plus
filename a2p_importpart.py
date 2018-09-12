@@ -115,11 +115,9 @@ def getImpPartsFromDoc(doc, visibleOnly = True):
                 impPartsOut.extend(impPartList)
     return impPartsOut
 
-def filterImpPartsFC17FF(obj):
+def filterImpParts(obj):
     impPartsOut = list()
     if obj.isDerivedFrom("Sketcher::SketchObject"):
-        pass
-    elif obj.isDerivedFrom("PartDesign::Feature"):
         pass
     elif obj.isDerivedFrom("PartDesign::Body"):
         # we want bodies that are top level in the document or top level in a container(App::Part)
@@ -133,64 +131,40 @@ def filterImpPartsFC17FF(obj):
             impPartsOut.append(obj)
     elif obj.hasExtension("App::GroupExtension"):     # App::Part container.  GroupEx contents are already in list,
         pass                                          # don't need to find them
-    elif obj.isDerivedFrom("Part::Feature"):
-        if not(obj.InList):
-            plmGlobal = obj.getGlobalPlacement();
-            plmLocal  = obj.Placement;
-            if (plmGlobal != plmLocal):
-                obj.Placement = plmGlobal
-            impPartsOut.append(obj)                  # top level in within Document
-        elif (len(obj.InList) == 1) and (obj.InList[0].hasExtension("App::GroupExtension")):
-            plmGlobal = obj.getGlobalPlacement();
-            plmLocal  = obj.Placement;
-            if (plmGlobal != plmLocal):
-                obj.Placement = plmGlobal
-            impPartsOut.append(obj)                  # top level within Group
-        elif a2plib.isA2pPart(obj):                  # imported part
-            impPartsOut.append(obj)
-        else:
-            pass                                     # more odd PF cases?? BaseFeature in body??
-    else:
-        pass                                         # garbage objects - Origins, Axis, etc
-    return impPartsOut
-
-def filterImpPartsFC16(obj):
-    impPartsOut = list()
-    if obj.isDerivedFrom("Part::Feature"):
-        if not(obj.InList):
-            impPartsOut.append(obj)                  # top level in within Document
-        elif (len(obj.InList) == 1) and (obj.InList[0].hasExtension("App::GroupExtension")):
-            impPartsOut.append(obj)                  # top level within Group
-        elif a2plib.isA2pPart(obj):                  # imported part
-            impPartsOut.append(obj)
-        else:
-            pass                                     # more odd PF cases?? BaseFeature in body??
-    else:
-        pass                                         # garbage objects - Origins, Axis, etc
-    return impPartsOut
-
-def filterImpParts(obj):
-    #test, which FreeCAD version is suitable for object to import
-    if obj.isDerivedFrom("Part::Feature"):
+    elif obj.isDerivedFrom("PartDesign::Feature"):
         try:
-            tmp = obj.getGlobalPlacement()
-            return filterImpPartsFC17FF(obj)
+            plmGlobal = obj.getGlobalPlacement();
         except:
-            return filterImpPartsFC16(obj)
+            plmGlobal = obj.Placement
+        plmLocal = obj.Placement
+        if (
+            hasattr(obj,"ViewObject") and
+            obj.ViewObject.isVisible() and
+            hasattr(obj,"Shape") and
+            len(obj.Shape.Faces) > 0
+            ):
+            if plmGlobal != plmLocal:
+                obj.Placement = plmGlobal
+            impPartsOut.append(obj)
+    elif obj.isDerivedFrom("Part::Feature"):
+        plmGlobal = obj.Placement
+        try:
+            plmGlobal = obj.getGlobalPlacement();
+        except:
+            pass
+        if not(obj.InList):
+            obj.Placement = plmGlobal
+            impPartsOut.append(obj)                  # top level in within Document
+        elif (len(obj.InList) == 1) and (obj.InList[0].hasExtension("App::GroupExtension")):
+            obj.Placement = plmGlobal
+            impPartsOut.append(obj)                  # top level within Group
+        elif a2plib.isA2pPart(obj):                  # imported part
+            impPartsOut.append(obj)
+        else:
+            pass                                     # more odd PF cases?? BaseFeature in body??
     else:
-        return filterImpPartsFC17FF(obj)
-
-'''
-def filterImpParts(obj):
-    #test, which FreeCAD version is suitable for object to import
-    try:
-        tmp = obj.getGlobalPlacement()
-        return filterImpPartsFC17FF(obj)
-    except:
-        return filterImpPartsFC16(obj)
-'''
-
-
+        pass                                         # garbage objects - Origins, Axis, etc
+    return impPartsOut
 
 def importPartFromFile(_doc, filename, importToCache=False):
     doc = _doc
