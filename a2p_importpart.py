@@ -132,20 +132,23 @@ def filterImpParts(obj):
     elif obj.hasExtension("App::GroupExtension"):     # App::Part container.  GroupEx contents are already in list,
         pass                                          # don't need to find them
     elif obj.isDerivedFrom("PartDesign::Feature"):
-        try:
-            plmGlobal = obj.getGlobalPlacement();
-        except:
-            plmGlobal = obj.Placement
-        plmLocal = obj.Placement
-        if (
-            hasattr(obj,"ViewObject") and
-            obj.ViewObject.isVisible() and
-            hasattr(obj,"Shape") and
-            len(obj.Shape.Faces) > 0
-            ):
-            if plmGlobal != plmLocal:
-                obj.Placement = plmGlobal
-            impPartsOut.append(obj)
+        if not obj.getParentGeoFeatureGroup():        # this is v016 PD::F.  017+ would have PGFG = Body
+            if ((not obj.InList) or
+               ((len(obj.InList) == 1) and (hasattr(obj.InList[0], "Group")))):  # not part of any other object
+                try:
+                    plmGlobal = obj.getGlobalPlacement();
+                except:
+                    plmGlobal = obj.Placement
+                plmLocal = obj.Placement
+                if (
+                    hasattr(obj,"ViewObject") and
+                    obj.ViewObject.isVisible() and
+                    hasattr(obj,"Shape") and
+                    len(obj.Shape.Faces) > 0
+                    ):
+                    if plmGlobal != plmLocal:
+                        obj.Placement = plmGlobal
+                    impPartsOut.append(obj)
     elif obj.isDerivedFrom("Part::Feature"):
         plmGlobal = obj.Placement
         try:
