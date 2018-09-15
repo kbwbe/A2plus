@@ -26,7 +26,12 @@ import FreeCADGui,FreeCAD
 from PySide import QtGui, QtCore
 import os, copy, time, sys
 import a2plib
-from a2p_MuxAssembly import muxObjectsWithKeys, createTopoInfo, Proxy_muxAssemblyObj
+from a2p_MuxAssembly import (
+    muxObjectsWithKeys,
+    createTopoInfo,
+    Proxy_muxAssemblyObj,
+    makePlacedShape
+    )
 from a2p_viewProviderProxies import *
 from a2p_versionmanagement import SubAssemblyWalk, A2P_VERSION
 import a2p_solversystem
@@ -124,10 +129,6 @@ def filterImpParts(obj):
         # we don't want bodies that are inside other bodies.
         if ((not(obj.InList)) or  \
             ((len(obj.InList) == 1) and (obj.InList[0].hasExtension("App::GroupExtension")))):  #top of group
-            plmGlobal = obj.getGlobalPlacement();
-            plmLocal  = obj.Placement;
-            if (plmGlobal != plmLocal):
-                obj.Placement = plmGlobal             # should obj be a copy here?  not in orig doc - maybe no problem?
             impPartsOut.append(obj)
     elif obj.hasExtension("App::GroupExtension"):     # App::Part container.  GroupEx contents are already in list,
         pass                                          # don't need to find them
@@ -135,31 +136,17 @@ def filterImpParts(obj):
         if not obj.getParentGeoFeatureGroup():        # this is v016 PD::F.  017+ would have PGFG = Body
             if ((not obj.InList) or
                ((len(obj.InList) == 1) and (hasattr(obj.InList[0], "Group")))):  # not part of any other object
-                try:
-                    plmGlobal = obj.getGlobalPlacement();
-                except:
-                    plmGlobal = obj.Placement
-                plmLocal = obj.Placement
                 if (
                     hasattr(obj,"ViewObject") and
                     obj.ViewObject.isVisible() and
                     hasattr(obj,"Shape") and
                     len(obj.Shape.Faces) > 0
                     ):
-                    if plmGlobal != plmLocal:
-                        obj.Placement = plmGlobal
                     impPartsOut.append(obj)
     elif obj.isDerivedFrom("Part::Feature"):
-        plmGlobal = obj.Placement
-        try:
-            plmGlobal = obj.getGlobalPlacement();
-        except:
-            pass
         if not(obj.InList):
-            obj.Placement = plmGlobal
-            impPartsOut.append(obj)                  # top level in within Document
+            impPartsOut.append(obj)                  # top levelwithin Document
         elif (len(obj.InList) == 1) and (obj.InList[0].hasExtension("App::GroupExtension")):
-            obj.Placement = plmGlobal
             impPartsOut.append(obj)                  # top level within Group
         elif a2plib.isA2pPart(obj):                  # imported part
             impPartsOut.append(obj)
@@ -251,7 +238,7 @@ def importPartFromFile(_doc, filename, importToCache=False):
         #newObj.muxInfo, newObj.Shape = muxObjectsWithKeys(importDoc, withColor=False)
     else:
         tmpObj = importableObjects[0]
-        newObj.Shape = tmpObj.Shape.copy()
+        newObj.Shape = makePlacedShape(tmpObj)
         newObj.ViewObject.ShapeColor = tmpObj.ViewObject.ShapeColor
         if appVersionStr() <= '000.016': #FC0.17: DiffuseColor overrides ShapeColor !
             newObj.ViewObject.DiffuseColor = tmpObj.ViewObject.DiffuseColor

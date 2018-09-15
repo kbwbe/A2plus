@@ -40,6 +40,17 @@ class Proxy_muxAssemblyObj:
 def createTopoInfo(obj): #deactivated at moment...
     return []
 
+def makePlacedShape(obj):
+    '''return a copy of obj.Shape with proper placement applied'''
+    tempShape = obj.Shape.copy()
+    plmGlobal = obj.Placement
+    try:
+        plmGlobal = obj.getGlobalPlacement();
+    except:
+        pass
+    tempShape.Placement = plmGlobal
+    return tempShape
+
 def muxObjectsWithKeys(objsIn, withColor=False):
     '''
     combines all the objects in objsIn into one shape,
@@ -54,9 +65,10 @@ def muxObjectsWithKeys(objsIn, withColor=False):
         colorFlag = ( len(obj.ViewObject.DiffuseColor) < len(obj.Shape.Faces) )
         shapeCol = obj.ViewObject.ShapeColor
         diffuseCol = obj.ViewObject.DiffuseColor
+        tempShape = makePlacedShape(obj)
 
         # now start the loop with use of the stored values..(much faster)
-        for i, face in enumerate(obj.Shape.Faces):
+        for i, face in enumerate(tempShape.Faces):
             faces.append(face)
             DebugMsg(A2P_DEBUG_3,"a2p MUX: i(Faces)={}\n{}\n".format(i,face))
 
