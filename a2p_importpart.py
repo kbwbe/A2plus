@@ -147,6 +147,7 @@ def filterImpParts(obj):
         if not(obj.InList):
             impPartsOut.append(obj)                  # top levelwithin Document
         elif (len(obj.InList) == 1) and (obj.InList[0].hasExtension("App::GroupExtension")):
+            obj.Placement = plmGlobal
             impPartsOut.append(obj)                  # top level within Group
         elif a2plib.isA2pPart(obj):                  # imported part
             impPartsOut.append(obj)
@@ -155,7 +156,6 @@ def filterImpParts(obj):
     else:
         pass                                         # garbage objects - Origins, Axis, etc
     return impPartsOut
-
 
 def importPartFromFile(_doc, filename, importToCache=False):
     doc = _doc
