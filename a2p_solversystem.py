@@ -417,8 +417,17 @@ class SolverSystem():
 
         while True:
             addList = []
+            newRigFound = False
             for rig in workList:
-                addList.extend(rig.getCandidates())
+                for linkedRig in rig.linkedRigids:
+                    if linkedRig in workList: continue
+                    if rig.isFullyConstrainedByRigid(linkedRig):
+                        addList.append(linkedRig)
+                        newRigFound = True
+                        break
+            if not newRigFound:
+                for rig in workList:
+                    addList.extend(rig.getCandidates())
             addList = set(addList)
             #self.printList("AddList", addList)
             if len(addList) > 0:
