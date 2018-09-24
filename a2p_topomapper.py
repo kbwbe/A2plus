@@ -40,6 +40,7 @@ Usage: start "a2p_toponamer.py" as makro ATM
 
 import FreeCAD, FreeCADGui, Part
 from FreeCAD import Base
+import a2plib
 
 def filterShapeObs(_list):
     lst = []
@@ -67,6 +68,7 @@ class BodyTopoMapper(object):
         self.setupVertexDict()
         self.setupVertexNames()
         self.setupEdgeDict()
+        self.setupEdgeNames()
         
     def calcVertexKey(self,vertex):
         '''
@@ -83,9 +85,34 @@ class BodyTopoMapper(object):
             key += keyPartial
         return key
     
-    def calcEdgeKeys(self,edge):
-        pass
-
+    def calcAxisKey(self,axis):
+        '''
+        create a unique key defined by axis-direction
+        '''
+        coords = (
+            axis.x,
+            axis.y,
+            axis.z
+            )
+        key = ''
+        for value in coords:
+            keyPartial = "%012.9f;" % value
+            key += keyPartial
+        return key
+    
+    def setupEdgeNames(self):
+        feature = self.shapeSequence[-1]
+        self.edgeNames = []
+        print ("=== index/edgeName Map of last feature ===")
+        for i,edge in enumerate(feature.Shape.Edges):
+            edgeKeys = self.calcEdgeKeys(edge)
+            for edgeKey in edgeKeys:
+                edgeName = self.edgeNameDict.get(edgeKey,None)
+                if edgeName != None:
+                    self.edgeNames.append(edgeName)
+                    print(str(i+1)+' '+edgeName)
+                    break
+            
     def setupVertexNames(self):
         feature = self.shapeSequence[-1]
         self.vertexNames = []
@@ -96,17 +123,49 @@ class BodyTopoMapper(object):
             self.vertexNames.append(vertexName)
             print(str(i+1)+' '+vertexName)
             
+    def calcEdgeKeys(self,edge):
+        keys = []
+        endPoint1 = edge.Vertexes[0]
+        endPoint2 = edge.Vertexes[-1]
+        direction1 = endPoint2.Point.sub(endPoint1.Point)
+        direction2 = endPoint1.Point.sub(endPoint2.Point)
+        try:
+            direction1.normalize()
+            direction2.normalize()
+        except:
+            pass
+        keys.append(
+            self.calcVertexKey(endPoint1)+self.calcAxisKey(direction1)
+            )
+        keys.append(
+            self.calcVertexKey(endPoint2)+self.calcAxisKey(direction2)
+            )
+        return keys
+            
+
+
     def setupEdgeDict(self):
         totalNumEdges = 0
         for feature in self.shapeSequence:
             numNewlyCreatedEdges = len(feature.Shape.Edges) - totalNumEdges
-            totalNumEdges = len(feature.Shape.Vertexes)
+            totalNumEdges = len(feature.Shape.Edges)
             edgeNamePrefix = self.body.Name + ';' + feature.Name + ';'
             edgeNameSuffix = str(numNewlyCreatedEdges)
             i = 0 # do not enumerate the following, count new vertexes !
             for edge in feature.Shape.Edges:
                 edgeKeys = self.calcEdgeKeys(edge) # usually more than one key per edge
                 edgeName = edgeNamePrefix + str(i) + ';' + edgeNameSuffix
+                i+=1
+                entryFound=False
+                for k in edgeKeys:
+                    tmp = self.edgeNameDict.get(k,False)
+                    if tmp != False:
+                        entryFound = True
+                        break
+                if not entryFound:
+                    for k in edgeKeys:
+                        self.edgeNameDict[k] = edgeName
+                
 
     def setupVertexDict(self):
         totalNumVertexes = 0
