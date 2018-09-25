@@ -70,15 +70,26 @@ class BodyTopoMapper(object):
         self.setupEdgeDict()
         self.setupEdgeNames()
         
-    def calcVertexKey(self,vertex):
+    def calcFloatKey(self,val):
+            return "%014.3f;" % val
+        
+    def calcVertexKey(self,inOb):
         '''
-        create a unique key defined by vertex-position
+        create a unique key defined by vertex-position,
+        accepts also vectors as input
         '''
-        coords = (
-            vertex.Point.x,
-            vertex.Point.y,
-            vertex.Point.z
-            )
+        try:
+            coords = (
+                inOb.Point.x,
+                inOb.Point.y,
+                inOb.Point.z
+                )
+        except:
+            coords = (
+                inOb.x,
+                inOb.y,
+                inOb.z,
+                )
         key = ''
         for value in coords:
             keyPartial = "%014.3f;" % value
@@ -101,8 +112,9 @@ class BodyTopoMapper(object):
         return key
     
     def setupEdgeNames(self):
-        feature = self.shapeSequence[-1]
         self.edgeNames = []
+        if len(self.shapeSequence) == 0: return
+        feature = self.shapeSequence[-1]
         print ("=== index/edgeName Map of last feature ===")
         for i,edge in enumerate(feature.Shape.Edges):
             edgeKeys = self.calcEdgeKeys(edge)
@@ -114,8 +126,9 @@ class BodyTopoMapper(object):
                     break
             
     def setupVertexNames(self):
-        feature = self.shapeSequence[-1]
         self.vertexNames = []
+        if len(self.shapeSequence) == 0: return
+        feature = self.shapeSequence[-1]
         print ("=== index/VertexName Map of last feature ===")
         for i,vertex in enumerate(feature.Shape.Vertexes):
             vertexKey = self.calcVertexKey(vertex)
@@ -125,24 +138,34 @@ class BodyTopoMapper(object):
             
     def calcEdgeKeys(self,edge):
         keys = []
-        endPoint1 = edge.Vertexes[0]
-        endPoint2 = edge.Vertexes[-1]
-        direction1 = endPoint2.Point.sub(endPoint1.Point)
-        direction2 = endPoint1.Point.sub(endPoint2.Point)
-        try:
-            direction1.normalize()
-            direction2.normalize()
-        except:
-            pass
-        keys.append(
-            self.calcVertexKey(endPoint1)+self.calcAxisKey(direction1)
-            )
-        keys.append(
-            self.calcVertexKey(endPoint2)+self.calcAxisKey(direction2)
-            )
-        return keys
-            
 
+        if hasattr(edge.Curve,'Axis'): #circular edge
+            keys.append(
+                'CIRC;'+
+                self.calcVertexKey(edge.Curve.Center)+
+                self.calcAxisKey(edge.Curve.Axis)+
+                self.calcFloatKey(edge.Curve.Radius)
+                )
+        else:
+            endPoint1 = edge.Vertexes[0]
+            endPoint2 = edge.Vertexes[-1]
+            direction1 = endPoint2.Point.sub(endPoint1.Point)
+            direction2 = endPoint1.Point.sub(endPoint2.Point)
+            try:
+                direction1.normalize()
+                direction2.normalize()
+            except:
+                pass
+            keys.append(
+                self.calcVertexKey(endPoint1)+
+                self.calcAxisKey(direction1)
+                )
+            keys.append(
+                self.calcVertexKey(endPoint2)+
+                self.calcAxisKey(direction2)
+                )
+            
+        return keys
 
     def setupEdgeDict(self):
         totalNumEdges = 0
@@ -154,17 +177,20 @@ class BodyTopoMapper(object):
             i = 0 # do not enumerate the following, count new vertexes !
             for edge in feature.Shape.Edges:
                 edgeKeys = self.calcEdgeKeys(edge) # usually more than one key per edge
-                edgeName = edgeNamePrefix + str(i) + ';' + edgeNameSuffix
-                i+=1
                 entryFound=False
+                # if one key matches, it is the old edge name
                 for k in edgeKeys:
                     tmp = self.edgeNameDict.get(k,False)
                     if tmp != False:
                         entryFound = True
                         break
                 if not entryFound:
-                    for k in edgeKeys:
-                        self.edgeNameDict[k] = edgeName
+                    edgeName = edgeNamePrefix + str(i) + ';' + edgeNameSuffix
+                    i+=1
+                else:
+                    edgeName = tmp # the old edge name...
+                for k in edgeKeys:
+                    self.edgeNameDict[k] = edgeName
                 
 
     def setupVertexDict(self):
