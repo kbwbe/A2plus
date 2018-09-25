@@ -25,14 +25,18 @@
 Experimental mapper for a2p related topological naming.
 
 Recent capabilities:
-- create unique toponame for each vertex in a single body document
+- create unique toponame for each vertex in a single body
+- create unique toponame for each edge in a single body
 
 Work in progress:
-- create unique toponame for each edge in a single body document
+- create unique toponame for each face in a single body
 
 Issues: globalPlacement ignored ATM
 
-Usage: start "a2p_toponamer.py" as makro ATM
+Usage: 
+- open fc document with a single body inside
+- execute "a2p_toponamer.py" as makro ATM
+- look at console output for created toponames
 '''
 
 
@@ -63,12 +67,15 @@ class BodyTopoMapper(object):
         self.vertexNames = []
         self.edgeNameDict = {}
         self.edgeNames = []
+        self.faceNameDict = {}
+        self.faceNames = []
         #
         self.calcShapeSequence()
         self.setupVertexDict()
         self.setupVertexNames()
         self.setupEdgeDict()
         self.setupEdgeNames()
+        self.setupFaceDict()
         
     def calcFloatKey(self,val):
             return "%014.3f;" % val
@@ -167,6 +174,44 @@ class BodyTopoMapper(object):
             
         return keys
 
+    def calcFaceKeys(self,face):
+        keys = []
+        # A sphere...
+        if str( face.Surface ).startswith('Sphere'):
+            keys.append(
+                'SPH;'+
+                self.calcVertexKey(face.Surface.Center)+
+                self.calcFloatKey(face.Surface.Radius)
+                )
+        # a cylindric face...
+        elif all( hasattr(face.Surface,a) for a in ['Axis','Center','Radius'] ):
+            axisKey = self.calcAxisKey(face.Surface.Axis)
+            radiusKey = self.calcFloatKey(face.Surface.Radius)
+            for v in face.Vertexes:
+                keys.append(
+                    'CYL;'+
+                    self.calcVertexKey(v)+
+                    axisKey+
+                    radiusKey
+                    )
+        elif str( face.Surface ) == '<Plane object>':
+            pt = face.Vertexes[0].Point
+            uv=face.Surface.parameter(pt)
+            u=uv[0]
+            v=uv[1]
+            normal=face.normalAt(u,v)
+            normalKey = self.calcAxisKey(normal)
+            for v in face.Vertexes:
+                keys.append(
+                    'PLANE;'+
+                    self.calcVertexKey(v)+
+                    normalKey
+                    )
+        else:
+            keys.append("NOTRACE")
+
+        return keys #FIXME
+
     def setupEdgeDict(self):
         totalNumEdges = 0
         for feature in self.shapeSequence:
@@ -174,7 +219,7 @@ class BodyTopoMapper(object):
             totalNumEdges = len(feature.Shape.Edges)
             edgeNamePrefix = self.body.Name + ';' + feature.Name + ';'
             edgeNameSuffix = str(numNewlyCreatedEdges)
-            i = 0 # do not enumerate the following, count new vertexes !
+            i = 0 # do not enumerate the following, count new Edges !
             for edge in feature.Shape.Edges:
                 edgeKeys = self.calcEdgeKeys(edge) # usually more than one key per edge
                 entryFound=False
@@ -191,6 +236,31 @@ class BodyTopoMapper(object):
                     edgeName = tmp # the old edge name...
                 for k in edgeKeys:
                     self.edgeNameDict[k] = edgeName
+                
+    def setupFaceDict(self):
+        totalNumFaces = 0
+        for feature in self.shapeSequence:
+            numNewlyCreatedFaces = len(feature.Shape.Faces) - totalNumFaces
+            totalNumFaces = len(feature.Shape.Faces)
+            faceNamePrefix = self.body.Name + ';' + feature.Name + ';'
+            faceNameSuffix = str(numNewlyCreatedFaces)
+            i = 0 # do not enumerate the following, count new Faces !
+            for face in feature.Shape.Faces:
+                faceKeys = self.calcFaceKeys(face) # usually more than one key per face
+                entryFound=False
+                # if one key matches, it is the old face name
+                for k in faceKeys:
+                    tmp = self.faceNameDict.get(k,False)
+                    if tmp != False:
+                        entryFound = True
+                        break
+                if not entryFound:
+                    faceName = faceNamePrefix + str(i) + ';' + faceNameSuffix
+                    i+=1
+                else:
+                    faceName = tmp # the old face name...
+                for k in faceKeys:
+                    self.faceNameDict[k] = faceName
                 
 
     def setupVertexDict(self):

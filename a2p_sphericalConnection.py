@@ -31,7 +31,7 @@ class SphericalSurfaceSelectionGate:
     def allow(self, doc, obj, sub):
         if sub.startswith('Face'):
             face = getObjectFaceFromName( obj, sub)
-            return str( face.Surface ).startswith('Sphere ')
+            return str( face.Surface ).startswith('Sphere')
         elif sub.startswith('Vertex'):
             return True
         else:
