@@ -76,6 +76,7 @@ class BodyTopoMapper(object):
         self.setupEdgeDict()
         self.setupEdgeNames()
         self.setupFaceDict()
+        self.setupFaceNames()
         
     def calcFloatKey(self,val):
             return "%014.3f;" % val
@@ -142,6 +143,23 @@ class BodyTopoMapper(object):
             vertexName = self.vertexNameDict[vertexKey]
             self.vertexNames.append(vertexName)
             print(str(i+1)+' '+vertexName)
+            
+    def setupFaceNames(self):
+        self.faceNames = []
+        if len(self.shapeSequence) == 0: return
+        feature = self.shapeSequence[-1]
+        print ("=== index/faceName Map of last feature ===")
+        for i,face in enumerate(feature.Shape.Faces):
+            faceKeys = self.calcFaceKeys(face)
+            for faceKey in faceKeys:
+                faceName = self.faceNameDict.get(faceKey,None)
+                if faceName != None:
+                    self.faceNames.append(faceName)
+                    print(str(i+1)+' '+faceName)
+                    break
+                else:
+                    self.faceNames.append("None")
+                    print(str(i+1)+" None")
             
     def calcEdgeKeys(self,edge):
         keys = []
