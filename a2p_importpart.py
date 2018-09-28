@@ -24,7 +24,7 @@
 
 import FreeCADGui,FreeCAD
 from PySide import QtGui, QtCore
-import os, copy, time, sys
+import os, copy, time, sys, platform
 import a2plib
 from a2p_MuxAssembly import (
     muxObjectsWithKeys,
@@ -45,6 +45,7 @@ from a2plib import (
     A2P_DEBUG_2,
     A2P_DEBUG_3
     )
+from macpath import normpath
 
 PYVERSION =  sys.version_info[0]
 
@@ -221,7 +222,16 @@ def importPartFromFile(_doc, filename, importToCache=False):
 
 
     newObj.addProperty("App::PropertyString", "a2p_Version","importPart").a2p_Version = A2P_VERSION
-    newObj.addProperty("App::PropertyFile",    "sourceFile",    "importPart").sourceFile = filename
+    
+    assemblyPath = os.path.normpath(os.path.split(doc.FileName)[0])
+    filePath = os.path.normpath(filename)
+    if platform.system() == "Windows":
+        prefix = '.\\'
+    else:
+        prefix = './'
+    relativePath = prefix+os.path.relpath(filePath, assemblyPath)
+    newObj.addProperty("App::PropertyFile",    "sourceFile",    "importPart").sourceFile = relativePath
+    
     newObj.addProperty("App::PropertyStringList","muxInfo","importPart")
     newObj.addProperty("App::PropertyFloat", "timeLastImport","importPart")
     newObj.setEditorMode("timeLastImport",1)
@@ -255,7 +265,7 @@ def importPartFromFile(_doc, filename, importToCache=False):
 #        newObj.ViewObject.DiffuseColor = newObj.ViewObject.DiffuseColor
 
     if importToCache:
-        objectCache.add(newObj.sourceFile, newObj)
+        objectCache.add(filename, newObj)
 
     if not importDocIsOpen:
         FreeCAD.closeDocument(importDoc.Name)
@@ -273,12 +283,27 @@ class a2p_ImportPartCommand():
                 }
 
     def Activated(self):
+        #
         if FreeCAD.ActiveDocument == None:
-            FreeCAD.newDocument()
+            QtGui.QMessageBox.information(
+                QtGui.QApplication.activeWindow(),
+               "No active Document found",
+               '''First create an empty file and\nsave it under desired name'''
+               )
+            return
+        #
+        if FreeCAD.ActiveDocument.FileName == '':
+            QtGui.QMessageBox.information(
+                QtGui.QApplication.activeWindow(),
+               "Unnamed document",
+               '''Before inserting first part,\nplease save the empty assembly\nto give it a name'''
+               )
+            return
+        
         doc = FreeCAD.activeDocument()
         guidoc = FreeCADGui.activeDocument()
         view = guidoc.activeView()
-
+        
         dialog = QtGui.QFileDialog(
             QtGui.QApplication.activeWindow(),
             "Select FreeCAD document to import part from"
@@ -365,10 +390,9 @@ def updateImportedParts(doc):
             if not hasattr( obj, 'muxInfo'):
                 obj.addProperty("App::PropertyStringList","muxInfo","importPart").muxInfo = []
 
-            if a2plib.USE_PROJECTFILE:
-                replacement = a2plib.findSourceFileInProject(obj.sourceFile) # work in any case with files within projectFolder!
-            else:
-                replacement = obj.sourceFile
+            oldSourceFile = obj.sourceFile # save for later restoring...
+            assemblyPath = os.path.normpath(os.path.split(doc.FileName)[0])
+            replacement = a2plib.findSourceFileInProject(obj.sourceFile, assemblyPath)
 
             if replacement == None:
                 QtGui.QMessageBox.critical(  QtGui.QApplication.activeWindow(),
@@ -380,7 +404,7 @@ def updateImportedParts(doc):
                                         )
             else:
                 obj.sourceFile = replacement # update Filepath, perhaps location changed !
-
+                
             if os.path.exists( obj.sourceFile ):
                 newPartCreationTime = os.path.getmtime( obj.sourceFile )
                 DebugMsg(A2P_DEBUG_3,"a2p updateImportedParts: newPartCreationTime: {}\n".format(newPartCreationTime))
@@ -403,6 +427,7 @@ def updateImportedParts(doc):
                     obj.ViewObject.DiffuseColor = copy.copy(newObject.ViewObject.DiffuseColor)
                     obj.ViewObject.Transparency = newObject.ViewObject.Transparency
                     obj.Placement = savedPlacement # restore the old placement
+                obj.sourceFile = oldSourceFile # restore the old path (relative/absolute)
 
     mw = FreeCADGui.getMainWindow()
     mdi = mw.findChild(QtGui.QMdiArea)
@@ -506,7 +531,8 @@ FreeCADGui.addCommand('a2p_duplicatePart', a2p_DuplicatePartCommand())
 
 class a2p_EditPartCommand:
     def Activated(self):
-        if FreeCAD.activeDocument() == None:
+        doc = FreeCAD.activeDocument()
+        if doc == None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
                                         "No active document found!",
                                         "Before editing a part, you have to open an assembly file."
@@ -525,8 +551,9 @@ You must select a part to edit first.
                 )
             return
         obj = selection[0]
-        FreeCADGui.Selection.clearSelection() # very imporant! Avoid Editing the assembly the part was called from!
-        fileNameWithinProjectFile = a2plib.findSourceFileInProject(obj.sourceFile)
+        FreeCADGui.Selection.clearSelection() # very important! Avoid Editing the assembly the part was called from!
+        assemblyPath = os.path.normpath(os.path.split(doc.FileName)[0])
+        fileNameWithinProjectFile = a2plib.findSourceFileInProject(obj.sourceFile, assemblyPath)
         if fileNameWithinProjectFile == None:
             msg = \
 '''
@@ -956,7 +983,6 @@ def a2p_FlipConstraintDirection():
 
 
 class a2p_Show_Hierarchy_Command:
-
     def Activated(self):
         doc = FreeCAD.activeDocument()
         if doc == None:
@@ -981,7 +1007,6 @@ FreeCADGui.addCommand('a2p_Show_Hierarchy_Command', a2p_Show_Hierarchy_Command()
 
 
 class a2p_Show_DOF_info_Command:
-
     def Activated(self):
         if FreeCAD.activeDocument() == None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
@@ -999,6 +1024,40 @@ class a2p_Show_DOF_info_Command:
             'ToolTip':      'print detailed DOF information to console'
             }
 FreeCADGui.addCommand('a2p_Show_DOF_info_Command', a2p_Show_DOF_info_Command())
+
+
+
+class a2p_absPath_to_relPath_Command:
+    def Activated(self):
+        doc = FreeCAD.activeDocument()
+        if doc == None:
+            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
+                                        "No active document found!",
+                                        "You have to open an assembly file first."
+                                    )
+            return
+        assemblyPath = os.path.normpath(  os.path.split( os.path.normpath(doc.FileName) )[0])
+        importParts = [ob for ob in doc.Objects if "mportPart" in ob.Content]
+        for iPart in importParts:
+            if (
+                iPart.sourceFile.startswith("./") or
+                iPart.sourceFile.startswith("../") or
+                iPart.sourceFile.startswith(".\\") or
+                iPart.sourceFile.startswith("..\\")
+                ): continue # path is already relative
+            filePath = os.path.normpath(iPart.sourceFile)
+            if platform.system() == "Windows":
+                prefix = '.\\'
+            else:
+                prefix = './'
+            iPart.sourceFile = prefix + os.path.relpath(filePath, assemblyPath)
+            
+    def GetResources(self):
+        return {
+            'MenuText':     'convert absolute pathes of importParts to relative ones',
+            'ToolTip':      'convert absolute pathes of importParts to relative ones'
+            }
+FreeCADGui.addCommand('a2p_absPath_to_relPath_Command', a2p_absPath_to_relPath_Command())
 
 
 

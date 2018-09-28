@@ -172,16 +172,36 @@ def getProjectFolder():
     return preferences.GetString('projectFolder', '~')
 
 #------------------------------------------------------------------------------
-def findSourceFileInProject(fullPath):
+def findSourceFileInProject(pathImportPart, assemblyPath):
     '''
     #------------------------------------------------------------------------------------
-    # function to find filename in projectFolder
-    # The path stored in an imported Part will be ignored
-    # Assemblies will become better movable in filesystem...
+    # interprete the sourcefile name of imported part
+    # if working with preference "useProjectFolder:
+    # - path of sourcefile is ignored
+    # - filename is looked up beneath projectFolder
+    #
+    # if not working with preference "useProjectFolder":
+    # - path of sourcefile is checked for being relative to assembly or absolute
+    # - path is interpreted in appropiate way
     #------------------------------------------------------------------------------------
     '''
     preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
-    if not preferences.GetBool('useProjectFolder', False): return fullPath
+    if not preferences.GetBool('useProjectFolder', False): 
+        # not working with useProjectFolder preference,
+        # check wether path is relative or absolute...
+        if (
+            pathImportPart.startswith('../') or
+            pathImportPart.startswith('..\\') or
+            pathImportPart.startswith('./') or
+            pathImportPart.startswith('.\\')
+            ):
+            # relative path
+            # calculate the absolute path
+            absolutePath = os.path.normpath(  os.path.join(assemblyPath,pathImportPart) )
+            return absolutePath
+        else:
+            #absolute path
+            return pathImportPart
 
     def findFile(name, path):
         for root, dirs, files in os.walk(path):
@@ -189,7 +209,24 @@ def findSourceFileInProject(fullPath):
                 return os.path.join(root, name)
 
     projectFolder = os.path.abspath(getProjectFolder()) # get normalized path
-    fileName = os.path.basename(fullPath)
+    fileName = os.path.basename(pathImportPart)
+    retval = findFile(fileName,projectFolder)
+    return retval
+
+#------------------------------------------------------------------------------
+def findInProject(pathImportPart):
+    '''
+    #------------------------------------------------------------------------------------
+    # function to find filename only in/beneath projectFolder
+    #------------------------------------------------------------------------------------
+    '''
+    def findFile(name, path):
+        for root, dirs, files in os.walk(path):
+            if name in files:
+                return os.path.join(root, name)
+
+    projectFolder = os.path.abspath(getProjectFolder()) # get normalized path
+    fileName = os.path.basename(pathImportPart)
     retval = findFile(fileName,projectFolder)
     return retval
 
@@ -198,7 +235,13 @@ def checkFileIsInProjectFolder(path):
     preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
     if not preferences.GetBool('useProjectFolder', False): return True
 
-    nameInProject = findSourceFileInProject(path)
+    nameInProject = findInProject(path)
+    print(
+        "path: {} nameInProject: {}".format(
+            path,
+            nameInProject
+            )
+        )
     if nameInProject == path:
         return True
     else:
