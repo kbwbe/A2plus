@@ -77,14 +77,12 @@ class ImportedPartViewProviderProxy:
         return None
 
     def attach(self, vobj):
-        default = coin.SoGroup()
-        vobj.addDisplayMode(default, "Standard")
         self.object_Name = vobj.Object.Name
         self.Object = vobj.Object
-        
 
     def setupContextMenu(self, ViewObject, popup_menu):
         pass
+
 
 class PopUpMenuItem:
     def __init__( self, proxy, menu, label, Freecad_cmd ):
@@ -127,6 +125,7 @@ class ConstraintViewProviderProxy:
     def getIcon(self):
         return self.iconPath
 
+#WF: next 3 methods not required
     def attach(self, vobj): #attach to what document?
         vobj.addDisplayMode( coin.SoGroup(),"Standard" )
 
@@ -167,6 +166,7 @@ class ConstraintMirrorViewProviderProxy:
     def getIcon(self):
         return self.iconPath
 
+#WF: next 3 methods not required
     def attach(self, vobj):
         vobj.addDisplayMode( coin.SoGroup(),"Standard" )
 
@@ -308,3 +308,4 @@ class ConstraintMirrorObjectProxy:
                         setattr( constraintObj, prop, getattr( obj, prop) )
                 except:
                     pass #loading issues...
+
