@@ -386,11 +386,10 @@ def updateImportedParts(doc):
             if not hasattr( obj, 'muxInfo'):
                 obj.addProperty("App::PropertyStringList","muxInfo","importPart").muxInfo = []
 
-            oldSourceFile = obj.sourceFile # save for later restoring...
             assemblyPath = os.path.normpath(os.path.split(doc.FileName)[0])
-            replacement = a2plib.findSourceFileInProject(obj.sourceFile, assemblyPath)
+            absPath = a2plib.findSourceFileInProject(obj.sourceFile, assemblyPath)
 
-            if replacement == None:
+            if absPath == None:
                 QtGui.QMessageBox.critical(  QtGui.QApplication.activeWindow(),
                                             "Source file not found",
                                             "update of {} aborted!\nUnable to find {}".format(
@@ -398,19 +397,17 @@ def updateImportedParts(doc):
                                                 obj.sourceFile
                                                 )
                                         )
-            else:
-                obj.sourceFile = replacement # update Filepath, perhaps location changed !
 
-            if os.path.exists( obj.sourceFile ):
-                newPartCreationTime = os.path.getmtime( obj.sourceFile )
+            if os.path.exists( absPath ):
+                newPartCreationTime = os.path.getmtime( absPath )
                 DebugMsg(A2P_DEBUG_3,"a2p updateImportedParts: newPartCreationTime: {}\n".format(newPartCreationTime))
                 DebugMsg(A2P_DEBUG_3,"a2p updateImportedParts: obj.timeLastImport:  {}\n".format(obj.timeLastImport))
                 if ( newPartCreationTime >= obj.timeLastImport or    # changed behaviour to allow refresh ondemand
                     obj.a2p_Version != A2P_VERSION
                     ):
-                    if not objectCache.isCached(obj.sourceFile): # Load every changed object one time to cache
-                        importPartFromFile(doc, obj.sourceFile, importToCache=True) # the version is now in the cache
-                    newObject = objectCache.get(obj.sourceFile)
+                    if not objectCache.isCached(absPath): # Load every changed object one time to cache
+                        importPartFromFile(doc, absPath, importToCache=True) # the version is now in the cache
+                    newObject = objectCache.get(absPath)
                     obj.timeLastImport = newPartCreationTime
                     if hasattr(newObject, 'a2p_Version'):
                         obj.a2p_Version = newObject.a2p_Version
@@ -423,7 +420,6 @@ def updateImportedParts(doc):
                     obj.ViewObject.DiffuseColor = copy.copy(newObject.ViewObject.DiffuseColor)
                     obj.ViewObject.Transparency = newObject.ViewObject.Transparency
                     obj.Placement = savedPlacement # restore the old placement
-                obj.sourceFile = oldSourceFile # restore the old path (relative/absolute)
 
     mw = FreeCADGui.getMainWindow()
     mdi = mw.findChild(QtGui.QMdiArea)
