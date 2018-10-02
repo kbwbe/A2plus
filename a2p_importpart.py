@@ -569,7 +569,10 @@ This is not allowed when using preference
                 )
             return
         #TODO: WF fails if "use folder" = false here
-        docs = FreeCAD.listDocuments().values()
+        docs = []
+        for d in FreeCAD.listDocuments().values(): #dict_values not indexable, docs now is...
+            docs.append(d)
+        #docs = FreeCAD.listDocuments().values()
         docFilenames = [ d.FileName for d in docs ]
         
         if not fileNameWithinProjectFile in docFilenames :
@@ -584,7 +587,6 @@ This is not allowed when using preference
             for s in sub:
                 mdi.setActiveSubWindow(s)
                 if FreeCAD.activeDocument().Name == name: break
-            return
             # This does not work somehow...
             # FreeCAD.setActiveDocument( name )
             # FreeCAD.ActiveDocument=FreeCAD.getDocument( name )
