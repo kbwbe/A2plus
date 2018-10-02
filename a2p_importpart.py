@@ -43,7 +43,8 @@ from a2plib import (
     A2P_DEBUG_LEVEL,
     A2P_DEBUG_1,
     A2P_DEBUG_2,
-    A2P_DEBUG_3
+    A2P_DEBUG_3,
+    getRelativePathesEnabled
     )
 
 PYVERSION =  sys.version_info[0]
@@ -225,13 +226,16 @@ def importPartFromFile(_doc, filename, importToCache=False):
     newObj.addProperty("App::PropertyString", "a2p_Version","importPart").a2p_Version = A2P_VERSION
     
     assemblyPath = os.path.normpath(os.path.split(doc.FileName)[0])
-    filePath = os.path.normpath(filename)
-    if platform.system() == "Windows":
-        prefix = '.\\'
+    absPath = os.path.normpath(filename)
+    if getRelativePathesEnabled():
+        if platform.system() == "Windows":
+            prefix = '.\\'
+        else:
+            prefix = './'
+        relativePath = prefix+os.path.relpath(absPath, assemblyPath)
+        newObj.addProperty("App::PropertyFile",    "sourceFile",    "importPart").sourceFile = relativePath
     else:
-        prefix = './'
-    relativePath = prefix+os.path.relpath(filePath, assemblyPath)
-    newObj.addProperty("App::PropertyFile",    "sourceFile",    "importPart").sourceFile = relativePath
+        newObj.addProperty("App::PropertyFile",    "sourceFile",    "importPart").sourceFile = absPath
     
     newObj.addProperty("App::PropertyStringList","muxInfo","importPart")
     newObj.addProperty("App::PropertyFloat", "timeLastImport","importPart")
@@ -567,13 +571,25 @@ This is not allowed when using preference
         #TODO: WF fails if "use folder" = false here
         docs = FreeCAD.listDocuments().values()
         docFilenames = [ d.FileName for d in docs ]
+        
         if not fileNameWithinProjectFile in docFilenames :
             FreeCAD.open(fileNameWithinProjectFile)
         else:
-            name = docs[docFilenames.index(fileNameWithinProjectFile)].Name
-            FreeCAD.setActiveDocument( name )
-            FreeCAD.ActiveDocument=FreeCAD.getDocument( name )
-            FreeCADGui.ActiveDocument=FreeCADGui.getDocument( name )
+            idx = docFilenames.index(fileNameWithinProjectFile)
+            name = docs[idx].Name
+            # Search and activate the corresponding document window..
+            mw=FreeCADGui.getMainWindow()
+            mdi=mw.findChild(QtGui.QMdiArea)
+            sub=mdi.subWindowList()
+            for s in sub:
+                mdi.setActiveSubWindow(s)
+                if FreeCAD.activeDocument().Name == name: break
+            return
+            # This does not work somehow...
+            # FreeCAD.setActiveDocument( name )
+            # FreeCAD.ActiveDocument=FreeCAD.getDocument( name )
+            # FreeCADGui.ActiveDocument=FreeCADGui.getDocument( name )
+
 
     def GetResources(self):
         return {

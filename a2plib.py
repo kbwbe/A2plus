@@ -24,16 +24,18 @@
 
 import FreeCAD, FreeCADGui, Part
 from PySide import QtGui, QtCore
-import numpy, os
+import numpy, os, sys
 from a2p_viewProviderProxies import *
 from  FreeCAD import Base
 
+PYVERSION =  sys.version_info[0]
 
 preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
 
 USE_PROJECTFILE = preferences.GetBool('useProjectFolder', False)
 PARTIAL_PROCESSING_ENABLED = preferences.GetBool('usePartialSolver', True)
 AUTOSOLVE_ENABLED = preferences.GetBool('autoSolve', True)
+RELATIVE_PATHES_ENABLED = preferences.GetBool('useRelativePathes',True)
 
 SAVED_TRANSPARENCY = []
 
@@ -74,11 +76,13 @@ PARTIAL_SOLVE_END = 6
 
 
 #------------------------------------------------------------------------------
+def getRelativePathesEnabled():
+    global RELATIVE_PATHES_ENABLED
+    return RELATIVE_PATHES_ENABLED
+#------------------------------------------------------------------------------
 def setAutoSolve(enabled):
     global AUTOSOLVE_ENABLED
     AUTOSOLVE_ENABLED = enabled
-    #preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
-    #preferences.SetBool('autoSolve', enabled)
 #------------------------------------------------------------------------------
 def getAutoSolveState():
     return AUTOSOLVE_ENABLED
@@ -86,8 +90,6 @@ def getAutoSolveState():
 def setPartialProcessing(enabled):
     global PARTIAL_PROCESSING_ENABLED
     PARTIAL_PROCESSING_ENABLED = enabled
-    #preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
-    #preferences.SetBool('usePartialSolver', enabled)
 #------------------------------------------------------------------------------
 def isPartialProcessing():
     return PARTIAL_PROCESSING_ENABLED
@@ -205,8 +207,12 @@ def findSourceFileInProject(pathImportPart, assemblyPath):
 
     def findFile(name, path):
         for root, dirs, files in os.walk(path):
-            if name in files:
-                return os.path.join(root, name)
+            if PYVERSION < 3:
+                if str(name) in files:
+                    return os.path.join(root, name)
+            else:
+                if name in files:
+                    return os.path.join(root, name)
 
     projectFolder = os.path.abspath(getProjectFolder()) # get normalized path
     fileName = os.path.basename(pathImportPart)
@@ -222,8 +228,12 @@ def findInProject(pathImportPart):
     '''
     def findFile(name, path):
         for root, dirs, files in os.walk(path):
-            if name in files:
-                return os.path.join(root, name)
+            if PYVERSION < 3:
+                if str(name) in files:
+                    return os.path.join(root, name)
+            else:
+                if name in files:
+                    return os.path.join(root, name)
 
     projectFolder = os.path.abspath(getProjectFolder()) # get normalized path
     fileName = os.path.basename(pathImportPart)
