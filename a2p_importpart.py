@@ -163,10 +163,19 @@ def importPartFromFile(_doc, filename, importToCache=False):
     #-------------------------------------------
     # Get the importDocument
     #-------------------------------------------
-    importDocIsOpen = filename in [ d.FileName for d in FreeCAD.listDocuments().values() ]
-    if importDocIsOpen:
-        importDoc = [ d for d in FreeCAD.listDocuments().values() if d.FileName == filename][0]
-    else:
+    
+    # look only for filenames, not pathes, as there are problems on WIN10 (Address-translation??)
+    importDoc = None
+    importDocIsOpen = False
+    requestedFile = os.path.split(filename)[1]
+    for d in FreeCAD.listDocuments().values():
+        recentFile = os.path.split(d.FileName)[1]
+        if requestedFile == recentFile:
+            importDoc = d # file is already open...
+            importDocIsOpen = True
+            break
+
+    if not importDocIsOpen:
         if filename.lower().endswith('.fcstd'):
             importDoc = FreeCAD.openDocument(filename)
         else:
@@ -466,7 +475,11 @@ def duplicateImportedPart( part ):
     nameBase = part.Label
     partName = a2plib.findUnusedObjectName(nameBase,document=doc)
     partLabel = a2plib.findUnusedObjectLabel(nameBase,document=doc)
-    newObj = doc.addObject("Part::FeaturePython", partName)
+    if PYVERSION >= 3:
+        newObj = doc.addObject("Part::FeaturePython", str(partName.encode("utf-8")) )
+    else:
+        newObj = doc.addObject("Part::FeaturePython", partName.encode("utf-8") )
+    
     newObj.Label = partLabel
 
     newObj.Proxy = Proxy_importPart()
