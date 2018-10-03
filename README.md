@@ -38,7 +38,7 @@ You have to assemble existing projects again.
 Releases of A2plus available ?
 ------------------------------
 
-Not at moment. A2plus is in very early alpha state, but already functional for small projects.
+There are prereleases available. Please have a look at the releases section of this repository
 
 Known Issues:
 -------------
@@ -49,6 +49,9 @@ After that please constrain these parts again.
 This behaviour is due to FreeCAD's lack of topolocigal naming and is difficult to handle at moment.
 Some work will be done in future to improve this behaviour.
 
+Installation
+------------
+A2plus can now be installed by FreeCAD's add-on manager.
 
 Linux Installation Instructions
 -------------------------------
