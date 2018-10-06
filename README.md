@@ -109,17 +109,23 @@ As your first steps learning this workbench, please have look at tutorials relat
 
 You can follow the tool-tips in the workbench's toolbar. They describe exactly what to do in which order.
 
-Current Features like shown in the workbench's toolbar:
+Current Features like shown in the order of workbench's toolbar:
+
+File Operations:
 * Add a part from external file (Shift+A) -
     Begin and continue here with adding (importing existing files) .fcstd parts
 * Update parts imported into the assembly -
     Use this to refresh changed parts already assembled
-* Move part - 
-    Just move selected part
-* Duplicate part -
+* Move selected part - 
+    Just move selected part and use FC positioning as well!
+* Duplicate part (hold Shift for multiple)-
     Adds one or more previously imported part into assembly
+* Convert Part to A2plus form  -
+    Makes the imported Part independent from the source file (useful for relocatable assemblies)
 * Edit -
     Opens the selected assembly part to be changed in a new tab
+
+Assembly Constraining:
 * Add a point-to-point identity {pointIdentityConstraint} -
     Fix a point vertex to another point vertex
 * Add a point-on-line match {pointOnLineConstraint} -
@@ -139,19 +145,37 @@ Current Features like shown in the workbench's toolbar:
     Selected planes make the latter object to be rotated by your edited 'angle' value.
     Keep the angle between aprox 0.1° and 179.9° or use workarounds.
 * Add a spherical constraint between objects -
-    Select spheres to be aligned or vertex/sphere or vertex/vertex
-* Solve A2plus constraints -
-    Manually invoke the A2pus solver (especially when AutoSolve is OFF)
+    Select spheres to be aligned or appropriate vertex/sphere or vertex/vertex
 * Delete constraints -
     Remove all constraints of selected part in one step
-* View constrained element -
-    Show all elements for a Tree view selected constraint
-* SAS Create or refresh simple shape of complete assembly -
-    the newly created compound can be found in tree vies
-* Toggle transparency of assembly -
-    The whole assembly will get transparent
-* Show only selected items (or all if none selected) -
-    Just another visibility helper
-* Toggle AutoSolve -
+
+Solver Usage:
+* Solve A2plus constraints -
+    Manually invoke the A2pus solver (especially when AutoSolve is OFF, see below)
+* Toggle autosolve -
+    Choose whether after constraining the relations should be solved at once or you like to invoke it manually.
     Normally the solver defaults to and works with AutoSolve, but for larger
     assemblies one may chose OFF and solve manually, as it saves computation time.
+* Flip direction of last constraint - 
+    Does exactly what it means, swap the direction of last added constraint
+* Print detailed DOF information to console -
+    Here we can read, on-demand, what degrees of freedom are fulfilled/ left for an assembly
+* Generate HTML file with detailed constraining structure -
+    Shows an overview of assembled parts and their constraints, viewable in any web browser
+* Show connected elements -
+    Show all connected elements for a selected constraint to inspect them
+* Toggle transparency of assembly -
+    The whole assembly will get transparent for reviewing
+* Show only selected items (or all if none selected) -
+    Just another visibility helper for assembling more easily
+* Create or refresh simple shape of complete assembly -
+    The newly created compound can be found in tree vies
+* Repair the treeview - 
+    Useful, if one had bad luck, that the tree-view of the assembly needs to be put back in order. 
+
+Preferences: 
+You can choose there, for the following:
+* the default Solver method
+* the automatic Solver behavior: automatic/ on-demand
+* how your imported files are handled upon import.
+
