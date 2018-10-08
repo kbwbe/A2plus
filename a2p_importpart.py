@@ -24,7 +24,7 @@
 
 import FreeCADGui,FreeCAD
 from PySide import QtGui, QtCore
-import os, copy, time, sys
+import os, copy, time, sys, platform
 import a2plib
 from a2p_MuxAssembly import (
     muxObjectsWithKeys,
@@ -43,7 +43,8 @@ from a2plib import (
     A2P_DEBUG_LEVEL,
     A2P_DEBUG_1,
     A2P_DEBUG_2,
-    A2P_DEBUG_3
+    A2P_DEBUG_3,
+    getRelativePathesEnabled
     )
 
 PYVERSION =  sys.version_info[0]
@@ -162,10 +163,19 @@ def importPartFromFile(_doc, filename, importToCache=False):
     #-------------------------------------------
     # Get the importDocument
     #-------------------------------------------
-    importDocIsOpen = filename in [ d.FileName for d in FreeCAD.listDocuments().values() ]
-    if importDocIsOpen:
-        importDoc = [ d for d in FreeCAD.listDocuments().values() if d.FileName == filename][0]
-    else:
+    
+    # look only for filenames, not pathes, as there are problems on WIN10 (Address-translation??)
+    importDoc = None
+    importDocIsOpen = False
+    requestedFile = os.path.split(filename)[1]
+    for d in FreeCAD.listDocuments().values():
+        recentFile = os.path.split(d.FileName)[1]
+        if requestedFile == recentFile:
+            importDoc = d # file is already open...
+            importDocIsOpen = True
+            break
+
+    if not importDocIsOpen:
         if filename.lower().endswith('.fcstd'):
             importDoc = FreeCAD.openDocument(filename)
         else:
@@ -219,9 +229,23 @@ def importPartFromFile(_doc, filename, importToCache=False):
             newObj = doc.addObject( "Part::FeaturePython", str(partName.encode('utf-8')) )    # works on Python 3.6.5
         newObj.Label = partLabel
 
+    newObj.Proxy = Proxy_muxAssemblyObj()
+    newObj.ViewObject.Proxy = ImportedPartViewProviderProxy()
 
     newObj.addProperty("App::PropertyString", "a2p_Version","importPart").a2p_Version = A2P_VERSION
-    newObj.addProperty("App::PropertyFile",    "sourceFile",    "importPart").sourceFile = filename
+    
+    assemblyPath = os.path.normpath(os.path.split(doc.FileName)[0])
+    absPath = os.path.normpath(filename)
+    if getRelativePathesEnabled():
+        if platform.system() == "Windows":
+            prefix = '.\\'
+        else:
+            prefix = './'
+        relativePath = prefix+os.path.relpath(absPath, assemblyPath)
+        newObj.addProperty("App::PropertyFile",    "sourceFile",    "importPart").sourceFile = relativePath
+    else:
+        newObj.addProperty("App::PropertyFile",    "sourceFile",    "importPart").sourceFile = absPath
+    
     newObj.addProperty("App::PropertyStringList","muxInfo","importPart")
     newObj.addProperty("App::PropertyFloat", "timeLastImport","importPart")
     newObj.setEditorMode("timeLastImport",1)
@@ -231,8 +255,7 @@ def importPartFromFile(_doc, filename, importToCache=False):
     newObj.addProperty("App::PropertyBool","subassemblyImport","importPart").subassemblyImport = subAssemblyImport
     newObj.setEditorMode("subassemblyImport",1)
     newObj.addProperty("App::PropertyBool","updateColors","importPart").updateColors = True
-    newObj.ViewObject.addDisplayMode(coin.SoGroup(),"Flat Lines")
-    #
+
     if subAssemblyImport:
         newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor = muxObjectsWithKeys(importableObjects, withColor=True)
         #newObj.muxInfo, newObj.Shape = muxObjectsWithKeys(importDoc, withColor=False)
@@ -245,9 +268,6 @@ def importPartFromFile(_doc, filename, importToCache=False):
         newObj.muxInfo = createTopoInfo(tmpObj)
         newObj.ViewObject.Transparency = tmpObj.ViewObject.Transparency
 
-    newObj.Proxy = Proxy_muxAssemblyObj()
-    newObj.ViewObject.Proxy = ImportedPartViewProviderProxy()
-
     doc.recompute()
 
 #    if len(newObj.ViewObject.DiffuseColor) > 1:                              # don't know if needed,
@@ -255,7 +275,7 @@ def importPartFromFile(_doc, filename, importToCache=False):
 #        newObj.ViewObject.DiffuseColor = newObj.ViewObject.DiffuseColor
 
     if importToCache:
-        objectCache.add(newObj.sourceFile, newObj)
+        objectCache.add(filename, newObj)
 
     if not importDocIsOpen:
         FreeCAD.closeDocument(importDoc.Name)
@@ -274,7 +294,21 @@ class a2p_ImportPartCommand():
 
     def Activated(self):
         if FreeCAD.ActiveDocument == None:
-            FreeCAD.newDocument()
+            QtGui.QMessageBox.information(
+                QtGui.QApplication.activeWindow(),
+               "No active Document found",
+               '''First create an empty file and\nsave it under desired name'''
+               )
+            return
+        #
+        if FreeCAD.ActiveDocument.FileName == '':
+            QtGui.QMessageBox.information(
+                QtGui.QApplication.activeWindow(),
+               "Unnamed document",
+               '''Before inserting first part,\nplease save the empty assembly\nto give it a name'''
+               )
+            return
+        
         doc = FreeCAD.activeDocument()
         guidoc = FreeCADGui.activeDocument()
         view = guidoc.activeView()
@@ -365,12 +399,10 @@ def updateImportedParts(doc):
             if not hasattr( obj, 'muxInfo'):
                 obj.addProperty("App::PropertyStringList","muxInfo","importPart").muxInfo = []
 
-            if a2plib.USE_PROJECTFILE:
-                replacement = a2plib.findSourceFileInProject(obj.sourceFile) # work in any case with files within projectFolder!
-            else:
-                replacement = obj.sourceFile
+            assemblyPath = os.path.normpath(os.path.split(doc.FileName)[0])
+            absPath = a2plib.findSourceFileInProject(obj.sourceFile, assemblyPath)
 
-            if replacement == None:
+            if absPath == None:
                 QtGui.QMessageBox.critical(  QtGui.QApplication.activeWindow(),
                                             "Source file not found",
                                             "update of {} aborted!\nUnable to find {}".format(
@@ -378,19 +410,17 @@ def updateImportedParts(doc):
                                                 obj.sourceFile
                                                 )
                                         )
-            else:
-                obj.sourceFile = replacement # update Filepath, perhaps location changed !
 
-            if os.path.exists( obj.sourceFile ):
-                newPartCreationTime = os.path.getmtime( obj.sourceFile )
+            if os.path.exists( absPath ):
+                newPartCreationTime = os.path.getmtime( absPath )
                 DebugMsg(A2P_DEBUG_3,"a2p updateImportedParts: newPartCreationTime: {}\n".format(newPartCreationTime))
                 DebugMsg(A2P_DEBUG_3,"a2p updateImportedParts: obj.timeLastImport:  {}\n".format(obj.timeLastImport))
                 if ( newPartCreationTime >= obj.timeLastImport or    # changed behaviour to allow refresh ondemand
                     obj.a2p_Version != A2P_VERSION
                     ):
-                    if not objectCache.isCached(obj.sourceFile): # Load every changed object one time to cache
-                        importPartFromFile(doc, obj.sourceFile, importToCache=True) # the version is now in the cache
-                    newObject = objectCache.get(obj.sourceFile)
+                    if not objectCache.isCached(absPath): # Load every changed object one time to cache
+                        importPartFromFile(doc, absPath, importToCache=True) # the version is now in the cache
+                    newObject = objectCache.get(absPath)
                     obj.timeLastImport = newPartCreationTime
                     if hasattr(newObject, 'a2p_Version'):
                         obj.a2p_Version = newObject.a2p_Version
@@ -445,9 +475,17 @@ def duplicateImportedPart( part ):
     nameBase = part.Label
     partName = a2plib.findUnusedObjectName(nameBase,document=doc)
     partLabel = a2plib.findUnusedObjectLabel(nameBase,document=doc)
-    newObj = doc.addObject("Part::FeaturePython", partName)
+    if PYVERSION >= 3:
+        newObj = doc.addObject("Part::FeaturePython", str(partName.encode("utf-8")) )
+    else:
+        newObj = doc.addObject("Part::FeaturePython", partName.encode("utf-8") )
+    
     newObj.Label = partLabel
-    #
+
+    newObj.Proxy = Proxy_importPart()
+    newObj.ViewObject.Proxy = ImportedPartViewProviderProxy()
+
+
     if hasattr(part,'a2p_Version'):
         newObj.addProperty("App::PropertyString", "a2p_Version","importPart").a2p_Version = part.a2p_Version
     newObj.addProperty("App::PropertyFile",    "sourceFile",    "importPart").sourceFile = part.sourceFile
@@ -460,13 +498,13 @@ def duplicateImportedPart( part ):
     if hasattr(part, 'subassemblyImport'):
         newObj.addProperty("App::PropertyBool","subassemblyImport","importPart").subassemblyImport = part.subassemblyImport
     newObj.Shape = part.Shape.copy()
+
     for p in part.ViewObject.PropertiesList: #assuming that the user may change the appearance of parts differently depending on their role in the assembly.
-        if hasattr(newObj.ViewObject, p) and p not in ['DiffuseColor','Proxy','MappedColors']:
+        if hasattr(part.ViewObject, p) and p not in ['DiffuseColor','Proxy','MappedColors']:
             setattr(newObj.ViewObject, p, getattr( part.ViewObject, p))
+
     newObj.ViewObject.DiffuseColor = copy.copy( part.ViewObject.DiffuseColor )
     newObj.ViewObject.Transparency = part.ViewObject.Transparency
-    newObj.Proxy = Proxy_importPart()
-    newObj.ViewObject.Proxy = ImportedPartViewProviderProxy()
     newObj.Placement.Base = part.Placement.Base
     newObj.Placement.Rotation = part.Placement.Rotation
     return newObj
@@ -506,7 +544,8 @@ FreeCADGui.addCommand('a2p_duplicatePart', a2p_DuplicatePartCommand())
 
 class a2p_EditPartCommand:
     def Activated(self):
-        if FreeCAD.activeDocument() == None:
+        doc = FreeCAD.activeDocument()
+        if doc == None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
                                         "No active document found!",
                                         "Before editing a part, you have to open an assembly file."
@@ -525,8 +564,9 @@ You must select a part to edit first.
                 )
             return
         obj = selection[0]
-        FreeCADGui.Selection.clearSelection() # very imporant! Avoid Editing the assembly the part was called from!
-        fileNameWithinProjectFile = a2plib.findSourceFileInProject(obj.sourceFile)
+        FreeCADGui.Selection.clearSelection() # very important! Avoid Editing the assembly the part was called from!
+        assemblyPath = os.path.normpath(os.path.split(doc.FileName)[0])
+        fileNameWithinProjectFile = a2plib.findSourceFileInProject(obj.sourceFile, assemblyPath)
         if fileNameWithinProjectFile == None:
             msg = \
 '''
@@ -542,15 +582,29 @@ This is not allowed when using preference
                 )
             return
         #TODO: WF fails if "use folder" = false here
-        docs = FreeCAD.listDocuments().values()
+        docs = []
+        for d in FreeCAD.listDocuments().values(): #dict_values not indexable, docs now is...
+            docs.append(d)
+        #docs = FreeCAD.listDocuments().values()
         docFilenames = [ d.FileName for d in docs ]
+        
         if not fileNameWithinProjectFile in docFilenames :
             FreeCAD.open(fileNameWithinProjectFile)
         else:
-            name = docs[docFilenames.index(fileNameWithinProjectFile)].Name
-            FreeCAD.setActiveDocument( name )
-            FreeCAD.ActiveDocument=FreeCAD.getDocument( name )
-            FreeCADGui.ActiveDocument=FreeCADGui.getDocument( name )
+            idx = docFilenames.index(fileNameWithinProjectFile)
+            name = docs[idx].Name
+            # Search and activate the corresponding document window..
+            mw=FreeCADGui.getMainWindow()
+            mdi=mw.findChild(QtGui.QMdiArea)
+            sub=mdi.subWindowList()
+            for s in sub:
+                mdi.setActiveSubWindow(s)
+                if FreeCAD.activeDocument().Name == name: break
+            # This does not work somehow...
+            # FreeCAD.setActiveDocument( name )
+            # FreeCAD.ActiveDocument=FreeCAD.getDocument( name )
+            # FreeCADGui.ActiveDocument=FreeCADGui.getDocument( name )
+
 
     def GetResources(self):
         return {
@@ -1002,6 +1056,40 @@ FreeCADGui.addCommand('a2p_Show_DOF_info_Command', a2p_Show_DOF_info_Command())
 
 
 
+class a2p_absPath_to_relPath_Command:
+    def Activated(self):
+        doc = FreeCAD.activeDocument()
+        if doc == None:
+            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
+                                        "No active document found!",
+                                        "You have to open an assembly file first."
+                                    )
+            return
+        assemblyPath = os.path.normpath(  os.path.split( os.path.normpath(doc.FileName) )[0])
+        importParts = [ob for ob in doc.Objects if "mportPart" in ob.Content]
+        for iPart in importParts:
+            if (
+                iPart.sourceFile.startswith("./") or
+                iPart.sourceFile.startswith("../") or
+                iPart.sourceFile.startswith(".\\") or
+                iPart.sourceFile.startswith("..\\")
+                ): continue # path is already relative
+            filePath = os.path.normpath(iPart.sourceFile)
+            if platform.system() == "Windows":
+                prefix = '.\\'
+            else:
+                prefix = './'
+            iPart.sourceFile = prefix + os.path.relpath(filePath, assemblyPath)
+            
+    def GetResources(self):
+        return {
+            'MenuText':     'convert absolute pathes of importParts to relative ones',
+            'ToolTip':      'convert absolute pathes of importParts to relative ones'
+            }
+FreeCADGui.addCommand('a2p_absPath_to_relPath_Command', a2p_absPath_to_relPath_Command())
+
+
+
 
 
 
@@ -1009,3 +1097,4 @@ FreeCADGui.addCommand('a2p_Show_DOF_info_Command', a2p_Show_DOF_info_Command())
 def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
     ''' updating constraints, deactivated at moment'''
     return
+

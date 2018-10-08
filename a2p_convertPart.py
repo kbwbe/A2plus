@@ -58,6 +58,10 @@ def convertToImportedPart(doc, obj):
     
     newObj = doc.addObject("Part::FeaturePython",partName)
     newObj.Label = partLabel
+
+    newObj.Proxy = Proxy_convertPart()
+    newObj.ViewObject.Proxy = ImportedPartViewProviderProxy()
+
     newObj.addProperty("App::PropertyString", "a2p_Version","importPart").a2p_Version = A2P_VERSION
     newObj.addProperty("App::PropertyFile",    "sourceFile",    "importPart").sourceFile = filename
     newObj.addProperty("App::PropertyStringList","muxInfo","importPart")
@@ -74,15 +78,12 @@ def convertToImportedPart(doc, obj):
     newObj.muxInfo = createTopoInfo(obj)
 
     for p in obj.ViewObject.PropertiesList: 
-        if hasattr(newObj.ViewObject, p) and p not in ['DiffuseColor','Proxy','MappedColors']:
+        if hasattr(obj.ViewObject, p) and p not in ['DiffuseColor','Proxy','MappedColors']:
             setattr(newObj.ViewObject, p, getattr( obj.ViewObject, p))
     newObj.ViewObject.DiffuseColor = copy.copy( obj.ViewObject.DiffuseColor )
     newObj.ViewObject.Transparency = obj.ViewObject.Transparency
     newObj.Placement.Base = obj.Placement.Base
     newObj.Placement.Rotation = obj.Placement.Rotation
-
-    newObj.Proxy = Proxy_convertPart()
-    newObj.ViewObject.Proxy = ImportedPartViewProviderProxy()
 
     doc.removeObject(obj.Name)          # don't want the original in this doc anymore
     newObj.recompute()
@@ -153,5 +154,6 @@ Please select a Part.
 
 
 FreeCADGui.addCommand('a2p_ConvertPart',a2p_ConvertPartCommand())
+
 
 

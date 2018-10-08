@@ -24,16 +24,18 @@
 
 import FreeCAD, FreeCADGui, Part
 from PySide import QtGui, QtCore
-import numpy, os
+import numpy, os, sys
 from a2p_viewProviderProxies import *
 from  FreeCAD import Base
 
+PYVERSION =  sys.version_info[0]
 
 preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
 
 USE_PROJECTFILE = preferences.GetBool('useProjectFolder', False)
 PARTIAL_PROCESSING_ENABLED = preferences.GetBool('usePartialSolver', True)
 AUTOSOLVE_ENABLED = preferences.GetBool('autoSolve', True)
+RELATIVE_PATHES_ENABLED = preferences.GetBool('useRelativePathes',True)
 
 SAVED_TRANSPARENCY = []
 
@@ -74,11 +76,13 @@ PARTIAL_SOLVE_END = 6
 
 
 #------------------------------------------------------------------------------
+def getRelativePathesEnabled():
+    global RELATIVE_PATHES_ENABLED
+    return RELATIVE_PATHES_ENABLED
+#------------------------------------------------------------------------------
 def setAutoSolve(enabled):
     global AUTOSOLVE_ENABLED
     AUTOSOLVE_ENABLED = enabled
-    #preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
-    #preferences.SetBool('autoSolve', enabled)
 #------------------------------------------------------------------------------
 def getAutoSolveState():
     return AUTOSOLVE_ENABLED
@@ -86,8 +90,6 @@ def getAutoSolveState():
 def setPartialProcessing(enabled):
     global PARTIAL_PROCESSING_ENABLED
     PARTIAL_PROCESSING_ENABLED = enabled
-    #preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
-    #preferences.SetBool('usePartialSolver', enabled)
 #------------------------------------------------------------------------------
 def isPartialProcessing():
     return PARTIAL_PROCESSING_ENABLED
@@ -172,24 +174,69 @@ def getProjectFolder():
     return preferences.GetString('projectFolder', '~')
 
 #------------------------------------------------------------------------------
-def findSourceFileInProject(fullPath):
+def findSourceFileInProject(pathImportPart, assemblyPath):
     '''
     #------------------------------------------------------------------------------------
-    # function to find filename in projectFolder
-    # The path stored in an imported Part will be ignored
-    # Assemblies will become better movable in filesystem...
+    # interprete the sourcefile name of imported part
+    # if working with preference "useProjectFolder:
+    # - path of sourcefile is ignored
+    # - filename is looked up beneath projectFolder
+    #
+    # if not working with preference "useProjectFolder":
+    # - path of sourcefile is checked for being relative to assembly or absolute
+    # - path is interpreted in appropiate way
     #------------------------------------------------------------------------------------
     '''
     preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
-    if not preferences.GetBool('useProjectFolder', False): return fullPath
+    if not preferences.GetBool('useProjectFolder', False): 
+        # not working with useProjectFolder preference,
+        # check wether path is relative or absolute...
+        if (
+            pathImportPart.startswith('../') or
+            pathImportPart.startswith('..\\') or
+            pathImportPart.startswith('./') or
+            pathImportPart.startswith('.\\')
+            ):
+            # relative path
+            # calculate the absolute path
+            absolutePath = os.path.normpath(  os.path.join(assemblyPath,pathImportPart) )
+            return absolutePath
+        else:
+            #absolute path
+            return pathImportPart
 
     def findFile(name, path):
         for root, dirs, files in os.walk(path):
-            if name in files:
-                return os.path.join(root, name)
+            if PYVERSION < 3:
+                if str(name) in files:
+                    return os.path.join(root, name)
+            else:
+                if name in files:
+                    return os.path.join(root, name)
 
     projectFolder = os.path.abspath(getProjectFolder()) # get normalized path
-    fileName = os.path.basename(fullPath)
+    fileName = os.path.basename(pathImportPart)
+    retval = findFile(fileName,projectFolder)
+    return retval
+
+#------------------------------------------------------------------------------
+def findInProject(pathImportPart):
+    '''
+    #------------------------------------------------------------------------------------
+    # function to find filename only in/beneath projectFolder
+    #------------------------------------------------------------------------------------
+    '''
+    def findFile(name, path):
+        for root, dirs, files in os.walk(path):
+            if PYVERSION < 3:
+                if str(name) in files:
+                    return os.path.join(root, name)
+            else:
+                if name in files:
+                    return os.path.join(root, name)
+
+    projectFolder = os.path.abspath(getProjectFolder()) # get normalized path
+    fileName = os.path.basename(pathImportPart)
     retval = findFile(fileName,projectFolder)
     return retval
 
@@ -198,7 +245,13 @@ def checkFileIsInProjectFolder(path):
     preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
     if not preferences.GetBool('useProjectFolder', False): return True
 
-    nameInProject = findSourceFileInProject(path)
+    nameInProject = findInProject(path)
+    print(
+        "path: {} nameInProject: {}".format(
+            path,
+            nameInProject
+            )
+        )
     if nameInProject == path:
         return True
     else:
@@ -477,14 +530,6 @@ def getPos(obj, subElementName):
             # pos = surface.Position
         elif str(surface) == "<Cylinder object>":
             pos = surface.Center
-            '''
-            center = surface.Center
-            bb = face.BoundBox
-            if bb.isInside(center):
-                pos = center
-            else:
-                pos = bb.getIntersectionPoint(center, surface.Axis)
-            '''
         elif all( hasattr(surface,a) for a in ['Axis','Center','Radius'] ):
             pos = surface.Center
         elif str(surface).startswith('<SurfaceOfRevolution'):

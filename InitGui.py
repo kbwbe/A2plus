@@ -136,7 +136,8 @@ class a2pWorkbench (Workbench):
             )
 
         menuEntries = [
-            'a2p_repairTreeViewCommand'
+            'a2p_repairTreeViewCommand',
+            'a2p_absPath_to_relPath_Command'
             ]
         self.appendMenu(
             'A2p',
