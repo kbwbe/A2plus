@@ -152,7 +152,7 @@ class TopoMapper(object):
             for v in face.Vertexes:
                 keys.append(
                     'CYL;'+
-                    self.calcVertexKey(v)+
+                    self.calcVertexKey(pl.multVec(v.Point))+
                     axisKey+
                     radiusKey
                     )
@@ -166,10 +166,10 @@ class TopoMapper(object):
             normalEnd = pl.multVec(pt.add(normal))
             normal = normalEnd.sub(normalStart)
             normalKey = self.calcAxisKey(normal)
-            for v in face.Vertexes:
+            for vert in face.Vertexes:
                 keys.append(
                     'PLANE;'+
-                    self.calcVertexKey(v)+
+                    self.calcVertexKey(pl.multVec(vert.Point))+
                     normalKey
                     )
         else:
@@ -192,10 +192,7 @@ class TopoMapper(object):
         self.doneObjects.append(objName)
         ob = self.doc.getObject(objName)
         shape = ob.Shape
-        if hasattr(ob,"Shape"):
-            pl = ob.getGlobalPlacement().multiply(ob.Placement.inverse())
-        else:
-            pl = ob.getGlobalPlacement()
+        pl = ob.getGlobalPlacement().multiply(ob.Placement.inverse())
         #
         # Populate vertex entries...
         vertexes = shape.Vertexes
@@ -242,7 +239,7 @@ class TopoMapper(object):
         self.totalNumFaces = len(faces)
         faceNamePrefix = 'F;' + objName + ';'
         faceNameSuffix = str(numNewlyCreatedFaces)
-        i = 0 # do not enumerate the following, count new Faces !
+        i = 1 # do not enumerate the following, count new Faces !
         for face in faces:
             faceKeys = self.calcFaceKeys(face, pl) # one key per vertex of a face
             entryFound=False
@@ -326,6 +323,12 @@ class TopoMapper(object):
             inList,outList = self.treeNodes[objName]
             if len(inList) == 0:
                 self.topLevelShapes.append(objName)
+                #
+                # Reset the counts for each toplevel shape
+                self.totalNumVertexes = 0
+                self.totalNumEdges = 0
+                self.totalNumFaces = 0
+                #
                 self.processTopoData(objName) # analyse each toplevel object...
         #
         #-------------------------------------------
@@ -345,9 +348,10 @@ class TopoMapper(object):
             k = self.calcVertexKey(v)
             name = self.shapeDict.get(k,None)
             print(
-                "{} {}".format(
+                "{} {}   {}".format(
                     i+1,
-                    name
+                    name,
+                    k
                     )
                 )
         #-------------------------------------------
@@ -357,27 +361,28 @@ class TopoMapper(object):
         for i,edge in enumerate(shell.Edges):
             keys = self.calcEdgeKeys(edge, pl)
             name = self.shapeDict.get(keys[0],None)
-            if name != None:
-                print(
-                    "{} {}".format(
-                        i+1,
-                        name
-                        )
-                      )
-            else:
-                print(
-                    "{} {} key => {}".format(
-                        i+1,
-                        name,
-                        keys[0]
-                        )
-                      )
+            print(
+                "{} {}   {}".format(
+                    i+1,
+                    name,
+                    keys[0]
+                    )
+                  )
         #-------------------------------------------
         # map facenames to the MUX
         #-------------------------------------------
-        # TODO, work in progress
-        
-        
+        pl = FreeCAD.Placement()
+        for i,face in enumerate(shell.Faces):
+            keys = self.calcFaceKeys(face, pl)
+            name = self.shapeDict.get(keys[0],None)
+            print(
+                "{} {}   {}".format(
+                    i+1,
+                    name,
+                    keys[0]
+                    )
+                  )
+
         #-------------------------------------------
         # for debug only
         # show the MUX shape         
@@ -385,7 +390,6 @@ class TopoMapper(object):
         tmp = self.doc.addObject("Part::Feature","tmp")
         tmp.Shape = shell
         doc.recompute()
-
 
 if __name__ == "__main__":
     doc = FreeCAD.activeDocument()
