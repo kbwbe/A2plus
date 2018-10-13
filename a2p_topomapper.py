@@ -45,9 +45,9 @@ import a2plib
 import os
 
 class TopoMapper(object):
-    def __init__(self,fileName):
-        self.fileName = fileName
-        self.doc = None
+    def __init__(self,doc):
+        self.doc = doc
+        self.fileName = self.doc.FileName
         self.shapeDict = {}
         self.vertexNames = []
         self.edgeNames = []
@@ -279,31 +279,7 @@ class TopoMapper(object):
         tempShape.Placement = plmGlobal
         return tempShape
     
-    def createTopoNames(self):
-        #-------------------------------------------
-        # Get the importDocument
-        #-------------------------------------------
-        # look only for filenames, not pathes, as there are problems on WIN10 (Address-translation??)
-        self.doc = None
-        docIsOpen = False
-        requestedFile = os.path.split(self.fileName)[1]
-        #-------------------------------------------
-        # open the doc if necessary
-        #-------------------------------------------
-        for d in FreeCAD.listDocuments().values():
-            recentFile = os.path.split(d.FileName)[1]
-            if requestedFile == recentFile:
-                self.doc = d # file is already open...
-                docIsOpen = True
-                break
-    
-        if not docIsOpen:
-            if self.fileName.lower().endswith('.fcstd'):
-                self.doc = FreeCAD.openDocument(self.fileName)
-            else:
-                msg = "A part can only be imported from a FreeCAD '*.fcstd' file"
-                QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Value Error", msg )
-                return
+    def createTopoNames(self,withColor=False):
         #-------------------------------------------
         # Create treenodes of the importable Objects with a shape
         #-------------------------------------------
@@ -335,18 +311,40 @@ class TopoMapper(object):
         # MUX the toplevel shapes
         #-------------------------------------------
         faces = []
+        faceColors = []
+        
         for objName in self.topLevelShapes:
+
             ob = self.doc.getObject(objName)
+
+            colorFlag = ( len(ob.ViewObject.DiffuseColor) < len(ob.Shape.Faces) )
+            shapeCol = ob.ViewObject.ShapeColor
+            diffuseCol = ob.ViewObject.DiffuseColor
             tempShape = self.makePlacedShape(ob)
-            for face in tempShape.Faces:
+
+            # now start the loop with use of the stored values..(much faster)
+            for i, face in enumerate(tempShape.Faces):
                 faces.append(face)
+                a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"a2p MUX: i(Faces)={}\n{}\n".format(i,face))
+    
+                if withColor:
+                    if colorFlag:
+                        faceColors.append(shapeCol)
+                    else:
+                        faceColors.append(diffuseCol[i])
+
         shell = Part.makeShell(faces)
+        #
+        muxInfo = []
         #-------------------------------------------
         # map vertexnames to the MUX
         #-------------------------------------------
+        muxInfo.append("[VERTEXES]")
         for i,v in enumerate(shell.Vertexes):
             k = self.calcVertexKey(v)
-            name = self.shapeDict.get(k,None)
+            name = self.shapeDict.get(k,"None")
+            muxInfo.append(name)
+            '''
             print(
                 "{} {}   {}".format(
                     i+1,
@@ -354,13 +352,17 @@ class TopoMapper(object):
                     k
                     )
                 )
+            '''
         #-------------------------------------------
         # map edgenames to the MUX
         #-------------------------------------------
+        muxInfo.append("[EDGES]")
         pl = FreeCAD.Placement()
         for i,edge in enumerate(shell.Edges):
             keys = self.calcEdgeKeys(edge, pl)
-            name = self.shapeDict.get(keys[0],None)
+            name = self.shapeDict.get(keys[0],"None")
+            muxInfo.append(name)
+            '''
             print(
                 "{} {}   {}".format(
                     i+1,
@@ -368,32 +370,26 @@ class TopoMapper(object):
                     keys[0]
                     )
                   )
+            '''
         #-------------------------------------------
         # map facenames to the MUX
         #-------------------------------------------
+        muxInfo.append("[FACES]")
         pl = FreeCAD.Placement()
         for i,face in enumerate(shell.Faces):
             keys = self.calcFaceKeys(face, pl)
-            name = self.shapeDict.get(keys[0],None)
-            print(
-                "{} {}   {}".format(
-                    i+1,
-                    name,
-                    keys[0]
-                    )
-                  )
+            name = self.shapeDict.get(keys[0],"None")
+            muxInfo.append(name)
 
-        #-------------------------------------------
-        # for debug only
-        # show the MUX shape         
-        #-------------------------------------------
-        tmp = self.doc.addObject("Part::Feature","tmp")
-        tmp.Shape = shell
-        doc.recompute()
+        if withColor:
+            return muxInfo, shell, faceColors
+        else:
+            return muxInfo, shell
+        
 
 if __name__ == "__main__":
     doc = FreeCAD.activeDocument()
-    tm = TopoMapper(doc.FileName)
+    tm = TopoMapper(doc)
     tm.createTopoNames()
 
 

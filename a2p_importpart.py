@@ -47,6 +47,8 @@ from a2plib import (
     getRelativePathesEnabled
     )
 
+from a2p_topomapper import TopoMapper
+
 PYVERSION =  sys.version_info[0]
 
 class ObjectCache:
@@ -256,17 +258,14 @@ def importPartFromFile(_doc, filename, importToCache=False):
     newObj.setEditorMode("subassemblyImport",1)
     newObj.addProperty("App::PropertyBool","updateColors","importPart").updateColors = True
 
-    if subAssemblyImport:
+    #if subAssemblyImport:
+    if False:
         newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor = muxObjectsWithKeys(importableObjects, withColor=True)
-        #newObj.muxInfo, newObj.Shape = muxObjectsWithKeys(importDoc, withColor=False)
     else:
-        tmpObj = importableObjects[0]
-        newObj.Shape = makePlacedShape(tmpObj)
-        newObj.ViewObject.ShapeColor = tmpObj.ViewObject.ShapeColor
-        if appVersionStr() <= '000.016': #FC0.17: DiffuseColor overrides ShapeColor !
-            newObj.ViewObject.DiffuseColor = tmpObj.ViewObject.DiffuseColor
-        newObj.muxInfo = createTopoInfo(tmpObj)
-        newObj.ViewObject.Transparency = tmpObj.ViewObject.Transparency
+        # TopoMapper manages import of non A2p-Files. It generates the shapes and appropiate topo names...
+        topoMapper = TopoMapper(importDoc)
+        newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor = topoMapper.createTopoNames(withColor=True)
+        
 
     doc.recompute()
 
