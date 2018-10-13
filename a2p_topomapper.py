@@ -343,7 +343,6 @@ class TopoMapper(object):
         faceColors = []
         
         for objName in self.topLevelShapes:
-            if "Body" in objName: continue
 
             ob = self.doc.getObject(objName)
 
