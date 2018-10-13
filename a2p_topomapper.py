@@ -323,6 +323,11 @@ class TopoMapper(object):
             inList,outList = self.treeNodes[objName]
             if len(inList) == 0:
                 self.topLevelShapes.append(objName)
+                print (
+                    "'{}' added to topLevelShapes".format(
+                        objName
+                        )
+                    )
                 #
                 # Reset the counts for each toplevel shape
                 self.totalNumVertexes = 0
@@ -338,6 +343,7 @@ class TopoMapper(object):
         faceColors = []
         
         for objName in self.topLevelShapes:
+            if "Body" in objName: continue
 
             ob = self.doc.getObject(objName)
 

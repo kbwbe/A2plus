@@ -1111,6 +1111,104 @@ FreeCADGui.addCommand('a2p_absPath_to_relPath_Command', a2p_absPath_to_relPath_C
 
 
 def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
-    ''' updating constraints, deactivated at moment'''
-    return
+    # return if there are no constraints linked to the object 
+    if len([c for c in doc.Objects if  'ConstraintInfo' in c.Content and oldObject.Name in [c.Object1, c.Object2] ]) == 0:
+        return
+
+    # check, wether object is an assembly with muxInformations.
+    # Then find edgenames with mapping in muxinfo...
+    deletionList = [] #for broken constraints
+    if hasattr(oldObject, 'muxInfo'):
+        if hasattr(newObject, 'muxInfo'):
+            #
+            oldVertexNames = []
+            oldEdgeNames = []
+            oldFaceNames = []
+            for item in oldObject.muxInfo:
+                if item[:1] == 'V':
+                    oldVertexNames.append(item)
+                if item[:1] == 'E':
+                    oldEdgeNames.append(item)
+                if item[:1] == 'F':
+                    oldFaceNames.append(item)
+            #
+            newVertexNames = []
+            newEdgeNames = []
+            newFaceNames = []
+            for item in newObject.muxInfo:
+                if item[:1] == 'E':
+                    newVertexNames.append(item)
+                if item[:1] == 'E':
+                    newEdgeNames.append(item)
+                if item[:1] == 'F':
+                    newFaceNames.append(item)
+            #
+            partName = oldObject.Name
+            for c in doc.Objects:
+                if 'ConstraintInfo' in c.Content:
+                    if partName == c.Object1:
+                        SubElement = "SubElement1"
+                    elif partName == c.Object2:
+                        SubElement = "SubElement2"
+                    else:
+                        SubElement = None
+                        
+                    if SubElement: #same as subElement <> None
+                        
+                        subElementName = getattr(c, SubElement)
+                        if subElementName[:4] == 'Face':
+                            try:
+                                oldIndex = int(subElementName[4:])-1
+                                oldConstraintString = oldFaceNames[oldIndex]
+                                newIndex = newFaceNames.index(oldConstraintString)
+                                newSubElementName = 'Face'+str(newIndex+1)
+                            except:
+                                newIndex = -1
+                                newSubElementName = 'INVALID'
+                                
+                        elif subElementName[:4] == 'Edge':
+                            try:
+                                oldIndex = int(subElementName[4:])-1
+                                oldConstraintString = oldEdgeNames[oldIndex]
+                                newIndex = newEdgeNames.index(oldConstraintString)
+                                newSubElementName = 'Edge'+str(newIndex+1)
+                            except:
+                                newIndex = -1
+                                newSubElementName = 'INVALID'
+                                
+                        elif subElementName[:6] == 'Vertex':
+                            try:
+                                oldIndex = int(subElementName[6:])-1
+                                oldConstraintString = oldVertexNames[oldIndex]
+                                newIndex = newVertexNames.index(oldConstraintString)
+                                newSubElementName = 'Vertex'+str(newIndex+1)
+                            except:
+                                newIndex = -1
+                                newSubElementName = 'INVALID'
+                                
+                        else:
+                            newIndex = -1
+                            newSubElementName = 'INVALID'
+                        
+                        if newIndex >= 0:
+                            setattr(c, SubElement, newSubElementName )
+                            print "oldConstraintString (KEY) : ",oldConstraintString
+                            print "Updating by SubElement-Map: ",subElementName,' => ',newSubElementName
+                            continue
+                        #
+                        # if code coming here, constraint is broken
+                        if c.Name not in deletionList:
+                            deletionList.append(c.Name)
+                            
+    
+    if len(deletionList) > 0: # there are broken constraints..
+        for cName in deletionList:
+        
+            flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.Abort
+            message = "constraint %s is broken. Delete constraint? otherwise check for wrong linkage." % cName
+            response = QtGui.QMessageBox.critical(QtGui.qApp.activeWindow(), "Broken Constraint", message, flags )
+        
+            if response == QtGui.QMessageBox.Yes:
+                FreeCAD.Console.PrintError("removing constraint %s" % cName)
+                doc.removeObject(cName)
 
