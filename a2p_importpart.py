@@ -30,10 +30,14 @@ from a2p_MuxAssembly import (
     muxObjectsWithKeys,
     createTopoInfo,
     Proxy_muxAssemblyObj,
-    makePlacedShape
+    makePlacedShape,
+    muxAssemblyWithTopoNames
     )
 from a2p_viewProviderProxies import *
-from a2p_versionmanagement import SubAssemblyWalk, A2P_VERSION
+from a2p_versionmanagement import (
+    SubAssemblyWalk, 
+    A2P_VERSION
+    )
 import a2p_solversystem
 from a2plib import (
     appVersionStr,
@@ -47,7 +51,9 @@ from a2plib import (
     getRelativePathesEnabled
     )
 
-from a2p_topomapper import TopoMapper
+from a2p_topomapper import (
+    TopoMapper
+    )
 
 PYVERSION =  sys.version_info[0]
 
@@ -184,15 +190,18 @@ def importPartFromFile(_doc, filename, importToCache=False):
             msg = "A part can only be imported from a FreeCAD '*.fcstd' file"
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Value Error", msg )
             return
+
+    #-------------------------------------------
+    # Initialize the new TopoMapper
+    #-------------------------------------------
+    topoMapper = TopoMapper(importDoc)
+
     #-------------------------------------------
     # Get a list of the importable Objects
     #-------------------------------------------
-
-    importableObjects = list()
-    importableObjects.extend(getImpPartsFromDoc(importDoc))            #visible parts only
-#    importableObjects.extend(getImpPartsFromDoc(importDoc, False))     #take invisible parts too
-
-    if importableObjects == None or len(importableObjects) == 0:
+    importableObjects = topoMapper.getTopLevelObjects()
+    
+    if len(importableObjects) == 0:
         msg = "No visible Part to import found. Aborting operation"
         QtGui.QMessageBox.information(
             QtGui.QApplication.activeWindow(),
@@ -200,8 +209,15 @@ def importPartFromFile(_doc, filename, importToCache=False):
             msg
             )
         return
-
-    #TODO: allow import multiple parts as separate items
+    
+    #-------------------------------------------
+    # Discover whether we are importing a subassembly or a single part
+    #-------------------------------------------
+    subAssemblyImport = False
+    if all([ 'importPart' in obj.Content for obj in importableObjects]) == 1:
+        subAssemblyImport = True
+        
+    '''
     #-------------------------------------------
     # Discover whether we are importing a subassembly or a single part
     #-------------------------------------------
@@ -214,6 +230,7 @@ def importPartFromFile(_doc, filename, importToCache=False):
         DebugMsg(A2P_DEBUG_3,"a2p importPartFromFile: importableObjects:\n{}\n".format(importableObjects))
     if len(importableObjects) > 1:
         subAssemblyImport = True
+    '''
 
     #-------------------------------------------
     # create new object
@@ -258,20 +275,20 @@ def importPartFromFile(_doc, filename, importToCache=False):
     newObj.setEditorMode("subassemblyImport",1)
     newObj.addProperty("App::PropertyBool","updateColors","importPart").updateColors = True
 
-    #if subAssemblyImport:
-    if False:
-        newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor = muxObjectsWithKeys(importableObjects, withColor=True)
+    if subAssemblyImport:
+    #if False:
+        #newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor = muxObjectsWithKeys(importableObjects, withColor=True)
+        newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor = muxAssemblyWithTopoNames(
+            importDoc, 
+            withColor=True
+            )
     else:
         # TopoMapper manages import of non A2p-Files. It generates the shapes and appropiate topo names...
-        topoMapper = TopoMapper(importDoc)
+        #topoMapper = TopoMapper(importDoc)
         newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor = topoMapper.createTopoNames(withColor=True)
         
 
     doc.recompute()
-
-#    if len(newObj.ViewObject.DiffuseColor) > 1:                              # don't know if needed,
-#        # force-reset colors if changed                                      # borrowed from Arch WB
-#        newObj.ViewObject.DiffuseColor = newObj.ViewObject.DiffuseColor
 
     if importToCache:
         objectCache.add(filename, newObj)

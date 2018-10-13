@@ -199,7 +199,7 @@ class TopoMapper(object):
         numNewlyCreatedVertexes = len(shape.Vertexes) - self.totalNumVertexes
         self.totalNumVertexes = len(shape.Vertexes)
         vertexNamePrefix = 'V;'+objName + ';'
-        vertexNameSuffix = str(numNewlyCreatedVertexes)
+        vertexNameSuffix = str(numNewlyCreatedVertexes)+';'
         i = 1 # do not enumerate the following, count new vertexes !
         for vertex in vertexes:
             vertexKey = self.calcVertexKey(pl.multVec(vertex.Point))
@@ -214,7 +214,7 @@ class TopoMapper(object):
         numNewlyCreatedEdges = len(edges) - self.totalNumEdges
         self.totalNumEdges = len(edges)
         edgeNamePrefix = 'E;' + objName + ';'
-        edgeNameSuffix = str(numNewlyCreatedEdges)
+        edgeNameSuffix = str(numNewlyCreatedEdges)+';'
         i = 1 # do not enumerate the following, count new Edges !
         for edge in edges:
             edgeKeys = self.calcEdgeKeys(edge, pl) # 2 keys for a linear edge, 1 key per circular egde
@@ -238,7 +238,7 @@ class TopoMapper(object):
         numNewlyCreatedFaces = len(faces) - self.totalNumFaces
         self.totalNumFaces = len(faces)
         faceNamePrefix = 'F;' + objName + ';'
-        faceNameSuffix = str(numNewlyCreatedFaces)
+        faceNameSuffix = str(numNewlyCreatedFaces)+';'
         i = 1 # do not enumerate the following, count new Faces !
         for face in faces:
             faceKeys = self.calcFaceKeys(face, pl) # one key per vertex of a face
@@ -278,6 +278,30 @@ class TopoMapper(object):
             pass
         tempShape.Placement = plmGlobal
         return tempShape
+    
+    def getTopLevelObjects(self):
+        #-------------------------------------------
+        # Create treenodes of the importable Objects with a shape
+        #-------------------------------------------
+        self.treeNodes = {}
+        shapeObs = self.filterShapeObs(self.doc.Objects)
+        S = set(shapeObs)
+        for ob in S:
+            self.treeNodes[ob.Name] = (
+                    self.filterShapeObs(ob.InList),
+                    self.filterShapeObs(ob.OutList)
+                    )
+        #-------------------------------------------
+        # Top level shapes have nodes with empty inList
+        # export complete topLevel objects
+        #-------------------------------------------
+        outObs = []
+        for objName in self.treeNodes.keys():
+            inList,outList = self.treeNodes[objName]
+            if len(inList) == 0:
+                outObs.append(self.doc.getObject(objName))
+        return outObs
+        
     
     def createTopoNames(self,withColor=False):
         #-------------------------------------------
