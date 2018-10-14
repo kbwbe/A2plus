@@ -1192,8 +1192,15 @@ def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
                         
                         if newIndex >= 0:
                             setattr(c, SubElement, newSubElementName )
-                            print "oldConstraintString (KEY) : ",oldConstraintString
-                            print "Updating by SubElement-Map: ",subElementName,' => ',newSubElementName
+                            print (
+                                    "oldConstraintString (KEY) : {}".format(
+                                    oldConstraintString
+                                    )
+                                   )
+                            print ("Updating by SubElement-Map: {} => {} ".format(
+                                       subElementName,newSubElementName
+                                       )
+                                   )
                             continue
                         #
                         # if code coming here, constraint is broken
