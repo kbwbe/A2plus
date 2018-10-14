@@ -452,7 +452,8 @@ def updateImportedParts(doc):
     mw = FreeCADGui.getMainWindow()
     mdi = mw.findChild(QtGui.QMdiArea)
     sub = mdi.activeSubWindow()
-    sub.showMaximized()
+    if sub != None:
+        sub.showMaximized()
 
     objectCache.cleanUp(doc)
     a2p_solversystem.autoSolveConstraints(doc)
@@ -1214,9 +1215,11 @@ def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
         
             flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.Abort
             message = "constraint %s is broken. Delete constraint? otherwise check for wrong linkage." % cName
-            response = QtGui.QMessageBox.critical(QtGui.qApp.activeWindow(), "Broken Constraint", message, flags )
+            #response = QtGui.QMessageBox.critical(QtGui.qApp.activeWindow(), "Broken Constraint", message, flags )
+            response = QtGui.QMessageBox.critical(None, "Broken Constraint", message, flags )
         
             if response == QtGui.QMessageBox.Yes:
                 FreeCAD.Console.PrintError("removing constraint %s" % cName)
-                doc.removeObject(cName)
+                c = doc.getObject(cName)
+                a2plib.removeConstraint(c)
 

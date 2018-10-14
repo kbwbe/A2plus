@@ -323,18 +323,11 @@ class TopoMapper(object):
             inList,outList = self.treeNodes[objName]
             if len(inList) == 0:
                 self.topLevelShapes.append(objName)
-                print (
-                    "'{}' added to topLevelShapes".format(
-                        objName
-                        )
-                    )
-                #
                 if a2plib.getUseTopoNaming():
                     # Reset the counts for each toplevel shape
                     self.totalNumVertexes = 0
                     self.totalNumEdges = 0
                     self.totalNumFaces = 0
-                    #
                     self.processTopoData(objName) # analyse each toplevel object...
         #
         #-------------------------------------------
