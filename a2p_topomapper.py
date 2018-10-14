@@ -329,12 +329,13 @@ class TopoMapper(object):
                         )
                     )
                 #
-                # Reset the counts for each toplevel shape
-                self.totalNumVertexes = 0
-                self.totalNumEdges = 0
-                self.totalNumFaces = 0
-                #
-                self.processTopoData(objName) # analyse each toplevel object...
+                if a2plib.getUseTopoNaming():
+                    # Reset the counts for each toplevel shape
+                    self.totalNumVertexes = 0
+                    self.totalNumEdges = 0
+                    self.totalNumFaces = 0
+                    #
+                    self.processTopoData(objName) # analyse each toplevel object...
         #
         #-------------------------------------------
         # MUX the toplevel shapes
@@ -365,50 +366,33 @@ class TopoMapper(object):
         shell = Part.makeShell(faces)
         #
         muxInfo = []
-        #-------------------------------------------
-        # map vertexnames to the MUX
-        #-------------------------------------------
-        muxInfo.append("[VERTEXES]")
-        for i,v in enumerate(shell.Vertexes):
-            k = self.calcVertexKey(v)
-            name = self.shapeDict.get(k,"None")
-            muxInfo.append(name)
-            '''
-            print(
-                "{} {}   {}".format(
-                    i+1,
-                    name,
-                    k
-                    )
-                )
-            '''
-        #-------------------------------------------
-        # map edgenames to the MUX
-        #-------------------------------------------
-        muxInfo.append("[EDGES]")
-        pl = FreeCAD.Placement()
-        for i,edge in enumerate(shell.Edges):
-            keys = self.calcEdgeKeys(edge, pl)
-            name = self.shapeDict.get(keys[0],"None")
-            muxInfo.append(name)
-            '''
-            print(
-                "{} {}   {}".format(
-                    i+1,
-                    name,
-                    keys[0]
-                    )
-                  )
-            '''
-        #-------------------------------------------
-        # map facenames to the MUX
-        #-------------------------------------------
-        muxInfo.append("[FACES]")
-        pl = FreeCAD.Placement()
-        for i,face in enumerate(shell.Faces):
-            keys = self.calcFaceKeys(face, pl)
-            name = self.shapeDict.get(keys[0],"None")
-            muxInfo.append(name)
+        if a2plib.getUseTopoNaming():
+            #-------------------------------------------
+            # map vertexnames to the MUX
+            #-------------------------------------------
+            muxInfo.append("[VERTEXES]")
+            for i,v in enumerate(shell.Vertexes):
+                k = self.calcVertexKey(v)
+                name = self.shapeDict.get(k,"None")
+                muxInfo.append(name)
+            #-------------------------------------------
+            # map edgenames to the MUX
+            #-------------------------------------------
+            muxInfo.append("[EDGES]")
+            pl = FreeCAD.Placement()
+            for i,edge in enumerate(shell.Edges):
+                keys = self.calcEdgeKeys(edge, pl)
+                name = self.shapeDict.get(keys[0],"None")
+                muxInfo.append(name)
+            #-------------------------------------------
+            # map facenames to the MUX
+            #-------------------------------------------
+            muxInfo.append("[FACES]")
+            pl = FreeCAD.Placement()
+            for i,face in enumerate(shell.Faces):
+                keys = self.calcFaceKeys(face, pl)
+                name = self.shapeDict.get(keys[0],"None")
+                muxInfo.append(name)
 
         if withColor:
             return muxInfo, shell, faceColors

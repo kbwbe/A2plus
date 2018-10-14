@@ -76,6 +76,10 @@ PARTIAL_SOLVE_END = 6
 
 
 #------------------------------------------------------------------------------
+def getUseTopoNaming():
+    preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
+    return preferences.GetBool('useTopoNaming',False)
+#------------------------------------------------------------------------------
 def getRelativePathesEnabled():
     global RELATIVE_PATHES_ENABLED
     return RELATIVE_PATHES_ENABLED

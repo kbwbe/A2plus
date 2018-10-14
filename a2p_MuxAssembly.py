@@ -75,7 +75,7 @@ def muxAssemblyWithTopoNames(doc, withColor=False):
     for obj in visibleObjects:
         #
         extendNames = False 
-        if len(obj.muxInfo) > 0: # Subelement-Strings existieren schon...
+        if a2plib.getUseTopoNaming() and len(obj.muxInfo) > 0: # Subelement-Strings existieren schon...
             extendNames = True
             #
             vertexNames = []
@@ -87,20 +87,21 @@ def muxAssemblyWithTopoNames(doc, withColor=False):
                 if item[0] == 'E': edgeNames.append(item)
                 if item[0] == 'F': faceNames.append(item)
 
-        for i, vertex in enumerate(obj.Shape.Vertexes):
-            if extendNames:
-                newName = "".join((vertexNames[i],obj.Name,';'))
-                muxInfo.append(newName)
-            else:
-                newName = "".join(('V;',str(i+1),';',obj.Name,';'))
-                muxInfo.append(newName)
-        for i, edge in enumerate(obj.Shape.Edges):
-            if extendNames:
-                newName = "".join((edgeNames[i],obj.Name,';'))
-                muxInfo.append(newName)
-            else:
-                newName = "".join(('E;',str(i+1),';',obj.Name,';'))
-                muxInfo.append(newName)
+        if a2plib.getUseTopoNaming():
+            for i, vertex in enumerate(obj.Shape.Vertexes):
+                if extendNames:
+                    newName = "".join((vertexNames[i],obj.Name,';'))
+                    muxInfo.append(newName)
+                else:
+                    newName = "".join(('V;',str(i+1),';',obj.Name,';'))
+                    muxInfo.append(newName)
+            for i, edge in enumerate(obj.Shape.Edges):
+                if extendNames:
+                    newName = "".join((edgeNames[i],obj.Name,';'))
+                    muxInfo.append(newName)
+                else:
+                    newName = "".join(('E;',str(i+1),';',obj.Name,';'))
+                    muxInfo.append(newName)
         
         # Save Computing time, store this before the for..enumerate loop later...
         colorFlag = ( len(obj.ViewObject.DiffuseColor) < len(obj.Shape.Faces) )
@@ -109,20 +110,29 @@ def muxAssemblyWithTopoNames(doc, withColor=False):
         tempShape = makePlacedShape(obj)
 
         # now start the loop with use of the stored values..(much faster)
-        for i, face in enumerate(tempShape.Faces):
-            faces.append(face)
-            if extendNames:
-                newName = "".join((faceNames[i],obj.Name,';'))
-                muxInfo.append(newName)
-            else:
-                newName = "".join(('F;',str(i+1),';',obj.Name,';'))
-                muxInfo.append(newName)
-
-            if withColor:
-                if colorFlag:
-                    faceColors.append(shapeCol)
+        if a2plib.getUseTopoNaming():
+            for i, face in enumerate(tempShape.Faces):
+                faces.append(face)
+                if extendNames:
+                    newName = "".join((faceNames[i],obj.Name,';'))
+                    muxInfo.append(newName)
                 else:
-                    faceColors.append(diffuseCol[i])
+                    newName = "".join(('F;',str(i+1),';',obj.Name,';'))
+                    muxInfo.append(newName)
+    
+                if withColor:
+                    if colorFlag:
+                        faceColors.append(shapeCol)
+                    else:
+                        faceColors.append(diffuseCol[i])
+        else:
+            for i, face in enumerate(tempShape.Faces):
+                faces.append(face)
+                if withColor:
+                    if colorFlag:
+                        faceColors.append(shapeCol)
+                    else:
+                        faceColors.append(diffuseCol[i])
 
     shell = Part.makeShell(faces)
     if withColor:

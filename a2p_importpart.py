@@ -284,7 +284,6 @@ def importPartFromFile(_doc, filename, importToCache=False):
             )
     else:
         # TopoMapper manages import of non A2p-Files. It generates the shapes and appropiate topo names...
-        #topoMapper = TopoMapper(importDoc)
         newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor = topoMapper.createTopoNames(withColor=True)
         
 
@@ -1111,6 +1110,8 @@ FreeCADGui.addCommand('a2p_absPath_to_relPath_Command', a2p_absPath_to_relPath_C
 
 
 def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
+    if not a2plib.getUseTopoNaming(): return
+    
     # return if there are no constraints linked to the object 
     if len([c for c in doc.Objects if  'ConstraintInfo' in c.Content and oldObject.Name in [c.Object1, c.Object2] ]) == 0:
         return
