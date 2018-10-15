@@ -147,13 +147,25 @@ class TopoMapper(object):
         elif all( hasattr(face.Surface,a) for a in ['Axis','Center','Radius'] ):
             axisStart = pl.multVec(face.Surface.Center)
             axisEnd   = pl.multVec(face.Surface.Center.add(face.Surface.Axis))
-            axisKey = self.calcAxisKey(axisEnd.sub(axisStart))
+            axis = axisEnd.sub(axisStart)
+            axisKey = self.calcAxisKey(axis)
+            negativeAxis = Base.Vector(axis)
+            negativeAxis.multiply(-1.0)
+            negativeAxisKey = self.calcAxisKey(negativeAxis)
             radiusKey = self.calcFloatKey(face.Surface.Radius)
+            #
             for v in face.Vertexes:
+                vertexKey = self.calcVertexKey(pl.multVec(v.Point))
                 keys.append(
                     'CYL;'+
-                    self.calcVertexKey(pl.multVec(v.Point))+
+                    vertexKey+
                     axisKey+
+                    radiusKey
+                    )
+                keys.append(
+                    'CYL;'+
+                    vertexKey+
+                    negativeAxisKey+
                     radiusKey
                     )
         elif str( face.Surface ) == '<Plane object>':
@@ -165,12 +177,21 @@ class TopoMapper(object):
             normalStart = pl.multVec(pt)
             normalEnd = pl.multVec(pt.add(normal))
             normal = normalEnd.sub(normalStart)
+            negativeNormal = Base.Vector(normal)
+            negativeNormal.multiply(-1.0)
             normalKey = self.calcAxisKey(normal)
+            negativeNormalKey = self.calcAxisKey(negativeNormal)
             for vert in face.Vertexes:
+                vertexKey = self.calcVertexKey(pl.multVec(vert.Point))
                 keys.append(
                     'PLANE;'+
-                    self.calcVertexKey(pl.multVec(vert.Point))+
+                    vertexKey+
                     normalKey
+                    )
+                keys.append(
+                    'PLANE;'+
+                    vertexKey+
+                    negativeNormalKey
                     )
         else:
             keys.append("NOTRACE")
