@@ -402,6 +402,11 @@ def updateImportedParts(doc):
                         )
         return
         
+    # modififying object's subelements causes solving of the assembly, disable autosolve here
+    autoSolveState = a2plib.getAutoSolveState()
+    a2plib.setAutoSolve(False)
+            
+    doc.openTransaction("updateImportParts")    
     objectCache.cleanUp(doc)
     for obj in doc.Objects:
         if hasattr(obj, 'sourceFile'):
@@ -456,8 +461,19 @@ def updateImportedParts(doc):
         sub.showMaximized()
 
     objectCache.cleanUp(doc)
-    a2p_solversystem.autoSolveConstraints(doc)
+    a2plib.setAutoSolve(autoSolveState)
+    
+    if not a2plib.getUseTopoNaming():
+        # This is only needed when not using toponames. 
+        # Otherwise updating constraints.subelements triggers this.
+        a2p_solversystem.autoSolveConstraints(
+            doc, 
+            useTransaction = False, 
+            callingFuncName = "updateImportedParts"
+            ) #transaction is already open...
+    
     doc.recompute()
+    doc.commitTransaction()    
 
 
 
@@ -1018,7 +1034,7 @@ def a2p_FlipConstraintDirection():
             lastConstraintAdded.directionConstraint = 'opposed'
         else:
             lastConstraintAdded.directionConstraint = 'aligned'
-        a2p_solversystem.autoSolveConstraints(FreeCAD.activeDocument())
+        a2p_solversystem.autoSolveConstraints(FreeCAD.activeDocument(), callingFuncName="a2p_FlipConstraintDirection")
     except:
         pass
 
@@ -1116,6 +1132,7 @@ def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
     # return if there are no constraints linked to the object 
     if len([c for c in doc.Objects if  'ConstraintInfo' in c.Content and oldObject.Name in [c.Object1, c.Object2] ]) == 0:
         return
+
 
     # check, wether object is an assembly with muxInformations.
     # Then find edgenames with mapping in muxinfo...
@@ -1222,4 +1239,6 @@ def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
                 FreeCAD.Console.PrintError("removing constraint %s" % cName)
                 c = doc.getObject(cName)
                 a2plib.removeConstraint(c)
+                
+
 
