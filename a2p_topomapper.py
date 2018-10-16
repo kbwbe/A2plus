@@ -24,16 +24,69 @@
 '''
 Experimental mapper for a2p related topological naming.
 
-Recent capabilities:
-- create unique toponame for each vertex in a single document
-- create unique toponame for each edge in a single document
-- create unique toponame for each face in a single document (not complete ready)
+It is used during first level import of fcstd documents to a2p
 
-Usage: 
-- open fc document with a single body inside
-- execute "a2p_toponamer.py" as makro ATM
-- look at console output for created toponames
-- compare vertex/edgenames with 'tmp' object in treeview
+Working principle:
+- History of toplevel shapes within the fcstd doc is analyzed starting from
+  the very first basefeature (found recursively from toplevel shapes)
+  
+- The algorithm analyses the vertexes/edges/faces of each shape in history
+- Each topo element is described by geometrical values (position,axis,etc)
+- A dictionary is build, the geometrical values are used as keys and the
+  values are the names of the topo-elements.
+- during processing of a new shape/feature, it's keys are calculated and looked
+  up in the dictionary. If a key already exists, the algo assumes, that the
+  geometry belongs to a former analysed shape. If the key does not exist,
+  a new key/name pair is added to the dictionary.
+- When all shapes are processed, there exists a dict with (multiple) entries
+  of all geometry.
+- Some geometry causes multiple keys. So for plane faces there are stored
+  two keys per vertex. One with positive axis value, one with neg.axis value.
+  This is necessary because normals can flip during build history.
+  
+Key-generation:
+    keys for vertexes: "xvalue;yvalue;zvalue"
+    
+    keys for edges: (different ones for different edge types)
+        straight lines
+            2 keys are uses, each consists of:
+                - vertexkey of the endpoint
+                - an axiskey pointing to the other endpoint
+        circles:
+            two keys are used for each vertex on the curve
+                - key consisting of center-vertex and positive axis data + radius
+                - key consisting of center-vertex and negative axis data + radius
+                - both marked with "CIRC" at the beginning
+                
+        other edge types are put to dict with dummy entries.
+        
+    keys for faces:
+        Plane faces are described by vertex/normal for each vertex.
+        Additionally a second entry by vertex/neg.normal for each vertex.
+        
+        Spheres are described by center-vertex + radius
+        
+        Cylindrical faces are described by vertex/pos.axis+radius and second one
+        with neg.axis per vertex.
+        
+Newer shapes in history can delete geo elements of previous ones. If the algorithm
+finds one relicting key of an old shape in the dict, it assumes that the geo element
+belongs to the old shape. Newly created geo elements, which belong together, then get
+the old name, otherwise a new name is defined and put to the dict.
+
+Example:
+A new feature cuts away an endpoint of a line, but one still exists:
+the newly linesegment belongs logically to the old existing one. The new vertex gets the existing name.
+So if a constraint was linked to the old linesegment, we can map it to the new linesegment and the
+assembly keeps consistent.
+
+After building the dict, the compound shape of total doc is analysed. Keys of this are build
+and looked up in the dict to get the names.
+
+A List of names (same indexes as vertexes[n],edges[],faces[] is generated for output.
+
+All this helps A2plus to identify the correct subelements for constraints, if imported
+parts are been edited.
 '''
 
 
@@ -45,9 +98,9 @@ import a2plib
 import os
 
 class TopoMapper(object):
-    def __init__(self,fileName):
-        self.fileName = fileName
-        self.doc = None
+    def __init__(self,doc):
+        self.doc = doc
+        self.fileName = self.doc.FileName
         self.shapeDict = {}
         self.vertexNames = []
         self.edgeNames = []
@@ -147,13 +200,25 @@ class TopoMapper(object):
         elif all( hasattr(face.Surface,a) for a in ['Axis','Center','Radius'] ):
             axisStart = pl.multVec(face.Surface.Center)
             axisEnd   = pl.multVec(face.Surface.Center.add(face.Surface.Axis))
-            axisKey = self.calcAxisKey(axisEnd.sub(axisStart))
+            axis = axisEnd.sub(axisStart)
+            axisKey = self.calcAxisKey(axis)
+            negativeAxis = Base.Vector(axis)
+            negativeAxis.multiply(-1.0)
+            negativeAxisKey = self.calcAxisKey(negativeAxis)
             radiusKey = self.calcFloatKey(face.Surface.Radius)
+            #
             for v in face.Vertexes:
+                vertexKey = self.calcVertexKey(pl.multVec(v.Point))
                 keys.append(
                     'CYL;'+
-                    self.calcVertexKey(pl.multVec(v.Point))+
+                    vertexKey+
                     axisKey+
+                    radiusKey
+                    )
+                keys.append(
+                    'CYL;'+
+                    vertexKey+
+                    negativeAxisKey+
                     radiusKey
                     )
         elif str( face.Surface ) == '<Plane object>':
@@ -165,12 +230,21 @@ class TopoMapper(object):
             normalStart = pl.multVec(pt)
             normalEnd = pl.multVec(pt.add(normal))
             normal = normalEnd.sub(normalStart)
+            negativeNormal = Base.Vector(normal)
+            negativeNormal.multiply(-1.0)
             normalKey = self.calcAxisKey(normal)
+            negativeNormalKey = self.calcAxisKey(negativeNormal)
             for vert in face.Vertexes:
+                vertexKey = self.calcVertexKey(pl.multVec(vert.Point))
                 keys.append(
                     'PLANE;'+
-                    self.calcVertexKey(pl.multVec(vert.Point))+
+                    vertexKey+
                     normalKey
+                    )
+                keys.append(
+                    'PLANE;'+
+                    vertexKey+
+                    negativeNormalKey
                     )
         else:
             keys.append("NOTRACE")
@@ -199,7 +273,7 @@ class TopoMapper(object):
         numNewlyCreatedVertexes = len(shape.Vertexes) - self.totalNumVertexes
         self.totalNumVertexes = len(shape.Vertexes)
         vertexNamePrefix = 'V;'+objName + ';'
-        vertexNameSuffix = str(numNewlyCreatedVertexes)
+        vertexNameSuffix = str(numNewlyCreatedVertexes)+';'
         i = 1 # do not enumerate the following, count new vertexes !
         for vertex in vertexes:
             vertexKey = self.calcVertexKey(pl.multVec(vertex.Point))
@@ -214,7 +288,7 @@ class TopoMapper(object):
         numNewlyCreatedEdges = len(edges) - self.totalNumEdges
         self.totalNumEdges = len(edges)
         edgeNamePrefix = 'E;' + objName + ';'
-        edgeNameSuffix = str(numNewlyCreatedEdges)
+        edgeNameSuffix = str(numNewlyCreatedEdges)+';'
         i = 1 # do not enumerate the following, count new Edges !
         for edge in edges:
             edgeKeys = self.calcEdgeKeys(edge, pl) # 2 keys for a linear edge, 1 key per circular egde
@@ -238,7 +312,7 @@ class TopoMapper(object):
         numNewlyCreatedFaces = len(faces) - self.totalNumFaces
         self.totalNumFaces = len(faces)
         faceNamePrefix = 'F;' + objName + ';'
-        faceNameSuffix = str(numNewlyCreatedFaces)
+        faceNameSuffix = str(numNewlyCreatedFaces)+';'
         i = 1 # do not enumerate the following, count new Faces !
         for face in faces:
             faceKeys = self.calcFaceKeys(face, pl) # one key per vertex of a face
@@ -279,31 +353,31 @@ class TopoMapper(object):
         tempShape.Placement = plmGlobal
         return tempShape
     
-    def createTopoNames(self):
+    def getTopLevelObjects(self):
         #-------------------------------------------
-        # Get the importDocument
+        # Create treenodes of the importable Objects with a shape
         #-------------------------------------------
-        # look only for filenames, not pathes, as there are problems on WIN10 (Address-translation??)
-        self.doc = None
-        docIsOpen = False
-        requestedFile = os.path.split(self.fileName)[1]
+        self.treeNodes = {}
+        shapeObs = self.filterShapeObs(self.doc.Objects)
+        S = set(shapeObs)
+        for ob in S:
+            self.treeNodes[ob.Name] = (
+                    self.filterShapeObs(ob.InList),
+                    self.filterShapeObs(ob.OutList)
+                    )
         #-------------------------------------------
-        # open the doc if necessary
+        # Top level shapes have nodes with empty inList
+        # export complete topLevel objects
         #-------------------------------------------
-        for d in FreeCAD.listDocuments().values():
-            recentFile = os.path.split(d.FileName)[1]
-            if requestedFile == recentFile:
-                self.doc = d # file is already open...
-                docIsOpen = True
-                break
+        outObs = []
+        for objName in self.treeNodes.keys():
+            inList,outList = self.treeNodes[objName]
+            if len(inList) == 0:
+                outObs.append(self.doc.getObject(objName))
+        return outObs
+        
     
-        if not docIsOpen:
-            if self.fileName.lower().endswith('.fcstd'):
-                self.doc = FreeCAD.openDocument(self.fileName)
-            else:
-                msg = "A part can only be imported from a FreeCAD '*.fcstd' file"
-                QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Value Error", msg )
-                return
+    def createTopoNames(self,withColor=False):
         #-------------------------------------------
         # Create treenodes of the importable Objects with a shape
         #-------------------------------------------
@@ -323,77 +397,78 @@ class TopoMapper(object):
             inList,outList = self.treeNodes[objName]
             if len(inList) == 0:
                 self.topLevelShapes.append(objName)
-                #
-                # Reset the counts for each toplevel shape
-                self.totalNumVertexes = 0
-                self.totalNumEdges = 0
-                self.totalNumFaces = 0
-                #
-                self.processTopoData(objName) # analyse each toplevel object...
+                if a2plib.getUseTopoNaming():
+                    # Reset the counts for each toplevel shape
+                    self.totalNumVertexes = 0
+                    self.totalNumEdges = 0
+                    self.totalNumFaces = 0
+                    self.processTopoData(objName) # analyse each toplevel object...
         #
         #-------------------------------------------
         # MUX the toplevel shapes
         #-------------------------------------------
         faces = []
+        faceColors = []
+        
         for objName in self.topLevelShapes:
-            ob = self.doc.getObject(objName)
-            tempShape = self.makePlacedShape(ob)
-            for face in tempShape.Faces:
-                faces.append(face)
-        shell = Part.makeShell(faces)
-        #-------------------------------------------
-        # map vertexnames to the MUX
-        #-------------------------------------------
-        for i,v in enumerate(shell.Vertexes):
-            k = self.calcVertexKey(v)
-            name = self.shapeDict.get(k,None)
-            print(
-                "{} {}   {}".format(
-                    i+1,
-                    name,
-                    k
-                    )
-                )
-        #-------------------------------------------
-        # map edgenames to the MUX
-        #-------------------------------------------
-        pl = FreeCAD.Placement()
-        for i,edge in enumerate(shell.Edges):
-            keys = self.calcEdgeKeys(edge, pl)
-            name = self.shapeDict.get(keys[0],None)
-            print(
-                "{} {}   {}".format(
-                    i+1,
-                    name,
-                    keys[0]
-                    )
-                  )
-        #-------------------------------------------
-        # map facenames to the MUX
-        #-------------------------------------------
-        pl = FreeCAD.Placement()
-        for i,face in enumerate(shell.Faces):
-            keys = self.calcFaceKeys(face, pl)
-            name = self.shapeDict.get(keys[0],None)
-            print(
-                "{} {}   {}".format(
-                    i+1,
-                    name,
-                    keys[0]
-                    )
-                  )
 
-        #-------------------------------------------
-        # for debug only
-        # show the MUX shape         
-        #-------------------------------------------
-        tmp = self.doc.addObject("Part::Feature","tmp")
-        tmp.Shape = shell
-        doc.recompute()
+            ob = self.doc.getObject(objName)
+
+            colorFlag = ( len(ob.ViewObject.DiffuseColor) < len(ob.Shape.Faces) )
+            shapeCol = ob.ViewObject.ShapeColor
+            diffuseCol = ob.ViewObject.DiffuseColor
+            tempShape = self.makePlacedShape(ob)
+
+            # now start the loop with use of the stored values..(much faster)
+            for i, face in enumerate(tempShape.Faces):
+                faces.append(face)
+    
+                if withColor:
+                    if colorFlag:
+                        faceColors.append(shapeCol)
+                    else:
+                        faceColors.append(diffuseCol[i])
+
+        shell = Part.makeShell(faces)
+        #
+        muxInfo = []
+        if a2plib.getUseTopoNaming():
+            #-------------------------------------------
+            # map vertexnames to the MUX
+            #-------------------------------------------
+            muxInfo.append("[VERTEXES]")
+            for i,v in enumerate(shell.Vertexes):
+                k = self.calcVertexKey(v)
+                name = self.shapeDict.get(k,"None")
+                muxInfo.append(name)
+            #-------------------------------------------
+            # map edgenames to the MUX
+            #-------------------------------------------
+            muxInfo.append("[EDGES]")
+            pl = FreeCAD.Placement()
+            for i,edge in enumerate(shell.Edges):
+                keys = self.calcEdgeKeys(edge, pl)
+                name = self.shapeDict.get(keys[0],"None")
+                muxInfo.append(name)
+            #-------------------------------------------
+            # map facenames to the MUX
+            #-------------------------------------------
+            muxInfo.append("[FACES]")
+            pl = FreeCAD.Placement()
+            for i,face in enumerate(shell.Faces):
+                keys = self.calcFaceKeys(face, pl)
+                name = self.shapeDict.get(keys[0],"None")
+                muxInfo.append(name)
+
+        if withColor:
+            return muxInfo, shell, faceColors
+        else:
+            return muxInfo, shell
+        
 
 if __name__ == "__main__":
     doc = FreeCAD.activeDocument()
-    tm = TopoMapper(doc.FileName)
+    tm = TopoMapper(doc)
     tm.createTopoNames()
 
 

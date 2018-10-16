@@ -54,10 +54,6 @@ RED = (1.0,0.0,0.0)
 GREEN = (0.0,1.0,0.0)
 BLUE = (0.0,0.0,1.0)
 
-# Activate a Testmode, solving does only some steps,
-# you can see Movement of parts on screen
-A2P_MOVIMODE        = False 
-
 # DEFINE DEBUG LEVELS FOR CONSOLE OUTPUT
 A2P_DEBUG_NONE      = 0
 A2P_DEBUG_1         = 1
@@ -75,6 +71,10 @@ PARTIAL_SOLVE_STAGE5 = 5    #take all remaining rigid and dependencies not done 
 PARTIAL_SOLVE_END = 6
 
 
+#------------------------------------------------------------------------------
+def getUseTopoNaming():
+    preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
+    return preferences.GetBool('useTopoNaming',False)
 #------------------------------------------------------------------------------
 def getRelativePathesEnabled():
     global RELATIVE_PATHES_ENABLED

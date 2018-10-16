@@ -41,7 +41,6 @@ from a2plib import (
     appVersionStr,
     Msg,
     DebugMsg,
-    A2P_MOVIMODE,
     A2P_DEBUG_LEVEL,
     A2P_DEBUG_1,
     A2P_DEBUG_2,
@@ -525,50 +524,24 @@ class SolverSystem():
             rig.applySolution(doc, self);
 
 #------------------------------------------------------------------------------
-def solveConstraints_OperationalMode( doc, cache=None ):
-    '''
-    Normal solving. Parts are moved according
-    required level of accuracy
-    '''
-    doc.openTransaction("a2p_systemSolving")
+def solveConstraints( doc, cache=None, useTransaction = True ):
+    if useTransaction: doc.openTransaction("a2p_systemSolving")
     ss = SolverSystem()
     ss.solveSystem(doc)
-    doc.commitTransaction()
+    if useTransaction: doc.commitTransaction()
 
-def solveConstraints_MoviMode( doc, cache=None ):
-    '''
-    Test solving mode. Solver does only some steps.
-    You can view the movement of parts on screen.
-    Used for approving correct function of dependencies
-    '''
-    doc.openTransaction("a2p_systemSolving")
-    ss = SolverSystem()
-    ss.loadSystem(doc)
-    for rig in ss.rigids:
-        rig.enableDependencies(ss.rigids)
-    for i in range(0,1):
-        for r in ss.rigids:
-            r.calcMoveData(doc, ss)
-        for r in ss.rigids:
-            r.move(doc)
-            r.applySolution(doc, ss)
-            FreeCADGui.updateGui()
-    doc.commitTransaction()
-    
-def solveConstraints( doc, cache=None ):
-    if A2P_MOVIMODE: #visual solver testmode, some visual solversteps on screen
-        solveConstraints_MoviMode(doc, cache=None)
-    else:
-        solveConstraints_OperationalMode(doc, cache=None) #Normal solver mode
-        #FreeCADGui.updateGui()
-        #FreeCAD.activeDocument().recompute()
-
-def autoSolveConstraints( doc, cache=None):
+def autoSolveConstraints( doc, callingFuncName, cache=None, useTransaction = True ):
     if not a2plib.getAutoSolveState():
-        #FreeCADGui.updateGui()
-        #FreeCAD.activeDocument().recompute() # perhaps a constraint was inserted or edited
         return
-    solveConstraints(doc)
+    if callingFuncName != None:
+        '''
+        print (
+            "autoSolveConstraints called from '{}'".format(
+                callingFuncName
+                )
+               )
+        '''
+    solveConstraints(doc, useTransaction)
 
 class a2p_SolverCommand:
     def Activated(self):

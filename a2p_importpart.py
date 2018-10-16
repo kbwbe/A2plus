@@ -30,10 +30,14 @@ from a2p_MuxAssembly import (
     muxObjectsWithKeys,
     createTopoInfo,
     Proxy_muxAssemblyObj,
-    makePlacedShape
+    makePlacedShape,
+    muxAssemblyWithTopoNames
     )
 from a2p_viewProviderProxies import *
-from a2p_versionmanagement import SubAssemblyWalk, A2P_VERSION
+from a2p_versionmanagement import (
+    SubAssemblyWalk, 
+    A2P_VERSION
+    )
 import a2p_solversystem
 from a2plib import (
     appVersionStr,
@@ -45,6 +49,10 @@ from a2plib import (
     A2P_DEBUG_2,
     A2P_DEBUG_3,
     getRelativePathesEnabled
+    )
+
+from a2p_topomapper import (
+    TopoMapper
     )
 
 PYVERSION =  sys.version_info[0]
@@ -182,15 +190,18 @@ def importPartFromFile(_doc, filename, importToCache=False):
             msg = "A part can only be imported from a FreeCAD '*.fcstd' file"
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Value Error", msg )
             return
+
+    #-------------------------------------------
+    # Initialize the new TopoMapper
+    #-------------------------------------------
+    topoMapper = TopoMapper(importDoc)
+
     #-------------------------------------------
     # Get a list of the importable Objects
     #-------------------------------------------
-
-    importableObjects = list()
-    importableObjects.extend(getImpPartsFromDoc(importDoc))            #visible parts only
-#    importableObjects.extend(getImpPartsFromDoc(importDoc, False))     #take invisible parts too
-
-    if importableObjects == None or len(importableObjects) == 0:
+    importableObjects = topoMapper.getTopLevelObjects()
+    
+    if len(importableObjects) == 0:
         msg = "No visible Part to import found. Aborting operation"
         QtGui.QMessageBox.information(
             QtGui.QApplication.activeWindow(),
@@ -198,8 +209,15 @@ def importPartFromFile(_doc, filename, importToCache=False):
             msg
             )
         return
-
-    #TODO: allow import multiple parts as separate items
+    
+    #-------------------------------------------
+    # Discover whether we are importing a subassembly or a single part
+    #-------------------------------------------
+    subAssemblyImport = False
+    if all([ 'importPart' in obj.Content for obj in importableObjects]) == 1:
+        subAssemblyImport = True
+        
+    '''
     #-------------------------------------------
     # Discover whether we are importing a subassembly or a single part
     #-------------------------------------------
@@ -212,6 +230,7 @@ def importPartFromFile(_doc, filename, importToCache=False):
         DebugMsg(A2P_DEBUG_3,"a2p importPartFromFile: importableObjects:\n{}\n".format(importableObjects))
     if len(importableObjects) > 1:
         subAssemblyImport = True
+    '''
 
     #-------------------------------------------
     # create new object
@@ -257,22 +276,18 @@ def importPartFromFile(_doc, filename, importToCache=False):
     newObj.addProperty("App::PropertyBool","updateColors","importPart").updateColors = True
 
     if subAssemblyImport:
-        newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor = muxObjectsWithKeys(importableObjects, withColor=True)
-        #newObj.muxInfo, newObj.Shape = muxObjectsWithKeys(importDoc, withColor=False)
+    #if False:
+        #newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor = muxObjectsWithKeys(importableObjects, withColor=True)
+        newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor = muxAssemblyWithTopoNames(
+            importDoc, 
+            withColor=True
+            )
     else:
-        tmpObj = importableObjects[0]
-        newObj.Shape = makePlacedShape(tmpObj)
-        newObj.ViewObject.ShapeColor = tmpObj.ViewObject.ShapeColor
-        if appVersionStr() <= '000.016': #FC0.17: DiffuseColor overrides ShapeColor !
-            newObj.ViewObject.DiffuseColor = tmpObj.ViewObject.DiffuseColor
-        newObj.muxInfo = createTopoInfo(tmpObj)
-        newObj.ViewObject.Transparency = tmpObj.ViewObject.Transparency
+        # TopoMapper manages import of non A2p-Files. It generates the shapes and appropiate topo names...
+        newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor = topoMapper.createTopoNames(withColor=True)
+        
 
     doc.recompute()
-
-#    if len(newObj.ViewObject.DiffuseColor) > 1:                              # don't know if needed,
-#        # force-reset colors if changed                                      # borrowed from Arch WB
-#        newObj.ViewObject.DiffuseColor = newObj.ViewObject.DiffuseColor
 
     if importToCache:
         objectCache.add(filename, newObj)
@@ -387,6 +402,11 @@ def updateImportedParts(doc):
                         )
         return
         
+    # modififying object's subelements causes solving of the assembly, disable autosolve here
+    autoSolveState = a2plib.getAutoSolveState()
+    a2plib.setAutoSolve(False)
+            
+    doc.openTransaction("updateImportParts")    
     objectCache.cleanUp(doc)
     for obj in doc.Objects:
         if hasattr(obj, 'sourceFile'):
@@ -437,11 +457,23 @@ def updateImportedParts(doc):
     mw = FreeCADGui.getMainWindow()
     mdi = mw.findChild(QtGui.QMdiArea)
     sub = mdi.activeSubWindow()
-    sub.showMaximized()
+    if sub != None:
+        sub.showMaximized()
 
     objectCache.cleanUp(doc)
-    a2p_solversystem.autoSolveConstraints(doc)
+    a2plib.setAutoSolve(autoSolveState)
+    
+    if not a2plib.getUseTopoNaming():
+        # This is only needed when not using toponames. 
+        # Otherwise updating constraints.subelements triggers this.
+        a2p_solversystem.autoSolveConstraints(
+            doc, 
+            useTransaction = False, 
+            callingFuncName = "updateImportedParts"
+            ) #transaction is already open...
+    
     doc.recompute()
+    doc.commitTransaction()    
 
 
 
@@ -1002,7 +1034,7 @@ def a2p_FlipConstraintDirection():
             lastConstraintAdded.directionConstraint = 'opposed'
         else:
             lastConstraintAdded.directionConstraint = 'aligned'
-        a2p_solversystem.autoSolveConstraints(FreeCAD.activeDocument())
+        a2p_solversystem.autoSolveConstraints(FreeCAD.activeDocument(), callingFuncName="a2p_FlipConstraintDirection")
     except:
         pass
 
@@ -1095,6 +1127,118 @@ FreeCADGui.addCommand('a2p_absPath_to_relPath_Command', a2p_absPath_to_relPath_C
 
 
 def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
-    ''' updating constraints, deactivated at moment'''
-    return
+    if not a2plib.getUseTopoNaming(): return
+    
+    # return if there are no constraints linked to the object 
+    if len([c for c in doc.Objects if  'ConstraintInfo' in c.Content and oldObject.Name in [c.Object1, c.Object2] ]) == 0:
+        return
+
+
+    # check, wether object is an assembly with muxInformations.
+    # Then find edgenames with mapping in muxinfo...
+    deletionList = [] #for broken constraints
+    if hasattr(oldObject, 'muxInfo'):
+        if hasattr(newObject, 'muxInfo'):
+            #
+            oldVertexNames = []
+            oldEdgeNames = []
+            oldFaceNames = []
+            for item in oldObject.muxInfo:
+                if item[:1] == 'V':
+                    oldVertexNames.append(item)
+                if item[:1] == 'E':
+                    oldEdgeNames.append(item)
+                if item[:1] == 'F':
+                    oldFaceNames.append(item)
+            #
+            newVertexNames = []
+            newEdgeNames = []
+            newFaceNames = []
+            for item in newObject.muxInfo:
+                if item[:1] == 'E':
+                    newVertexNames.append(item)
+                if item[:1] == 'E':
+                    newEdgeNames.append(item)
+                if item[:1] == 'F':
+                    newFaceNames.append(item)
+            #
+            partName = oldObject.Name
+            for c in doc.Objects:
+                if 'ConstraintInfo' in c.Content:
+                    if partName == c.Object1:
+                        SubElement = "SubElement1"
+                    elif partName == c.Object2:
+                        SubElement = "SubElement2"
+                    else:
+                        SubElement = None
+                        
+                    if SubElement: #same as subElement <> None
+                        
+                        subElementName = getattr(c, SubElement)
+                        if subElementName[:4] == 'Face':
+                            try:
+                                oldIndex = int(subElementName[4:])-1
+                                oldConstraintString = oldFaceNames[oldIndex]
+                                newIndex = newFaceNames.index(oldConstraintString)
+                                newSubElementName = 'Face'+str(newIndex+1)
+                            except:
+                                newIndex = -1
+                                newSubElementName = 'INVALID'
+                                
+                        elif subElementName[:4] == 'Edge':
+                            try:
+                                oldIndex = int(subElementName[4:])-1
+                                oldConstraintString = oldEdgeNames[oldIndex]
+                                newIndex = newEdgeNames.index(oldConstraintString)
+                                newSubElementName = 'Edge'+str(newIndex+1)
+                            except:
+                                newIndex = -1
+                                newSubElementName = 'INVALID'
+                                
+                        elif subElementName[:6] == 'Vertex':
+                            try:
+                                oldIndex = int(subElementName[6:])-1
+                                oldConstraintString = oldVertexNames[oldIndex]
+                                newIndex = newVertexNames.index(oldConstraintString)
+                                newSubElementName = 'Vertex'+str(newIndex+1)
+                            except:
+                                newIndex = -1
+                                newSubElementName = 'INVALID'
+                                
+                        else:
+                            newIndex = -1
+                            newSubElementName = 'INVALID'
+                        
+                        if newIndex >= 0:
+                            setattr(c, SubElement, newSubElementName )
+                            print (
+                                    "oldConstraintString (KEY) : {}".format(
+                                    oldConstraintString
+                                    )
+                                   )
+                            print ("Updating by SubElement-Map: {} => {} ".format(
+                                       subElementName,newSubElementName
+                                       )
+                                   )
+                            continue
+                        #
+                        # if code coming here, constraint is broken
+                        if c.Name not in deletionList:
+                            deletionList.append(c.Name)
+                            
+    
+    if len(deletionList) > 0: # there are broken constraints..
+        for cName in deletionList:
+        
+            flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.Abort
+            message = "constraint %s is broken. Delete constraint? otherwise check for wrong linkage." % cName
+            #response = QtGui.QMessageBox.critical(QtGui.qApp.activeWindow(), "Broken Constraint", message, flags )
+            response = QtGui.QMessageBox.critical(None, "Broken Constraint", message, flags )
+        
+            if response == QtGui.QMessageBox.Yes:
+                FreeCAD.Console.PrintError("removing constraint %s" % cName)
+                c = doc.getObject(cName)
+                a2plib.removeConstraint(c)
+                
+
 
