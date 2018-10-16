@@ -157,7 +157,12 @@ class TopoMapper(object):
 
     def calcEdgeKeys(self, edge, pl):
         keys = []
-        if hasattr(edge,"Curve") and hasattr(edge.Curve,'Axis'): #circular edge #hasattr(edge,"Curve") because of spheres...
+        #circular edge #hasattr(edge,"Curve") because of spheres...
+        if (
+            hasattr(edge,"Curve") and 
+            hasattr(edge.Curve,'Axis') and
+            hasattr(edge.Curve,'Radius')
+            ): 
             axisStart = pl.multVec(edge.Curve.Center)
             axisEnd   = pl.multVec(edge.Curve.Center.add(edge.Curve.Axis))
             axis = axisEnd.sub(axisStart)
