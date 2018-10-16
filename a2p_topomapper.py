@@ -24,16 +24,69 @@
 '''
 Experimental mapper for a2p related topological naming.
 
-Recent capabilities:
-- create unique toponame for each vertex in a single document
-- create unique toponame for each edge in a single document
-- create unique toponame for each face in a single document (not complete ready)
+It is used during first level import of fcstd documents to a2p
 
-Usage: 
-- open fc document with a single body inside
-- execute "a2p_toponamer.py" as makro ATM
-- look at console output for created toponames
-- compare vertex/edgenames with 'tmp' object in treeview
+Working principle:
+- History of toplevel shapes within the fcstd doc is analyzed starting from
+  the very first basefeature (found recursively from toplevel shapes)
+  
+- The algorithm analyses the vertexes/edges/faces of each shape in history
+- Each topo element is described by geometrical values (position,axis,etc)
+- A dictionary is build, the geometrical values are used as keys and the
+  values are the names of the topo-elements.
+- during processing of a new shape/feature, it's keys are calculated and looked
+  up in the dictionary. If a key already exists, the algo assumes, that the
+  geometry belongs to a former analysed shape. If the key does not exist,
+  a new key/name pair is added to the dictionary.
+- When all shapes are processed, there exists a dict with (multiple) entries
+  of all geometry.
+- Some geometry causes multiple keys. So for plane faces there are stored
+  two keys per vertex. One with positive axis value, one with neg.axis value.
+  This is necessary because normals can flip during build history.
+  
+Key-generation:
+    keys for vertexes: "xvalue;yvalue;zvalue"
+    
+    keys for edges: (different ones for different edge types)
+        straight lines
+            2 keys are uses, each consists of:
+                - vertexkey of the endpoint
+                - an axiskey pointing to the other endpoint
+        circles:
+            two keys are used for each vertex on the curve
+                - key consisting of center-vertex and positive axis data + radius
+                - key consisting of center-vertex and negative axis data + radius
+                - both marked with "CIRC" at the beginning
+                
+        other edge types are put to dict with dummy entries.
+        
+    keys for faces:
+        Plane faces are described by vertex/normal for each vertex.
+        Additionally a second entry by vertex/neg.normal for each vertex.
+        
+        Spheres are described by center-vertex + radius
+        
+        Cylindrical faces are described by vertex/pos.axis+radius and second one
+        with neg.axis per vertex.
+        
+Newer shapes in history can delete geo elements of previous ones. If the algorithm
+finds one relicting key of an old shape in the dict, it assumes that the geo element
+belongs to the old shape. Newly created geo elements, which belong together, then get
+the old name, otherwise a new name is defined and put to the dict.
+
+Example:
+A new feature cuts away an endpoint of a line, but one still exists:
+the newly linesegment belongs logically to the old existing one. The new vertex gets the existing name.
+So if a constraint was linked to the old linesegment, we can map it to the new linesegment and the
+assembly keeps consistent.
+
+After building the dict, the compound shape of total doc is analysed. Keys of this are build
+and looked up in the dict to get the names.
+
+A List of names (same indexes as vertexes[n],edges[],faces[] is generated for output.
+
+All this helps A2plus to identify the correct subelements for constraints, if imported
+parts are been edited.
 '''
 
 
@@ -369,7 +422,6 @@ class TopoMapper(object):
             # now start the loop with use of the stored values..(much faster)
             for i, face in enumerate(tempShape.Faces):
                 faces.append(face)
-                a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"a2p MUX: i(Faces)={}\n{}\n".format(i,face))
     
                 if withColor:
                     if colorFlag:
