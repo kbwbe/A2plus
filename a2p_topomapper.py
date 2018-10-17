@@ -95,7 +95,7 @@ from PySide import QtGui, QtCore
 import FreeCAD, FreeCADGui, Part
 from FreeCAD import Base
 import a2plib
-import os
+import os, copy
 
 class TopoMapper(object):
     def __init__(self,doc):
@@ -420,19 +420,24 @@ class TopoMapper(object):
             ob = self.doc.getObject(objName)
 
             colorFlag = ( len(ob.ViewObject.DiffuseColor) < len(ob.Shape.Faces) )
-            shapeCol = ob.ViewObject.ShapeColor
-            diffuseCol = ob.ViewObject.DiffuseColor
+            shapeCol = copy.deepcopy(ob.ViewObject.ShapeColor)                     # for sCT-Mode: meaning: shapeColor
+            shapeTsp = copy.deepcopy(ob.ViewObject.Transparency)                   # for sCT-Mode: |_ plus Transparency
+            comboCol = (shapeCol[0],shapeCol[1],shapeCol[2],float(shapeTsp/100.0)) # comboCol: sCT-Mode color calculation
+            diffuseCol = copy.deepcopy(ob.ViewObject.DiffuseColor)                 # for dCi-Mode: diffuseColor per face[i]
             tempShape = self.makePlacedShape(ob)
 
             # now start the loop with use of the stored values..(much faster)
             for i, face in enumerate(tempShape.Faces):
                 faces.append(face)
+                a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"a2p assyMUX: i(Faces)={}, {} ".format(i,face))
     
                 if withColor:
                     if colorFlag:
-                        faceColors.append(shapeCol)
+                        faceColors.append(comboCol)
+                        a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"sCT-Mode\n")
                     else:
                         faceColors.append(diffuseCol[i])
+                        a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"dCi-Mode\n")
 
         shell = Part.makeShell(faces)
         #
