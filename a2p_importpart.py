@@ -450,8 +450,9 @@ def updateImportedParts(doc):
                     # save Placement because following newObject.Shape.copy() isn't resetting it to zeroes...
                     savedPlacement  = obj.Placement
                     obj.Shape = newObject.Shape.copy()
-                    obj.ViewObject.DiffuseColor = copy.copy(newObject.ViewObject.DiffuseColor)
-                    obj.ViewObject.Transparency = newObject.ViewObject.Transparency
+#                    obj.ViewObject.ShapeColor = copy.deepcopy(newObject.ViewObject.ShapeColor)
+#                    obj.ViewObject.Transparency = copy.deepcopy(newObject.ViewObject.Transparency)
+                    obj.ViewObject.DiffuseColor = copy.deepcopy(newObject.ViewObject.DiffuseColor)
                     obj.Placement = savedPlacement # restore the old placement
 
     mw = FreeCADGui.getMainWindow()
@@ -810,7 +811,15 @@ class ViewConnectionsObserver:
             FreeCADGui.Selection.addSelection(
                 FreeCAD.ActiveDocument.getObject(selected.Object2), selected.SubElement2)
 
+            
+
 class a2p_isolateCommand:
+
+    def hasFaces(self,ob):
+        if hasattr(ob,"Shape") and hasattr(ob.Shape,"Faces") and len(ob.Shape.Faces)>0:
+            return True
+        return False
+
     def Activated(self):
         if FreeCAD.activeDocument() == None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
@@ -827,6 +836,7 @@ class a2p_isolateCommand:
                 if obj.Name == 'PartInformation': continue
                 if obj.Name[:4] == 'Page': continue
                 if obj.Name == 'SimpleAssemblyShape': continue
+                if not self.hasFaces(obj): continue
                 if hasattr(obj,'ViewObject'):
                     if hasattr(obj.ViewObject,'Visibility'):
                         obj.ViewObject.Visibility = True
