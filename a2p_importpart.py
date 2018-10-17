@@ -810,7 +810,15 @@ class ViewConnectionsObserver:
             FreeCADGui.Selection.addSelection(
                 FreeCAD.ActiveDocument.getObject(selected.Object2), selected.SubElement2)
 
+            
+
 class a2p_isolateCommand:
+
+    def hasFaces(self,ob):
+        if hasattr(ob,"Shape") and hasattr(ob.Shape,"Faces") and len(ob.Shape.Faces)>0:
+            return True
+        return False
+
     def Activated(self):
         if FreeCAD.activeDocument() == None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
@@ -827,6 +835,7 @@ class a2p_isolateCommand:
                 if obj.Name == 'PartInformation': continue
                 if obj.Name[:4] == 'Page': continue
                 if obj.Name == 'SimpleAssemblyShape': continue
+                if not self.hasFaces(obj): continue
                 if hasattr(obj,'ViewObject'):
                     if hasattr(obj.ViewObject,'Visibility'):
                         obj.ViewObject.Visibility = True
