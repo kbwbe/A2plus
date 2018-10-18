@@ -1165,7 +1165,7 @@ def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
             newEdgeNames = []
             newFaceNames = []
             for item in newObject.muxInfo:
-                if item[:1] == 'E':
+                if item[:1] == 'V':
                     newVertexNames.append(item)
                 if item[:1] == 'E':
                     newEdgeNames.append(item)
