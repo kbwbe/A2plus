@@ -425,13 +425,12 @@ def updateImportedParts(doc):
 
             if absPath == None:
                 QtGui.QMessageBox.critical(  QtGui.QApplication.activeWindow(),
-                                            "Source file not found",
-                                            "update of {} aborted!\nUnable to find {}".format(
-                                                obj.Name,
+                                            u"Source file not found",
+                                            u"Unable to find {}".format(
                                                 obj.sourceFile
                                                 )
                                         )
-            if os.path.exists( absPath ):
+            if absPath != None and os.path.exists( absPath ):
                 newPartCreationTime = os.path.getmtime( absPath )
                 if ( 
                     newPartCreationTime > obj.timeLastImport or
