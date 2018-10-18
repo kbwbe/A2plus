@@ -63,9 +63,6 @@ def muxAssemblyWithTopoNames(doc, withColor=False):
     faceColors = []
     muxInfo = [] # List of keys, not used at moment...
 
-
-    objects = doc.Objects
-        
     visibleObjects = [ obj for obj in doc.Objects
                        if hasattr(obj,'ViewObject') and obj.ViewObject.isVisible()
                        and hasattr(obj,'Shape') and len(obj.Shape.Faces) > 0
@@ -88,14 +85,14 @@ def muxAssemblyWithTopoNames(doc, withColor=False):
                 if item[0] == 'F': faceNames.append(item)
 
         if a2plib.getUseTopoNaming():
-            for i, vertex in enumerate(obj.Shape.Vertexes):
+            for i in range(0, len(obj.Shape.Vertexes) ):
                 if extendNames:
                     newName = "".join((vertexNames[i],obj.Name,';'))
                     muxInfo.append(newName)
                 else:
                     newName = "".join(('V;',str(i+1),';',obj.Name,';'))
                     muxInfo.append(newName)
-            for i, edge in enumerate(obj.Shape.Edges):
+            for i in range(0, len(obj.Shape.Edges) ):
                 if extendNames:
                     newName = "".join((edgeNames[i],obj.Name,';'))
                     muxInfo.append(newName)
@@ -110,29 +107,22 @@ def muxAssemblyWithTopoNames(doc, withColor=False):
         tempShape = makePlacedShape(obj)
 
         # now start the loop with use of the stored values..(much faster)
-        if a2plib.getUseTopoNaming():
-            for i, face in enumerate(tempShape.Faces):
-                faces.append(face)
+        topoNaming = a2plib.getUseTopoNaming()
+        for i, face in enumerate(tempShape.Faces):
+            faces.append(face)
+            if topoNaming:
                 if extendNames:
                     newName = "".join((faceNames[i],obj.Name,';'))
                     muxInfo.append(newName)
                 else:
                     newName = "".join(('F;',str(i+1),';',obj.Name,';'))
                     muxInfo.append(newName)
-    
-                if withColor:
-                    if colorFlag:
-                        faceColors.append(shapeCol)
-                    else:
-                        faceColors.append(diffuseCol[i])
-        else:
-            for i, face in enumerate(tempShape.Faces):
-                faces.append(face)
-                if withColor:
-                    if colorFlag:
-                        faceColors.append(shapeCol)
-                    else:
-                        faceColors.append(diffuseCol[i])
+
+            if withColor:
+                if colorFlag:
+                    faceColors.append(shapeCol)
+                else:
+                    faceColors.append(diffuseCol[i])
 
     shell = Part.makeShell(faces)
     if withColor:
