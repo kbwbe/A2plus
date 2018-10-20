@@ -54,10 +54,6 @@ RED = (1.0,0.0,0.0)
 GREEN = (0.0,1.0,0.0)
 BLUE = (0.0,0.0,1.0)
 
-# Activate a Testmode, solving does only some steps,
-# you can see Movement of parts on screen
-A2P_MOVIMODE        = False 
-
 # DEFINE DEBUG LEVELS FOR CONSOLE OUTPUT
 A2P_DEBUG_NONE      = 0
 A2P_DEBUG_1         = 1
@@ -75,6 +71,10 @@ PARTIAL_SOLVE_STAGE5 = 5    #take all remaining rigid and dependencies not done 
 PARTIAL_SOLVE_END = 6
 
 
+#------------------------------------------------------------------------------
+def getUseTopoNaming():
+    preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
+    return preferences.GetBool('useTopoNaming',False)
 #------------------------------------------------------------------------------
 def getRelativePathesEnabled():
     global RELATIVE_PATHES_ENABLED
@@ -174,6 +174,18 @@ def getProjectFolder():
     return preferences.GetString('projectFolder', '~')
 
 #------------------------------------------------------------------------------
+def findFile(name, path):
+    '''
+    Searches a file within a directory and it's subdirectories
+    '''
+    for root, dirs, files in os.walk(path):
+        if PYVERSION < 3:
+            if name.encode('utf-8') in files:
+                return os.path.join(root, name)
+        else:
+            if name in files:
+                return os.path.join(root, name)
+#------------------------------------------------------------------------------
 def findSourceFileInProject(pathImportPart, assemblyPath):
     '''
     #------------------------------------------------------------------------------------
@@ -205,53 +217,19 @@ def findSourceFileInProject(pathImportPart, assemblyPath):
             #absolute path
             return pathImportPart
 
-    def findFile(name, path):
-        for root, dirs, files in os.walk(path):
-            if PYVERSION < 3:
-                if str(name) in files:
-                    return os.path.join(root, name)
-            else:
-                if name in files:
-                    return os.path.join(root, name)
-
     projectFolder = os.path.abspath(getProjectFolder()) # get normalized path
     fileName = os.path.basename(pathImportPart)
     retval = findFile(fileName,projectFolder)
     return retval
-
-#------------------------------------------------------------------------------
-def findInProject(pathImportPart):
-    '''
-    #------------------------------------------------------------------------------------
-    # function to find filename only in/beneath projectFolder
-    #------------------------------------------------------------------------------------
-    '''
-    def findFile(name, path):
-        for root, dirs, files in os.walk(path):
-            if PYVERSION < 3:
-                if str(name) in files:
-                    return os.path.join(root, name)
-            else:
-                if name in files:
-                    return os.path.join(root, name)
-
-    projectFolder = os.path.abspath(getProjectFolder()) # get normalized path
-    fileName = os.path.basename(pathImportPart)
-    retval = findFile(fileName,projectFolder)
-    return retval
-
 #------------------------------------------------------------------------------
 def checkFileIsInProjectFolder(path):
     preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
     if not preferences.GetBool('useProjectFolder', False): return True
 
-    nameInProject = findInProject(path)
-    print(
-        "path: {} nameInProject: {}".format(
-            path,
-            nameInProject
-            )
-        )
+    projectFolder = os.path.abspath(getProjectFolder()) # get normalized path
+    fileName = os.path.basename(path)
+    nameInProject = findFile(fileName,projectFolder)
+    
     if nameInProject == path:
         return True
     else:

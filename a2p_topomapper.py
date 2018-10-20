@@ -24,59 +24,93 @@
 '''
 Experimental mapper for a2p related topological naming.
 
-Recent capabilities:
-- create unique toponame for each vertex in a single body
-- create unique toponame for each edge in a single body
+It is used during first level import of fcstd documents to a2p
 
-Work in progress:
-- create unique toponame for each face in a single body
+Working principle:
+- History of toplevel shapes within the fcstd doc is analyzed starting from
+  the very first basefeature (found recursively from toplevel shapes)
+  
+- The algorithm analyses the vertexes/edges/faces of each shape in history
+- Each topo element is described by geometrical values (position,axis,etc)
+- A dictionary is build, the geometrical values are used as keys and the
+  values are the names of the topo-elements.
+- during processing of a new shape/feature, it's keys are calculated and looked
+  up in the dictionary. If a key already exists, the algo assumes, that the
+  geometry belongs to a former analysed shape. If the key does not exist,
+  a new key/name pair is added to the dictionary.
+- When all shapes are processed, there exists a dict with (multiple) entries
+  of all geometry.
+- Some geometry causes multiple keys. So for plane faces there are stored
+  two keys per vertex. One with positive axis value, one with neg.axis value.
+  This is necessary because normals can flip during build history.
+  
+Key-generation:
+    keys for vertexes: "xvalue;yvalue;zvalue"
+    
+    keys for edges: (different ones for different edge types)
+        straight lines
+            2 keys are uses, each consists of:
+                - vertexkey of the endpoint
+                - an axiskey pointing to the other endpoint
+        circles:
+            two keys are used for each vertex on the curve
+                - key consisting of center-vertex and positive axis data + radius
+                - key consisting of center-vertex and negative axis data + radius
+                - both marked with "CIRC" at the beginning
+                
+        other edge types are put to dict with dummy entries.
+        
+    keys for faces:
+        Plane faces are described by vertex/normal for each vertex.
+        Additionally a second entry by vertex/neg.normal for each vertex.
+        
+        Spheres are described by center-vertex + radius
+        
+        Cylindrical faces are described by vertex/pos.axis+radius and second one
+        with neg.axis per vertex.
+        
+Newer shapes in history can delete geo elements of previous ones. If the algorithm
+finds one relicting key of an old shape in the dict, it assumes that the geo element
+belongs to the old shape. Newly created geo elements, which belong together, then get
+the old name, otherwise a new name is defined and put to the dict.
 
-Issues: globalPlacement ignored ATM
+Example:
+A new feature cuts away an endpoint of a line, but one still exists:
+the newly linesegment belongs logically to the old existing one. The new vertex gets the existing name.
+So if a constraint was linked to the old linesegment, we can map it to the new linesegment and the
+assembly keeps consistent.
 
-Usage: 
-- open fc document with a single body inside
-- execute "a2p_toponamer.py" as makro ATM
-- look at console output for created toponames
+After building the dict, the compound shape of total doc is analysed. Keys of this are build
+and looked up in the dict to get the names.
+
+A List of names (same indexes as vertexes[n],edges[],faces[] is generated for output.
+
+All this helps A2plus to identify the correct subelements for constraints, if imported
+parts are been edited.
 '''
 
 
 
-
+from PySide import QtGui, QtCore
 import FreeCAD, FreeCADGui, Part
 from FreeCAD import Base
 import a2plib
+import os
 
-def filterShapeObs(_list):
-    lst = []
-    for ob in _list:
-        if hasattr(ob,"Shape"):
-            if len(ob.Shape.Faces) > 0:
-                lst.append(ob)
-    S = set(lst)
-    lst = []
-    lst.extend(S)
-    return lst
-
-
-class BodyTopoMapper(object):
-    
-    def __init__(self,bodyObject):
-        self.body = bodyObject
-        self.shapeSequence = []
-        self.vertexNameDict = {}
+class TopoMapper(object):
+    def __init__(self,doc):
+        self.doc = doc
+        self.fileName = self.doc.FileName
+        self.shapeDict = {}
         self.vertexNames = []
-        self.edgeNameDict = {}
         self.edgeNames = []
-        self.faceNameDict = {}
         self.faceNames = []
-        #
-        self.calcShapeSequence()
-        self.setupVertexDict()
-        self.setupVertexNames()
-        self.setupEdgeDict()
-        self.setupEdgeNames()
-        self.setupFaceDict()
-        self.setupFaceNames()
+        self.treeNodes = {}
+        self.topLevelShapes = []
+        self.doneObjects = []
+        self.totalNumVertexes = 0
+        self.totalNumEdges = 0
+        self.totalNumFaces = 0
         
     def calcFloatKey(self,val):
             return "%014.3f;" % val
@@ -101,6 +135,7 @@ class BodyTopoMapper(object):
         key = ''
         for value in coords:
             keyPartial = "%014.3f;" % value
+            if keyPartial == "-000000000.000;": keyPartial = "0000000000.000;"
             key += keyPartial
         return key
     
@@ -116,66 +151,32 @@ class BodyTopoMapper(object):
         key = ''
         for value in coords:
             keyPartial = "%012.9f;" % value
+            if keyPartial == "-0.000000000;": keyPartial = "00.000000000;"
             key += keyPartial
         return key
-    
-    def setupEdgeNames(self):
-        self.edgeNames = []
-        if len(self.shapeSequence) == 0: return
-        feature = self.shapeSequence[-1]
-        print ("=== index/edgeName Map of last feature ===")
-        for i,edge in enumerate(feature.Shape.Edges):
-            edgeKeys = self.calcEdgeKeys(edge)
-            for edgeKey in edgeKeys:
-                edgeName = self.edgeNameDict.get(edgeKey,None)
-                if edgeName != None:
-                    self.edgeNames.append(edgeName)
-                    print(str(i+1)+' '+edgeName)
-                    break
-            
-    def setupVertexNames(self):
-        self.vertexNames = []
-        if len(self.shapeSequence) == 0: return
-        feature = self.shapeSequence[-1]
-        print ("=== index/VertexName Map of last feature ===")
-        for i,vertex in enumerate(feature.Shape.Vertexes):
-            vertexKey = self.calcVertexKey(vertex)
-            vertexName = self.vertexNameDict[vertexKey]
-            self.vertexNames.append(vertexName)
-            print(str(i+1)+' '+vertexName)
-            
-    def setupFaceNames(self):
-        self.faceNames = []
-        if len(self.shapeSequence) == 0: return
-        feature = self.shapeSequence[-1]
-        print ("=== index/faceName Map of last feature ===")
-        for i,face in enumerate(feature.Shape.Faces):
-            faceKeys = self.calcFaceKeys(face)
-            for faceKey in faceKeys:
-                faceName = self.faceNameDict.get(faceKey,None)
-                if faceName != None:
-                    self.faceNames.append(faceName)
-                    print(str(i+1)+' '+faceName)
-                    break
-                else:
-                    self.faceNames.append("None")
-                    print(str(i+1)+" None")
-            
-    def calcEdgeKeys(self,edge):
-        keys = []
 
-        if hasattr(edge.Curve,'Axis'): #circular edge
+    def calcEdgeKeys(self, edge, pl):
+        keys = []
+        #circular edge #hasattr(edge,"Curve") because of spheres...
+        if (
+            hasattr(edge,"Curve") and 
+            hasattr(edge.Curve,'Axis') and
+            hasattr(edge.Curve,'Radius')
+            ): 
+            axisStart = pl.multVec(edge.Curve.Center)
+            axisEnd   = pl.multVec(edge.Curve.Center.add(edge.Curve.Axis))
+            axis = axisEnd.sub(axisStart)
             keys.append(
                 'CIRC;'+
-                self.calcVertexKey(edge.Curve.Center)+
-                self.calcAxisKey(edge.Curve.Axis)+
+                self.calcVertexKey(pl.multVec(edge.Curve.Center))+
+                self.calcAxisKey(axis)+
                 self.calcFloatKey(edge.Curve.Radius)
                 )
         else:
-            endPoint1 = edge.Vertexes[0]
-            endPoint2 = edge.Vertexes[-1]
-            direction1 = endPoint2.Point.sub(endPoint1.Point)
-            direction2 = endPoint1.Point.sub(endPoint2.Point)
+            endPoint1 = pl.multVec(edge.Vertexes[0].Point)
+            endPoint2 = pl.multVec(edge.Vertexes[-1].Point)
+            direction1 = endPoint2.sub(endPoint1)
+            direction2 = endPoint1.sub(endPoint2)
             try:
                 direction1.normalize()
                 direction2.normalize()
@@ -189,27 +190,40 @@ class BodyTopoMapper(object):
                 self.calcVertexKey(endPoint2)+
                 self.calcAxisKey(direction2)
                 )
-            
         return keys
-
-    def calcFaceKeys(self,face):
+    
+    def calcFaceKeys(self, face, pl):
         keys = []
         # A sphere...
         if str( face.Surface ).startswith('Sphere'):
             keys.append(
                 'SPH;'+
-                self.calcVertexKey(face.Surface.Center)+
+                self.calcVertexKey(pl.multVec(face.Surface.Center))+
                 self.calcFloatKey(face.Surface.Radius)
                 )
         # a cylindric face...
         elif all( hasattr(face.Surface,a) for a in ['Axis','Center','Radius'] ):
-            axisKey = self.calcAxisKey(face.Surface.Axis)
+            axisStart = pl.multVec(face.Surface.Center)
+            axisEnd   = pl.multVec(face.Surface.Center.add(face.Surface.Axis))
+            axis = axisEnd.sub(axisStart)
+            axisKey = self.calcAxisKey(axis)
+            negativeAxis = Base.Vector(axis)
+            negativeAxis.multiply(-1.0)
+            negativeAxisKey = self.calcAxisKey(negativeAxis)
             radiusKey = self.calcFloatKey(face.Surface.Radius)
+            #
             for v in face.Vertexes:
+                vertexKey = self.calcVertexKey(pl.multVec(v.Point))
                 keys.append(
                     'CYL;'+
-                    self.calcVertexKey(v)+
+                    vertexKey+
                     axisKey+
+                    radiusKey
+                    )
+                keys.append(
+                    'CYL;'+
+                    vertexKey+
+                    negativeAxisKey+
                     radiusKey
                     )
         elif str( face.Surface ) == '<Plane object>':
@@ -218,128 +232,258 @@ class BodyTopoMapper(object):
             u=uv[0]
             v=uv[1]
             normal=face.normalAt(u,v)
+            normalStart = pl.multVec(pt)
+            normalEnd = pl.multVec(pt.add(normal))
+            normal = normalEnd.sub(normalStart)
+            negativeNormal = Base.Vector(normal)
+            negativeNormal.multiply(-1.0)
             normalKey = self.calcAxisKey(normal)
-            for v in face.Vertexes:
+            negativeNormalKey = self.calcAxisKey(negativeNormal)
+            for vert in face.Vertexes:
+                vertexKey = self.calcVertexKey(pl.multVec(vert.Point))
                 keys.append(
                     'PLANE;'+
-                    self.calcVertexKey(v)+
+                    vertexKey+
                     normalKey
+                    )
+                keys.append(
+                    'PLANE;'+
+                    vertexKey+
+                    negativeNormalKey
                     )
         else:
             keys.append("NOTRACE")
-
         return keys #FIXME
-
-    def setupEdgeDict(self):
-        totalNumEdges = 0
-        for feature in self.shapeSequence:
-            numNewlyCreatedEdges = len(feature.Shape.Edges) - totalNumEdges
-            totalNumEdges = len(feature.Shape.Edges)
-            edgeNamePrefix = self.body.Name + ';' + feature.Name + ';'
-            edgeNameSuffix = str(numNewlyCreatedEdges)
-            i = 0 # do not enumerate the following, count new Edges !
-            for edge in feature.Shape.Edges:
-                edgeKeys = self.calcEdgeKeys(edge) # usually more than one key per edge
-                entryFound=False
-                # if one key matches, it is the old edge name
-                for k in edgeKeys:
-                    tmp = self.edgeNameDict.get(k,False)
-                    if tmp != False:
-                        entryFound = True
-                        break
-                if not entryFound:
-                    edgeName = edgeNamePrefix + str(i) + ';' + edgeNameSuffix
-                    i+=1
-                else:
-                    edgeName = tmp # the old edge name...
-                for k in edgeKeys:
-                    self.edgeNameDict[k] = edgeName
-                
-    def setupFaceDict(self):
-        totalNumFaces = 0
-        for feature in self.shapeSequence:
-            numNewlyCreatedFaces = len(feature.Shape.Faces) - totalNumFaces
-            totalNumFaces = len(feature.Shape.Faces)
-            faceNamePrefix = self.body.Name + ';' + feature.Name + ';'
-            faceNameSuffix = str(numNewlyCreatedFaces)
-            i = 0 # do not enumerate the following, count new Faces !
-            for face in feature.Shape.Faces:
-                faceKeys = self.calcFaceKeys(face) # usually more than one key per face
-                entryFound=False
-                # if one key matches, it is the old face name
-                for k in faceKeys:
-                    tmp = self.faceNameDict.get(k,False)
-                    if tmp != False:
-                        entryFound = True
-                        break
-                if not entryFound:
-                    faceName = faceNamePrefix + str(i) + ';' + faceNameSuffix
-                    i+=1
-                else:
-                    faceName = tmp # the old face name...
-                for k in faceKeys:
-                    self.faceNameDict[k] = faceName
-                
-
-    def setupVertexDict(self):
-        totalNumVertexes = 0
-        for feature in self.shapeSequence:
-            numNewlyCreatedVertexes = len(feature.Shape.Vertexes) - totalNumVertexes
-            totalNumVertexes = len(feature.Shape.Vertexes)
-            vertexNamePrefix = self.body.Name + ';' + feature.Name + ';'
-            vertexNameSuffix = str(numNewlyCreatedVertexes)
-            i = 0 # do not enumerate the following, count new vertexes !
-            for vertex in feature.Shape.Vertexes:
-                vertexKey = self.calcVertexKey(vertex)
-                vertexName = vertexNamePrefix + str(i) + ';' + vertexNameSuffix
-                vertexFound = self.vertexNameDict.get(vertexKey,False)
-                if vertexFound == False:
-                    self.vertexNameDict[vertexKey] = vertexName
-                    i+=1 # new vertex counting per feature
-
-    def calcShapeSequence(self):
-        self.shapeSequence = []
-        S = set(self.body.OutList)
-        shapedObs = []
-        for ob in S:
-            dependsOn = None
+    
+    
+    def filterShapeObs(self,_list):
+        lst = []
+        for ob in _list:
             if hasattr(ob,"Shape"):
                 if len(ob.Shape.Faces) > 0:
-                    tmp = filterShapeObs(ob.OutList)
-                    if len(tmp)>0:
-                        dependsOn = tmp[0]
-                    shapedObs.append((ob,dependsOn))
-        #start with baseFeature
-        recentFeature = None
-        foundNew = False
-        for ob,dependsOn in shapedObs:
-            if not dependsOn: # dependsOn == None...
-                recentFeature = ob
-                foundNew = True
-                break
-        while foundNew:
-            self.shapeSequence.append(recentFeature)
-            foundNew = False
-            for ob,dependsOn in shapedObs:
-                if recentFeature == dependsOn:
-                    recentFeature = ob
-                    foundNew = True
+                    lst.append(ob)
+        S = set(lst)
+        lst = []
+        lst.extend(S)
+        return lst
+
+    def populateShapeDict(self,objName):
+        self.doneObjects.append(objName)
+        ob = self.doc.getObject(objName)
+        shape = ob.Shape
+        pl = ob.getGlobalPlacement().multiply(ob.Placement.inverse())
+        #
+        # Populate vertex entries...
+        vertexes = shape.Vertexes
+        numNewlyCreatedVertexes = len(shape.Vertexes) - self.totalNumVertexes
+        self.totalNumVertexes = len(shape.Vertexes)
+        vertexNamePrefix = 'V;'+objName + ';'
+        vertexNameSuffix = str(numNewlyCreatedVertexes)+';'
+        i = 1 # do not enumerate the following, count new vertexes !
+        for vertex in vertexes:
+            vertexKey = self.calcVertexKey(pl.multVec(vertex.Point))
+            vertexName = vertexNamePrefix + str(i) + ';' + vertexNameSuffix
+            vertexFound = self.shapeDict.get(vertexKey,False)
+            if vertexFound == False:
+                self.shapeDict[vertexKey] = vertexName
+                i+=1 # new vertex counting per feature
+        #
+        # populate edge entries...
+        edges = shape.Edges
+        numNewlyCreatedEdges = len(edges) - self.totalNumEdges
+        self.totalNumEdges = len(edges)
+        edgeNamePrefix = 'E;' + objName + ';'
+        edgeNameSuffix = str(numNewlyCreatedEdges)+';'
+        i = 1 # do not enumerate the following, count new Edges !
+        for edge in edges:
+            edgeKeys = self.calcEdgeKeys(edge, pl) # 2 keys for a linear edge, 1 key per circular egde
+            entryFound=False
+            for k in edgeKeys:
+                tmp = self.shapeDict.get(k,False)
+                if tmp != False:
+                    entryFound = True
                     break
-        print("")
-        print("=== Feature creation history ===")
-        for s in self.shapeSequence:
-            print (s.Name)
-        print("")
+            if not entryFound:
+                edgeName = edgeNamePrefix + str(i) + ';' + edgeNameSuffix
+                i+=1
+            else:
+                edgeName = tmp # the old edge name...
+            for k in edgeKeys:
+                self.shapeDict[k] = edgeName
+        #
+        # populate face entries...
+        faces = shape.Faces
+        self.totalNumFaces = 0
+        numNewlyCreatedFaces = len(faces) - self.totalNumFaces
+        self.totalNumFaces = len(faces)
+        faceNamePrefix = 'F;' + objName + ';'
+        faceNameSuffix = str(numNewlyCreatedFaces)+';'
+        i = 1 # do not enumerate the following, count new Faces !
+        for face in faces:
+            faceKeys = self.calcFaceKeys(face, pl) # one key per vertex of a face
+            entryFound=False
+            # if one key matches, it is the old face name
+            for k in faceKeys:
+                tmp = self.shapeDict.get(k,False)
+                if tmp != False:
+                    entryFound = True
+                    break
+            if not entryFound:
+                faceName = faceNamePrefix + str(i) + ';' + faceNameSuffix
+                i+=1
+            else:
+                faceName = tmp # the old face name...
+            for k in faceKeys:
+                self.shapeDict[k] = faceName
+        
+    def processTopoData(self,objName,level=0):
+        '''
+        Recursive function which populates the
+        shapeDict with geometricKey/toponame entries
+        '''
+        level+=1
+        inList, outList = self.treeNodes[objName]
+        for ob in outList:
+            self.processTopoData(ob.Name,level)
+        if (
+            not objName.startswith("Body") and
+            objName not in self.doneObjects
+            ):
+            self.populateShapeDict(objName)
+        
+    def makePlacedShape(self,obj):
+        '''
+        return a copy of obj.Shape with proper placement applied
+        '''
+        tempShape = obj.Shape.copy()
+        plmGlobal = obj.Placement
+        try:
+            plmGlobal = obj.getGlobalPlacement();
+        except:
+            pass
+        tempShape.Placement = plmGlobal
+        return tempShape
+    
+    def getTopLevelObjects(self):
+        #-------------------------------------------
+        # Create treenodes of the importable Objects with a shape
+        #-------------------------------------------
+        self.treeNodes = {}
+        shapeObs = self.filterShapeObs(self.doc.Objects)
+        S = set(shapeObs)
+        for ob in S:
+            self.treeNodes[ob.Name] = (
+                    self.filterShapeObs(ob.InList),
+                    self.filterShapeObs(ob.OutList)
+                    )
+        #-------------------------------------------
+        # nodes with empty inList are top level shapes for sure
+        # (cloned objects could be missing)
+        #-------------------------------------------
+        self.topLevelShapes = []
+        for objName in self.treeNodes.keys():
+            inList,dummy = self.treeNodes[objName]
+            if len(inList) == 0:
+                self.topLevelShapes.append(objName)
+        #-------------------------------------------
+        # search for missing clone-basefeatures
+        #-------------------------------------------
+        addList = []
+        for n in self.topLevelShapes:
+            if n.startswith('Clone'):
+                dummy,outList = self.treeNodes[n]
+                if len(outList) == 1:
+                    addList.append(outList[0].Name)
+        if len(addList) > 0:
+            self.topLevelShapes.extend(addList)
+        #-------------------------------------------
+        # return complete topLevel document objects for external use
+        #-------------------------------------------
+        outObs = []
+        for objName in self.topLevelShapes:
+            outObs.append(self.doc.getObject(objName))
+        return outObs
+        
+    
+    def createTopoNames(self,withColor=False):
+        '''
+        creates a combined shell of all toplevel objects and
+        assignes toponames to it's geometry if toponaming is
+        enabled.
+        '''
+        self.getTopLevelObjects()
+        #-------------------------------------------
+        # analyse the toplevel shapes
+        #-------------------------------------------
+        if a2plib.getUseTopoNaming():
+            for n in self.topLevelShapes:
+                self.totalNumVertexes = 0
+                self.totalNumEdges = 0
+                self.totalNumFaces = 0
+                self.processTopoData(n) # analyse each toplevel object...
+        #
+        #-------------------------------------------
+        # MUX the toplevel shapes
+        #-------------------------------------------
+        faces = []
+        faceColors = []
+        
+        for objName in self.topLevelShapes:
+            ob = self.doc.getObject(objName)
+            colorFlag = ( len(ob.ViewObject.DiffuseColor) < len(ob.Shape.Faces) )
+            shapeCol = ob.ViewObject.ShapeColor
+            diffuseCol = ob.ViewObject.DiffuseColor
+            tempShape = self.makePlacedShape(ob)
 
+            # now start the loop with use of the stored values..(much faster)
+            for i, face in enumerate(tempShape.Faces):
+                faces.append(face)
+    
+                if withColor:
+                    if colorFlag:
+                        faceColors.append(shapeCol)
+                    else:
+                        faceColors.append(diffuseCol[i])
 
-if __name__ == "__main__":
-    print ("a2p_topomapper v0.0.0")
-    print ("")
-    doc = FreeCAD.activeDocument()
-    obs = doc.Objects
-    for ob in obs:
-        if "Body" in ob.Name:
-            topoMap = BodyTopoMapper(ob)
+        shell = Part.makeShell(faces)
+        #-------------------------------------------
+        # if toponaming is used, assign toponames to
+        # shells geometry
+        #-------------------------------------------
+        muxInfo = []
+        if a2plib.getUseTopoNaming():
+            #-------------------------------------------
+            # map vertexnames to the MUX
+            #-------------------------------------------
+            muxInfo.append("[VERTEXES]")
+            for i,v in enumerate(shell.Vertexes):
+                k = self.calcVertexKey(v)
+                name = self.shapeDict.get(k,"None")
+                muxInfo.append(name)
+            #-------------------------------------------
+            # map edgenames to the MUX
+            #-------------------------------------------
+            muxInfo.append("[EDGES]")
+            pl = FreeCAD.Placement()
+            for i,edge in enumerate(shell.Edges):
+                keys = self.calcEdgeKeys(edge, pl)
+                name = self.shapeDict.get(keys[0],"None")
+                muxInfo.append(name)
+            #-------------------------------------------
+            # map facenames to the MUX
+            #-------------------------------------------
+            muxInfo.append("[FACES]")
+            pl = FreeCAD.Placement()
+            for i,face in enumerate(shell.Faces):
+                keys = self.calcFaceKeys(face, pl)
+                name = self.shapeDict.get(keys[0],"None")
+                muxInfo.append(name)
+
+        if withColor:
+            return muxInfo, shell, faceColors
+        else:
+            return muxInfo, shell
+
 
 
 

@@ -279,7 +279,11 @@ class ConstraintObjectProxy:
 
     def callSolveConstraints(self):
         from a2p_solversystem import autoSolveConstraints
-        autoSolveConstraints( FreeCAD.activeDocument(), cache = None )
+        autoSolveConstraints( 
+            FreeCAD.activeDocument(), 
+            cache = None, 
+            callingFuncName = "ConstraintObjectProxy::callSolveConstraints"
+            )
 
 
 class ConstraintMirrorObjectProxy:

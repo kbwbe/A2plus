@@ -26,7 +26,7 @@
          <rect>
           <x>9</x>
           <y>29</y>
-          <width>481</width>
+          <width>591</width>
           <height>141</height>
          </rect>
         </property>
@@ -197,6 +197,19 @@
          </property>
          <property name="prefEntry" stdset="0">
           <cstring>autoSolve</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/A2plus</cstring>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="Gui::PrefCheckBox" name="checkBox">
+         <property name="text">
+          <string>use experimental topological naming</string>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>useTopoNaming</cstring>
          </property>
          <property name="prefPath" stdset="0">
           <cstring>Mod/A2plus</cstring>
