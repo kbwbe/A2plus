@@ -28,7 +28,6 @@ import os, copy, time, sys, platform
 import a2plib
 from a2p_MuxAssembly import (
     muxObjectsWithKeys,
-    createTopoInfo,
     Proxy_muxAssemblyObj,
     makePlacedShape,
     muxAssemblyWithTopoNames

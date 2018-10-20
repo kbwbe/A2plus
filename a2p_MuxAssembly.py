@@ -37,8 +37,21 @@ class Proxy_muxAssemblyObj:
     def execute(self, shape):
         pass
 
-def createTopoInfo(obj): #deactivated at moment...
-    return []
+def createTopoInfo(obj): # used during converting an object to a2p object
+    muxInfo = []
+    if not a2plib.getUseTopoNaming(): return muxInfo
+    #
+    # Assembly works with topoNaming!
+    for i in range(0, len(obj.Shape.Vertexes) ):
+        newName = "".join(('V;',str(i+1),';',obj.Name,';'))
+        muxInfo.append(newName)
+    for i in range(0, len(obj.Shape.Edges) ):
+        newName = "".join(('E;',str(i+1),';',obj.Name,';'))
+        muxInfo.append(newName)
+    for i in range(0, len(obj.Shape.Faces) ):
+        newName = "".join(('F;',str(i+1),';',obj.Name,';'))
+        muxInfo.append(newName)
+    return muxInfo
 
 def makePlacedShape(obj):
     '''return a copy of obj.Shape with proper placement applied'''
