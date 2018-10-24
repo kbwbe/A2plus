@@ -450,9 +450,8 @@ def updateImportedParts(doc):
                     # save Placement because following newObject.Shape.copy() isn't resetting it to zeroes...
                     savedPlacement  = obj.Placement
                     obj.Shape = newObject.Shape.copy()
-#                    obj.ViewObject.ShapeColor = copy.deepcopy(newObject.ViewObject.ShapeColor)
-#                    obj.ViewObject.Transparency = copy.deepcopy(newObject.ViewObject.Transparency)
-                    obj.ViewObject.DiffuseColor = copy.deepcopy(newObject.ViewObject.DiffuseColor)
+                    obj.ViewObject.DiffuseColor = copy.copy(newObject.ViewObject.DiffuseColor)
+                    obj.ViewObject.Transparency = newObject.ViewObject.Transparency
                     obj.Placement = savedPlacement # restore the old placement
 
     mw = FreeCADGui.getMainWindow()
