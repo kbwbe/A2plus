@@ -337,6 +337,10 @@ class TopoMapper(object):
                 self.shapeDict[k] = faceName
         
     def processTopoData(self,objName,level=0):
+        '''
+        Recursive function which populates the
+        shapeDict with geometricKey/toponame entries
+        '''
         level+=1
         inList, outList = self.treeNodes[objName]
         for ob in outList:
@@ -348,7 +352,9 @@ class TopoMapper(object):
             self.populateShapeDict(objName)
         
     def makePlacedShape(self,obj):
-        '''return a copy of obj.Shape with proper placement applied'''
+        '''
+        return a copy of obj.Shape with proper placement applied
+        '''
         tempShape = obj.Shape.copy()
         plmGlobal = obj.Placement
         try:
@@ -371,43 +377,50 @@ class TopoMapper(object):
                     self.filterShapeObs(ob.OutList)
                     )
         #-------------------------------------------
-        # Top level shapes have nodes with empty inList
-        # export complete topLevel objects
+        # nodes with empty inList are top level shapes for sure
+        # (cloned objects could be missing)
+        #-------------------------------------------
+        self.topLevelShapes = []
+        for objName in self.treeNodes.keys():
+            inList,dummy = self.treeNodes[objName]
+            if len(inList) == 0:
+                self.topLevelShapes.append(objName)
+        #-------------------------------------------
+        # search for missing clone-basefeatures
+        #-------------------------------------------
+        addList = []
+        for n in self.topLevelShapes:
+            if n.startswith('Clone'):
+                dummy,outList = self.treeNodes[n]
+                if len(outList) == 1:
+                    addList.append(outList[0].Name)
+        if len(addList) > 0:
+            self.topLevelShapes.extend(addList)
+        #-------------------------------------------
+        # return complete topLevel document objects for external use
         #-------------------------------------------
         outObs = []
-        for objName in self.treeNodes.keys():
-            inList,outList = self.treeNodes[objName]
-            if len(inList) == 0:
-                outObs.append(self.doc.getObject(objName))
+        for objName in self.topLevelShapes:
+            outObs.append(self.doc.getObject(objName))
         return outObs
         
     
     def createTopoNames(self,withColor=False):
+        '''
+        creates a combined shell of all toplevel objects and
+        assignes toponames to it's geometry if toponaming is
+        enabled.
+        '''
+        self.getTopLevelObjects()
         #-------------------------------------------
-        # Create treenodes of the importable Objects with a shape
+        # analyse the toplevel shapes
         #-------------------------------------------
-        self.treeNodes = {}
-        shapeObs = self.filterShapeObs(self.doc.Objects)
-        S = set(shapeObs)
-        for ob in S:
-            self.treeNodes[ob.Name] = (
-                    self.filterShapeObs(ob.InList),
-                    self.filterShapeObs(ob.OutList)
-                    )
-        #-------------------------------------------
-        # Top level shapes have nodes with empty inList
-        #-------------------------------------------
-        self.topLevelShapes = []
-        for objName in self.treeNodes.keys():
-            inList,outList = self.treeNodes[objName]
-            if len(inList) == 0:
-                self.topLevelShapes.append(objName)
-                if a2plib.getUseTopoNaming():
-                    # Reset the counts for each toplevel shape
-                    self.totalNumVertexes = 0
-                    self.totalNumEdges = 0
-                    self.totalNumFaces = 0
-                    self.processTopoData(objName) # analyse each toplevel object...
+        if a2plib.getUseTopoNaming():
+            for n in self.topLevelShapes:
+                self.totalNumVertexes = 0
+                self.totalNumEdges = 0
+                self.totalNumFaces = 0
+                self.processTopoData(n) # analyse each toplevel object...
         #
         #-------------------------------------------
         # MUX the toplevel shapes
@@ -416,31 +429,34 @@ class TopoMapper(object):
         faceColors = []
         
         for objName in self.topLevelShapes:
-
             ob = self.doc.getObject(objName)
-
             colorFlag = ( len(ob.ViewObject.DiffuseColor) < len(ob.Shape.Faces) )
-            shapeCol = copy.deepcopy(ob.ViewObject.ShapeColor)                     # for sCT-Mode: meaning: shapeColor
-            shapeTsp = copy.deepcopy(ob.ViewObject.Transparency)                   # for sCT-Mode: |_ plus Transparency
-            comboCol = (shapeCol[0],shapeCol[1],shapeCol[2],float(shapeTsp/100.0)) # comboCol: sCT-Mode color calculation
-            diffuseCol = copy.deepcopy(ob.ViewObject.DiffuseColor)                 # for dCi-Mode: diffuseColor per face[i]
+#            shapeCol = ob.ViewObject.ShapeColor                                    # MASTER APPROACH
+#            diffuseCol = ob.ViewObject.DiffuseColor                                # MASTER APPROACH
+            shapeCol = copy.deepcopy(ob.ViewObject.ShapeColor)                     ## for sCT-Mode: meaning: shapeColor
+            shapeTsp = copy.deepcopy(ob.ViewObject.Transparency)                   ## for sCT-Mode: |_ plus Transparency
+            comboCol = (shapeCol[0],shapeCol[1],shapeCol[2],float(shapeTsp/100.0)) ## comboCol: sCT-Mode color calculation
+            diffuseCol = copy.deepcopy(ob.ViewObject.DiffuseColor)                 ## for dCi-Mode: diffuseColor per face[i]
             tempShape = self.makePlacedShape(ob)
 
             # now start the loop with use of the stored values..(much faster)
             for i, face in enumerate(tempShape.Faces):
                 faces.append(face)
-                a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"a2p assyMUX: i(Faces)={}, {} ".format(i,face))
-    
+                a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"a2p tm-MUX: i(Faces)={}, {} ".format(i,face)) # debug improve-color info
+
                 if withColor:
                     if colorFlag:
                         faceColors.append(comboCol)
-                        a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"sCT-Mode\n")
+                        a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"sCT-Mode\n") # debug improve-color info
                     else:
                         faceColors.append(diffuseCol[i])
-                        a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"dCi-Mode\n")
+                        a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"dCi-Mode\n") # debug improve-color info
 
         shell = Part.makeShell(faces)
-        #
+        #-------------------------------------------
+        # if toponaming is used, assign toponames to
+        # shells geometry
+        #-------------------------------------------
         muxInfo = []
         if a2plib.getUseTopoNaming():
             #-------------------------------------------
@@ -474,12 +490,6 @@ class TopoMapper(object):
             return muxInfo, shell, faceColors
         else:
             return muxInfo, shell
-        
-
-if __name__ == "__main__":
-    doc = FreeCAD.activeDocument()
-    tm = TopoMapper(doc)
-    tm.createTopoNames()
 
 
 

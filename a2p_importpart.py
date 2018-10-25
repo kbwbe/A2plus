@@ -28,7 +28,6 @@ import os, copy, time, sys, platform
 import a2plib
 from a2p_MuxAssembly import (
     muxObjectsWithKeys,
-    createTopoInfo,
     Proxy_muxAssemblyObj,
     makePlacedShape,
     muxAssemblyWithTopoNames
@@ -45,6 +44,7 @@ from a2plib import (
     Msg,
     DebugMsg,
     A2P_DEBUG_LEVEL,
+    A2P_DEBUG_NONE,
     A2P_DEBUG_1,
     A2P_DEBUG_2,
     A2P_DEBUG_3,
@@ -424,18 +424,15 @@ def updateImportedParts(doc):
 
             if absPath == None:
                 QtGui.QMessageBox.critical(  QtGui.QApplication.activeWindow(),
-                                            "Source file not found",
-                                            "update of {} aborted!\nUnable to find {}".format(
-                                                obj.Name,
+                                            u"Source file not found",
+                                            u"Unable to find {}".format(
                                                 obj.sourceFile
                                                 )
                                         )
-
-            if os.path.exists( absPath ):
+            if absPath != None and os.path.exists( absPath ):
                 newPartCreationTime = os.path.getmtime( absPath )
-                DebugMsg(A2P_DEBUG_3,"a2p updateImportedParts: newPartCreationTime: {}\n".format(newPartCreationTime))
-                DebugMsg(A2P_DEBUG_3,"a2p updateImportedParts: obj.timeLastImport:  {}\n".format(obj.timeLastImport))
-                if ( newPartCreationTime >= obj.timeLastImport or    # changed behaviour to allow refresh ondemand
+                if ( 
+                    newPartCreationTime >= obj.timeLastImport or                                 # force loading
                     obj.a2p_Version != A2P_VERSION
                     ):
                     if not objectCache.isCached(absPath): # Load every changed object one time to cache
@@ -443,16 +440,27 @@ def updateImportedParts(doc):
                     newObject = objectCache.get(absPath)
                     obj.timeLastImport = newPartCreationTime
                     if hasattr(newObject, 'a2p_Version'):
-                        obj.a2p_Version = newObject.a2p_Version
+                        obj.a2p_Version = A2P_VERSION
                     importUpdateConstraintSubobjects( doc, obj, newObject ) # do this before changing shape and mux
                     if hasattr(newObject, 'muxInfo'):
                         obj.muxInfo = newObject.muxInfo
                     # save Placement because following newObject.Shape.copy() isn't resetting it to zeroes...
                     savedPlacement  = obj.Placement
                     obj.Shape = newObject.Shape.copy()
-#                    obj.ViewObject.ShapeColor = copy.deepcopy(newObject.ViewObject.ShapeColor)
-#                    obj.ViewObject.Transparency = copy.deepcopy(newObject.ViewObject.Transparency)
-                    obj.ViewObject.DiffuseColor = copy.deepcopy(newObject.ViewObject.DiffuseColor)
+###                    obj.ViewObject.DiffuseColor = copy.copy(newObject.ViewObject.DiffuseColor) ### MASTER APPROACH
+###                    obj.ViewObject.Transparency = newObject.ViewObject.Transparency            ### MASTER APPROACH
+###
+##                    if len(newObject.ViewObject.DiffuseColor) < len(newObject.Shape.Faces):     ## 2nd try
+##                        obj.ViewObject.ShapeColor = newObject.ViewObject.ShapeColor             ## 2nd try
+##                        obj.ViewObject.Transparency = newObject.ViewObject.Transparency         ## 2nd try
+##                    else:                                                                       ## 2nd try
+##                        obj.ViewObject.DiffuseColor = newObject.ViewObject.DiffuseColor         ## 2nd try
+##
+#                    obj.ViewObject.ShapeColor = copy.deepcopy(newObject.ViewObject.ShapeColor)      #3rd try
+#                    obj.ViewObject.Transparency = copy.deepcopy(newObject.ViewObject.Transparency)  #3rd try
+#                    obj.ViewObject.DiffuseColor = copy.deepcopy(newObject.ViewObject.DiffuseColor)  #3rd try
+#                    obj.ViewObject.Transparency = newObject.ViewObject.Transparency                 #3rd try
+
                     obj.Placement = savedPlacement # restore the old placement
 
     mw = FreeCADGui.getMainWindow()
@@ -1165,7 +1173,7 @@ def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
             newEdgeNames = []
             newFaceNames = []
             for item in newObject.muxInfo:
-                if item[:1] == 'E':
+                if item[:1] == 'V':
                     newVertexNames.append(item)
                 if item[:1] == 'E':
                     newEdgeNames.append(item)

@@ -37,8 +37,21 @@ class Proxy_muxAssemblyObj:
     def execute(self, shape):
         pass
 
-def createTopoInfo(obj): #deactivated at moment...
-    return []
+def createTopoInfo(obj): # used during converting an object to a2p object
+    muxInfo = []
+    if not a2plib.getUseTopoNaming(): return muxInfo
+    #
+    # Assembly works with topoNaming!
+    for i in range(0, len(obj.Shape.Vertexes) ):
+        newName = "".join(('V;',str(i+1),';',obj.Name,';'))
+        muxInfo.append(newName)
+    for i in range(0, len(obj.Shape.Edges) ):
+        newName = "".join(('E;',str(i+1),';',obj.Name,';'))
+        muxInfo.append(newName)
+    for i in range(0, len(obj.Shape.Faces) ):
+        newName = "".join(('F;',str(i+1),';',obj.Name,';'))
+        muxInfo.append(newName)
+    return muxInfo
 
 def makePlacedShape(obj):
     '''return a copy of obj.Shape with proper placement applied'''
@@ -63,9 +76,6 @@ def muxAssemblyWithTopoNames(doc, withColor=False):
     faceColors = []
     muxInfo = [] # List of keys, not used at moment...
 
-
-    objects = doc.Objects
-        
     visibleObjects = [ obj for obj in doc.Objects
                        if hasattr(obj,'ViewObject') and obj.ViewObject.isVisible()
                        and hasattr(obj,'Shape') and len(obj.Shape.Faces) > 0
@@ -88,14 +98,14 @@ def muxAssemblyWithTopoNames(doc, withColor=False):
                 if item[0] == 'F': faceNames.append(item)
 
         if a2plib.getUseTopoNaming():
-            for i, vertex in enumerate(obj.Shape.Vertexes):
+            for i in range(0, len(obj.Shape.Vertexes) ):
                 if extendNames:
                     newName = "".join((vertexNames[i],obj.Name,';'))
                     muxInfo.append(newName)
                 else:
                     newName = "".join(('V;',str(i+1),';',obj.Name,';'))
                     muxInfo.append(newName)
-            for i, edge in enumerate(obj.Shape.Edges):
+            for i in range(0, len(obj.Shape.Edges) ):
                 if extendNames:
                     newName = "".join((edgeNames[i],obj.Name,';'))
                     muxInfo.append(newName)
@@ -105,43 +115,34 @@ def muxAssemblyWithTopoNames(doc, withColor=False):
         
         # Save Computing time, store this before the for..enumerate loop later...
         colorFlag = ( len(obj.ViewObject.DiffuseColor) < len(obj.Shape.Faces) )
-        shapeCol = copy.deepcopy(obj.ViewObject.ShapeColor)                    # for sCT-Mode: meaning: shapeColor
-        shapeTsp = copy.deepcopy(obj.ViewObject.Transparency)                  # for sCT-Mode: |_  plus Transparency
-        comboCol = (shapeCol[0],shapeCol[1],shapeCol[2],float(shapeTsp/100.0)) # comboCol: sCT-Mode color calculation
-        diffuseCol = copy.deepcopy(obj.ViewObject.DiffuseColor)                # for dCi-Mode: diffuseColor per face[i]
+#        shapeCol = obj.ViewObject.ShapeColor                                   # MASTER APPROACH
+#        diffuseCol = obj.ViewObject.DiffuseColor                               # MASTER APPROACH
+        shapeCol = copy.deepcopy(obj.ViewObject.ShapeColor)                    ## for sCT-Mode: meaning: shapeColor
+        shapeTsp = copy.deepcopy(obj.ViewObject.Transparency)                  ## for sCT-Mode: |_  plus Transparency
+        comboCol = (shapeCol[0],shapeCol[1],shapeCol[2],float(shapeTsp/100.0)) ## comboCol: sCT-Mode color calculation
+        diffuseCol = copy.deepcopy(obj.ViewObject.DiffuseColor)                ## for dCi-Mode: diffuseColor per face[i]
         tempShape = makePlacedShape(obj)
 
         # now start the loop with use of the stored values..(much faster)
-        if a2plib.getUseTopoNaming():
-            for i, face in enumerate(tempShape.Faces):
-                faces.append(face)
-                a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"a2p partMUX: i(Faces)={}, {} ".format(i,face))
-
+        topoNaming = a2plib.getUseTopoNaming()
+        for i, face in enumerate(tempShape.Faces):
+            faces.append(face)
+            a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"a2p MA-MUX: i(Faces)={}, {} ".format(i,face)) # debug improve-color info
+            if topoNaming:
                 if extendNames:
                     newName = "".join((faceNames[i],obj.Name,';'))
                     muxInfo.append(newName)
                 else:
                     newName = "".join(('F;',str(i+1),';',obj.Name,';'))
                     muxInfo.append(newName)
-    
-                if withColor:
-                    if colorFlag:
-                        faceColors.append(comboCol)
-                        a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"sCT-Mode\n")
-                    else:
-                        faceColors.append(diffuseCol[i])
-                        a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"dCi-Mode\n")
-        else:
-            for i, face in enumerate(tempShape.Faces):
-                faces.append(face)
-                a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"a2p partMUX: i(Faces)={}, {} ".format(i,face))
-                if withColor:
-                    if colorFlag:
-                        faceColors.append(comboCol)
-                        a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"sCT-Mode\n")
-                    else:
-                        faceColors.append(diffuseCol[i])
-                        a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"dCi-Mode\n")
+
+            if withColor:
+                if colorFlag:
+                    faceColors.append(comboCol)
+                    a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"sCT-Mode\n") # debug improve-color info
+                else:
+                    faceColors.append(diffuseCol[i])
+                    a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"dCi-Mode\n") # debug improve-color info
 
     shell = Part.makeShell(faces)
     if withColor:
