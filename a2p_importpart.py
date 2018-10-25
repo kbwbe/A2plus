@@ -432,7 +432,7 @@ def updateImportedParts(doc):
             if absPath != None and os.path.exists( absPath ):
                 newPartCreationTime = os.path.getmtime( absPath )
                 if ( 
-                    newPartCreationTime > obj.timeLastImport or
+                    newPartCreationTime >= obj.timeLastImport or                                 # force loading
                     obj.a2p_Version != A2P_VERSION
                     ):
                     if not objectCache.isCached(absPath): # Load every changed object one time to cache
@@ -447,8 +447,20 @@ def updateImportedParts(doc):
                     # save Placement because following newObject.Shape.copy() isn't resetting it to zeroes...
                     savedPlacement  = obj.Placement
                     obj.Shape = newObject.Shape.copy()
-                    obj.ViewObject.DiffuseColor = copy.copy(newObject.ViewObject.DiffuseColor)
-                    obj.ViewObject.Transparency = newObject.ViewObject.Transparency
+###                    obj.ViewObject.DiffuseColor = copy.copy(newObject.ViewObject.DiffuseColor) ### MASTER APPROACH
+###                    obj.ViewObject.Transparency = newObject.ViewObject.Transparency            ### MASTER APPROACH
+###
+##                    if len(newObject.ViewObject.DiffuseColor) < len(newObject.Shape.Faces):     ## 2nd try
+##                        obj.ViewObject.ShapeColor = newObject.ViewObject.ShapeColor             ## 2nd try
+##                        obj.ViewObject.Transparency = newObject.ViewObject.Transparency         ## 2nd try
+##                    else:                                                                       ## 2nd try
+##                        obj.ViewObject.DiffuseColor = newObject.ViewObject.DiffuseColor         ## 2nd try
+##
+#                    obj.ViewObject.ShapeColor = copy.deepcopy(newObject.ViewObject.ShapeColor)      #3rd try
+#                    obj.ViewObject.Transparency = copy.deepcopy(newObject.ViewObject.Transparency)  #3rd try
+#                    obj.ViewObject.DiffuseColor = copy.deepcopy(newObject.ViewObject.DiffuseColor)  #3rd try
+#                    obj.ViewObject.Transparency = newObject.ViewObject.Transparency                 #3rd try
+
                     obj.Placement = savedPlacement # restore the old placement
 
     mw = FreeCADGui.getMainWindow()
