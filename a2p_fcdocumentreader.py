@@ -22,42 +22,80 @@
 
 import FreeCAD, FreeCADGui
 import a2plib
-import zipfile
 
+import zipfile
 try:
     import xml.etree.cElementTree as ET
-    print("C ElementTree loaded")
 except ImportError:
     import xml.etree.ElementTree as ET
-    print("python ElementTree loaded")
     
 import os
 
 #------------------------------------------------------------------------------
-class A2p_xmldoc_Object(object):
+# Small helper funcs
+#------------------------------------------------------------------------------
+def printElement(elem):
+    print(
+        "tag: {}, attributes: {}".format(
+            elem.tag,
+            elem.attrib
+            )
+        )
+    
+
+#------------------------------------------------------------------------------
+class A2p_xmldoc_Property(object):
     '''
-    Helper class prototype to store FC objects found in document.xml
+    BaseClass for xml-Properties
     '''
     def __init__(self,name,_type):
         self.name = name
         self.type = _type
+        print(self)
         
     def __str__(self):
-        return "ObjName: {}, ObjType: {}".format(self.name,self.type)
+        return "PropertyName: {}, Type: {}".format(self.name,self.type)
     
-    def loadObjectData(self):
+
+#------------------------------------------------------------------------------
+class A2p_xmldoc_Object(object):
+    '''
+    class prototype to store FC objects found in document.xml
+    '''
+    def __init__(self,name,_type):
+        self.name = name
+        self.type = _type
+        self.propertyList = []
+        print(self)
+        
+    def __str__(self):
+        return "ObjName: {}, Type: {}".format(self.name,self.type)
+    
+    def loadPropertyList(self,tree):
+        for elem in tree.iterfind('ObjectData/Object'):
+            if elem.attrib['name'] == self.name:
+                for e in elem.findall('Properties/Property'):
+                    p = A2p_xmldoc_Property(
+                        e.attrib['name'],
+                        e.attrib['type']
+                        )
+                    self.propertyList.append(p)
+                    
+    
+    def loadObjectData(self,tree):
         raise NotImplementedError(
-            "Dependency class {} doesn't implement movement, use inherited classes instead!".format(
+            "xml-ojbect class {} doesn't allow loadObjectData, use inherited classes instead!".format(
                 self.__class__.__name__)
             )
         
 #------------------------------------------------------------------------------
 class A2p_xmldoc_SpreadSheet(A2p_xmldoc_Object):
-    '''
-    Extract Spreadsheed data from fcstd xml document
-    '''
-    def loadData(self):
-        pass
+    def loadObjectData(self,tree):
+        '''
+        Extract Spreadsheed data from fcstd xml document
+        '''
+        self.loadPropertyList(tree)
+
 #------------------------------------------------------------------------------
 class FCdocumentReader(object):
     '''
@@ -101,32 +139,19 @@ class FCdocumentReader(object):
         self.loadObjects()
         return True
     
-    def printElement(self,elem):
-        print(
-            "tag: {}, attributes: {}".format(
-                elem.tag,
-                elem.attrib
-                )
-            )
-    
     def loadObjects(self):
         self.objects = []
-        #for elem in self.tree.iterfind('Objects/Object'):
-        for elem in self.root.findall('Objects/Object'):
+        for elem in self.tree.iterfind('Objects/Object'):
+        #for elem in self.root.findall('Objects/Object'):
             if elem.attrib['type'].startswith('Spreadsheet'): 
                 ob = A2p_xmldoc_SpreadSheet(
                         elem.attrib['name'],
                         elem.attrib['type']
                         )
                 self.objects.append(ob)
-                ob.loadObjectData()
-                print(ob)
+                ob.loadObjectData(self.tree)
             else:
-                print("unhandled xml object! name: {}, type: {}".format(
-                        elem.attrib['name'],
-                        elem.attrib['type']
-                        )
-                      )
+                pass # unhandled object types
 #------------------------------------------------------------------------------
 
         
