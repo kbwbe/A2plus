@@ -32,18 +32,6 @@ except ImportError:
 import os
 
 #------------------------------------------------------------------------------
-# Small helper funcs
-#------------------------------------------------------------------------------
-def printElement(elem):
-    print(
-        "tag: {}, attributes: {}".format(
-            elem.tag,
-            elem.attrib
-            )
-        )
-    
-
-#------------------------------------------------------------------------------
 class A2p_xmldoc_Property(object):
     '''
     BaseClass for xml-Properties
@@ -56,7 +44,6 @@ class A2p_xmldoc_Property(object):
         
     def __str__(self):
         return "PropertyName: {}, Type: {}".format(self.name,self.type)
-    
 
 #------------------------------------------------------------------------------
 class A2p_xmldoc_PropertyString(A2p_xmldoc_Property):
@@ -67,7 +54,15 @@ class A2p_xmldoc_PropertyString(A2p_xmldoc_Property):
     
 #------------------------------------------------------------------------------
 class A2p_xmldoc_PropertySheet(A2p_xmldoc_Property):
-    pass
+    
+    def getCellValues(self):
+        '''returns a dict:  cellAddress:value '''
+        cellEntries = self.treeElement.findall('Cells/Cell')
+        cellDict = {}
+        for ce in cellEntries:
+            cellDict[ce.attrib['address']] = ce.attrib['content']
+        return cellDict
+
 #------------------------------------------------------------------------------
 class A2p_xmldoc_Object(object):
     '''
@@ -109,7 +104,8 @@ class A2p_xmldoc_Object(object):
                         pass # unsupported property type
 #------------------------------------------------------------------------------
 class A2p_xmldoc_SpreadSheet(A2p_xmldoc_Object):
-    pass
+    def getCells(self):
+        return self.propertyDict['cells'].getCellValues()
 #------------------------------------------------------------------------------
 class FCdocumentReader(object):
     '''
@@ -118,7 +114,6 @@ class FCdocumentReader(object):
     within FreeCAD
     '''
     def __init__(self):
-        self.realPath = ''
         self.tree = None
         self.root = None
         self.objects = []
@@ -129,34 +124,22 @@ class FCdocumentReader(object):
         self.root = None
         self.objects = []
         
-    def openDocument(self,fileName, assemblyPath):
+    def openDocument(self,fileName):
         self.clear()
-        # Handler abs/rel pathes and projectFiles
-        fn = a2plib.findSourceFileInProject(fileName, assemblyPath)
-        if fn == None or fn == "":
-            print(u"Could not open xml from: {} !".format(
-                    fileName
-                    )
-                  )
-            return False
         #
         # decompress the file
-        self.realPath = fn
-        f = zipfile.ZipFile(fn, 'r')
+        f = zipfile.ZipFile(fileName,'r')
         xml = f.read('Document.xml')
         f.close()
         #
         # load the ElementTree
         self.tree = ET.ElementTree(ET.fromstring(xml))
-        self.root = self.tree.getroot()
         #
         self.loadObjects()
-        return True
     
     def loadObjects(self):
         self.objects = []
         for elem in self.tree.iterfind('Objects/Object'):
-        #for elem in self.root.findall('Objects/Object'):
             if elem.attrib['type'].startswith('Spreadsheet'): 
                 ob = A2p_xmldoc_SpreadSheet(
                         elem.attrib['name'],
@@ -166,16 +149,26 @@ class FCdocumentReader(object):
                 self.objects.append(ob)
             else:
                 pass # unhandled object types
+            
+    def getObjectByName(self,name):
+        for ob in self.objects:
+            if ob.name == name:
+                return ob
+        return None
 #------------------------------------------------------------------------------
-
-        
         
 if __name__ == "__main__":
     doc = FreeCAD.activeDocument() 
-    fname = doc.FileName
     dr = FCdocumentReader()
-    assemblyPath = os.path.split(fname)[0]
-    dr.openDocument(fname, assemblyPath)       
+    dr.openDocument(doc.FileName) 
+    cellDict = dr.getObjectByName('Spreadsheet').getCells()
+    for k in cellDict.keys():
+        print(u"Address: {}, content {}".format(
+                k,
+                cellDict[k]
+                )
+              )
+    
 
 
 
