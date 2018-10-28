@@ -390,7 +390,10 @@ class TopoMapper(object):
         #-------------------------------------------
         addList = []
         for n in self.topLevelShapes:
-            if n.startswith('Clone'):
+            if (
+                n.startswith('Clone') or
+                n.startswith('Part__Mirroring')
+                ):
                 dummy,outList = self.treeNodes[n]
                 if len(outList) == 1:
                     addList.append(outList[0].Name)
