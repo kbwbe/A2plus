@@ -62,6 +62,7 @@ class a2pWorkbench (Workbench):
         import a2p_sphericalConnection
         import a2p_solversystem
         import a2p_MuxAssembly
+        import a2p_partinformation
 
         partCommands = [
             'a2p_ImportPart',
@@ -99,7 +100,8 @@ class a2pWorkbench (Workbench):
             ]
         miscCommands = [
             'a2p_SimpleAssemblyShapeCommand',
-            'a2p_repairTreeViewCommand'
+            'a2p_repairTreeViewCommand',
+            'a2p_CreatePartInformationSheet_Command'
             ]
 
         self.appendToolbar(
