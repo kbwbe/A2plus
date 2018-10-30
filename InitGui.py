@@ -63,6 +63,7 @@ class a2pWorkbench (Workbench):
         import a2p_solversystem
         import a2p_MuxAssembly
         import a2p_partinformation
+        import a2p_bom #bill of materials == partslist
 
         partCommands = [
             'a2p_ImportPart',
@@ -101,7 +102,8 @@ class a2pWorkbench (Workbench):
         miscCommands = [
             'a2p_SimpleAssemblyShapeCommand',
             'a2p_repairTreeViewCommand',
-            'a2p_CreatePartInformationSheet_Command'
+            'a2p_CreatePartInformationSheet_Command',
+            'a2p_CreatePartlist'
             ]
 
         self.appendToolbar(

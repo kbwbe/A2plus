@@ -2,8 +2,6 @@
 #*                                                                         *
 #*   Copyright (c) 2018 kbwbe                                              *
 #*                                                                         *
-#*   Portions of code based on hamish's assembly 2                         *
-#*                                                                         *
 #*   This program is free software; you can redistribute it and/or modify  *
 #*   it under the terms of the GNU Lesser General Public License (LGPL)    *
 #*   as published by the Free Software Foundation; either version 2 of     *
@@ -29,33 +27,72 @@ import os
 
 import a2plib
 from a2p_fcdocumentreader import FCdocumentReader
-from xdg.Menu import __getFileName
 
 
 #------------------------------------------------------------------------------
-class partLister(object):
+def createPartList(
+        importPath,
+        parentAssemblyDir,
+        partListEntries,
+        recursive=False
+        ):
     '''
     Extract quantities and descriptions of assembled parts from
     document.xml
     Is able to analyse subassemblies by recursion
     '''
-    def __init__(self,importPath,workingDir): #add workingDir to be able to open relative pathes
-        self.importPath = importPath
-        self.basicFileName = None
-        self.workingDir = None
-        self.partListEntries = {}
-        #
-        fileNameInProject = a2plib.findSourceFileInProject(
-            self.importPath,
-            workingDir
+    fileNameInProject = a2plib.findSourceFileInProject(
+        importPath,
+        parentAssemblyDir
+        )
+    workingDir,basicFileName = os.path.split(fileNameInProject)
+    docReader = FCdocumentReader()
+    docReader.openDocument(fileNameInProject)
+    for ob in docReader.getA2pObjects():
+        print(u'{}, Subassembly? = {}'.format(ob,ob.isSubassembly()))
+        if ob.isSubassembly and recursive:
+            createPartList(
+                ob.getA2pSource(),
+                workingDir,
+                partListEntries,
+                recursive
+                )
+
+
+
+
+#------------------------------------------------------------------------------
+class a2p_CreatePartlist():
+
+    def Activated(self):
+        doc = FreeCAD.activeDocument()
+
+        if doc == None:
+            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
+                                        "No active document found!",
+                                        "You have to open an fcstd file first."
+                                    )
+            return
+        
+        completeFilePath = doc.FileName
+        p,f = os.path.split(completeFilePath)
+        
+        createPartList(
+            doc.FileName,
+            p,
+            {},
+            recursive=True
             )
-        self.workingDir,self.basicFileName = os.path.split(fileNameInProject)
-        self.docReader = FCdocumentReader()
-        self.docReader.openDocument(fileNameInProject)
         
-    def createPartListEntries(self,assemblyDir):
-        pass
+
+    def GetResources(self):
+        return {
+            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_partsList.svg',
+            'MenuText':     'create a spreadsheet with a partlist of this file',
+            'ToolTip':      'create a spreadsheet with a partlist of this file'
+            }
         
+FreeCADGui.addCommand('a2p_CreatePartlist', a2p_CreatePartlist())
 #------------------------------------------------------------------------------
 
 

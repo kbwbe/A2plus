@@ -50,6 +50,16 @@ class A2p_xmldoc_PropertyString(A2p_xmldoc_Property):
         return s.attrib['value']
     
 #------------------------------------------------------------------------------
+class A2p_xmldoc_PropertyBool(A2p_xmldoc_Property):
+    
+    def getBool(self):
+        s = self.treeElement.find('Bool')
+        if s.attrib['value'] == 'true':
+            return True
+        else:
+            return False
+    
+#------------------------------------------------------------------------------
 class A2p_xmldoc_PropertyFile(A2p_xmldoc_Property):
     
     def getStringValue(self):
@@ -104,7 +114,14 @@ class A2p_xmldoc_Object(object):
                             e.attrib['type']
                             )
                         self.propertyDict[e.attrib['name']] = p
-                    if e.attrib['type'] == 'App::PropertyFile':
+                    elif e.attrib['type'] == 'App::PropertyBool':
+                        p = A2p_xmldoc_PropertyBool(
+                            e,
+                            e.attrib['name'],
+                            e.attrib['type']
+                            )
+                        self.propertyDict[e.attrib['name']] = p
+                    elif e.attrib['type'] == 'App::PropertyFile':
                         p = A2p_xmldoc_PropertyFile(
                             e,
                             e.attrib['name'],
@@ -135,7 +152,12 @@ class A2p_xmldoc_FeaturePython(A2p_xmldoc_Object):
     
     def getA2pSource(self):
         if self.isA2pObject:
-            return ob.propertyDict['sourceFile'].getStringValue()
+            return self.propertyDict['sourceFile'].getStringValue()
+        return None
+    
+    def isSubassembly(self):
+        if self.isA2pObject:
+            return self.propertyDict['subassemblyImport'].getBool()
         return None
 
 #------------------------------------------------------------------------------
