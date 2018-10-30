@@ -21,6 +21,8 @@
 #***************************************************************************
 
 import FreeCAD, FreeCADGui
+from PySide import QtGui, QtCore
+import os
 import a2plib
 
 import zipfile
@@ -28,8 +30,6 @@ try:
     import xml.etree.cElementTree as ET
 except ImportError:
     import xml.etree.ElementTree as ET
-    
-import os
 
 #------------------------------------------------------------------------------
 class A2p_xmldoc_Property(object):
@@ -40,13 +40,20 @@ class A2p_xmldoc_Property(object):
         self.treeElement = treeElement
         self.name = name
         self.type = _type
-        print(self)
+        #print(self)
         
     def __str__(self):
         return "PropertyName: {}, Type: {}".format(self.name,self.type)
 
 #------------------------------------------------------------------------------
 class A2p_xmldoc_PropertyString(A2p_xmldoc_Property):
+    
+    def getStringValue(self):
+        s = self.treeElement.find('String')
+        return s.attrib['value']
+    
+#------------------------------------------------------------------------------
+class A2p_xmldoc_PropertyFile(A2p_xmldoc_Property):
     
     def getStringValue(self):
         s = self.treeElement.find('String')
@@ -60,7 +67,10 @@ class A2p_xmldoc_PropertySheet(A2p_xmldoc_Property):
         cellEntries = self.treeElement.findall('Cells/Cell')
         cellDict = {}
         for ce in cellEntries:
-            cellDict[ce.attrib['address']] = ce.attrib['content']
+            try:
+                cellDict[ce.attrib['address']] = ce.attrib['content']
+            except:
+                pass # no content attribute, perhaps backgroundcolor or somethin else...
         return cellDict
 
 #------------------------------------------------------------------------------
@@ -76,10 +86,14 @@ class A2p_xmldoc_Object(object):
         self.propertyDict = {}
         self.loadPropertyDict(self.tree)
         self.label = self.propertyDict['Label'].getStringValue()
-        print(self)
+        print(u"{}".format(self))
         
     def __str__(self):
-        return "ObjName: {}, Label: {}, Type: {}".format(self.name, self.label, self.type)
+        return u"ObjName: {}, Label: {}, Type: {}".format(
+            self.name,
+            self.label, 
+            self.type
+            )
     
     def loadPropertyDict(self,tree):
         for elem in tree.iterfind('ObjectData/Object'):
@@ -88,6 +102,13 @@ class A2p_xmldoc_Object(object):
                 for e in elem.findall('Properties/Property'):
                     if e.attrib['type'] == 'App::PropertyString':
                         p = A2p_xmldoc_PropertyString(
+                            e,
+                            e.attrib['name'],
+                            e.attrib['type']
+                            )
+                        self.propertyDict[e.attrib['name']] = p
+                    if e.attrib['type'] == 'App::PropertyFile':
+                        p = A2p_xmldoc_PropertyFile(
                             e,
                             e.attrib['name'],
                             e.attrib['type']
@@ -106,6 +127,19 @@ class A2p_xmldoc_Object(object):
 class A2p_xmldoc_SpreadSheet(A2p_xmldoc_Object):
     def getCells(self):
         return self.propertyDict['cells'].getCellValues()
+
+#------------------------------------------------------------------------------
+class A2p_xmldoc_FeaturePython(A2p_xmldoc_Object):
+    
+    def isA2pObject(self):
+        if self.propertyDict.get('a2p_Version',None) != None: return True
+        return False
+    
+    def getA2pSource(self):
+        if self.isA2pObject:
+            return ob.propertyDict['sourceFile'].getStringValue()
+        return None
+
 #------------------------------------------------------------------------------
 class FCdocumentReader(object):
     '''
@@ -147,8 +181,23 @@ class FCdocumentReader(object):
                         self.tree
                         )
                 self.objects.append(ob)
+            if elem.attrib['type'].startswith('Part::FeaturePython'): 
+                ob = A2p_xmldoc_FeaturePython(
+                        elem.attrib['name'],
+                        elem.attrib['type'],
+                        self.tree
+                        )
+                self.objects.append(ob)
             else:
                 pass # unhandled object types
+            
+    def getA2pObjects(self):
+        out = []
+        for ob in self.objects:
+            if ob.propertyDict.get('a2p_Version',None) != None:
+                out.append(ob)
+        return out
+        
             
     def getObjectByName(self,name):
         for ob in self.objects:
@@ -160,15 +209,22 @@ class FCdocumentReader(object):
 if __name__ == "__main__":
     doc = FreeCAD.activeDocument() 
     dr = FCdocumentReader()
-    dr.openDocument(doc.FileName) 
-    cellDict = dr.getObjectByName('Spreadsheet').getCells()
+    dr.openDocument(doc.FileName)
+     
+    cellDict = dr.getObjectByName('_PARTINFO_').getCells()
     for k in cellDict.keys():
         print(u"Address: {}, content {}".format(
                 k,
                 cellDict[k]
                 )
               )
-    
+
+    for ob in dr.getA2pObjects():
+        print(u"sourcefile: {}".format(
+                ob.getA2pSource()
+                )
+              )
+        
 
 
 
