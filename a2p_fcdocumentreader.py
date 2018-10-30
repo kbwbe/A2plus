@@ -21,9 +21,6 @@
 #***************************************************************************
 
 import FreeCAD, FreeCADGui
-from PySide import QtGui, QtCore
-import os
-import a2plib
 
 import zipfile
 try:
@@ -86,7 +83,7 @@ class A2p_xmldoc_Object(object):
         self.propertyDict = {}
         self.loadPropertyDict(self.tree)
         self.label = self.propertyDict['Label'].getStringValue()
-        print(u"{}".format(self))
+        #print(u"{}".format(self))
         
     def __str__(self):
         return u"ObjName: {}, Label: {}, Type: {}".format(
@@ -125,6 +122,7 @@ class A2p_xmldoc_Object(object):
                         pass # unsupported property type
 #------------------------------------------------------------------------------
 class A2p_xmldoc_SpreadSheet(A2p_xmldoc_Object):
+    
     def getCells(self):
         return self.propertyDict['cells'].getCellValues()
 
@@ -198,6 +196,12 @@ class FCdocumentReader(object):
                 out.append(ob)
         return out
         
+    def getSpreadsheetObjects(self):
+        out = []
+        for ob in self.objects:
+            if ob.type.startswith('Spreadsheet'):
+                out.append(ob)
+        return out
             
     def getObjectByName(self,name):
         for ob in self.objects:
@@ -211,14 +215,15 @@ if __name__ == "__main__":
     dr = FCdocumentReader()
     dr.openDocument(doc.FileName)
      
-    cellDict = dr.getObjectByName('_PARTINFO_').getCells()
-    for k in cellDict.keys():
-        print(u"Address: {}, content {}".format(
-                k,
-                cellDict[k]
-                )
-              )
-
+    for ob in dr.getSpreadsheetObjects():
+        if ob.name == '_PARTINFO_':
+            cellDict = ob.getCells()
+            for k in cellDict.keys():
+                print(u"Address: {}, content {}".format(
+                        k,
+                        cellDict[k]
+                        )
+                      )
     for ob in dr.getA2pObjects():
         print(u"sourcefile: {}".format(
                 ob.getA2pSource()

@@ -70,7 +70,6 @@ PARTIAL_SOLVE_STAGE4 = 4    #look for block of rigids, if a rigid is fully const
 PARTIAL_SOLVE_STAGE5 = 5    #take all remaining rigid and dependencies not done and try to solve them all together
 PARTIAL_SOLVE_END = 6
 
-
 #------------------------------------------------------------------------------
 def getUseTopoNaming():
     preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")

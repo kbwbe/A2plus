@@ -25,6 +25,7 @@ import Spreadsheet
 from PySide import QtGui, QtCore
 import os, copy, time, sys, platform
 import a2plib
+from a2p_partlistglobals import PARTLIST_ROWNAMES
 
 PARTINFORMATION_SHEET_NAME = '_PARTINFO_'
 PARTINFORMATION_SHEET_LABEL = '#PARTINFO#'
@@ -52,22 +53,14 @@ class a2p_CreatePartInformationSheet_Command:
         ss = doc.addObject('Spreadsheet::Sheet',PARTINFORMATION_SHEET_NAME)
         ss.Label = PARTINFORMATION_SHEET_LABEL
         
-        ss.set('A1','SUPPLIER')
-        ss.set('A2','PARTNAME SUPPLIER')
-        ss.set('A3','PARTNUMBER SUPPLIER')
-        ss.set('A4','INTERNAL PARTNAME')
-        ss.set('A5','INTERNAL PARTNUMBER')
-        
-        ss.set('B1','')
-        ss.set('B2','')
-        ss.set('B3','')
-        ss.set('B4','')
-        ss.set('B5','')
+        for idx,name in enumerate(PARTLIST_ROWNAMES):
+            ss.set('A'+str(idx+1),name)
+            ss.set('B'+str(idx+1),'')
         
         ss.setColumnWidth('A',220)
         ss.setColumnWidth('B',300)
-        ss.setBackground('A1:A5', (0.000000,1.000000,0.000000,1.000000))
-        ss.setBackground('B1:B5', (0.85,0.85,0.85,1.000000))
+        ss.setBackground('A1:A'+str(len(PARTLIST_ROWNAMES)), (0.000000,1.000000,0.000000,1.000000))
+        ss.setBackground('B1:B'+str(len(PARTLIST_ROWNAMES)), (0.85,0.85,0.85,1.000000))
         doc.recompute()
 
     def GetResources(self):
