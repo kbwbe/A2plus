@@ -21,7 +21,7 @@
 #***************************************************************************
 
 
-PARTLIST_ROWNAMES = [
+PARTLIST_COLUMN_NAMES = [
     u'SUPPLIER',
     u'PARTNO_SUPPLIER',
     u'PARTNAME_SUPPLIER',

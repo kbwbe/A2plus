@@ -27,6 +27,7 @@ import os
 
 import a2plib
 from a2p_fcdocumentreader import FCdocumentReader
+from a2p_partlistglobals import PARTLIST_COLUMN_NAMES
 
 
 #------------------------------------------------------------------------------
@@ -46,17 +47,52 @@ def createPartList(
         parentAssemblyDir
         )
     workingDir,basicFileName = os.path.split(fileNameInProject)
-    docReader = FCdocumentReader()
-    docReader.openDocument(fileNameInProject)
-    for ob in docReader.getA2pObjects():
+    docReader1 = FCdocumentReader()
+    docReader1.openDocument(fileNameInProject)
+    for ob in docReader1.getA2pObjects():
         print(u'{}, Subassembly? = {}'.format(ob,ob.isSubassembly()))
-        if ob.isSubassembly and recursive:
-            createPartList(
-                ob.getA2pSource(),
-                workingDir,
-                partListEntries,
-                recursive
-                )
+        if ob.isSubassembly() and recursive:
+            partListEntries = createPartList(
+                                        ob.getA2pSource(),
+                                        workingDir,
+                                        partListEntries,
+                                        recursive
+                                        )
+        if not ob.isSubassembly() or not recursive:
+            # Try to get spreadsheetdata _PARTINFO_ from linked source
+            linkedSource = ob.getA2pSource()
+            linkedSource = a2plib.findSourceFileInProject(
+                            linkedSource,
+                            workingDir
+                            ) 
+            docReader2 = FCdocumentReader()
+            docReader2.openDocument(linkedSource)
+            print (linkedSource)
+            # Initialize a default parts information...
+            partInformation = []
+            for i in range(0,len(PARTLIST_COLUMN_NAMES)):
+                partInformation.append("*")
+            # if there is a proper spreadsheat, then read it...
+            for ob in docReader2.getSpreadsheetObjects():
+                if ob.name == '_PARTINFO_':
+                    cells = ob.getCells()
+                    for addr in cells.keys():
+                        if addr[:1] == 'B': #column B contains the information
+                            idx = int(addr[1:])-1
+                            if idx < len(PARTLIST_COLUMN_NAMES): # don't read further!
+                                partInformation[idx] = cells[addr]
+            # put information to dict and count usage of sourcefiles..
+            entry = partListEntries.get(linkedSource,None)
+            if entry == None:
+                partListEntries[linkedSource] = [
+                    1,
+                    partInformation
+                    ]
+            else:
+                partListEntries.get(linkedSource)[0]+=1 #count sourcefile usage
+                
+    return partListEntries
+                
 
 
 
@@ -66,23 +102,24 @@ class a2p_CreatePartlist():
 
     def Activated(self):
         doc = FreeCAD.activeDocument()
-
         if doc == None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
                                         "No active document found!",
                                         "You have to open an fcstd file first."
                                     )
             return
-        
         completeFilePath = doc.FileName
         p,f = os.path.split(completeFilePath)
         
-        createPartList(
+        partListEntries = createPartList(
             doc.FileName,
             p,
             {},
             recursive=True
             )
+        
+        for k in partListEntries.keys():
+            print partListEntries[k]
         
 
     def GetResources(self):
