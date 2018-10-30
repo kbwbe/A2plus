@@ -41,6 +41,9 @@ def createPartList(
     Extract quantities and descriptions of assembled parts from
     document.xml
     Is able to analyse subassemblies by recursion
+    
+    It works with a dict. Structure of an entry is:
+    filename: [Quantity,[information,information,....] ]
     '''
     fileNameInProject = a2plib.findSourceFileInProject(
         importPath,
@@ -58,6 +61,8 @@ def createPartList(
                                         partListEntries,
                                         recursive
                                         )
+            
+        # Process information of this a2p object
         if not ob.isSubassembly() or not recursive:
             # Try to get spreadsheetdata _PARTINFO_ from linked source
             linkedSource = ob.getA2pSource()
@@ -65,9 +70,15 @@ def createPartList(
                             linkedSource,
                             workingDir
                             ) 
+            # Is it already processed minimum one time ?
+            entry = partListEntries.get(linkedSource,None)
+            if entry != None:
+                partListEntries.get(linkedSource)[0]+=1 #count sourcefile usage
+                continue # only needed to count imports of this file, information exists yet
+
+            # There is no entry in dict, need to read out information from importFile...
             docReader2 = FCdocumentReader()
             docReader2.openDocument(linkedSource)
-            print (linkedSource)
             # Initialize a default parts information...
             partInformation = []
             for i in range(0,len(PARTLIST_COLUMN_NAMES)):
