@@ -31,6 +31,7 @@ PARTINFORMATION_SHEET_NAME = '_PARTINFO_'
 PARTINFORMATION_SHEET_LABEL = '#PARTINFO#'
 
 
+
 #------------------------------------------------------------------------------
 class a2p_CreatePartInformationSheet_Command:
 

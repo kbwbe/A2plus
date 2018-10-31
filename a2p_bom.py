@@ -30,6 +30,10 @@ from a2p_fcdocumentreader import FCdocumentReader
 from a2p_partlistglobals import PARTLIST_COLUMN_NAMES
 
 
+BOM_SHEET_NAME  = '_PARTSLIST_'  #BOM = BillOfMaterials...
+BOM_SHEET_LABEL = '#PARTSLIST#'
+
+
 #------------------------------------------------------------------------------
 def createPartList(
         importPath,
@@ -83,6 +87,8 @@ def createPartList(
             partInformation = []
             for i in range(0,len(PARTLIST_COLUMN_NAMES)):
                 partInformation.append("*")
+            # last entry of partinformations is reserved for filename
+            partInformation[-1] = os.path.split(linkedSource)[1] #without complete path...
             # if there is a proper spreadsheat, then read it...
             for ob in docReader2.getSpreadsheetObjects():
                 if ob.name == '_PARTINFO_':
@@ -103,9 +109,6 @@ def createPartList(
                 partListEntries.get(linkedSource)[0]+=1 #count sourcefile usage
                 
     return partListEntries
-                
-
-
 
 
 #------------------------------------------------------------------------------
@@ -122,15 +125,64 @@ class a2p_CreatePartlist():
         completeFilePath = doc.FileName
         p,f = os.path.split(completeFilePath)
         
+        flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
+        msg = u"Partslist/BOM: Do recursively over all included subassemblies ?"
+        response = QtGui.QMessageBox.information(QtGui.QApplication.activeWindow(), u"PARTSLIST/BOM mode?", msg, flags )
+        if response == QtGui.QMessageBox.Yes:
+            subAssyRecursion = True
+        else:
+            subAssyRecursion = False
+        
+        
+        
         partListEntries = createPartList(
             doc.FileName,
             p,
             {},
-            recursive=True
+            recursive=subAssyRecursion
             )
         
         for k in partListEntries.keys():
             print partListEntries[k]
+
+        # delete old BOM if one exists...
+        try:
+            doc.removeObject(BOM_SHEET_NAME)
+        except:
+            pass
+        # create a spreadsheet with a special reserved name...
+        ss = doc.addObject('Spreadsheet::Sheet',BOM_SHEET_NAME)
+        ss.Label = BOM_SHEET_LABEL
+        
+        # Write Column headers to spreadsheet
+        ss.set('A1',u'POS')
+        ss.set('B1',u'QTY')
+        idx1 = ord('C')
+        idx2 = idx1 + len(PARTLIST_COLUMN_NAMES)
+        i=0
+        for c in xrange(idx1,idx2):
+            ss.set(chr(c)+"1",PARTLIST_COLUMN_NAMES[i])
+            i+=1
+        # Set the background color of the column headers
+        ss.setBackground('A1:'+chr(idx2-1)+'1', (0.000000,1.000000,0.000000,1.000000))
+        # Set the columnwith to proper values
+        ss.setColumnWidth('A',75)
+        i=0
+        for c in xrange(idx1,idx2):
+            ss.setColumnWidth(chr(c),250)
+            i+=1
+        # fill entries for partsList...
+        idx3 = ord('A')
+        for idx, k in enumerate(partListEntries.keys()):
+            ss.set('A'+str(idx+2),str(idx+1))
+            ss.set('B'+str(idx+2),str(partListEntries[k][0]))
+            values = partListEntries[k][1]
+            for j,tx in enumerate(values):
+                tx2 = tx.encode('UTF-8')
+                ss.set(chr(idx3+2+j)+str(idx+2),tx2)
+        
+        # recompute to finish..
+        doc.recompute()
         
 
     def GetResources(self):
