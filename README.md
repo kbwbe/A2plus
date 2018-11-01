@@ -23,7 +23,6 @@ Different is:
 * A new designed solving algorithm, able to solve some more complicated relations.
 * Different and in future more constraints, internally with different names.
 * No animation for degrees of freedom, as difficult for new solver type.
-* No parts list at moment. Export to office spreadsheats planned for future versions.
 * No collision check of parts at moment. Planned for future versions
 * Some new small features as visibility helpers (isolate and show only selected parts, transparency of whole assembly)
 
