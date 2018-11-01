@@ -27,8 +27,10 @@ import os, copy, time, sys, platform
 import a2plib
 from a2p_partlistglobals import PARTLIST_COLUMN_NAMES
 
-PARTINFORMATION_SHEET_NAME = '_PARTINFO_'
-PARTINFORMATION_SHEET_LABEL = '#PARTINFO#'
+from a2p_partlistglobals import (
+    PARTINFORMATION_SHEET_NAME, 
+    PARTINFORMATION_SHEET_LABEL
+    )
 
 
 
@@ -66,7 +68,7 @@ class a2p_CreatePartInformationSheet_Command:
 
     def GetResources(self):
         return {
-            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_partsInfo.svg',
+            'Pixmap'  :     ':/icons/a2p_partsInfo.svg',
             'MenuText':     'create a spreadSheet with logistics/ordering information',
             'ToolTip':      'create a spreadSheet with logistics/ordering information'
             }

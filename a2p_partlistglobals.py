@@ -20,6 +20,12 @@
 #*                                                                         *
 #***************************************************************************
 
+PARTINFORMATION_SHEET_NAME = '_PARTINFO_'
+PARTINFORMATION_SHEET_LABEL = '#PARTINFO#'
+
+BOM_SHEET_NAME  = '_PARTSLIST_'  #BOM = BillOfMaterials...
+BOM_SHEET_LABEL = '#PARTSLIST#'
+
 
 PARTLIST_COLUMN_NAMES = [
     u'IDENTNO',

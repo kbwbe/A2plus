@@ -37,7 +37,6 @@ class A2p_xmldoc_Property(object):
         self.treeElement = treeElement
         self.name = name
         self.type = _type
-        #print(self)
         
     def __str__(self):
         return "PropertyName: {}, Type: {}".format(self.name,self.type)
@@ -93,7 +92,6 @@ class A2p_xmldoc_Object(object):
         self.propertyDict = {}
         self.loadPropertyDict(self.tree)
         self.label = self.propertyDict['Label'].getStringValue()
-        #print(u"{}".format(self))
         
     def __str__(self):
         return u"ObjName: {}, Label: {}, Type: {}".format(

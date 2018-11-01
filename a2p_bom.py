@@ -29,9 +29,11 @@ import a2plib
 from a2p_fcdocumentreader import FCdocumentReader
 from a2p_partlistglobals import PARTLIST_COLUMN_NAMES
 
-
-BOM_SHEET_NAME  = '_PARTSLIST_'  #BOM = BillOfMaterials...
-BOM_SHEET_LABEL = '#PARTSLIST#'
+from a2p_partlistglobals import (
+    BOM_SHEET_NAME,
+    BOM_SHEET_LABEL,
+    PARTINFORMATION_SHEET_NAME
+    )
 
 
 #------------------------------------------------------------------------------
@@ -57,7 +59,7 @@ def createPartList(
     docReader1 = FCdocumentReader()
     docReader1.openDocument(fileNameInProject)
     for ob in docReader1.getA2pObjects():
-        print(u'{}, Subassembly? = {}'.format(ob,ob.isSubassembly()))
+        #print(u'{}, Subassembly? = {}'.format(ob,ob.isSubassembly()))
         if ob.isSubassembly() and recursive:
             partListEntries = createPartList(
                                         ob.getA2pSource(),
@@ -91,7 +93,7 @@ def createPartList(
             partInformation[-1] = os.path.split(linkedSource)[1] #without complete path...
             # if there is a proper spreadsheat, then read it...
             for ob in docReader2.getSpreadsheetObjects():
-                if ob.name == '_PARTINFO_':
+                if ob.name == PARTINFORMATION_SHEET_NAME:
                     cells = ob.getCells()
                     for addr in cells.keys():
                         if addr[:1] == 'B': #column B contains the information
@@ -142,9 +144,6 @@ class a2p_CreatePartlist():
             recursive=subAssyRecursion
             )
         
-        for k in partListEntries.keys():
-            print partListEntries[k]
-
         # delete old BOM if one exists...
         try:
             doc.removeObject(BOM_SHEET_NAME)
@@ -183,11 +182,12 @@ class a2p_CreatePartlist():
         
         # recompute to finish..
         doc.recompute()
+        print("partslist/BOM spreadsheet has been created!")
         
 
     def GetResources(self):
         return {
-            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_partsList.svg',
+            'Pixmap'  :     ':/icons/a2p_partsList.svg',
             'MenuText':     'create a spreadsheet with a partlist of this file',
             'ToolTip':      'create a spreadsheet with a partlist of this file'
             }
