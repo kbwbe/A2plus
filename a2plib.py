@@ -188,20 +188,20 @@ def findFile(name, path):
 def findSourceFileInProject(pathImportPart, assemblyPath):
     '''
     #------------------------------------------------------------------------------------
-    # interprete the sourcefile name of imported part
+    # interpret the sourcefile name of imported part
     # if working with preference "useProjectFolder:
     # - path of sourcefile is ignored
     # - filename is looked up beneath projectFolder
     #
     # if not working with preference "useProjectFolder":
     # - path of sourcefile is checked for being relative to assembly or absolute
-    # - path is interpreted in appropiate way
+    # - path is interpreted in appropriate way
     #------------------------------------------------------------------------------------
     '''
     preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
     if not preferences.GetBool('useProjectFolder', False): 
         # not working with useProjectFolder preference,
-        # check wether path is relative or absolute...
+        # check whether path is relative or absolute...
         if (
             pathImportPart.startswith('../') or
             pathImportPart.startswith('..\\') or

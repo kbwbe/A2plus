@@ -172,7 +172,7 @@ def importPartFromFile(_doc, filename, importToCache=False):
     # Get the importDocument
     #-------------------------------------------
     
-    # look only for filenames, not pathes, as there are problems on WIN10 (Address-translation??)
+    # look only for filenames, not paths, as there are problems on WIN10 (Address-translation??)
     importDoc = None
     importDocIsOpen = False
     requestedFile = os.path.split(filename)[1]
@@ -283,7 +283,7 @@ def importPartFromFile(_doc, filename, importToCache=False):
             withColor=True
             )
     else:
-        # TopoMapper manages import of non A2p-Files. It generates the shapes and appropiate topo names...
+        # TopoMapper manages import of non A2p-Files. It generates the shapes and appropriate topo names...
         newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor = topoMapper.createTopoNames(withColor=True)
         
 
@@ -1121,8 +1121,8 @@ class a2p_absPath_to_relPath_Command:
             
     def GetResources(self):
         return {
-            'MenuText':     'convert absolute pathes of importParts to relative ones',
-            'ToolTip':      'convert absolute pathes of importParts to relative ones'
+            'MenuText':     'convert absolute paths of importParts to relative ones',
+            'ToolTip':      'convert absolute paths of importParts to relative ones'
             }
 FreeCADGui.addCommand('a2p_absPath_to_relPath_Command', a2p_absPath_to_relPath_Command())
 
@@ -1140,7 +1140,7 @@ def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
         return
 
 
-    # check, wether object is an assembly with muxInformations.
+    # check, whether object is an assembly with muxInformations.
     # Then find edgenames with mapping in muxinfo...
     deletionList = [] #for broken constraints
     if hasattr(oldObject, 'muxInfo'):
