@@ -186,9 +186,10 @@ class Dependency():
             ob1 = doc.getObject(c.Object1)
             ob2 = doc.getObject(c.Object2)
 
-            vert1 = getObjectVertexFromName(ob1, c.SubElement1)
+            #vert1 = getObjectVertexFromName(ob1, c.SubElement1)
             plane2 = getObjectFaceFromName(ob2, c.SubElement2)
-            dep1.refPoint = vert1.Point
+            dep1.refPoint = getPos(ob1, c.SubElement1)
+
             dep2.refPoint = plane2.Faces[0].BoundBox.Center
 
             normal2 = plane2.Surface.Axis
