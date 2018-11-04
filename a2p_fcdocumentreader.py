@@ -155,8 +155,12 @@ class A2p_xmldoc_FeaturePython(A2p_xmldoc_Object):
     
     def isSubassembly(self):
         if self.isA2pObject:
-            return self.propertyDict['subassemblyImport'].getBool()
-        return None
+            propFound = self.propertyDict.get('subassemblyImport',None)
+            if propFound:
+                return propFound.getBool()
+            else:
+                return False
+        return False
 
 #------------------------------------------------------------------------------
 class FCdocumentReader(object):

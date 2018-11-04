@@ -29,7 +29,7 @@ from PySide import QtGui
 class PointOnPlaneSelectionGate:
     def allow(self, doc, obj, sub):
         s1 = SelectionExObject(doc, obj, sub)
-        return vertexSelected( s1 )
+        return vertexSelected( s1 ) or CircularEdgeSelected( s1 ) # allow vertex or center of circle
 
 class PointOnPlaneSelectionGate2:
     def allow(self, doc, obj, sub):
@@ -41,14 +41,17 @@ def parseSelection(selection, objectToUpdate=None):
     if len(selection) == 2:
         s1, s2 = selection
         if s1.ObjectName != s2.ObjectName:
-            if vertexSelected(s1) and planeSelected(s2):
+            if ( 
+                 (vertexSelected(s1) or CircularEdgeSelected(s1)) and 
+                 planeSelected(s2)
+                ):
                 validSelection = True
                 cParms = [ [s1.ObjectName, s1.SubElementNames[0], s1.Object.Label ],
                            [s2.ObjectName, s2.SubElementNames[0], s2.Object.Label ] ]
     if not validSelection:
         msg = '''
               for Point on Plane constraint select in this order:
-              1.) a vertex
+              1.) a vertex or a center of a circle
               2.) a plane
 
               Selection made: %s
@@ -66,7 +69,27 @@ def parseSelection(selection, objectToUpdate=None):
         c.addProperty("App::PropertyString","SubElement1","ConstraintInfo").SubElement1 = cParms[0][1]
         c.addProperty("App::PropertyString","Object2","ConstraintInfo").Object2 = cParms[1][0]
         c.addProperty("App::PropertyString","SubElement2","ConstraintInfo").SubElement2 = cParms[1][1]
+        
+        c.addProperty('App::PropertyDistance','offset',"ConstraintInfo")
 
+        ''' TODO: use a dialog for editing the value calculated within next section
+        doc = FreeCAD.activeDocument()
+        ob1 = doc.getObject(c.Object1)
+        ob2 = doc.getObject(c.Object2)
+        
+        point = getPos(ob1, c.SubElement1)
+        plane = getObjectFaceFromName(ob2, c.SubElement2)
+        planeNormal = plane.Surface.Axis
+        planePos = getPos(ob2, c.SubElement2)
+        #
+        # calculate recent offset...
+        delta = point.sub(planePos)
+        offs = delta.dot(planeNormal)
+        c.offset = offs
+        '''
+        c.offset = 0.0 # default value until dialog is done...
+        
+        
         c.setEditorMode('Type',1)
         for prop in ["Object1","Object2","SubElement1","SubElement2"]:
             c.setEditorMode(prop, 1)
@@ -103,14 +126,14 @@ def parseSelection(selection, objectToUpdate=None):
 
 selection_text = \
 '''for Point on Plane constraint select in this order:
-1.) a vertex
+1.) a vertex or a center of a circle
 2.) a plane
 '''
 
 toolTipText = \
 '''
 Add a Point on Plane constraint between two objects
-1.) select a vertex from a part
+1.) select a vertex or a center of a circle
 2.) select a plane on other part
 '''
 
