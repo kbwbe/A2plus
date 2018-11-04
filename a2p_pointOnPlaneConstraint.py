@@ -72,6 +72,7 @@ def parseSelection(selection, objectToUpdate=None):
         
         c.addProperty('App::PropertyDistance','offset',"ConstraintInfo")
 
+        ''' TODO: use a dialog for editing the value calculated within next section
         doc = FreeCAD.activeDocument()
         ob1 = doc.getObject(c.Object1)
         ob2 = doc.getObject(c.Object2)
@@ -85,6 +86,9 @@ def parseSelection(selection, objectToUpdate=None):
         delta = point.sub(planePos)
         offs = delta.dot(planeNormal)
         c.offset = offs
+        '''
+        c.offset = 0.0 # default value until dialog is done...
+        
         
         c.setEditorMode('Type',1)
         for prop in ["Object1","Object2","SubElement1","SubElement2"]:
