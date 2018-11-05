@@ -120,12 +120,24 @@ class a2p_CreatePartlist():
         doc = FreeCAD.activeDocument()
         if doc == None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
-                                        "No active document found!",
-                                        "You have to open an fcstd file first."
+                                        u"No active document found!",
+                                        u"You have to open an fcstd file first."
                                     )
             return
         completeFilePath = doc.FileName
         p,f = os.path.split(completeFilePath)
+        
+        flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
+        msg = u"Please save before generating a partlist!\nSave now ?"
+        response = QtGui.QMessageBox.information(QtGui.QApplication.activeWindow(), u"Save document?", msg, flags )
+        if response == QtGui.QMessageBox.No:
+            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
+                                        u"Partlist generation aborted!",
+                                        u"You have to save the assembly file first."
+                                    )
+            return
+        else:
+            doc.save()
         
         flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
         msg = u"Partslist/BOM: Do recursively over all included subassemblies ?"
@@ -134,8 +146,6 @@ class a2p_CreatePartlist():
             subAssyRecursion = True
         else:
             subAssyRecursion = False
-        
-        
         
         partListEntries = createPartList(
             doc.FileName,
