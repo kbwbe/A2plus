@@ -159,7 +159,7 @@ class a2p_CreatePartlist():
         idx1 = ord('C')
         idx2 = idx1 + len(PARTLIST_COLUMN_NAMES)
         i=0
-        for c in xrange(idx1,idx2):
+        for c in range(idx1,idx2):
             ss.set(chr(c)+"1",PARTLIST_COLUMN_NAMES[i])
             i+=1
         # Set the background color of the column headers
@@ -167,7 +167,7 @@ class a2p_CreatePartlist():
         # Set the columnwith to proper values
         ss.setColumnWidth('A',75)
         i=0
-        for c in xrange(idx1,idx2):
+        for c in range(idx1,idx2):
             ss.setColumnWidth(chr(c),250)
             i+=1
         # fill entries for partsList...
@@ -177,7 +177,10 @@ class a2p_CreatePartlist():
             ss.set('B'+str(idx+2),str(partListEntries[k][0]))
             values = partListEntries[k][1]
             for j,tx in enumerate(values):
-                tx2 = tx.encode('UTF-8')
+                if a2plib.PYVERSION == 2:
+                    tx2 = tx.encode('UTF-8')
+                else:
+                    tx2 = tx
                 ss.set(chr(idx3+2+j)+str(idx+2),tx2)
         
         # recompute to finish..
