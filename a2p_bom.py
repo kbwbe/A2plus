@@ -24,15 +24,17 @@ import FreeCADGui,FreeCAD
 from PySide import QtGui, QtCore
 import Spreadsheet
 import os
+import string
 
 import a2plib
 from a2p_fcdocumentreader import FCdocumentReader
-from a2p_partlistglobals import PARTLIST_COLUMN_NAMES
 
 from a2p_partlistglobals import (
+    PARTLIST_COLUMN_NAMES,
     BOM_SHEET_NAME,
     BOM_SHEET_LABEL,
-    PARTINFORMATION_SHEET_NAME
+    PARTINFORMATION_SHEET_NAME,
+    BOM_MAX_LENGTH
     )
 
 
@@ -115,17 +117,39 @@ def createPartList(
 
 #------------------------------------------------------------------------------
 class a2p_CreatePartlist():
+    
+    def clearPartList(self):
+        alphabet_list = list(string.ascii_uppercase)
+        doc = FreeCAD.activeDocument()
+        ss = doc.getObject(BOM_SHEET_NAME)
+        for i in range(0,12): #12 Rows enought for a partlist
+            for k in range(0,BOM_MAX_LENGTH):
+                cellAdress = alphabet_list[i]+str(k+1)
+                print cellAdress
+                ss.set(cellAdress,'')
 
     def Activated(self):
         doc = FreeCAD.activeDocument()
         if doc == None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
-                                        "No active document found!",
-                                        "You have to open an fcstd file first."
+                                        u"No active document found!",
+                                        u"You have to open an fcstd file first."
                                     )
             return
         completeFilePath = doc.FileName
         p,f = os.path.split(completeFilePath)
+        
+        flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
+        msg = u"Please save before generating a partlist!\nSave now ?"
+        response = QtGui.QMessageBox.information(QtGui.QApplication.activeWindow(), u"Save document?", msg, flags )
+        if response == QtGui.QMessageBox.No:
+            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
+                                        u"Partlist generation aborted!",
+                                        u"You have to save the assembly file first."
+                                    )
+            return
+        else:
+            doc.save()
         
         flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
         msg = u"Partslist/BOM: Do recursively over all included subassemblies ?"
@@ -135,8 +159,6 @@ class a2p_CreatePartlist():
         else:
             subAssyRecursion = False
         
-        
-        
         partListEntries = createPartList(
             doc.FileName,
             p,
@@ -144,14 +166,16 @@ class a2p_CreatePartlist():
             recursive=subAssyRecursion
             )
         
-        # delete old BOM if one exists...
+        ss = None
         try:
-            doc.removeObject(BOM_SHEET_NAME)
+            ss = doc.getObject(BOM_SHEET_NAME)
         except:
             pass
-        # create a spreadsheet with a special reserved name...
-        ss = doc.addObject('Spreadsheet::Sheet',BOM_SHEET_NAME)
-        ss.Label = BOM_SHEET_LABEL
+        if ss == None:
+            ss = doc.addObject('Spreadsheet::Sheet',BOM_SHEET_NAME)
+            ss.Label = BOM_SHEET_LABEL
+        else:
+            self.clearPartList()
         
         # Write Column headers to spreadsheet
         ss.set('A1',u'POS')
@@ -159,7 +183,7 @@ class a2p_CreatePartlist():
         idx1 = ord('C')
         idx2 = idx1 + len(PARTLIST_COLUMN_NAMES)
         i=0
-        for c in xrange(idx1,idx2):
+        for c in range(idx1,idx2):
             ss.set(chr(c)+"1",PARTLIST_COLUMN_NAMES[i])
             i+=1
         # Set the background color of the column headers
@@ -167,7 +191,7 @@ class a2p_CreatePartlist():
         # Set the columnwith to proper values
         ss.setColumnWidth('A',75)
         i=0
-        for c in xrange(idx1,idx2):
+        for c in range(idx1,idx2):
             ss.setColumnWidth(chr(c),250)
             i+=1
         # fill entries for partsList...
@@ -177,7 +201,10 @@ class a2p_CreatePartlist():
             ss.set('B'+str(idx+2),str(partListEntries[k][0]))
             values = partListEntries[k][1]
             for j,tx in enumerate(values):
-                tx2 = tx.encode('UTF-8')
+                if a2plib.PYVERSION == 2:
+                    tx2 = tx.encode('UTF-8')
+                else:
+                    tx2 = tx
                 ss.set(chr(idx3+2+j)+str(idx+2),tx2)
         
         # recompute to finish..
