@@ -125,7 +125,6 @@ class a2p_CreatePartlist():
         for i in range(0,12): #12 Rows enought for a partlist
             for k in range(0,BOM_MAX_LENGTH):
                 cellAdress = alphabet_list[i]+str(k+1)
-                print cellAdress
                 ss.set(cellAdress,'')
 
     def Activated(self):
