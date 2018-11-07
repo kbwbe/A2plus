@@ -24,15 +24,17 @@ import FreeCADGui,FreeCAD
 from PySide import QtGui, QtCore
 import Spreadsheet
 import os
+import string
 
 import a2plib
 from a2p_fcdocumentreader import FCdocumentReader
-from a2p_partlistglobals import PARTLIST_COLUMN_NAMES
 
 from a2p_partlistglobals import (
+    PARTLIST_COLUMN_NAMES,
     BOM_SHEET_NAME,
     BOM_SHEET_LABEL,
-    PARTINFORMATION_SHEET_NAME
+    PARTINFORMATION_SHEET_NAME,
+    BOM_MAX_LENGTH
     )
 
 
@@ -115,6 +117,16 @@ def createPartList(
 
 #------------------------------------------------------------------------------
 class a2p_CreatePartlist():
+    
+    def clearPartList(self):
+        alphabet_list = list(string.ascii_uppercase)
+        doc = FreeCAD.activeDocument()
+        ss = doc.getObject(BOM_SHEET_NAME)
+        for i in range(0,12): #12 Rows enought for a partlist
+            for k in range(0,BOM_MAX_LENGTH):
+                cellAdress = alphabet_list[i]+str(k+1)
+                print cellAdress
+                ss.set(cellAdress,'')
 
     def Activated(self):
         doc = FreeCAD.activeDocument()
@@ -154,14 +166,16 @@ class a2p_CreatePartlist():
             recursive=subAssyRecursion
             )
         
-        # delete old BOM if one exists...
+        ss = None
         try:
-            doc.removeObject(BOM_SHEET_NAME)
+            ss = doc.getObject(BOM_SHEET_NAME)
         except:
             pass
-        # create a spreadsheet with a special reserved name...
-        ss = doc.addObject('Spreadsheet::Sheet',BOM_SHEET_NAME)
-        ss.Label = BOM_SHEET_LABEL
+        if ss == None:
+            ss = doc.addObject('Spreadsheet::Sheet',BOM_SHEET_NAME)
+            ss.Label = BOM_SHEET_LABEL
+        else:
+            self.clearPartList()
         
         # Write Column headers to spreadsheet
         ss.set('A1',u'POS')
