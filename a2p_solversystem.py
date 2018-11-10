@@ -45,6 +45,8 @@ from a2plib import (
     A2P_DEBUG_1,
     A2P_DEBUG_2,
     A2P_DEBUG_3,
+    
+    PARTIAL_SOLVE_STAGE1,
     )
 from a2p_dependencies import Dependency
 from a2p_rigid import Rigid
@@ -71,15 +73,6 @@ SOLVER_SPIN_ACCURACY = 1.0e-1 # gets to smaller values during solving
 SOLVER_STEPS_CONVERGENCY_CHECK = 150 #200
 SOLVER_CONVERGENCY_FACTOR = 0.99
 SOLVER_CONVERGENCY_ERROR_INIT_VALUE = 1.0e+20
-
-from a2plib import (
-    PARTIAL_SOLVE_STAGE1,
-    PARTIAL_SOLVE_STAGE2, 
-    PARTIAL_SOLVE_STAGE3,
-    PARTIAL_SOLVE_STAGE4,
-    PARTIAL_SOLVE_STAGE5,
-    PARTIAL_SOLVE_END
-    )
 
 #------------------------------------------------------------------------------
 class SolverSystem():
@@ -338,27 +331,21 @@ class SolverSystem():
         self.mySOLVER_POS_ACCURACY = SOLVER_CONTROLDATA[self.level_of_accuracy][0]
         self.mySOLVER_SPIN_ACCURACY = SOLVER_CONTROLDATA[self.level_of_accuracy][1]
 
-        #startTime = int(round(time.time() * 1000))
         self.loadSystem(doc)
         if self.status == "loadingDependencyError":
             return
         self.assignParentship(doc)
-        #loadTime = int(round(time.time() * 1000))
         while True:
             systemSolved = self.calculateChain(doc)
-            #totalTime = int(round(time.time() * 1000))
             if systemSolved:
                 self.level_of_accuracy+=1
                 if self.level_of_accuracy > len(SOLVER_CONTROLDATA):
                     self.solutionToParts(doc)
                     break
-                #self.prepareRestart()
                 self.mySOLVER_POS_ACCURACY = SOLVER_CONTROLDATA[self.level_of_accuracy][0]
                 self.mySOLVER_SPIN_ACCURACY = SOLVER_CONTROLDATA[self.level_of_accuracy][1]
-                #self.solutionToParts(doc)
                 self.loadSystem(doc)
             else:
-                #self.solutionToParts(doc)
                 completeSolvingRequired = SOLVER_CONTROLDATA[self.level_of_accuracy][2]
                 if not completeSolvingRequired: systemSolved = True
                 break

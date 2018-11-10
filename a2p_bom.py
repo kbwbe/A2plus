@@ -60,6 +60,7 @@ def createPartList(
         )
     workingDir,basicFileName = os.path.split(fileNameInProject)
     docReader1 = FCdocumentReader()
+    
     docReader1.openDocument(fileNameInProject)
     for ob in docReader1.getA2pObjects():
         #print(u'{}, Subassembly? = {}'.format(ob,ob.isSubassembly()))

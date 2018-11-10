@@ -63,12 +63,6 @@ A2P_DEBUG_3         = 3
 A2P_DEBUG_LEVEL = A2P_DEBUG_NONE
 
 PARTIAL_SOLVE_STAGE1 = 1    #solve all rigid fully constrained to tempfixed rigid, enable only involved dep, then set them as tempfixed
-PARTIAL_SOLVE_STAGE2 = 2    #solve all rigid constrained only to tempfixed rigids, it doesn't matter if fully constrained or not. 
-                            #in case more than one tempfixed rigid
-PARTIAL_SOLVE_STAGE3 = 3    #repeat stage 1 and stage2 as there are rigids that match
-PARTIAL_SOLVE_STAGE4 = 4    #look for block of rigids, if a rigid is fully constrained to one rigid, solve them and create a superrigid (disabled at the moment)
-PARTIAL_SOLVE_STAGE5 = 5    #take all remaining rigid and dependencies not done and try to solve them all together
-PARTIAL_SOLVE_END = 6
 
 #------------------------------------------------------------------------------
 def getUseTopoNaming():
@@ -106,13 +100,6 @@ def setTransparency():
         if hasattr(obj,'ViewObject'):
             if hasattr(obj.ViewObject,'Transparency'):
 #                if hasattr(obj.ViewObject,'DiffuseColor'):
-                if ( len(obj.ViewObject.DiffuseColor) == 1 ) :
-                    DebugMsg(A2P_DEBUG_3,"a2p setTransparency:  ONE ShapeColor and Transparency detected:\n{}" \
-                        .format(obj.ViewObject.DiffuseColor))
-                else:
-                    DebugMsg(A2P_DEBUG_3,"a2p setTransparency: muxed assembly detected:\n{}" \
-                       .format(obj.ViewObject.DiffuseColor))
-                DebugMsg(A2P_DEBUG_3,"A2P setTransparency: Saving transparency!\n")
                 SAVED_TRANSPARENCY.append(
                     (obj.Name, obj.ViewObject.Transparency, obj.ViewObject.DiffuseColor)
                     )
