@@ -115,19 +115,14 @@ def muxAssemblyWithTopoNames(doc, withColor=False):
         
         # Save Computing time, store this before the for..enumerate loop later...
         colorFlag = ( len(obj.ViewObject.DiffuseColor) < len(obj.Shape.Faces) )
-#        shapeCol = obj.ViewObject.ShapeColor                                   # MASTER APPROACH
-#        diffuseCol = obj.ViewObject.DiffuseColor                               # MASTER APPROACH
-        shapeCol = copy.deepcopy(obj.ViewObject.ShapeColor)                    ## for sCT-Mode: meaning: shapeColor
-        shapeTsp = copy.deepcopy(obj.ViewObject.Transparency)                  ## for sCT-Mode: |_  plus Transparency
-        comboCol = (shapeCol[0],shapeCol[1],shapeCol[2],float(shapeTsp/100.0)) ## comboCol: sCT-Mode color calculation
-        diffuseCol = copy.deepcopy(obj.ViewObject.DiffuseColor)                ## for dCi-Mode: diffuseColor per face[i]
+        shapeCol = obj.ViewObject.ShapeColor
+        diffuseCol = obj.ViewObject.DiffuseColor
         tempShape = makePlacedShape(obj)
 
         # now start the loop with use of the stored values..(much faster)
         topoNaming = a2plib.getUseTopoNaming()
         for i, face in enumerate(tempShape.Faces):
             faces.append(face)
-            a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"a2p MA-MUX: i(Faces)={}, {} ".format(i,face)) # debug improve-color info
             if topoNaming:
                 if extendNames:
                     newName = "".join((faceNames[i],obj.Name,';'))
@@ -138,11 +133,9 @@ def muxAssemblyWithTopoNames(doc, withColor=False):
 
             if withColor:
                 if colorFlag:
-                    faceColors.append(comboCol)
-                    a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"sCT-Mode\n") # debug improve-color info
+                    faceColors.append(shapeCol)
                 else:
                     faceColors.append(diffuseCol[i])
-                    a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"dCi-Mode\n") # debug improve-color info
 
     shell = Part.makeShell(faces)
     if withColor:
