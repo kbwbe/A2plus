@@ -537,15 +537,24 @@ def isA2pPart(obj):
         result = True                         #  -> otherwise toggle transparency won't work
     elif hasattr(obj,"subassemblyImport"):    # another possible assembly item
         result = True
+    elif hasattr(obj,"assembly2Version"):    # another possible assembly item (very old a2p versions)
+        result = True
     return result
-
+#------------------------------------------------------------------------------
+def isEditableA2pPart(obj):
+    if not isA2pPart(obj): return False
+    if hasattr(obj,"sourceFile"):
+        if obj.sourceFile == "converted": return False
+        if obj.sourceFile == "": return False
+    return True
+#------------------------------------------------------------------------------
 def isA2pConstraint(obj): 
     result = False
     if hasattr(obj,"Content"):
         if ('ConstraintInfo' in obj.Content) or ('ConstraintNfo'in obj.Content):
             result = True
     return result
-
+#------------------------------------------------------------------------------
 def isA2pObject(obj):
     result = False
     if isA2pPart(obj) or isA2pConstraint(obj):

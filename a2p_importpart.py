@@ -453,23 +453,45 @@ def duplicateImportedPart( part ):
 
 class a2p_DuplicatePartCommand:
     def Activated(self):
+        #====================================================
+        # Is there an open Doc ?
+        #====================================================
         if FreeCAD.activeDocument() == None:
-            QtGui.QMessageBox.critical(
+            QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
-               "No active Document error",
-               "First please open an assembly file!"
+               u"No active Document error",
+               u"First please open an assembly file!"
                )
             return
+        
+        #====================================================
+        # Is something been selected ?
+        #====================================================
         selection = [s for s in FreeCADGui.Selection.getSelectionEx() if s.Document == FreeCAD.ActiveDocument ]
-        if len(selection) == 1:
-            PartMover(  FreeCADGui.activeDocument().activeView(), duplicateImportedPart( selection[0].Object ) )
-        else:
-            QtGui.QMessageBox.critical(
+        if len(selection) != 1:
+            QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
-               "Selection error",
-               "Before duplicating, first please select a part!"
+               u"Selection error",
+               u"Before duplicating, first please select a part!"
                )
+            return
             
+        #====================================================
+        # Is the selection an a2p part ?
+        #====================================================
+        obj = selection[0].Object
+        if not a2plib.isA2pPart(obj):
+            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
+                                        u"Duplicate: Selection invalid!",
+                                        u"This object is no imported part!"
+                                    )
+            return
+        
+        #====================================================
+        # Duplicate the part
+        #====================================================
+        PartMover(  FreeCADGui.activeDocument().activeView(), duplicateImportedPart( selection[0].Object ) )
+        
 
     def GetResources(self):
         return {
@@ -487,24 +509,42 @@ FreeCADGui.addCommand('a2p_duplicatePart', a2p_DuplicatePartCommand())
 class a2p_EditPartCommand:
     def Activated(self):
         doc = FreeCAD.activeDocument()
+        #====================================================
+        # Is there an open Doc ?
+        #====================================================
         if doc == None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
-                                        "No active document found!",
-                                        "Before editing a part, you have to open an assembly file."
+                                        u"No active document found!",
+                                        u"Before editing a part, you have to open an assembly file."
                                     )
             return
+        
+        #====================================================
+        # Is something been selected ?
+        #====================================================
         selection = [s for s in FreeCADGui.Selection.getSelection() if s.Document == FreeCAD.ActiveDocument ]
         if not selection:
-            msg = \
-'''
-You must select a part to edit first.
-'''
             QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
-                "Selection Error",
-                msg
+                u"Selection Error",
+                u"You must select a part to edit first."
                 )
             return
+        
+        #====================================================
+        # Has the selected object an editable a2p file ?
+        #====================================================
+        obj = selection[0]
+        if not a2plib.isEditableA2pPart(obj):
+            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
+                                        u"Edit: Selection invalid!",
+                                        u"This object is no imported part!"
+                                    )
+            return
+        
+        #====================================================
+        # Does the file exist ?
+        #====================================================
         obj = selection[0]
         FreeCADGui.Selection.clearSelection() # very important! Avoid Editing the assembly the part was called from!
         assemblyPath = os.path.normpath(os.path.split(doc.FileName)[0])
@@ -523,7 +563,10 @@ This is not allowed when using preference
                 msg
                 )
             return
-        #TODO: WF fails if "use folder" = false here
+
+        #====================================================
+        # Open the file for editing and switch the window
+        #====================================================
         docs = []
         for d in FreeCAD.listDocuments().values(): #dict_values not indexable, docs now is...
             docs.append(d)
@@ -542,10 +585,6 @@ This is not allowed when using preference
             for s in sub:
                 mdi.setActiveSubWindow(s)
                 if FreeCAD.activeDocument().Name == name: break
-            # This does not work somehow...
-            # FreeCAD.setActiveDocument( name )
-            # FreeCAD.ActiveDocument=FreeCAD.getDocument( name )
-            # FreeCADGui.ActiveDocument=FreeCADGui.getDocument( name )
 
 
     def GetResources(self):
@@ -603,19 +642,41 @@ class PartMoverSelectionObserver:
 
 class a2p_MovePartCommand:
     def Activated(self):
+        #====================================================
+        # Is there an open Doc ?
+        #====================================================
         if FreeCAD.activeDocument() == None:
             QtGui.QMessageBox.critical(
                 QtGui.QApplication.activeWindow(),
-               "No active Document error",
-               "First please open an assembly file!"
+               u"No active Document error",
+               u"First please open an assembly file!"
+               )
+            return
+        
+        #====================================================
+        # Is something been selected ?
+        #====================================================
+        selection = [s for s in FreeCADGui.Selection.getSelectionEx() if s.Document == FreeCAD.ActiveDocument ]
+        if len(selection) != 1:
+            QtGui.QMessageBox.information(
+                QtGui.QApplication.activeWindow(),
+               u"Selection error",
+               u"Before moving, first please select exact 1 part!"
                )
             return
             
-        selection = [s for s in FreeCADGui.Selection.getSelectionEx() if s.Document == FreeCAD.ActiveDocument ]
-        if len(selection) == 1:
+        #====================================================
+        # Move object, if possible
+        #====================================================
+        try:
             PartMover(  FreeCADGui.activeDocument().activeView(), selection[0].Object )
-        else:
-            PartMoverSelectionObserver()
+        except:
+            QtGui.QMessageBox.information(
+                QtGui.QApplication.activeWindow(),
+               u"Wrong selection",
+               u"Cannot move selected object!"
+               )
+            
 
     def GetResources(self):
         return {
