@@ -26,7 +26,6 @@ import FreeCADGui,FreeCAD
 from PySide import QtGui, QtCore
 import os, copy, time
 import a2plib
-from a2p_importpart import filterImpParts
 from a2p_MuxAssembly import createTopoInfo
 from a2p_viewProviderProxies import *
 from a2p_versionmanagement import SubAssemblyWalk, A2P_VERSION
@@ -41,17 +40,11 @@ class Proxy_convertPart:
         pass
 
 def convertToImportedPart(doc, obj):
-    '''convertToImportedPart(document, documentObject) - changes a regular FreeCAD object into an A2plus
+    '''
+    convertToImportedPart(document, documentObject) - changes a regular FreeCAD object into an A2plus
     importedPart, adds the importedPart to the document and removes the FreeCAD object from the 
-    document. Returns None'''
-    
-#    objExpand = filterImpParts(obj)
-#    if not objExpand:
-#        msg = obj.Name + " was not converted."
-#        FreeCADGui.Console.Message(msg)
-#    for oe in objExpand:
-    
-    #partName = obj.Name
+    document. Returns None
+    '''
     partName = a2plib.findUnusedObjectName( obj.Label, document=doc )
     partLabel = a2plib.findUnusedObjectLabel( obj.Label, document=doc )
     filename = "converted"   #or none? if obj is already in this doc, we don't know it's original filename
