@@ -60,7 +60,7 @@ A2P_DEBUG_1         = 1
 A2P_DEBUG_2         = 2
 A2P_DEBUG_3         = 3
 
-A2P_DEBUG_LEVEL = A2P_DEBUG_NONE
+A2P_DEBUG_LEVEL = A2P_DEBUG_3
 
 PARTIAL_SOLVE_STAGE1 = 1    #solve all rigid fully constrained to tempfixed rigid, enable only involved dep, then set them as tempfixed
 
