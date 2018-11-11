@@ -444,6 +444,8 @@ class TopoMapper(object):
             for i, face in enumerate(tempShape.Faces):
                 faces.append(face)
 
+                a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"a2p tm-MUX: i(Faces)={} {}\n".format(i,face))
+
                 if withColor:
                     if colorFlag:
                         faceColors.append(mux.makeDiffuseElement(shapeCol,objTrans))
@@ -451,6 +453,9 @@ class TopoMapper(object):
                         faceColors.append(diffuseCol[i])
 
         shell = Part.makeShell(faces)
+        a2plib.Msg("A2P tm-MUX: result: {}\n".format(shell))
+        a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"a2p tm-MUX: faceColors:\n{}\n".format(faceColors)) # has result all faces' color values?
+
         #-------------------------------------------
         # if toponaming is used, assign toponames to
         # shells geometry

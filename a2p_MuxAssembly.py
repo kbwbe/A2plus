@@ -128,6 +128,7 @@ def muxAssemblyWithTopoNames(doc, withColor=False):
         topoNaming = a2plib.getUseTopoNaming()
         for i, face in enumerate(tempShape.Faces):
             faces.append(face)
+            DebugMsg(A2P_DEBUG_3,"a2p MA-MUX: i(Faces)={} {}\n".format(i,face))
             if topoNaming:
                 if extendNames:
                     newName = "".join((faceNames[i],obj.Name,';'))
@@ -143,6 +144,8 @@ def muxAssemblyWithTopoNames(doc, withColor=False):
                     faceColors.append(diffuseCol[i])
 
     shell = Part.makeShell(faces)
+    Msg("A2P MA-MUX: result: {}\n".format(shell))
+    DebugMsg(A2P_DEBUG_3,"a2p MA-MUX: faceColors:\n{}\n".format(faceColors))            # has result all faces' color values?
     if withColor:
         return muxInfo, shell, faceColors
     else:
@@ -168,7 +171,7 @@ def muxObjectsWithKeys(objsIn, withColor=False):
         # now start the loop with use of the stored values..(much faster)
         for i, face in enumerate(tempShape.Faces):
             faces.append(face)
-            DebugMsg(A2P_DEBUG_3,"a2p MUX: i(Faces)={}\n{}\n".format(i,face))
+            DebugMsg(A2P_DEBUG_3,"a2p MA-MUX: i(Faces)={} {}\n".format(i,face))
 
             if withColor:
                 if colorFlag:
@@ -177,8 +180,8 @@ def muxObjectsWithKeys(objsIn, withColor=False):
                     faceColors.append(diffuseCol[i])
 
     shell = Part.makeShell(faces)
-    Msg("A2P MUX: result: {}\n".format(shell))
-    DebugMsg(A2P_DEBUG_3,"a2p MUX: faceColors:\n{}\n".format(faceColors))            # has result all faces' color values?
+    Msg("A2P MA-MUX: result: {}\n".format(shell))
+    DebugMsg(A2P_DEBUG_3,"a2p MA-MUX: faceColors:\n{}\n".format(faceColors))            # has result all faces' color values?
     if withColor:
         return muxInfo, shell, faceColors
     else:
