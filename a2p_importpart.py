@@ -345,7 +345,7 @@ def updateImportedParts(doc):
             if absPath != None and os.path.exists( absPath ):
                 newPartCreationTime = os.path.getmtime( absPath )
                 if ( 
-                    newPartCreationTime > obj.timeLastImport or
+                    newPartCreationTime >= obj.timeLastImport or                                 # force loading
                     obj.a2p_Version != A2P_VERSION
                     ):
                     if not objectCache.isCached(absPath): # Load every changed object one time to cache
