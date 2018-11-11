@@ -99,10 +99,24 @@ def setTransparency():
     for obj in doc.Objects:
         if hasattr(obj,'ViewObject'):
             if hasattr(obj.ViewObject,'Transparency'):
-#                if hasattr(obj.ViewObject,'DiffuseColor'):
-                SAVED_TRANSPARENCY.append(
-                    (obj.Name, obj.ViewObject.Transparency, obj.ViewObject.DiffuseColor)
-                    )
+                if hasattr(obj.ViewObject,'DiffuseColor'):
+                    diffuseFlag = True
+                    if ( len(obj.ViewObject.DiffuseColor) == 1 ) :
+                        DebugMsg(A2P_DEBUG_3,"a2p setTransparency: one-shape DiffuseColor detected:\n{}\n" \
+                            .format(obj.ViewObject.DiffuseColor))
+                    else:
+                        DebugMsg(A2P_DEBUG_3,"a2p setTransparency: muxed-shape DiffuseColor detected:\n{}\n" \
+                            .format(obj.ViewObject.DiffuseColor))
+                    DebugMsg(A2P_DEBUG_3,"a2p setTransparency: Saving transparency (DiffuseColor)\n")
+                    SAVED_TRANSPARENCY.append(
+                            (obj.Name, obj.ViewObject.Transparency, diffuseFlag, obj.ViewObject.DiffuseColor)
+                        )
+                else:
+                    diffuseFlag = False
+                    DebugMsg(A2P_DEBUG_3,"a2p setTransparency: Saving transparency (ShapeColor)\n")
+                    SAVED_TRANSPARENCY.append(
+                            (obj.Name, obj.ViewObject.Transparency, diffuseFlag, obj.ViewObject.ShapeColor)
+                        )
                 obj.ViewObject.Transparency = 80
 #------------------------------------------------------------------------------
 def restoreTransparency():
@@ -114,7 +128,10 @@ def restoreTransparency():
         obj = doc.getObject(setting[0])
         if obj is not None:
             obj.ViewObject.Transparency = setting[1]
-            obj.ViewObject.DiffuseColor = setting[2]
+            if setting[2] == True :
+                obj.ViewObject.DiffuseColor = setting[3]
+            else:
+                obj.ViewObject.ShapeColor = setting[3]
     SAVED_TRANSPARENCY = []
 #------------------------------------------------------------------------------
 def isTransparencyEnabled():
