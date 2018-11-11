@@ -350,18 +350,20 @@ def updateImportedParts(doc):
                     ):
                     if not objectCache.isCached(absPath): # Load every changed object one time to cache
                         importPartFromFile(doc, absPath, importToCache=True) # the version is now in the cache
-                    newObject = objectCache.get(absPath)
+                        
+                    cachedObject = objectCache.get(absPath)
                     obj.timeLastImport = newPartCreationTime
-                    if hasattr(newObject, 'a2p_Version'):
+                    if hasattr(cachedObject, 'a2p_Version'):
                         obj.a2p_Version = A2P_VERSION
-                    importUpdateConstraintSubobjects( doc, obj, newObject ) # do this before changing shape and mux
-                    if hasattr(newObject, 'muxInfo'):
-                        obj.muxInfo = newObject.muxInfo
-                    # save Placement because following newObject.Shape.copy() isn't resetting it to zeroes...
+                    importUpdateConstraintSubobjects( doc, obj, cachedObject ) # do this before changing shape and mux
+                    if hasattr(cachedObject, 'muxInfo'):
+                        obj.muxInfo = cachedObject.muxInfo
+                    # save Placement because following cachedObject.Shape.copy() isn't resetting it to zeroes...
                     savedPlacement  = obj.Placement
-                    obj.Shape = newObject.Shape.copy()
-                    obj.ViewObject.DiffuseColor = copy.copy(newObject.ViewObject.DiffuseColor)
-                    obj.ViewObject.Transparency = newObject.ViewObject.Transparency
+                    obj.Shape = cachedObject.Shape.copy()
+                    obj.ViewObject.ShapeColor = cachedObject.ViewObject.ShapeColor
+                    obj.ViewObject.Transparency = cachedObject.ViewObject.Transparency
+                    obj.ViewObject.DiffuseColor = cachedObject.ViewObject.DiffuseColor   #diffuse must be set last
                     obj.Placement = savedPlacement # restore the old placement
 
     mw = FreeCADGui.getMainWindow()
