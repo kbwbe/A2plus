@@ -447,8 +447,9 @@ def duplicateImportedPart( part ):
         if hasattr(part.ViewObject, p) and p not in ['DiffuseColor','Proxy','MappedColors']:
             setattr(newObj.ViewObject, p, getattr( part.ViewObject, p))
 
-    newObj.ViewObject.DiffuseColor = copy.copy( part.ViewObject.DiffuseColor )
-    newObj.ViewObject.Transparency = part.ViewObject.Transparency
+#    newObj.ViewObject.Transparency = part.ViewObject.Transparency               # this is done in the above loop? WF
+    newObj.ViewObject.DiffuseColor = copy.deepcopy( part.ViewObject.DiffuseColor )  # MK's old way: copy.deepcopy()
+#    newObj.ViewObject.DiffuseColor = part.ViewObject.DiffuseColor               # so is this, but it needs to go last WF
     newObj.Placement.Base = part.Placement.Base
     newObj.Placement.Rotation = part.Placement.Rotation
     return newObj
