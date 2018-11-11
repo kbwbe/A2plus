@@ -161,8 +161,8 @@ def muxObjectsWithKeys(objsIn, withColor=False):
         # Save Computing time, store this before the for..enumerate loop later...
         colorFlag = ( len(obj.ViewObject.DiffuseColor) < len(obj.Shape.Faces) )
         shapeCol = obj.ViewObject.ShapeColor
-        diffuseCol = obj.ViewObject.DiffuseColor
         objTrans = obj.ViewObject.Transparency
+        diffuseCol = obj.ViewObject.DiffuseColor
         tempShape = makePlacedShape(obj)
 
         # now start the loop with use of the stored values..(much faster)
