@@ -256,7 +256,15 @@ class ConstraintObjectProxy:
         # Add new property "disable_onChanged" if not already existing...
         if not hasattr(self, 'disable_onChanged'):
             self.disable_onChanged = False
+        '''
+        # add new property offset of pointOnPlane, if not already existing...
+        # introduced above version v0.1.5    
+        if obj.Type == 'pointOnPlane':
+            if not hasattr(obj,'offset'):
+                obj.addProperty('App::PropertyDistance','offset',"ConstraintInfo")
+                obj.offset = 0.0
         #
+        '''
         if self.disable_onChanged: return
         global a2p_NeedToSolveSystem
         if hasattr(self, 'mirror_name'):

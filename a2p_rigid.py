@@ -45,17 +45,9 @@ from a2plib import (
     A2P_DEBUG_1,
     A2P_DEBUG_2,
     A2P_DEBUG_3,
+    PARTIAL_SOLVE_STAGE1,
     )
 import a2p_libDOF
-
-from a2plib import (
-    PARTIAL_SOLVE_STAGE1,
-    PARTIAL_SOLVE_STAGE2, 
-    PARTIAL_SOLVE_STAGE3,
-    PARTIAL_SOLVE_STAGE4,
-    PARTIAL_SOLVE_STAGE5,
-    PARTIAL_SOLVE_END
-    )
 
 from a2p_libDOF import (
     SystemOrigin,
