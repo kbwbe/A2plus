@@ -218,6 +218,11 @@ class FCdocumentReader(object):
         for ob in self.objects:
             if ob.propertyDict.get('a2p_Version',None) != None:
                 out.append(ob)
+                continue
+            elif ob.propertyDict.get('assembly2Version',None) != None: # for very old a2p projects...
+                out.append(ob)
+                continue
+            
         return out
         
     def getSpreadsheetObjects(self):

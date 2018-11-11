@@ -34,6 +34,7 @@ from a2p_partlistglobals import (
     BOM_SHEET_NAME,
     BOM_SHEET_LABEL,
     PARTINFORMATION_SHEET_NAME,
+    BOM_MAX_COLS,
     BOM_MAX_LENGTH
     )
 
@@ -59,6 +60,7 @@ def createPartList(
         )
     workingDir,basicFileName = os.path.split(fileNameInProject)
     docReader1 = FCdocumentReader()
+    
     docReader1.openDocument(fileNameInProject)
     for ob in docReader1.getA2pObjects():
         #print(u'{}, Subassembly? = {}'.format(ob,ob.isSubassembly()))
@@ -122,7 +124,7 @@ class a2p_CreatePartlist():
         alphabet_list = list(string.ascii_uppercase)
         doc = FreeCAD.activeDocument()
         ss = doc.getObject(BOM_SHEET_NAME)
-        for i in range(0,12): #12 Rows enought for a partlist
+        for i in range(0,BOM_MAX_COLS):
             for k in range(0,BOM_MAX_LENGTH):
                 cellAdress = alphabet_list[i]+str(k+1)
                 ss.set(cellAdress,'')

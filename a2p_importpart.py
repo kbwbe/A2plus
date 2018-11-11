@@ -94,78 +94,6 @@ class ObjectCache:
 
 objectCache = ObjectCache()
 
-def globalVisibility(doc, imp):
-    if not imp.InList:
-        return imp.ViewObject.Visibility
-    else:
-        for parent in imp.InList:
-            if not parent.ViewObject.Visibility:
-                return parent.ViewObject.Visibility
-            else:
-                return globalVisibility(doc, parent)
-
-def getImpPartsFromDoc(doc, visibleOnly = True):
-    objsIn = doc.Objects
-    impPartsOut = list()
-    for obj in objsIn:
-        impPartList = filterImpParts(obj)
-        if (impPartList):
-            if (visibleOnly):
-                vizParts = list()
-                for imp in impPartList:
-                    if imp.isDerivedFrom("PartDesign::Body"):
-                        if hasattr(imp,'ViewObject') and imp.ViewObject.isVisible() and \
-                           hasattr(imp.Tip,'ViewObject') and imp.Tip.ViewObject.isVisible():
-                            gv = globalVisibility(doc, imp)
-                            if gv:
-                                vizParts.append(imp)
-                    else:
-                        if hasattr(imp,'ViewObject') and imp.ViewObject.isVisible():
-                            gv = globalVisibility(doc, imp)
-                            if gv:
-                                vizParts.append(imp)
-                impPartsOut.extend(vizParts)
-            else:
-                impPartsOut.extend(impPartList)
-    return impPartsOut
-
-def filterImpParts(obj):
-    impPartsOut = list()
-    if obj.isDerivedFrom("Sketcher::SketchObject"):
-        pass
-    elif obj.isDerivedFrom("PartDesign::Body"):
-        # we want bodies that are top level in the document or top level in a container(App::Part)
-        # we don't want bodies that are inside other bodies.
-        if ((not(obj.InList)) or  \
-            ((len(obj.InList) == 1) and (obj.InList[0].hasExtension("App::GroupExtension")))):  #top of group
-            impPartsOut.append(obj)
-    elif obj.hasExtension("App::GroupExtension"):     # App::Part container.  GroupEx contents are already in list,
-        pass                                          # don't need to find them
-    elif obj.isDerivedFrom("PartDesign::Feature"):
-        if not obj.getParentGeoFeatureGroup():        # this is v016 PD::F.  017+ would have PGFG = Body
-            if ((not obj.InList) or
-               ((len(obj.InList) == 1) and (hasattr(obj.InList[0], "Group")))):  # not part of any other object
-                if (
-                    hasattr(obj,"ViewObject") and
-                    obj.ViewObject.isVisible() and
-                    hasattr(obj,"Shape") and
-                    len(obj.Shape.Faces) > 0
-                    ):
-                    impPartsOut.append(obj)
-    elif obj.isDerivedFrom("Part::Feature"):
-        if not(obj.InList):
-            impPartsOut.append(obj)                  # top levelwithin Document
-        elif (len(obj.InList) == 1) and (obj.InList[0].hasExtension("App::GroupExtension")):
-            obj.Placement = plmGlobal
-            impPartsOut.append(obj)                  # top level within Group
-        elif a2plib.isA2pPart(obj):                  # imported part
-            impPartsOut.append(obj)
-        else:
-            pass                                     # more odd PF cases?? BaseFeature in body??
-    else:
-        pass                                         # garbage objects - Origins, Axis, etc
-    return impPartsOut
-
 def importPartFromFile(_doc, filename, importToCache=False):
     doc = _doc
     #-------------------------------------------
@@ -217,21 +145,6 @@ def importPartFromFile(_doc, filename, importToCache=False):
     if all([ 'importPart' in obj.Content for obj in importableObjects]) == 1:
         subAssemblyImport = True
         
-    '''
-    #-------------------------------------------
-    # Discover whether we are importing a subassembly or a single part
-    #-------------------------------------------
-    #if any([ 'importPart' in obj.Content for obj in importDoc.Objects]) and not len(visibleObjects) == 1:
-    subAssemblyImport = False
-    Msg("A2P importPartFromFile: importableObjects: {}\n".format(len(importableObjects)))
-    if len(importableObjects) == 1:
-        DebugMsg(A2P_DEBUG_3,"a2p importPartFromFile: first and only file: {}\n".format(importableObjects[0]))
-    else:
-        DebugMsg(A2P_DEBUG_3,"a2p importPartFromFile: importableObjects:\n{}\n".format(importableObjects))
-    if len(importableObjects) > 1:
-        subAssemblyImport = True
-    '''
-
     #-------------------------------------------
     # create new object
     #-------------------------------------------
@@ -540,23 +453,45 @@ def duplicateImportedPart( part ):
 
 class a2p_DuplicatePartCommand:
     def Activated(self):
+        #====================================================
+        # Is there an open Doc ?
+        #====================================================
         if FreeCAD.activeDocument() == None:
-            QtGui.QMessageBox.critical(
+            QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
-               "No active Document error",
-               "First please open an assembly file!"
+               u"No active Document error",
+               u"First please open an assembly file!"
                )
             return
+        
+        #====================================================
+        # Is something been selected ?
+        #====================================================
         selection = [s for s in FreeCADGui.Selection.getSelectionEx() if s.Document == FreeCAD.ActiveDocument ]
-        if len(selection) == 1:
-            PartMover(  FreeCADGui.activeDocument().activeView(), duplicateImportedPart( selection[0].Object ) )
-        else:
-            QtGui.QMessageBox.critical(
+        if len(selection) != 1:
+            QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
-               "Selection error",
-               "Before duplicating, first please select a part!"
+               u"Selection error",
+               u"Before duplicating, first please select a part!"
                )
+            return
             
+        #====================================================
+        # Is the selection an a2p part ?
+        #====================================================
+        obj = selection[0].Object
+        if not a2plib.isA2pPart(obj):
+            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
+                                        u"Duplicate: Selection invalid!",
+                                        u"This object is no imported part!"
+                                    )
+            return
+        
+        #====================================================
+        # Duplicate the part
+        #====================================================
+        PartMover(  FreeCADGui.activeDocument().activeView(), duplicateImportedPart( selection[0].Object ) )
+        
 
     def GetResources(self):
         return {
@@ -574,24 +509,42 @@ FreeCADGui.addCommand('a2p_duplicatePart', a2p_DuplicatePartCommand())
 class a2p_EditPartCommand:
     def Activated(self):
         doc = FreeCAD.activeDocument()
+        #====================================================
+        # Is there an open Doc ?
+        #====================================================
         if doc == None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
-                                        "No active document found!",
-                                        "Before editing a part, you have to open an assembly file."
+                                        u"No active document found!",
+                                        u"Before editing a part, you have to open an assembly file."
                                     )
             return
+        
+        #====================================================
+        # Is something been selected ?
+        #====================================================
         selection = [s for s in FreeCADGui.Selection.getSelection() if s.Document == FreeCAD.ActiveDocument ]
         if not selection:
-            msg = \
-'''
-You must select a part to edit first.
-'''
             QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
-                "Selection Error",
-                msg
+                u"Selection Error",
+                u"You must select a part to edit first."
                 )
             return
+        
+        #====================================================
+        # Has the selected object an editable a2p file ?
+        #====================================================
+        obj = selection[0]
+        if not a2plib.isEditableA2pPart(obj):
+            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
+                                        u"Edit: Selection invalid!",
+                                        u"This object is no imported part!"
+                                    )
+            return
+        
+        #====================================================
+        # Does the file exist ?
+        #====================================================
         obj = selection[0]
         FreeCADGui.Selection.clearSelection() # very important! Avoid Editing the assembly the part was called from!
         assemblyPath = os.path.normpath(os.path.split(doc.FileName)[0])
@@ -610,7 +563,10 @@ This is not allowed when using preference
                 msg
                 )
             return
-        #TODO: WF fails if "use folder" = false here
+
+        #====================================================
+        # Open the file for editing and switch the window
+        #====================================================
         docs = []
         for d in FreeCAD.listDocuments().values(): #dict_values not indexable, docs now is...
             docs.append(d)
@@ -629,10 +585,6 @@ This is not allowed when using preference
             for s in sub:
                 mdi.setActiveSubWindow(s)
                 if FreeCAD.activeDocument().Name == name: break
-            # This does not work somehow...
-            # FreeCAD.setActiveDocument( name )
-            # FreeCAD.ActiveDocument=FreeCAD.getDocument( name )
-            # FreeCADGui.ActiveDocument=FreeCADGui.getDocument( name )
 
 
     def GetResources(self):
@@ -690,19 +642,41 @@ class PartMoverSelectionObserver:
 
 class a2p_MovePartCommand:
     def Activated(self):
+        #====================================================
+        # Is there an open Doc ?
+        #====================================================
         if FreeCAD.activeDocument() == None:
             QtGui.QMessageBox.critical(
                 QtGui.QApplication.activeWindow(),
-               "No active Document error",
-               "First please open an assembly file!"
+               u"No active Document error",
+               u"First please open an assembly file!"
+               )
+            return
+        
+        #====================================================
+        # Is something been selected ?
+        #====================================================
+        selection = [s for s in FreeCADGui.Selection.getSelectionEx() if s.Document == FreeCAD.ActiveDocument ]
+        if len(selection) != 1:
+            QtGui.QMessageBox.information(
+                QtGui.QApplication.activeWindow(),
+               u"Selection error",
+               u"Before moving, first please select exact 1 part!"
                )
             return
             
-        selection = [s for s in FreeCADGui.Selection.getSelectionEx() if s.Document == FreeCAD.ActiveDocument ]
-        if len(selection) == 1:
+        #====================================================
+        # Move object, if possible
+        #====================================================
+        try:
             PartMover(  FreeCADGui.activeDocument().activeView(), selection[0].Object )
-        else:
-            PartMoverSelectionObserver()
+        except:
+            QtGui.QMessageBox.information(
+                QtGui.QApplication.activeWindow(),
+               u"Wrong selection",
+               u"Cannot move selected object!"
+               )
+            
 
     def GetResources(self):
         return {
