@@ -94,85 +94,13 @@ class ObjectCache:
 
 objectCache = ObjectCache()
 
-def globalVisibility(doc, imp):
-    if not imp.InList:
-        return imp.ViewObject.Visibility
-    else:
-        for parent in imp.InList:
-            if not parent.ViewObject.Visibility:
-                return parent.ViewObject.Visibility
-            else:
-                return globalVisibility(doc, parent)
-
-def getImpPartsFromDoc(doc, visibleOnly = True):
-    objsIn = doc.Objects
-    impPartsOut = list()
-    for obj in objsIn:
-        impPartList = filterImpParts(obj)
-        if (impPartList):
-            if (visibleOnly):
-                vizParts = list()
-                for imp in impPartList:
-                    if imp.isDerivedFrom("PartDesign::Body"):
-                        if hasattr(imp,'ViewObject') and imp.ViewObject.isVisible() and \
-                           hasattr(imp.Tip,'ViewObject') and imp.Tip.ViewObject.isVisible():
-                            gv = globalVisibility(doc, imp)
-                            if gv:
-                                vizParts.append(imp)
-                    else:
-                        if hasattr(imp,'ViewObject') and imp.ViewObject.isVisible():
-                            gv = globalVisibility(doc, imp)
-                            if gv:
-                                vizParts.append(imp)
-                impPartsOut.extend(vizParts)
-            else:
-                impPartsOut.extend(impPartList)
-    return impPartsOut
-
-def filterImpParts(obj):
-    impPartsOut = list()
-    if obj.isDerivedFrom("Sketcher::SketchObject"):
-        pass
-    elif obj.isDerivedFrom("PartDesign::Body"):
-        # we want bodies that are top level in the document or top level in a container(App::Part)
-        # we don't want bodies that are inside other bodies.
-        if ((not(obj.InList)) or  \
-            ((len(obj.InList) == 1) and (obj.InList[0].hasExtension("App::GroupExtension")))):  #top of group
-            impPartsOut.append(obj)
-    elif obj.hasExtension("App::GroupExtension"):     # App::Part container.  GroupEx contents are already in list,
-        pass                                          # don't need to find them
-    elif obj.isDerivedFrom("PartDesign::Feature"):
-        if not obj.getParentGeoFeatureGroup():        # this is v016 PD::F.  017+ would have PGFG = Body
-            if ((not obj.InList) or
-               ((len(obj.InList) == 1) and (hasattr(obj.InList[0], "Group")))):  # not part of any other object
-                if (
-                    hasattr(obj,"ViewObject") and
-                    obj.ViewObject.isVisible() and
-                    hasattr(obj,"Shape") and
-                    len(obj.Shape.Faces) > 0
-                    ):
-                    impPartsOut.append(obj)
-    elif obj.isDerivedFrom("Part::Feature"):
-        if not(obj.InList):
-            impPartsOut.append(obj)                  # top levelwithin Document
-        elif (len(obj.InList) == 1) and (obj.InList[0].hasExtension("App::GroupExtension")):
-            obj.Placement = plmGlobal
-            impPartsOut.append(obj)                  # top level within Group
-        elif a2plib.isA2pPart(obj):                  # imported part
-            impPartsOut.append(obj)
-        else:
-            pass                                     # more odd PF cases?? BaseFeature in body??
-    else:
-        pass                                         # garbage objects - Origins, Axis, etc
-    return impPartsOut
-
 def importPartFromFile(_doc, filename, importToCache=False):
     doc = _doc
     #-------------------------------------------
     # Get the importDocument
     #-------------------------------------------
     
-    # look only for filenames, not pathes, as there are problems on WIN10 (Address-translation??)
+    # look only for filenames, not paths, as there are problems on WIN10 (Address-translation??)
     importDoc = None
     importDocIsOpen = False
     requestedFile = os.path.split(filename)[1]
@@ -217,21 +145,6 @@ def importPartFromFile(_doc, filename, importToCache=False):
     if all([ 'importPart' in obj.Content for obj in importableObjects]) == 1:
         subAssemblyImport = True
         
-    '''
-    #-------------------------------------------
-    # Discover whether we are importing a subassembly or a single part
-    #-------------------------------------------
-    #if any([ 'importPart' in obj.Content for obj in importDoc.Objects]) and not len(visibleObjects) == 1:
-    subAssemblyImport = False
-    Msg("A2P importPartFromFile: importableObjects: {}\n".format(len(importableObjects)))
-    if len(importableObjects) == 1:
-        DebugMsg(A2P_DEBUG_3,"a2p importPartFromFile: first and only file: {}\n".format(importableObjects[0]))
-    else:
-        DebugMsg(A2P_DEBUG_3,"a2p importPartFromFile: importableObjects:\n{}\n".format(importableObjects))
-    if len(importableObjects) > 1:
-        subAssemblyImport = True
-    '''
-
     #-------------------------------------------
     # create new object
     #-------------------------------------------
@@ -283,7 +196,7 @@ def importPartFromFile(_doc, filename, importToCache=False):
             withColor=True
             )
     else:
-        # TopoMapper manages import of non A2p-Files. It generates the shapes and appropiate topo names...
+        # TopoMapper manages import of non A2p-Files. It generates the shapes and appropriate topo names...
         newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor = topoMapper.createTopoNames(withColor=True)
         
 
@@ -437,30 +350,20 @@ def updateImportedParts(doc):
                     ):
                     if not objectCache.isCached(absPath): # Load every changed object one time to cache
                         importPartFromFile(doc, absPath, importToCache=True) # the version is now in the cache
-                    newObject = objectCache.get(absPath)
+                        
+                    cachedObject = objectCache.get(absPath)
                     obj.timeLastImport = newPartCreationTime
-                    if hasattr(newObject, 'a2p_Version'):
+                    if hasattr(cachedObject, 'a2p_Version'):
                         obj.a2p_Version = A2P_VERSION
-                    importUpdateConstraintSubobjects( doc, obj, newObject ) # do this before changing shape and mux
-                    if hasattr(newObject, 'muxInfo'):
-                        obj.muxInfo = newObject.muxInfo
-                    # save Placement because following newObject.Shape.copy() isn't resetting it to zeroes...
+                    importUpdateConstraintSubobjects( doc, obj, cachedObject ) # do this before changing shape and mux
+                    if hasattr(cachedObject, 'muxInfo'):
+                        obj.muxInfo = cachedObject.muxInfo
+                    # save Placement because following cachedObject.Shape.copy() isn't resetting it to zeroes...
                     savedPlacement  = obj.Placement
-                    obj.Shape = newObject.Shape.copy()
-###                    obj.ViewObject.DiffuseColor = copy.copy(newObject.ViewObject.DiffuseColor) ### MASTER APPROACH
-###                    obj.ViewObject.Transparency = newObject.ViewObject.Transparency            ### MASTER APPROACH
-###
-##                    if len(newObject.ViewObject.DiffuseColor) < len(newObject.Shape.Faces):     ## 2nd try
-##                        obj.ViewObject.ShapeColor = newObject.ViewObject.ShapeColor             ## 2nd try
-##                        obj.ViewObject.Transparency = newObject.ViewObject.Transparency         ## 2nd try
-##                    else:                                                                       ## 2nd try
-##                        obj.ViewObject.DiffuseColor = newObject.ViewObject.DiffuseColor         ## 2nd try
-##
-#                    obj.ViewObject.ShapeColor = copy.deepcopy(newObject.ViewObject.ShapeColor)      #3rd try
-#                    obj.ViewObject.Transparency = copy.deepcopy(newObject.ViewObject.Transparency)  #3rd try
-#                    obj.ViewObject.DiffuseColor = copy.deepcopy(newObject.ViewObject.DiffuseColor)  #3rd try
-#                    obj.ViewObject.Transparency = newObject.ViewObject.Transparency                 #3rd try
-
+                    obj.Shape = cachedObject.Shape.copy()
+                    obj.ViewObject.ShapeColor = cachedObject.ViewObject.ShapeColor
+                    obj.ViewObject.Transparency = cachedObject.ViewObject.Transparency
+                    obj.ViewObject.DiffuseColor = cachedObject.ViewObject.DiffuseColor   #diffuse must be set last
                     obj.Placement = savedPlacement # restore the old placement
 
     mw = FreeCADGui.getMainWindow()
@@ -544,31 +447,54 @@ def duplicateImportedPart( part ):
         if hasattr(part.ViewObject, p) and p not in ['DiffuseColor','Proxy','MappedColors']:
             setattr(newObj.ViewObject, p, getattr( part.ViewObject, p))
 
-    newObj.ViewObject.DiffuseColor = copy.copy( part.ViewObject.DiffuseColor )
-    newObj.ViewObject.Transparency = part.ViewObject.Transparency
+#    newObj.ViewObject.Transparency = part.ViewObject.Transparency               # this is done in the above loop? WF
+    newObj.ViewObject.DiffuseColor = copy.deepcopy( part.ViewObject.DiffuseColor )  # MK's old way: copy.deepcopy()
+#    newObj.ViewObject.DiffuseColor = part.ViewObject.DiffuseColor               # so is this, but it needs to go last WF
     newObj.Placement.Base = part.Placement.Base
     newObj.Placement.Rotation = part.Placement.Rotation
     return newObj
 
 class a2p_DuplicatePartCommand:
     def Activated(self):
+        #====================================================
+        # Is there an open Doc ?
+        #====================================================
         if FreeCAD.activeDocument() == None:
-            QtGui.QMessageBox.critical(
+            QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
-               "No active Document error",
-               "First please open an assembly file!"
+               u"No active Document error",
+               u"First please open an assembly file!"
                )
             return
+        
+        #====================================================
+        # Is something been selected ?
+        #====================================================
         selection = [s for s in FreeCADGui.Selection.getSelectionEx() if s.Document == FreeCAD.ActiveDocument ]
-        if len(selection) == 1:
-            PartMover(  FreeCADGui.activeDocument().activeView(), duplicateImportedPart( selection[0].Object ) )
-        else:
-            QtGui.QMessageBox.critical(
+        if len(selection) != 1:
+            QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
-               "Selection error",
-               "Before duplicating, first please select a part!"
+               u"Selection error",
+               u"Before duplicating, first please select a part!"
                )
+            return
             
+        #====================================================
+        # Is the selection an a2p part ?
+        #====================================================
+        obj = selection[0].Object
+        if not a2plib.isA2pPart(obj):
+            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
+                                        u"Duplicate: Selection invalid!",
+                                        u"This object is no imported part!"
+                                    )
+            return
+        
+        #====================================================
+        # Duplicate the part
+        #====================================================
+        PartMover(  FreeCADGui.activeDocument().activeView(), duplicateImportedPart( selection[0].Object ) )
+        
 
     def GetResources(self):
         return {
@@ -586,24 +512,42 @@ FreeCADGui.addCommand('a2p_duplicatePart', a2p_DuplicatePartCommand())
 class a2p_EditPartCommand:
     def Activated(self):
         doc = FreeCAD.activeDocument()
+        #====================================================
+        # Is there an open Doc ?
+        #====================================================
         if doc == None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
-                                        "No active document found!",
-                                        "Before editing a part, you have to open an assembly file."
+                                        u"No active document found!",
+                                        u"Before editing a part, you have to open an assembly file."
                                     )
             return
+        
+        #====================================================
+        # Is something been selected ?
+        #====================================================
         selection = [s for s in FreeCADGui.Selection.getSelection() if s.Document == FreeCAD.ActiveDocument ]
         if not selection:
-            msg = \
-'''
-You must select a part to edit first.
-'''
             QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
-                "Selection Error",
-                msg
+                u"Selection Error",
+                u"You must select a part to edit first."
                 )
             return
+        
+        #====================================================
+        # Has the selected object an editable a2p file ?
+        #====================================================
+        obj = selection[0]
+        if not a2plib.isEditableA2pPart(obj):
+            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
+                                        u"Edit: Selection invalid!",
+                                        u"This object is no imported part!"
+                                    )
+            return
+        
+        #====================================================
+        # Does the file exist ?
+        #====================================================
         obj = selection[0]
         FreeCADGui.Selection.clearSelection() # very important! Avoid Editing the assembly the part was called from!
         assemblyPath = os.path.normpath(os.path.split(doc.FileName)[0])
@@ -622,7 +566,10 @@ This is not allowed when using preference
                 msg
                 )
             return
-        #TODO: WF fails if "use folder" = false here
+
+        #====================================================
+        # Open the file for editing and switch the window
+        #====================================================
         docs = []
         for d in FreeCAD.listDocuments().values(): #dict_values not indexable, docs now is...
             docs.append(d)
@@ -641,10 +588,6 @@ This is not allowed when using preference
             for s in sub:
                 mdi.setActiveSubWindow(s)
                 if FreeCAD.activeDocument().Name == name: break
-            # This does not work somehow...
-            # FreeCAD.setActiveDocument( name )
-            # FreeCAD.ActiveDocument=FreeCAD.getDocument( name )
-            # FreeCADGui.ActiveDocument=FreeCADGui.getDocument( name )
 
 
     def GetResources(self):
@@ -702,19 +645,41 @@ class PartMoverSelectionObserver:
 
 class a2p_MovePartCommand:
     def Activated(self):
+        #====================================================
+        # Is there an open Doc ?
+        #====================================================
         if FreeCAD.activeDocument() == None:
             QtGui.QMessageBox.critical(
                 QtGui.QApplication.activeWindow(),
-               "No active Document error",
-               "First please open an assembly file!"
+               u"No active Document error",
+               u"First please open an assembly file!"
+               )
+            return
+        
+        #====================================================
+        # Is something been selected ?
+        #====================================================
+        selection = [s for s in FreeCADGui.Selection.getSelectionEx() if s.Document == FreeCAD.ActiveDocument ]
+        if len(selection) != 1:
+            QtGui.QMessageBox.information(
+                QtGui.QApplication.activeWindow(),
+               u"Selection error",
+               u"Before moving, first please select exact 1 part!"
                )
             return
             
-        selection = [s for s in FreeCADGui.Selection.getSelectionEx() if s.Document == FreeCAD.ActiveDocument ]
-        if len(selection) == 1:
+        #====================================================
+        # Move object, if possible
+        #====================================================
+        try:
             PartMover(  FreeCADGui.activeDocument().activeView(), selection[0].Object )
-        else:
-            PartMoverSelectionObserver()
+        except:
+            QtGui.QMessageBox.information(
+                QtGui.QApplication.activeWindow(),
+               u"Wrong selection",
+               u"Cannot move selected object!"
+               )
+            
 
     def GetResources(self):
         return {
@@ -1133,8 +1098,8 @@ class a2p_absPath_to_relPath_Command:
             
     def GetResources(self):
         return {
-            'MenuText':     'convert absolute pathes of importParts to relative ones',
-            'ToolTip':      'convert absolute pathes of importParts to relative ones'
+            'MenuText':     'convert absolute paths of importParts to relative ones',
+            'ToolTip':      'convert absolute paths of importParts to relative ones'
             }
 FreeCADGui.addCommand('a2p_absPath_to_relPath_Command', a2p_absPath_to_relPath_Command())
 
@@ -1152,7 +1117,7 @@ def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
         return
 
 
-    # check, wether object is an assembly with muxInformations.
+    # check, whether object is an assembly with muxInformations.
     # Then find edgenames with mapping in muxinfo...
     deletionList = [] #for broken constraints
     if hasattr(oldObject, 'muxInfo'):

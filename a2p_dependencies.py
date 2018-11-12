@@ -172,7 +172,6 @@ class Dependency():
             ob2 = doc.getObject(c.Object2)
 
             vert1 = getObjectVertexFromName(ob1, c.SubElement1)
-            #line2 = getObjectEdgeFromName(ob2, c.SubElement2)
             dep1.refPoint = vert1.Point
             dep2.refPoint = getPos(ob2, c.SubElement2)
 
@@ -186,12 +185,22 @@ class Dependency():
             ob1 = doc.getObject(c.Object1)
             ob2 = doc.getObject(c.Object2)
 
-            vert1 = getObjectVertexFromName(ob1, c.SubElement1)
+            #vert1 = getObjectVertexFromName(ob1, c.SubElement1)
+            dep1.refPoint = getPos(ob1, c.SubElement1)
+            
             plane2 = getObjectFaceFromName(ob2, c.SubElement2)
-            dep1.refPoint = vert1.Point
             dep2.refPoint = plane2.Faces[0].BoundBox.Center
 
             normal2 = plane2.Surface.Axis
+            #shift refPoint of plane by offset
+            try:
+                offs = c.offset
+            except:
+                offs = 0.0
+            offsetVector = Base.Vector(normal2)
+            offsetVector.multiply(offs)
+            dep2.refPoint = dep2.refPoint.add(offsetVector)
+            
             dep2.refAxisEnd = dep2.refPoint.add(normal2)
 
         elif c.Type == "circularEdge":

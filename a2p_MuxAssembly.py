@@ -64,6 +64,10 @@ def makePlacedShape(obj):
     tempShape.Placement = plmGlobal
     return tempShape
 
+def makeDiffuseElement(color,trans):
+    elem = (color[0],color[1],color[2],trans/100.0)
+    return elem
+
 def muxAssemblyWithTopoNames(doc, withColor=False):
     '''
     Mux an a2p assenbly
@@ -115,19 +119,16 @@ def muxAssemblyWithTopoNames(doc, withColor=False):
         
         # Save Computing time, store this before the for..enumerate loop later...
         colorFlag = ( len(obj.ViewObject.DiffuseColor) < len(obj.Shape.Faces) )
-#        shapeCol = obj.ViewObject.ShapeColor                                   # MASTER APPROACH
-#        diffuseCol = obj.ViewObject.DiffuseColor                               # MASTER APPROACH
-        shapeCol = copy.deepcopy(obj.ViewObject.ShapeColor)                    ## for sCT-Mode: meaning: shapeColor
-        shapeTsp = copy.deepcopy(obj.ViewObject.Transparency)                  ## for sCT-Mode: |_  plus Transparency
-        comboCol = (shapeCol[0],shapeCol[1],shapeCol[2],float(shapeTsp/100.0)) ## comboCol: sCT-Mode color calculation
-        diffuseCol = copy.deepcopy(obj.ViewObject.DiffuseColor)                ## for dCi-Mode: diffuseColor per face[i]
+        shapeCol = obj.ViewObject.ShapeColor
+        objTrans = obj.ViewObject.Transparency
+        diffuseCol = obj.ViewObject.DiffuseColor
         tempShape = makePlacedShape(obj)
 
         # now start the loop with use of the stored values..(much faster)
         topoNaming = a2plib.getUseTopoNaming()
         for i, face in enumerate(tempShape.Faces):
             faces.append(face)
-            a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"a2p MA-MUX: i(Faces)={}, {} ".format(i,face)) # debug improve-color info
+            DebugMsg(A2P_DEBUG_3,"a2p MA-MUX: i(Faces)={} {}\n".format(i,face))
             if topoNaming:
                 if extendNames:
                     newName = "".join((faceNames[i],obj.Name,';'))
@@ -138,13 +139,13 @@ def muxAssemblyWithTopoNames(doc, withColor=False):
 
             if withColor:
                 if colorFlag:
-                    faceColors.append(comboCol)
-                    a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"sCT-Mode\n") # debug improve-color info
+                    faceColors.append(makeDiffuseElement(shapeCol,objTrans))
                 else:
                     faceColors.append(diffuseCol[i])
-                    a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"dCi-Mode\n") # debug improve-color info
 
     shell = Part.makeShell(faces)
+    Msg("A2P MA-MUX: result: {}\n".format(shell))
+    DebugMsg(A2P_DEBUG_3,"a2p MA-MUX: faceColors:\n{}\n".format(faceColors))            # has result all faces' color values?
     if withColor:
         return muxInfo, shell, faceColors
     else:
@@ -163,23 +164,24 @@ def muxObjectsWithKeys(objsIn, withColor=False):
         # Save Computing time, store this before the for..enumerate loop later...
         colorFlag = ( len(obj.ViewObject.DiffuseColor) < len(obj.Shape.Faces) )
         shapeCol = obj.ViewObject.ShapeColor
+        objTrans = obj.ViewObject.Transparency
         diffuseCol = obj.ViewObject.DiffuseColor
         tempShape = makePlacedShape(obj)
 
         # now start the loop with use of the stored values..(much faster)
         for i, face in enumerate(tempShape.Faces):
             faces.append(face)
-            DebugMsg(A2P_DEBUG_3,"a2p MUX: i(Faces)={}\n{}\n".format(i,face))
+            DebugMsg(A2P_DEBUG_3,"a2p MA-MUX: i(Faces)={} {}\n".format(i,face))
 
             if withColor:
                 if colorFlag:
-                    faceColors.append(shapeCol)
+                    faceColors.append(makeDiffuseElement(shapeCol,objTrans))
                 else:
                     faceColors.append(diffuseCol[i])
 
     shell = Part.makeShell(faces)
-    Msg("A2P MUX: result: {}\n".format(shell))
-    DebugMsg(A2P_DEBUG_3,"a2p MUX: faceColors:\n{}\n".format(faceColors))            # has result all faces' color values?
+    Msg("A2P MA-MUX: result: {}\n".format(shell))
+    DebugMsg(A2P_DEBUG_3,"a2p MA-MUX: faceColors:\n{}\n".format(faceColors))            # has result all faces' color values?
     if withColor:
         return muxInfo, shell, faceColors
     else:

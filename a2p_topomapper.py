@@ -29,7 +29,7 @@ It is used during first level import of fcstd documents to a2p
 Working principle:
 - History of toplevel shapes within the fcstd doc is analyzed starting from
   the very first basefeature (found recursively from toplevel shapes)
-  
+
 - The algorithm analyses the vertexes/edges/faces of each shape in history
 - Each topo element is described by geometrical values (position,axis,etc)
 - A dictionary is build, the geometrical values are used as keys and the
@@ -43,10 +43,10 @@ Working principle:
 - Some geometry causes multiple keys. So for plane faces there are stored
   two keys per vertex. One with positive axis value, one with neg.axis value.
   This is necessary because normals can flip during build history.
-  
+
 Key-generation:
     keys for vertexes: "xvalue;yvalue;zvalue"
-    
+
     keys for edges: (different ones for different edge types)
         straight lines
             2 keys are uses, each consists of:
@@ -57,18 +57,18 @@ Key-generation:
                 - key consisting of center-vertex and positive axis data + radius
                 - key consisting of center-vertex and negative axis data + radius
                 - both marked with "CIRC" at the beginning
-                
+
         other edge types are put to dict with dummy entries.
-        
+
     keys for faces:
         Plane faces are described by vertex/normal for each vertex.
         Additionally a second entry by vertex/neg.normal for each vertex.
-        
+
         Spheres are described by center-vertex + radius
-        
+
         Cylindrical faces are described by vertex/pos.axis+radius and second one
         with neg.axis per vertex.
-        
+
 Newer shapes in history can delete geo elements of previous ones. If the algorithm
 finds one relicting key of an old shape in the dict, it assumes that the geo element
 belongs to the old shape. Newly created geo elements, which belong together, then get
@@ -95,7 +95,8 @@ from PySide import QtGui, QtCore
 import FreeCAD, FreeCADGui, Part
 from FreeCAD import Base
 import a2plib
-import os, copy
+import os
+import a2p_MuxAssembly as mux
 
 class TopoMapper(object):
     def __init__(self,doc):
@@ -111,10 +112,10 @@ class TopoMapper(object):
         self.totalNumVertexes = 0
         self.totalNumEdges = 0
         self.totalNumFaces = 0
-        
+
     def calcFloatKey(self,val):
             return "%014.3f;" % val
-        
+
     def calcVertexKey(self,inOb):
         '''
         create a unique key defined by vertex-position,
@@ -138,7 +139,7 @@ class TopoMapper(object):
             if keyPartial == "-000000000.000;": keyPartial = "0000000000.000;"
             key += keyPartial
         return key
-    
+
     def calcAxisKey(self,axis):
         '''
         create a unique key defined by axis-direction
@@ -159,10 +160,10 @@ class TopoMapper(object):
         keys = []
         #circular edge #hasattr(edge,"Curve") because of spheres...
         if (
-            hasattr(edge,"Curve") and 
+            hasattr(edge,"Curve") and
             hasattr(edge.Curve,'Axis') and
             hasattr(edge.Curve,'Radius')
-            ): 
+            ):
             axisStart = pl.multVec(edge.Curve.Center)
             axisEnd   = pl.multVec(edge.Curve.Center.add(edge.Curve.Axis))
             axis = axisEnd.sub(axisStart)
@@ -191,7 +192,7 @@ class TopoMapper(object):
                 self.calcAxisKey(direction2)
                 )
         return keys
-    
+
     def calcFaceKeys(self, face, pl):
         keys = []
         # A sphere...
@@ -254,8 +255,8 @@ class TopoMapper(object):
         else:
             keys.append("NOTRACE")
         return keys #FIXME
-    
-    
+
+
     def filterShapeObs(self,_list):
         lst = []
         for ob in _list:
@@ -296,7 +297,7 @@ class TopoMapper(object):
         edgeNameSuffix = str(numNewlyCreatedEdges)+';'
         i = 1 # do not enumerate the following, count new Edges !
         for edge in edges:
-            edgeKeys = self.calcEdgeKeys(edge, pl) # 2 keys for a linear edge, 1 key per circular egde
+            edgeKeys = self.calcEdgeKeys(edge, pl) # 2 keys for a linear edge, 1 key per circular edge
             entryFound=False
             for k in edgeKeys:
                 tmp = self.shapeDict.get(k,False)
@@ -335,7 +336,7 @@ class TopoMapper(object):
                 faceName = tmp # the old face name...
             for k in faceKeys:
                 self.shapeDict[k] = faceName
-        
+
     def processTopoData(self,objName,level=0):
         '''
         Recursive function which populates the
@@ -350,7 +351,7 @@ class TopoMapper(object):
             objName not in self.doneObjects
             ):
             self.populateShapeDict(objName)
-        
+
     def makePlacedShape(self,obj):
         '''
         return a copy of obj.Shape with proper placement applied
@@ -363,7 +364,7 @@ class TopoMapper(object):
             pass
         tempShape.Placement = plmGlobal
         return tempShape
-    
+
     def getTopLevelObjects(self):
         #-------------------------------------------
         # Create treenodes of the importable Objects with a shape
@@ -390,7 +391,10 @@ class TopoMapper(object):
         #-------------------------------------------
         addList = []
         for n in self.topLevelShapes:
-            if n.startswith('Clone'):
+            if (
+                n.startswith('Clone') or
+                n.startswith('Part__Mirroring')
+                ):
                 dummy,outList = self.treeNodes[n]
                 if len(outList) == 1:
                     addList.append(outList[0].Name)
@@ -403,12 +407,12 @@ class TopoMapper(object):
         for objName in self.topLevelShapes:
             outObs.append(self.doc.getObject(objName))
         return outObs
-        
-    
+
+
     def createTopoNames(self,withColor=False):
         '''
         creates a combined shell of all toplevel objects and
-        assignes toponames to it's geometry if toponaming is
+        assigns toponames to its geometry if toponaming is
         enabled.
         '''
         self.getTopLevelObjects()
@@ -427,32 +431,31 @@ class TopoMapper(object):
         #-------------------------------------------
         faces = []
         faceColors = []
-        
+
         for objName in self.topLevelShapes:
             ob = self.doc.getObject(objName)
             colorFlag = ( len(ob.ViewObject.DiffuseColor) < len(ob.Shape.Faces) )
-#            shapeCol = ob.ViewObject.ShapeColor                                    # MASTER APPROACH
-#            diffuseCol = ob.ViewObject.DiffuseColor                                # MASTER APPROACH
-            shapeCol = copy.deepcopy(ob.ViewObject.ShapeColor)                     ## for sCT-Mode: meaning: shapeColor
-            shapeTsp = copy.deepcopy(ob.ViewObject.Transparency)                   ## for sCT-Mode: |_ plus Transparency
-            comboCol = (shapeCol[0],shapeCol[1],shapeCol[2],float(shapeTsp/100.0)) ## comboCol: sCT-Mode color calculation
-            diffuseCol = copy.deepcopy(ob.ViewObject.DiffuseColor)                 ## for dCi-Mode: diffuseColor per face[i]
+            shapeCol = ob.ViewObject.ShapeColor
+            objTrans = ob.ViewObject.Transparency
+            diffuseCol = ob.ViewObject.DiffuseColor
             tempShape = self.makePlacedShape(ob)
 
             # now start the loop with use of the stored values..(much faster)
             for i, face in enumerate(tempShape.Faces):
                 faces.append(face)
-                a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"a2p tm-MUX: i(Faces)={}, {} ".format(i,face)) # debug improve-color info
+
+                a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"a2p tm-MUX: i(Faces)={} {}\n".format(i,face))
 
                 if withColor:
                     if colorFlag:
-                        faceColors.append(comboCol)
-                        a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"sCT-Mode\n") # debug improve-color info
+                        faceColors.append(mux.makeDiffuseElement(shapeCol,objTrans))
                     else:
                         faceColors.append(diffuseCol[i])
-                        a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"dCi-Mode\n") # debug improve-color info
 
         shell = Part.makeShell(faces)
+        a2plib.Msg("A2P tm-MUX: result: {}\n".format(shell))
+        a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"a2p tm-MUX: faceColors:\n{}\n".format(faceColors)) # has result all faces' color values?
+
         #-------------------------------------------
         # if toponaming is used, assign toponames to
         # shells geometry
@@ -490,47 +493,3 @@ class TopoMapper(object):
             return muxInfo, shell, faceColors
         else:
             return muxInfo, shell
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -109,7 +109,7 @@
         <item>
          <widget class="Gui::PrefRadioButton" name="radioButton_3">
           <property name="text">
-           <string>use relative pathes for imported parts</string>
+           <string>use relative paths for imported parts</string>
           </property>
           <property name="checked">
            <bool>true</bool>
@@ -125,7 +125,7 @@
         <item>
          <widget class="Gui::PrefRadioButton" name="radioButton_4">
           <property name="text">
-           <string>use absolute pathes for imported parts</string>
+           <string>use absolute paths for imported parts</string>
           </property>
           <property name="prefEntry" stdset="0">
            <cstring>useAbsolutePathes</cstring>
