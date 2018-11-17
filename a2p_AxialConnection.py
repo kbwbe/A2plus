@@ -126,6 +126,10 @@ Selection:
 toolTipText = \
 '''
 Add an axialConstraint between two parts
+
+2 axis are aligned and be moved
+to be coincident
+
 Selection:
 1.) Select cylindrical face or linear edge on a part
 2.) Select cylindrical face or linear edge on another part
