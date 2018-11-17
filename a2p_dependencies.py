@@ -303,6 +303,23 @@ class Dependency():
                 
             dep1.refAxisEnd = dep1.refPoint.add(axis1)
             dep2.refAxisEnd = dep2.refPoint.add(axis2)
+            
+        elif c.Type == "axisParallel":
+            dep1 = DependencyAxisParallel(c, "pointAxis")
+            dep2 = DependencyAxisParallel(c, "pointAxis")
+
+            ob1 = doc.getObject(c.Object1)
+            ob2 = doc.getObject(c.Object2)
+            dep1.refPoint = getPos(ob1,c.SubElement1)
+            dep2.refPoint = getPos(ob2,c.SubElement2)
+            axis1 = getAxis(ob1, c.SubElement1)
+            axis2 = getAxis(ob2, c.SubElement2)
+            if dep2.direction == "opposed":
+                axis2.multiply(-1.0)
+                
+            dep1.refAxisEnd = dep1.refPoint.add(axis1)
+            dep2.refAxisEnd = dep2.refPoint.add(axis2)
+            
         else:
             raise NotImplementedError("Constraint type {} was not implemented!".format(c.Type))
 
@@ -699,3 +716,20 @@ class DependencyAxial(Dependency):
         else:
             return AxisDistance(tmpaxis,_dofPos), AxisAlignment(tmpaxis,_dofRot)
     
+class DependencyAxisParallel(Dependency):
+    def __init__(self, constraint, refType):
+        Dependency.__init__(self, constraint, refType, True)
+        self.isPointConstraint = False
+        self.useRefPointSpin = False
+
+    def getMovement(self):
+        if not self.Enabled: return None, None
+        return self.refPoint, Base.Vector(0.0, 0.0, 0.0)
+    
+    def calcDOF(self, _dofPos, _dofRot, _pointconstraints=[]):
+    #AxialConstraint:
+    #    AxisAlignment()    needs to know the axis normal to circle (stored in dep as refpoint and refAxisEnd) and the dofrot array
+    #    AxisDistance()     needs to know the axis normal to circle (stored in dep as refpoint and refAxisEnd) and the dofpos array
+    #    LockRotation()     need to know if LockRotation is True or False and the array dofrot
+        tmpaxis = cleanAxis(create_Axis2Points(self.refPoint,self.refAxisEnd))
+        return _dofPos, AxisAlignment(tmpaxis,_dofRot)

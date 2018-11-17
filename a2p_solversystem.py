@@ -159,15 +159,12 @@ class SolverSystem():
             if rigid2 != None and not rigid2 in rigid1.linkedRigids: rigid1.linkedRigids.append(rigid2);
             if rigid1 != None and not rigid1 in rigid2.linkedRigids: rigid2.linkedRigids.append(rigid1);
             
-            Dependency.Create(doc, c, self, rigid1, rigid2)
-            '''
             try:
                 Dependency.Create(doc, c, self, rigid1, rigid2)
             except:
                 self.status = "loadingDependencyError"
                 deleteList.append(c)
-            '''
-            
+                
         for rig in self.rigids:
             rig.hierarchyLinkedRigids.extend(rig.linkedRigids)
                
@@ -541,7 +538,7 @@ class a2p_SolverCommand:
         return {
             'Pixmap' : path_a2p + '/icons/a2p_solver.svg',
             'MenuText': 'Solve',
-            'ToolTip': 'Solve Assembly 2 constraints'
+            'ToolTip': 'Solve A2plus constraints'
             }
 
 FreeCADGui.addCommand('a2p_SolverCommand', a2p_SolverCommand())

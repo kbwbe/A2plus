@@ -27,42 +27,50 @@ from a2plib import *
 from pivy import coin
 from PySide import QtGui
 
-class AxialSelectionGate:
+class PlanesParallelSelectionGate:
     def allow(self, doc, obj, sub):
-        return ValidSelection(SelectionExObject(doc, obj, sub))
+        s1 = SelectionExObject(doc, obj, sub)
+        return LinearEdgeSelected( s1 ) or cylindricalPlaneSelected( s1 )
 
-def ValidSelection(selectionExObj):
-    return cylindricalPlaneSelected(selectionExObj)\
-         or LinearEdgeSelected(selectionExObj)\
-         or AxisOfPlaneSelected(selectionExObj)
+class PlanesParallelSelectionGate2:
+    def allow(self, doc, obj, sub):
+        s2 = SelectionExObject(doc, obj, sub)
+        return LinearEdgeSelected( s2 ) or cylindricalPlaneSelected( s2 )
 
 def parseSelection(selection, objectToUpdate=None):
     validSelection = False
     if len(selection) == 2:
         s1, s2 = selection
         if s1.ObjectName != s2.ObjectName:
-            if ValidSelection(s1) and ValidSelection(s2):
+            if (
+                (LinearEdgeSelected(s1) or cylindricalPlaneSelected(s1)) and
+                (LinearEdgeSelected(s2) or cylindricalPlaneSelected(s2))
+                ): 
                 validSelection = True
                 cParms = [ [s1.ObjectName, s1.SubElementNames[0], s1.Object.Label ],
                            [s2.ObjectName, s2.SubElementNames[0], s2.Object.Label ] ]
     if not validSelection:
         msg = '''
-              To add an axial constraint select two cylindrical surfaces or two
-              straight lines, each from a different part. Selection made:%s
-              '''  % printSelection(selection)
+              axisParallelConstraint requires a selection of:
+              - cylinderAxis or linearEdge on a part
+              - cylinderAxis or linearEdge on another part
+              Selection made: %s
+              ''' % printSelection(selection)
+
         QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Incorrect Usage", msg)
         return
 
     if objectToUpdate == None:
-        cName = findUnusedObjectName('axialConstraint')
+        extraText = ''
+        cName = findUnusedObjectName('axisParallel')
         c = FreeCAD.ActiveDocument.addObject("App::FeaturePython", cName)
-        c.addProperty("App::PropertyString","Type","ConstraintInfo","Object 1").Type = 'axial'
+        c.addProperty("App::PropertyString","Type","ConstraintInfo").Type = 'axisParallel'
         c.addProperty("App::PropertyString","Object1","ConstraintInfo").Object1 = cParms[0][0]
         c.addProperty("App::PropertyString","SubElement1","ConstraintInfo").SubElement1 = cParms[0][1]
         c.addProperty("App::PropertyString","Object2","ConstraintInfo").Object2 = cParms[1][0]
         c.addProperty("App::PropertyString","SubElement2","ConstraintInfo").SubElement2 = cParms[1][1]
 
-        doc = FreeCAD.activeDocument()        
+        doc = FreeCAD.activeDocument()
         ob1 = doc.getObject(c.Object1)
         ob2 = doc.getObject(c.Object2)
         axis1 = getAxis(ob1, c.SubElement1)
@@ -71,17 +79,11 @@ def parseSelection(selection, objectToUpdate=None):
         
         c.addProperty("App::PropertyEnumeration","directionConstraint", "ConstraintInfo")
         c.directionConstraint = ["aligned","opposed"]
-        
+
         if angle <= 90.0:
             c.directionConstraint = "aligned"
         else:
             c.directionConstraint = "opposed"
-
-        c.setEditorMode('Type',1)
-        for prop in ["Object1","Object2","SubElement1","SubElement2"]:
-            c.setEditorMode(prop, 1)
-        
-        c.addProperty("App::PropertyBool","lockRotation","ConstraintInfo")
 
         c.setEditorMode('Type',1)
         for prop in ["Object1","Object2","SubElement1","SubElement2"]:
@@ -99,11 +101,10 @@ def parseSelection(selection, objectToUpdate=None):
         c.Proxy = ConstraintObjectProxy()
         c.ViewObject.Proxy = ConstraintViewProviderProxy(
             c,
-            #path_a2p + '/icons/a2p_AxialConstraint.svg',
-            ':/icons/a2p_AxialConstraint.svg',
-            True,
-            cParms[1][2],
-            cParms[0][2]
+            ':/icons/a2p_AxisParallelConstraint.svg',
+            True, cParms[1][2],
+            cParms[0][2],
+            extraText
             )
     else:
         c = objectToUpdate
@@ -116,28 +117,26 @@ def parseSelection(selection, objectToUpdate=None):
     c.purgeTouched()
     c.Proxy.callSolveConstraints()
 
+
 selection_text = \
 '''
-Selection:
-1.) Select cylindrical face or linear edge on a part
-2.) Select cylindrical face or linear edge on another part
+1.) linearEdge or cylinderFace from a part
+2.) linearEdge or cylinderFace from another part
 '''
 
 toolTipText = \
 '''
-Add an axialConstraint between two parts
+Add an axisParallel constraint between two objects
 
-2 axis are aligned and be moved
-to be coincident
+Axis' will only rotate to be parallel, but not be
+moved to be coincident
 
-Selection:
-1.) Select cylindrical face or linear edge on a part
-2.) Select cylindrical face or linear edge on another part
+select:
+1.) linearEdge or cylinderFace from a part
+2.) linearEdge or cylinderFace from another part
 '''
 
-
-
-class a2p_AxialConnectionCommand:
+class a2p_AxisParallelCommand:
     def Activated(self):
         selection = FreeCADGui.Selection.getSelectionEx()
         if len(selection) == 2:
@@ -145,17 +144,18 @@ class a2p_AxialConnectionCommand:
         else:
             FreeCADGui.Selection.clearSelection()
             ConstraintSelectionObserver(
-                 AxialSelectionGate(),
+                 PlanesParallelSelectionGate(),
                  parseSelection,
-                 taskDialog_title ='add axial constraint',
+                 taskDialog_title ='add planesParallel constraint',
                  taskDialog_iconPath = self.GetResources()['Pixmap'],
-                 taskDialog_text = selection_text
-                 )
+                 taskDialog_text = selection_text,
+                 secondSelectionGate = PlanesParallelSelectionGate2() )
+
     def GetResources(self):
         return {
-             'Pixmap' : path_a2p + '/icons/a2p_AxialConstraint.svg',
-             'MenuText': 'Add axial constraint',
+             'Pixmap' : ':/icons/a2p_AxisParallelConstraint.svg',
+             'MenuText': 'Add axisParallel constraint',
              'ToolTip': toolTipText
              }
 
-FreeCADGui.addCommand('a2p_AxialConnection', a2p_AxialConnectionCommand())
+FreeCADGui.addCommand('a2p_AxisParallelCommand', a2p_AxisParallelCommand())
