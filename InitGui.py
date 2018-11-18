@@ -54,6 +54,7 @@ class a2pWorkbench (Workbench):
         import a2p_CircularEdgeConnection
         import a2p_planesParallelConstraint
         import a2p_axisParallelConstraint
+        import a2p_axisPlaneParallelConstraint
         import a2p_planeConstraint
         import a2p_AxialConnection
         import a2p_angleConnection
@@ -81,6 +82,7 @@ class a2pWorkbench (Workbench):
             'a2p_CircularEdgeConnection',
             'a2p_AxialConnection',
             'a2p_AxisParallelCommand',
+            'a2p_AxisPlaneParallelCommand',
             'a2p_PlanesParallelConnectionCommand',
             'a2p_PlaneConnection',
             'a2p_AngledPlanesCommand',
