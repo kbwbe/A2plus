@@ -112,6 +112,7 @@ class TopoMapper(object):
         self.totalNumVertexes = 0
         self.totalNumEdges = 0
         self.totalNumFaces = 0
+        self.isPartDesignDocument = False
 
     def calcFloatKey(self,val):
             return "%014.3f;" % val
@@ -279,11 +280,14 @@ class TopoMapper(object):
         numNewlyCreatedVertexes = len(shape.Vertexes) - self.totalNumVertexes
         self.totalNumVertexes = len(shape.Vertexes)
         vertexNamePrefix = 'V;'+objName + ';'
-        vertexNameSuffix = str(numNewlyCreatedVertexes)+';'
+        vertexNameSuffix = str(numNewlyCreatedVertexes)+';' #only correct for PartDesign, PartWB gives false counts
         i = 1 # do not enumerate the following, count new vertexes !
         for vertex in vertexes:
             vertexKey = self.calcVertexKey(pl.multVec(vertex.Point))
-            vertexName = vertexNamePrefix + str(i) + ';' + vertexNameSuffix
+            if self.isPartDesignDocument:
+                vertexName = vertexNamePrefix + str(i) + ';' + vertexNameSuffix
+            else:
+                vertexName = vertexNamePrefix + str(i) + ';'
             vertexFound = self.shapeDict.get(vertexKey,False)
             if vertexFound == False:
                 self.shapeDict[vertexKey] = vertexName
@@ -294,7 +298,7 @@ class TopoMapper(object):
         numNewlyCreatedEdges = len(edges) - self.totalNumEdges
         self.totalNumEdges = len(edges)
         edgeNamePrefix = 'E;' + objName + ';'
-        edgeNameSuffix = str(numNewlyCreatedEdges)+';'
+        edgeNameSuffix = str(numNewlyCreatedEdges)+';' #only correct for PartDesign, PartWB gives false counts
         i = 1 # do not enumerate the following, count new Edges !
         for edge in edges:
             edgeKeys = self.calcEdgeKeys(edge, pl) # 2 keys for a linear edge, 1 key per circular edge
@@ -305,7 +309,10 @@ class TopoMapper(object):
                     entryFound = True
                     break
             if not entryFound:
-                edgeName = edgeNamePrefix + str(i) + ';' + edgeNameSuffix
+                if self.isPartDesignDocument:
+                    edgeName = edgeNamePrefix + str(i) + ';' + edgeNameSuffix
+                else:
+                    edgeName = edgeNamePrefix + str(i) + ';'
                 i+=1
             else:
                 edgeName = tmp # the old edge name...
@@ -318,7 +325,7 @@ class TopoMapper(object):
         numNewlyCreatedFaces = len(faces) - self.totalNumFaces
         self.totalNumFaces = len(faces)
         faceNamePrefix = 'F;' + objName + ';'
-        faceNameSuffix = str(numNewlyCreatedFaces)+';'
+        faceNameSuffix = str(numNewlyCreatedFaces)+';' #only correct for PartDesign, PartWB gives false counts
         i = 1 # do not enumerate the following, count new Faces !
         for face in faces:
             faceKeys = self.calcFaceKeys(face, pl) # one key per vertex of a face
@@ -330,7 +337,10 @@ class TopoMapper(object):
                     entryFound = True
                     break
             if not entryFound:
-                faceName = faceNamePrefix + str(i) + ';' + faceNameSuffix
+                if self.isPartDesignDocument:
+                    faceName = faceNamePrefix + str(i) + ';' + faceNameSuffix
+                else:
+                    faceName = faceNamePrefix + str(i) + ';'
                 i+=1
             else:
                 faceName = tmp # the old face name...
@@ -408,6 +418,12 @@ class TopoMapper(object):
             outObs.append(self.doc.getObject(objName))
         return outObs
 
+    def detectPartDesignDocument(self):
+        self.isPartDesignDocument = False
+        for ob in self.doc.Objects:
+            if ob.Name.startswith('Body'):
+                self.isPartDesignDocument = True
+                break
 
     def createTopoNames(self,withColor=False):
         '''
@@ -415,6 +431,7 @@ class TopoMapper(object):
         assigns toponames to its geometry if toponaming is
         enabled.
         '''
+        self.detectPartDesignDocument()
         self.getTopLevelObjects()
         #-------------------------------------------
         # analyse the toplevel shapes

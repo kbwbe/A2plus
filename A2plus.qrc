@@ -3,6 +3,8 @@
         <file>icons/a2p_AngleConstraint.svg</file>
         <file>icons/a2p_autoSolve.svg</file>
         <file>icons/a2p_AxialConstraint.svg</file>
+        <file>icons/a2p_AxisParallelConstraint.svg</file>
+        <file>icons/a2p_AxisPlaneParallelConstraint.svg</file>
         <file>icons/a2p_checkAssembly.svg</file>
         <file>icons/a2p_CircularEdgeConstraint.svg</file>
         <file>icons/a2p_degreesOfFreedomAnimation.svg</file>
