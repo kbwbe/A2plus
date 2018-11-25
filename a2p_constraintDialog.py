@@ -28,6 +28,8 @@ import os, sys
 from a2p_viewProviderProxies import *
 from  FreeCAD import Base
 
+from a2p_solversystem import solveConstraints
+
 
 #==============================================================================
 class a2p_ConstraintPanel(QtGui.QWidget):
@@ -37,12 +39,12 @@ class a2p_ConstraintPanel(QtGui.QWidget):
         
     def initUI(self):
         self.setWindowTitle('Create constraints')
-        self.setMinimumHeight(400)
+        self.setMinimumHeight(200)
         
         mainLayout = QtGui.QVBoxLayout() # a VBoxLayout for the whole form
         #-------------------------------------
         self.panel1 = QtGui.QWidget(self)
-        self.panel1.setMinimumHeight(48)
+        self.panel1.setMinimumHeight(40)
         panel1_Layout = QtGui.QHBoxLayout()
         #-------------------------------------
         self.pointIdentityButton = QtGui.QPushButton(self.panel1)
@@ -59,15 +61,42 @@ class a2p_ConstraintPanel(QtGui.QWidget):
         #-------------------------------------
         panel1_Layout.addWidget(self.pointIdentityButton)
         panel1_Layout.addWidget(self.pointOnLineButton)
+        panel1_Layout.addStretch(1)
         self.panel1.setLayout(panel1_Layout)
         #-------------------------------------
-
-
+        
         
         #-------------------------------------
-        mainLayout.addLayout(panel1_Layout)
+        self.finalPanel = QtGui.QWidget(self)
+        self.finalPanel.setMinimumHeight(40)
+        finalPanel_Layout = QtGui.QHBoxLayout()
+        #-------------------------------------
+        self.solveButton = QtGui.QPushButton(self.finalPanel)
+        self.solveButton.setFixedSize(32,32)
+        self.solveButton.setIcon(QtGui.QIcon(':/icons/a2p_solver.svg'))
+        self.solveButton.setToolTip("solve Constraints")
+        self.solveButton.setText("")
+        #-------------------------------------
+        finalPanel_Layout.addStretch(1)
+        finalPanel_Layout.addWidget(self.solveButton)
+        self.finalPanel.setLayout(finalPanel_Layout)
+        #-------------------------------------
+        
+        #-------------------------------------
+        mainLayout.addWidget(self.panel1)
+        mainLayout.addStretch(1)
+        mainLayout.addWidget(self.finalPanel)
         self.setLayout(mainLayout)       
         #-------------------------------------
+        
+        QtCore.QObject.connect(self.solveButton, QtCore.SIGNAL("clicked()"), self.solve)
+
+        
+    def solve(self):
+        doc = FreeCAD.activeDocument()
+        if doc != None:
+            solveConstraints(doc)
+        
     
 #==============================================================================
 class a2p_ConstraintTaskDialog:
@@ -87,6 +116,7 @@ class a2p_ConstraintTaskDialog:
         retVal = (
             #0x02000000 + # Apply
             0x00400000 + # Cancel
+            0x00200000 + # Close
             0x00000400   # Ok
             )
         return retVal
