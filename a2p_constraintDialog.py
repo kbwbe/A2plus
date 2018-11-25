@@ -47,10 +47,11 @@ class a2p_ConstraintPanel(QtGui.QWidget):
         
         #-------------------------------------
         self.panel1 = QtGui.QWidget(self)
-        self.panel1.setMinimumHeight(40)
+        self.panel1.setMinimumHeight(32)
         panel1_Layout = QtGui.QHBoxLayout()
         #-------------------------------------
         self.pointLabel = QtGui.QLabel('Point Constraints')
+        self.pointLabel.setMinimumWidth(145)
         #-------------------------------------
         self.pointIdentityButton = QtGui.QPushButton(self.panel1)
         self.pointIdentityButton.setFixedSize(32,32)
@@ -84,10 +85,11 @@ class a2p_ConstraintPanel(QtGui.QWidget):
 
         #-------------------------------------
         self.panel2 = QtGui.QWidget(self)
-        self.panel2.setMinimumHeight(40)
+        self.panel2.setMinimumHeight(32)
         panel2_Layout = QtGui.QHBoxLayout()
         #-------------------------------------
         self.axisLabel = QtGui.QLabel('Axis Constraints')
+        self.axisLabel.setMinimumWidth(145)
         #-------------------------------------
         self.circularEdgeButton = QtGui.QPushButton(self.panel2)
         self.circularEdgeButton.setFixedSize(32,32)
@@ -126,12 +128,14 @@ class a2p_ConstraintPanel(QtGui.QWidget):
         self.panel2.setLayout(panel2_Layout)
         #-------------------------------------
 
+
         #-------------------------------------
         self.panel3 = QtGui.QWidget(self)
-        self.panel3.setMinimumHeight(40)
+        self.panel3.setMinimumHeight(32)
         panel3_Layout = QtGui.QHBoxLayout()
         #-------------------------------------
         self.planesLabel = QtGui.QLabel('Plane Constraints')
+        self.planesLabel.setMinimumWidth(145)
         #-------------------------------------
         self.planesParallelButton = QtGui.QPushButton(self.panel3)
         self.planesParallelButton.setFixedSize(32,32)
@@ -189,10 +193,12 @@ class a2p_ConstraintPanel(QtGui.QWidget):
         self.setLayout(mainLayout)       
         #-------------------------------------
         
+        #-------------------------------------
         self.selectionTimer = QtCore.QTimer()
         QtCore.QObject.connect(self.selectionTimer, QtCore.SIGNAL("timeout()"), self.parseSelections)
         self.selectionTimer.start(100)
         
+        #-------------------------------------
         QtCore.QObject.connect(self.solveButton, QtCore.SIGNAL("clicked()"), self.solve)
         
     def parseSelections(self):
@@ -204,20 +210,47 @@ class a2p_ConstraintPanel(QtGui.QWidget):
         else:
             s1, s2 = selection
             if s1.ObjectName != s2.ObjectName:
+                #=============================
                 if vertexSelected(s1):
                     if vertexSelected(s2):
                         self.pointIdentityButton.setEnabled(True)
                         validSelection = True
-                    if LinearEdgeSelected(s2):
+                    elif LinearEdgeSelected(s2):
                         self.pointOnLineButton.setEnabled(True)
                         validSelection = True
-                
+                    elif planeSelected(s2):
+                        self.pointOnPlaneButton.setEnabled(True)
+                        validSelection = True
+                #=============================
+                elif LinearEdgeSelected(s1) or cylindricalPlaneSelected(s1):
+                    if LinearEdgeSelected(s2) or cylindricalPlaneSelected(s2):
+                        self.axisParallelButton.setEnabled(True)
+                        self.axialButton.setEnabled(True) #
+                        validSelection = True
+                    elif planeSelected(s2):
+                        self.axisPlaneParallelButton.setEnabled(True)
+                        validSelection = True
+                #=============================
+                elif CircularEdgeSelected(s1):
+                    if planeSelected(s2):
+                        self.pointOnPlaneButton.setEnabled(True)
+                        validSelection = True
+                    elif CircularEdgeSelected(s2):
+                        self.circularEdgeButton.setEnabled(True)
+                        validSelection = True
+                #=============================
+                elif planeSelected(s1):
+                    if planeSelected(s2):
+                        self.planesParallelButton.setEnabled(True)
+                        self.planeCoincidentButton.setEnabled(True)
+                        self.angledPlanesButton.setEnabled(True)
+                        validSelection = True
+                #=============================
         if validSelection:
             self.solveButton.setEnabled(True)
         else:
             self.solveButton.setEnabled(False)
-        
-        self.selectionTimer.start(200)
+        self.selectionTimer.start(100)
 
 
         
