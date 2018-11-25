@@ -89,7 +89,16 @@ class a2p_ConstraintPanel(QtGui.QWidget):
         self.setLayout(mainLayout)       
         #-------------------------------------
         
+        self.selectionTimer = QtCore.QTimer()
+        QtCore.QObject.connect(self.selectionTimer, QtCore.SIGNAL("timeout()"), self.parseSelections)
+        self.selectionTimer.start(200)
+        
         QtCore.QObject.connect(self.solveButton, QtCore.SIGNAL("clicked()"), self.solve)
+        
+    def parseSelections(self):
+        print ("parseSelections")
+        
+        self.selectionTimer.start(200)
 
         
     def solve(self):
