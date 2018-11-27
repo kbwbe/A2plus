@@ -95,7 +95,7 @@ from PySide import QtGui, QtCore
 import FreeCAD, FreeCADGui, Part
 from FreeCAD import Base
 import a2plib
-import os
+import os, copy
 import a2p_MuxAssembly as mux
 
 class TopoMapper(object):
@@ -451,10 +451,23 @@ class TopoMapper(object):
 
         for objName in self.topLevelShapes:
             ob = self.doc.getObject(objName)
-            colorFlag = ( len(ob.ViewObject.DiffuseColor) < len(ob.Shape.Faces) )
+#            noDiffuse = ( len(ob.ViewObject.DiffuseColor) < len(ob.Shape.Faces) )
+            noDiffuse = ( len(ob.ViewObject.DiffuseColor) == 1 )
             shapeCol = ob.ViewObject.ShapeColor
-            objTrans = ob.ViewObject.Transparency
-            diffuseCol = ob.ViewObject.DiffuseColor
+            objTransp = ob.ViewObject.Transparency
+#            diffuseCol = ob.ViewObject.DiffuseColor
+
+            if getattr(ob,'updateColors',True) and hasattr(ob.ViewObject, 'DiffuseColor'):
+                diffuseCol = copy.copy( ob.ViewObject.DiffuseColor )
+                #ob.ViewObject.Transparency = copy.copy( obj_to_copy.ViewObject.Transparency )   # .Transparency property
+                tsp = copy.copy( ob.ViewObject.Transparency )   # .Transparency workaround for FC 0.17 @ Nov 2016 (assembly2)
+                if tsp < 100 and tsp!=0:
+                    ob.ViewObject.Transparency = tsp+1
+                if tsp == 100:
+                    ob.ViewObject.Transparency = tsp-1
+                a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"A2p tm transparency-workaround")
+                ob.ViewObject.Transparency = tsp # .Transparency workaround end
+
             tempShape = self.makePlacedShape(ob)
 
             # now start the loop with use of the stored values..(much faster)
@@ -464,8 +477,8 @@ class TopoMapper(object):
                 a2plib.DebugMsg(a2plib.A2P_DEBUG_3,"a2p tm-MUX: i(Faces)={} {}\n".format(i,face))
 
                 if withColor:
-                    if colorFlag:
-                        faceColors.append(mux.makeDiffuseElement(shapeCol,objTrans))
+                    if noDiffuse:
+                        faceColors.append(mux.makeDiffuseElement(shapeCol,objTransp))
                     else:
                         faceColors.append(diffuseCol[i])
 

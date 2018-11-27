@@ -118,11 +118,22 @@ def muxAssemblyWithTopoNames(doc, withColor=False):
                     muxInfo.append(newName)
         
         # Save Computing time, store this before the for..enumerate loop later...
-        colorFlag = ( len(obj.ViewObject.DiffuseColor) < len(obj.Shape.Faces) )
+        noDiffuse = ( len(obj.ViewObject.DiffuseColor) == 1 )
         shapeCol = obj.ViewObject.ShapeColor
-        objTrans = obj.ViewObject.Transparency
-        diffuseCol = obj.ViewObject.DiffuseColor
+        objTransp = obj.ViewObject.Transparency
+#        diffuseCol = obj.ViewObject.DiffuseColor
         tempShape = makePlacedShape(obj)
+
+        if getattr(obj,'updateColors',True) and hasattr(obj.ViewObject, 'DiffuseColor'):
+            diffuseCol = copy.copy( obj.ViewObject.DiffuseColor )
+            #obj.ViewObject.Transparency = copy.copy( obj_to_copy.ViewObject.Transparency )   # .Transparency property
+            tsp = copy.copy( obj.ViewObject.Transparency )   # .Transparency workaround for FC 0.17 @ Nov 2016 (assembly2)
+            if tsp < 100 and tsp!=0:
+                obj.ViewObject.Transparency = tsp+1
+            if tsp == 100:
+                obj.ViewObject.Transparency = tsp-1
+            DebugMsg(A2P_DEBUG_3,"a2p MA transparency-workaround")
+            obj.ViewObject.Transparency = tsp # .Transparency workaround end
 
         # now start the loop with use of the stored values..(much faster)
         topoNaming = a2plib.getUseTopoNaming()
@@ -138,8 +149,8 @@ def muxAssemblyWithTopoNames(doc, withColor=False):
                     muxInfo.append(newName)
 
             if withColor:
-                if colorFlag:
-                    faceColors.append(makeDiffuseElement(shapeCol,objTrans))
+                if noDiffuse:
+                    faceColors.append(makeDiffuseElement(shapeCol,objTransp))
                 else:
                     faceColors.append(diffuseCol[i])
 
@@ -162,11 +173,22 @@ def muxObjectsWithKeys(objsIn, withColor=False):
 
     for obj in objsIn:
         # Save Computing time, store this before the for..enumerate loop later...
-        colorFlag = ( len(obj.ViewObject.DiffuseColor) < len(obj.Shape.Faces) )
+        noDiffuse = ( len(obj.ViewObject.DiffuseColor) == 1 )
         shapeCol = obj.ViewObject.ShapeColor
-        objTrans = obj.ViewObject.Transparency
-        diffuseCol = obj.ViewObject.DiffuseColor
+        objTransp = obj.ViewObject.Transparency
+#        diffuseCol = obj.ViewObject.DiffuseColor
         tempShape = makePlacedShape(obj)
+
+        if getattr(obj,'updateColors',True) and hasattr(obj.ViewObject, 'DiffuseColor'):
+            diffuseCol = copy.copy( obj.ViewObject.DiffuseColor )
+            #obj.ViewObject.Transparency = copy.copy( obj_to_copy.ViewObject.Transparency )   # .Transparency property
+            tsp = copy.copy( obj.ViewObject.Transparency )   # .Transparency workaround for FC 0.17 @ Nov 2016 (assembly2)
+            if tsp < 100 and tsp!=0:
+                obj.ViewObject.Transparency = tsp+1
+            if tsp == 100:
+                obj.ViewObject.Transparency = tsp-1
+            DebugMsg(A2P_DEBUG_3,"a2p MA transparency-workaround")
+            obj.ViewObject.Transparency = tsp # .Transparency workaround end
 
         # now start the loop with use of the stored values..(much faster)
         for i, face in enumerate(tempShape.Faces):
@@ -174,8 +196,8 @@ def muxObjectsWithKeys(objsIn, withColor=False):
             DebugMsg(A2P_DEBUG_3,"a2p MA-MUX: i(Faces)={} {}\n".format(i,face))
 
             if withColor:
-                if colorFlag:
-                    faceColors.append(makeDiffuseElement(shapeCol,objTrans))
+                if noDiffuse:
+                    faceColors.append(makeDiffuseElement(shapeCol,objTransp))
                 else:
                     faceColors.append(diffuseCol[i])
 
