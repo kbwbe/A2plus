@@ -84,7 +84,7 @@ class BasicConstraint():
         
         self.calcInitialValues() #override in subclass !
         self.setInitialValues()
-        self.groupUnderParentObjectInTree()
+        self.groupUnderParentTreeObject()
         self.setupProxies()
         
     def setupProxies(self):

@@ -30,6 +30,7 @@ from  FreeCAD import Base
 
 from a2plib import *
 from a2p_solversystem import solveConstraints
+import a2p_constraints
 
 
 #==============================================================================
@@ -37,6 +38,7 @@ class a2p_ConstraintPanel(QtGui.QWidget):
     def __init__(self):
         super(a2p_ConstraintPanel,self).__init__()
         self.constraintButtons = []
+        self.activeConstraint = None
         self.initUI()
         
     def initUI(self):
@@ -58,6 +60,7 @@ class a2p_ConstraintPanel(QtGui.QWidget):
         self.pointIdentityButton.setIcon(QtGui.QIcon(':/icons/a2p_PointIdentity.svg'))
         self.pointIdentityButton.setToolTip("pointIdentity")
         self.pointIdentityButton.setText("")
+        QtCore.QObject.connect(self.pointIdentityButton, QtCore.SIGNAL("clicked()"), self.onPointIdentityButton)
         self.constraintButtons.append(self.pointIdentityButton)
         #-------------------------------------
         self.pointOnLineButton = QtGui.QPushButton(self.panel1)
@@ -65,6 +68,7 @@ class a2p_ConstraintPanel(QtGui.QWidget):
         self.pointOnLineButton.setIcon(QtGui.QIcon(':/icons/a2p_PointOnLineConstraint.svg'))
         self.pointOnLineButton.setToolTip("pointOnLineConstraint")
         self.pointOnLineButton.setText("")
+        QtCore.QObject.connect(self.pointOnLineButton, QtCore.SIGNAL("clicked()"), self.onPointOnLineButton)
         self.constraintButtons.append(self.pointOnLineButton)
         #-------------------------------------
         self.pointOnPlaneButton = QtGui.QPushButton(self.panel1)
@@ -72,6 +76,7 @@ class a2p_ConstraintPanel(QtGui.QWidget):
         self.pointOnPlaneButton.setIcon(QtGui.QIcon(':/icons/a2p_PointOnPlaneConstraint.svg'))
         self.pointOnPlaneButton.setToolTip("pointOnPlaneConstraint")
         self.pointOnPlaneButton.setText("")
+        QtCore.QObject.connect(self.pointOnPlaneButton, QtCore.SIGNAL("clicked()"), self.onPointOnPlaneButton)
         self.constraintButtons.append(self.pointOnPlaneButton)
         #-------------------------------------
         panel1_Layout.addWidget(self.pointLabel)
@@ -96,6 +101,7 @@ class a2p_ConstraintPanel(QtGui.QWidget):
         self.circularEdgeButton.setIcon(QtGui.QIcon(':/icons/a2p_CircularEdgeConstraint.svg'))
         self.circularEdgeButton.setToolTip("circularEdgeConstraint")
         self.circularEdgeButton.setText("")
+        QtCore.QObject.connect(self.circularEdgeButton, QtCore.SIGNAL("clicked()"), self.onCircularEdgeButton)
         self.constraintButtons.append(self.circularEdgeButton)
         #-------------------------------------
         self.axialButton = QtGui.QPushButton(self.panel2)
@@ -103,6 +109,7 @@ class a2p_ConstraintPanel(QtGui.QWidget):
         self.axialButton.setIcon(QtGui.QIcon(':/icons/a2p_AxialConstraint.svg'))
         self.axialButton.setToolTip("axialCoincidentConstraint")
         self.axialButton.setText("")
+        QtCore.QObject.connect(self.axialButton, QtCore.SIGNAL("clicked()"), self.onAxialButton)
         self.constraintButtons.append(self.axialButton)
         #-------------------------------------
         self.axisParallelButton = QtGui.QPushButton(self.panel2)
@@ -110,6 +117,7 @@ class a2p_ConstraintPanel(QtGui.QWidget):
         self.axisParallelButton.setIcon(QtGui.QIcon(':/icons/a2p_AxisParallelConstraint.svg'))
         self.axisParallelButton.setToolTip("axisParallelConstraint")
         self.axisParallelButton.setText("")
+        QtCore.QObject.connect(self.axisParallelButton, QtCore.SIGNAL("clicked()"), self.onAxisParallelButton)
         self.constraintButtons.append(self.axisParallelButton)
         #-------------------------------------
         self.axisPlaneParallelButton = QtGui.QPushButton(self.panel2)
@@ -117,6 +125,7 @@ class a2p_ConstraintPanel(QtGui.QWidget):
         self.axisPlaneParallelButton.setIcon(QtGui.QIcon(':/icons/a2p_AxisPlaneParallelConstraint.svg'))
         self.axisPlaneParallelButton.setToolTip("axisPlaneParallelConstraint")
         self.axisPlaneParallelButton.setText("")
+        QtCore.QObject.connect(self.axisPlaneParallelButton, QtCore.SIGNAL("clicked()"), self.onAxisPlaneParallelButton)
         self.constraintButtons.append(self.axisPlaneParallelButton)
         #-------------------------------------
         panel2_Layout.addWidget(self.axisLabel)
@@ -142,6 +151,7 @@ class a2p_ConstraintPanel(QtGui.QWidget):
         self.planesParallelButton.setIcon(QtGui.QIcon(':/icons/a2p_PlanesParallelConstraint.svg'))
         self.planesParallelButton.setToolTip("planesParallelConstraint")
         self.planesParallelButton.setText("")
+        QtCore.QObject.connect(self.planesParallelButton, QtCore.SIGNAL("clicked()"), self.onPlanesParallelButton)
         self.constraintButtons.append(self.planesParallelButton)
         #-------------------------------------
         self.planeCoincidentButton = QtGui.QPushButton(self.panel3)
@@ -149,6 +159,7 @@ class a2p_ConstraintPanel(QtGui.QWidget):
         self.planeCoincidentButton.setIcon(QtGui.QIcon(':/icons/a2p_PlaneCoincidentConstraint.svg'))
         self.planeCoincidentButton.setToolTip("planesCoincidentConstraint")
         self.planeCoincidentButton.setText("")
+        QtCore.QObject.connect(self.planeCoincidentButton, QtCore.SIGNAL("clicked()"), self.onPlaneCoincidentButton)
         self.constraintButtons.append(self.planeCoincidentButton)
         #-------------------------------------
         self.angledPlanesButton = QtGui.QPushButton(self.panel3)
@@ -156,6 +167,7 @@ class a2p_ConstraintPanel(QtGui.QWidget):
         self.angledPlanesButton.setIcon(QtGui.QIcon(':/icons/a2p_AngleConstraint.svg'))
         self.angledPlanesButton.setToolTip("angledPlanesConstraint")
         self.angledPlanesButton.setText("")
+        QtCore.QObject.connect(self.angledPlanesButton, QtCore.SIGNAL("clicked()"), self.onAngledPlanesButton)
         self.constraintButtons.append(self.angledPlanesButton)
         #-------------------------------------
         panel3_Layout.addWidget(self.planesLabel)
@@ -201,9 +213,9 @@ class a2p_ConstraintPanel(QtGui.QWidget):
         #-------------------------------------
         QtCore.QObject.connect(self.solveButton, QtCore.SIGNAL("clicked()"), self.solve)
         
+        
     def parseSelections(self):
         selection = FreeCADGui.Selection.getSelectionEx()
-        validSelection = False
         if len(selection) != 2:
             for btn in self.constraintButtons:
                 btn.setEnabled(False)
@@ -214,47 +226,79 @@ class a2p_ConstraintPanel(QtGui.QWidget):
                 if vertexSelected(s1):
                     if vertexSelected(s2):
                         self.pointIdentityButton.setEnabled(True)
-                        validSelection = True
                     elif LinearEdgeSelected(s2):
                         self.pointOnLineButton.setEnabled(True)
-                        validSelection = True
                     elif planeSelected(s2):
                         self.pointOnPlaneButton.setEnabled(True)
-                        validSelection = True
                 #=============================
                 elif LinearEdgeSelected(s1) or cylindricalPlaneSelected(s1):
                     if LinearEdgeSelected(s2) or cylindricalPlaneSelected(s2):
                         self.axisParallelButton.setEnabled(True)
                         self.axialButton.setEnabled(True) #
-                        validSelection = True
                     elif planeSelected(s2):
                         self.axisPlaneParallelButton.setEnabled(True)
-                        validSelection = True
                 #=============================
                 elif CircularEdgeSelected(s1):
                     if planeSelected(s2):
                         self.pointOnPlaneButton.setEnabled(True)
-                        validSelection = True
                     elif CircularEdgeSelected(s2):
                         self.circularEdgeButton.setEnabled(True)
-                        validSelection = True
                 #=============================
                 elif planeSelected(s1):
                     if planeSelected(s2):
                         self.planesParallelButton.setEnabled(True)
                         self.planeCoincidentButton.setEnabled(True)
                         self.angledPlanesButton.setEnabled(True)
-                        validSelection = True
                 #=============================
-        if validSelection:
+        if self.activeConstraint:
             self.solveButton.setEnabled(True)
         else:
             self.solveButton.setEnabled(False)
         self.selectionTimer.start(100)
 
 
+    def onPointIdentityButton(self):
+        selection = FreeCADGui.Selection.getSelectionEx()
+        self.activeConstraint = a2p_constraints.PointIdentityConstraint(selection)
         
+    def onPointOnLineButton(self):
+        selection = FreeCADGui.Selection.getSelectionEx()
+        self.activeConstraint = a2p_constraints.PointOnLineConstraint(selection)
+
+    def onPointOnPlaneButton(self):
+        selection = FreeCADGui.Selection.getSelectionEx()
+        self.activeConstraint = a2p_constraints.PointOnPlaneConstraint(selection)
+        
+    def onCircularEdgeButton(self):
+        selection = FreeCADGui.Selection.getSelectionEx()
+        self.activeConstraint = a2p_constraints.CircularEdgeConstraint(selection)
+
+    def onAxialButton(self):
+        selection = FreeCADGui.Selection.getSelectionEx()
+        self.activeConstraint = a2p_constraints.AxialConstraint(selection)
+
+    def onAxisParallelButton(self):
+        selection = FreeCADGui.Selection.getSelectionEx()
+        self.activeConstraint = a2p_constraints.AxisParallelConstraint(selection)
+
+    def onAxisPlaneParallelButton(self):
+        selection = FreeCADGui.Selection.getSelectionEx()
+        self.activeConstraint = a2p_constraints.AxisPlaneParallelConstraint(selection)
+
+    def onPlanesParallelButton(self):
+        selection = FreeCADGui.Selection.getSelectionEx()
+        self.activeConstraint = a2p_constraints.PlanesParallelConstraint(selection)
+
+    def onPlaneCoincidentButton(self):
+        selection = FreeCADGui.Selection.getSelectionEx()
+        self.activeConstraint = a2p_constraints.PlaneConstraint(selection)
+
+    def onAngledPlanesButton(self):
+        selection = FreeCADGui.Selection.getSelectionEx()
+        self.activeConstraint = a2p_constraints.AngledPlanesConstraint(selection)
+
     def solve(self):
+        self.activeConstraint = None
         doc = FreeCAD.activeDocument()
         if doc != None:
             solveConstraints(doc)
