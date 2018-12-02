@@ -35,6 +35,11 @@ import a2p_constraints
 
 #==============================================================================
 class a2p_ConstraintValueWidget(QtGui.QWidget):
+
+    Canceled = QtCore.Signal()
+    Acceoted = QtCore.Signal()
+
+    
     def __init__(self,constraintObject):
         super(a2p_ConstraintValueWidget,self).__init__()
         self.constraintObject = constraintObject # The documentObject of a constraint!
@@ -113,8 +118,52 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             self.mainLayout.addWidget(self.lockRotationCombo,self.lineNo,1)
             self.lineNo += 1
         
+        #==============================
+        self.buttonPanel = QtGui.QWidget(self)
+        self.buttonPanelLayout = QtGui.QHBoxLayout()
+        
+        self.cancelButton = QtGui.QPushButton(self.buttonPanel)
+        self.cancelButton.setFixedHeight(32)
+        self.cancelButton.setIcon(QtGui.QIcon(':/icons/a2p_DeleteConnections.svg')) #need new Icon
+        self.cancelButton.setToolTip("delete this constraint")
+        self.cancelButton.setText("Cancel")
+        
+        self.solveButton = QtGui.QPushButton(self.buttonPanel)
+        self.solveButton.setFixedHeight(32)
+        self.solveButton.setIcon(QtGui.QIcon(':/icons/a2p_solver.svg'))
+        self.solveButton.setToolTip("solve Constraints")
+        self.solveButton.setText("Solve")
+        
+        self.acceptButton = QtGui.QPushButton(self.buttonPanel)
+        self.acceptButton.setFixedHeight(32)
+        self.acceptButton.setIcon(QtGui.QIcon(':/icons/a2p_checkAssembly.svg')) #need new Icon
+        self.acceptButton.setToolTip("solve Constraints")
+        self.acceptButton.setText("Accept")
+        
+        self.buttonPanelLayout.addWidget(self.cancelButton)
+        self.buttonPanelLayout.addWidget(self.solveButton)
+        self.buttonPanelLayout.addWidget(self.acceptButton)
+        self.buttonPanel.setLayout(self.buttonPanelLayout)
+        
+        self.mainLayout.addWidget(self.buttonPanel,self.lineNo,0,1,2)
+        self.lineNo += 1
 
+        #==============================
         self.setLayout(self.mainLayout)
+        QtCore.QObject.connect(self.cancelButton, QtCore.SIGNAL("clicked()"), self.cancel)
+        QtCore.QObject.connect(self.solveButton, QtCore.SIGNAL("clicked()"), self.solve)
+        QtCore.QObject.connect(self.acceptButton, QtCore.SIGNAL("clicked()"), self.accept)
+        
+    def solve(self):
+        doc = FreeCAD.activeDocument()
+        if doc != None:
+            solveConstraints(doc)
+            
+    def cancel(self):
+        self.Canceled.emit()
+        
+    def accept(self):
+        self.Accepted.emit()
         
 #==============================================================================
 class a2p_ConstraintPanel(QtGui.QWidget):
@@ -263,27 +312,9 @@ class a2p_ConstraintPanel(QtGui.QWidget):
 
 
         #-------------------------------------
-        self.finalPanel = QtGui.QWidget(self)
-        self.finalPanel.setMinimumHeight(40)
-        finalPanel_Layout = QtGui.QHBoxLayout()
-        #-------------------------------------
-        self.solveButton = QtGui.QPushButton(self.finalPanel)
-        self.solveButton.setFixedSize(32,32)
-        self.solveButton.setIcon(QtGui.QIcon(':/icons/a2p_solver.svg'))
-        self.solveButton.setToolTip("solve Constraints")
-        self.solveButton.setText("")
-        #-------------------------------------
-        finalPanel_Layout.addStretch(1)
-        finalPanel_Layout.addWidget(self.solveButton)
-        self.finalPanel.setLayout(finalPanel_Layout)
-        #-------------------------------------
-        
-        #-------------------------------------
         self.mainLayout.addWidget(self.panel1)
         self.mainLayout.addWidget(self.panel2)
         self.mainLayout.addWidget(self.panel3)
-        self.mainLayout.addStretch(1)
-        self.mainLayout.addWidget(self.finalPanel)
         self.setLayout(self.mainLayout)       
         #-------------------------------------
         
@@ -292,13 +323,14 @@ class a2p_ConstraintPanel(QtGui.QWidget):
         QtCore.QObject.connect(self.selectionTimer, QtCore.SIGNAL("timeout()"), self.parseSelections)
         self.selectionTimer.start(100)
         
-        #-------------------------------------
-        QtCore.QObject.connect(self.solveButton, QtCore.SIGNAL("clicked()"), self.solve)
         
         
     def parseSelections(self):
         selection = FreeCADGui.Selection.getSelectionEx()
         if len(selection) != 2:
+            for btn in self.constraintButtons:
+                btn.setEnabled(False)
+        elif self.activeConstraint != None:
             for btn in self.constraintButtons:
                 btn.setEnabled(False)
         else:
@@ -332,10 +364,6 @@ class a2p_ConstraintPanel(QtGui.QWidget):
                         self.planeCoincidentButton.setEnabled(True)
                         self.angledPlanesButton.setEnabled(True)
                 #=============================
-        if self.activeConstraint:
-            self.solveButton.setEnabled(True)
-        else:
-            self.solveButton.setEnabled(False)
         self.selectionTimer.start(100)
 
     def manageConstraint(self):
@@ -347,6 +375,19 @@ class a2p_ConstraintPanel(QtGui.QWidget):
             self.activeConstraint.constraintObject
             )
         self.mainLayout.addWidget(self.constraintValueBox)
+        QtCore.QObject.connect(self.constraintValueBox, QtCore.SIGNAL("Canceled()"), self.onCancelConstraint)
+        QtCore.QObject.connect(self.constraintValueBox, QtCore.SIGNAL("Accepted()"), self.onAcceptConstraint)
+        
+    def onAcceptConstraint(self):
+        self.constraintValueBox.deleteLater()
+        self.activeConstraint = None
+        FreeCADGui.Selection.clearSelection()
+
+    def onCancelConstraint(self):
+        self.constraintValueBox.deleteLater()
+        removeConstraint(self.activeConstraint.constraintObject)
+        self.activeConstraint = None
+        FreeCADGui.Selection.clearSelection()
 
     def onPointIdentityButton(self):
         selection = FreeCADGui.Selection.getSelectionEx()
@@ -398,13 +439,6 @@ class a2p_ConstraintPanel(QtGui.QWidget):
         self.activeConstraint = a2p_constraints.AngledPlanesConstraint(selection)
         self.manageConstraint()
 
-    def solve(self):
-        self.activeConstraint = None
-        doc = FreeCAD.activeDocument()
-        if doc != None:
-            solveConstraints(doc)
-        
-    
 #==============================================================================
 class a2p_ConstraintTaskDialog:
     '''
@@ -422,9 +456,9 @@ class a2p_ConstraintTaskDialog:
     def getStandardButtons(self):
         retVal = (
             #0x02000000 + # Apply
-            0x00400000 + # Cancel
-            0x00200000 + # Close
-            0x00000400   # Ok
+            #0x00400000 + # Cancel
+            0x00200000 # Close
+            #0x00000400   # Ok
             )
         return retVal
 #==============================================================================
