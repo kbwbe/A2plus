@@ -23,7 +23,7 @@
 #***************************************************************************
 
 from a2plib import *
-from PySide import QtGui
+from PySide import QtGui, QtCore
 import math
 from a2p_viewProviderProxies import *
 

@@ -34,6 +34,89 @@ import a2p_constraints
 
 
 #==============================================================================
+class a2p_ConstraintValueWidget(QtGui.QWidget):
+    def __init__(self,constraintObject):
+        super(a2p_ConstraintValueWidget,self).__init__()
+        self.constraintObject = constraintObject # The documentObject of a constraint!
+        self.lineNo = 0
+        self.initUI()
+
+    def initUI(self):
+        
+        self.setMinimumHeight(100)
+        self.mainLayout = QtGui.QGridLayout() # a VBoxLayout for the whole form
+        
+        #==============================
+        lbl1 = QtGui.QLabel(self)
+        lbl1.setText(self.constraintObject.Label)
+        lbl1.setFrameStyle(
+            QtGui.QFrame.Panel | 
+            QtGui.QFrame.Sunken
+            )
+        self.mainLayout.addWidget(lbl1,self.lineNo,0,1,2)
+        self.lineNo += 1
+        
+        #==============================
+        if hasattr(self.constraintObject,"directionConstraint"):   
+            lbl3 = QtGui.QLabel(self)
+            lbl3.setText("Direction")
+            self.mainLayout.addWidget(lbl3,self.lineNo,0)
+            
+            self.directionCombo = QtGui.QComboBox(self)
+            self.directionCombo.insertItem(0,"aligned")
+            self.directionCombo.insertItem(1,"opposed")
+            d = self.constraintObject.directionConstraint # not every constraint has a direction
+            if d == "aligned":
+                self.directionCombo.setCurrentIndex(0)
+            elif d == "opposed":
+                self.directionCombo.setCurrentIndex(1)
+            self.mainLayout.addWidget(self.directionCombo,self.lineNo,1)
+            self.lineNo += 1
+        
+        #==============================
+        if hasattr(self.constraintObject,"offset"):   
+            offs = self.constraintObject.offset    
+            lbl4 = QtGui.QLabel(self)
+            lbl4.setText("Offset")
+            self.mainLayout.addWidget(lbl4,self.lineNo,0)
+            
+            self.offsetEdit = QtGui.QLineEdit(self)
+            self.offsetEdit.setText("{}".format(offs))
+            self.mainLayout.addWidget(self.offsetEdit,self.lineNo,1)
+            self.lineNo += 1
+            
+        #==============================
+        if hasattr(self.constraintObject,"angle"):   
+            angle = self.constraintObject.angle    
+            lbl5 = QtGui.QLabel(self)
+            lbl5.setText("Angle")
+            self.mainLayout.addWidget(lbl5,self.lineNo,0)
+            
+            self.angleEdit = QtGui.QLineEdit(self)
+            self.angleEdit.setText("{}".format(angle))
+            self.mainLayout.addWidget(self.angleEdit,self.lineNo,1)
+            self.lineNo += 1
+            
+        #==============================
+        if hasattr(self.constraintObject,"lockRotation"):   
+            lbl6 = QtGui.QLabel(self)
+            lbl6.setText("lockRotation")
+            self.mainLayout.addWidget(lbl6,self.lineNo,0)
+            
+            self.lockRotationCombo = QtGui.QComboBox(self)
+            self.lockRotationCombo.insertItem(0,"False")
+            self.lockRotationCombo.insertItem(1,"True")
+            if self.constraintObject.lockRotation: # not every constraint has a direction
+                self.lockRotationCombo.setCurrentIndex(1)
+            else:
+                self.lockRotationCombo.setCurrentIndex(0)
+            self.mainLayout.addWidget(self.lockRotationCombo,self.lineNo,1)
+            self.lineNo += 1
+        
+
+        self.setLayout(self.mainLayout)
+        
+#==============================================================================
 class a2p_ConstraintPanel(QtGui.QWidget):
     def __init__(self):
         super(a2p_ConstraintPanel,self).__init__()
@@ -45,7 +128,7 @@ class a2p_ConstraintPanel(QtGui.QWidget):
         self.setWindowTitle('Create constraints')
         self.setMinimumHeight(300)
         
-        mainLayout = QtGui.QVBoxLayout() # a VBoxLayout for the whole form
+        self.mainLayout = QtGui.QVBoxLayout() # a VBoxLayout for the whole form
         
         #-------------------------------------
         self.panel1 = QtGui.QWidget(self)
@@ -179,7 +262,6 @@ class a2p_ConstraintPanel(QtGui.QWidget):
         #-------------------------------------
 
 
-        
         #-------------------------------------
         self.finalPanel = QtGui.QWidget(self)
         self.finalPanel.setMinimumHeight(40)
@@ -197,12 +279,12 @@ class a2p_ConstraintPanel(QtGui.QWidget):
         #-------------------------------------
         
         #-------------------------------------
-        mainLayout.addWidget(self.panel1)
-        mainLayout.addWidget(self.panel2)
-        mainLayout.addWidget(self.panel3)
-        mainLayout.addStretch(1)
-        mainLayout.addWidget(self.finalPanel)
-        self.setLayout(mainLayout)       
+        self.mainLayout.addWidget(self.panel1)
+        self.mainLayout.addWidget(self.panel2)
+        self.mainLayout.addWidget(self.panel3)
+        self.mainLayout.addStretch(1)
+        self.mainLayout.addWidget(self.finalPanel)
+        self.setLayout(self.mainLayout)       
         #-------------------------------------
         
         #-------------------------------------
@@ -256,46 +338,65 @@ class a2p_ConstraintPanel(QtGui.QWidget):
             self.solveButton.setEnabled(False)
         self.selectionTimer.start(100)
 
+    def manageConstraint(self):
+        try:
+            self.constraintValueBox.deleteLater()
+        except:
+            pass
+        self.constraintValueBox = a2p_ConstraintValueWidget(
+            self.activeConstraint.constraintObject
+            )
+        self.mainLayout.addWidget(self.constraintValueBox)
 
     def onPointIdentityButton(self):
         selection = FreeCADGui.Selection.getSelectionEx()
         self.activeConstraint = a2p_constraints.PointIdentityConstraint(selection)
+        self.manageConstraint()
         
     def onPointOnLineButton(self):
         selection = FreeCADGui.Selection.getSelectionEx()
         self.activeConstraint = a2p_constraints.PointOnLineConstraint(selection)
+        self.manageConstraint()
 
     def onPointOnPlaneButton(self):
         selection = FreeCADGui.Selection.getSelectionEx()
         self.activeConstraint = a2p_constraints.PointOnPlaneConstraint(selection)
+        self.manageConstraint()
         
     def onCircularEdgeButton(self):
         selection = FreeCADGui.Selection.getSelectionEx()
         self.activeConstraint = a2p_constraints.CircularEdgeConstraint(selection)
+        self.manageConstraint()
 
     def onAxialButton(self):
         selection = FreeCADGui.Selection.getSelectionEx()
         self.activeConstraint = a2p_constraints.AxialConstraint(selection)
+        self.manageConstraint()
 
     def onAxisParallelButton(self):
         selection = FreeCADGui.Selection.getSelectionEx()
         self.activeConstraint = a2p_constraints.AxisParallelConstraint(selection)
+        self.manageConstraint()
 
     def onAxisPlaneParallelButton(self):
         selection = FreeCADGui.Selection.getSelectionEx()
         self.activeConstraint = a2p_constraints.AxisPlaneParallelConstraint(selection)
+        self.manageConstraint()
 
     def onPlanesParallelButton(self):
         selection = FreeCADGui.Selection.getSelectionEx()
         self.activeConstraint = a2p_constraints.PlanesParallelConstraint(selection)
+        self.manageConstraint()
 
     def onPlaneCoincidentButton(self):
         selection = FreeCADGui.Selection.getSelectionEx()
         self.activeConstraint = a2p_constraints.PlaneConstraint(selection)
+        self.manageConstraint()
 
     def onAngledPlanesButton(self):
         selection = FreeCADGui.Selection.getSelectionEx()
         self.activeConstraint = a2p_constraints.AngledPlanesConstraint(selection)
+        self.manageConstraint()
 
     def solve(self):
         self.activeConstraint = None
