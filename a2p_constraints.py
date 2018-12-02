@@ -143,7 +143,7 @@ class PointIdentityConstraint(BasicConstraint):
         pass
 
     @staticmethod
-    def getToolTip(self):
+    def getToolTip():
         return \
 '''
 Add PointIdentity Constraint:
@@ -164,7 +164,7 @@ class PointOnLineConstraint(BasicConstraint):
         pass
 
     @staticmethod
-    def getToolTip(self):
+    def getToolTip():
         return \
 '''
 Add a PointOnLine constraint between two objects
@@ -192,7 +192,7 @@ class PointOnPlaneConstraint(BasicConstraint):
         self.offset = delta.dot(planeNormal)
 
     @staticmethod
-    def getToolTip(self):
+    def getToolTip():
         return \
 '''
 Add a Point on Plane constraint between two objects
@@ -223,7 +223,7 @@ class CircularEdgeConstraint(BasicConstraint):
         self.lockRotation = False
 
     @staticmethod
-    def getToolTip(self):
+    def getToolTip():
         return \
 '''
 Add a circular edge constraint between two parts
@@ -252,7 +252,7 @@ class AxialConstraint(BasicConstraint):
         self.lockRotation = False
 
     @staticmethod
-    def getToolTip(self):
+    def getToolTip():
         return \
 '''
 Add an axialConstraint between two parts
@@ -284,7 +284,7 @@ class AxisParallelConstraint(BasicConstraint):
             self.direction = "opposed"
 
     @staticmethod
-    def getToolTip(self):
+    def getToolTip():
         return \
 '''
 Add an axisParallel constraint between two objects
@@ -309,7 +309,7 @@ class AxisPlaneParallelConstraint(BasicConstraint):
         pass
 
     @staticmethod
-    def getToolTip(self):
+    def getToolTip():
         return \
 '''
 Creates an axisPlaneParallel constraint.
@@ -343,7 +343,7 @@ class PlanesParallelConstraint(BasicConstraint):
             self.direction = "opposed"
 
     @staticmethod
-    def getToolTip(self):
+    def getToolTip():
         return \
 '''
 Add a planesParallel constraint between two objects
@@ -378,7 +378,7 @@ class PlaneConstraint(BasicConstraint):
         self.offset = 0.0
 
     @staticmethod
-    def getToolTip(self):
+    def getToolTip():
         return \
 '''
 Add a planeCoincident constraint between two objects
@@ -405,7 +405,7 @@ class AngledPlanesConstraint(BasicConstraint):
         self.angle = math.degrees(normal2.getAngle(normal1))
 
     @staticmethod
-    def getToolTip(self):
+    def getToolTip():
         return \
 '''
 Creates an angleBetweenPlanes constraint.
@@ -439,7 +439,7 @@ class SphericalConstraint(BasicConstraint):
         pass
 
     @staticmethod
-    def getToolTip(self):
+    def getToolTip():
         return \
 '''
 Add a spherical constraint between to objects
