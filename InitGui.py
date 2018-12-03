@@ -65,6 +65,7 @@ class a2pWorkbench (Workbench):
         import a2p_solversystem
         import a2p_MuxAssembly
         import a2p_partinformation
+        import a2p_constraintDialog
         import a2p_bom #bill of materials == partslist
 
         partCommands = [
@@ -76,6 +77,7 @@ class a2pWorkbench (Workbench):
             'a2p_editImportedPart',
             ]
         constraintCommands = [
+            'a2p_ConstraintDialogCommand',
             'a2p_PointIdentityConnectionCommand',
             'a2p_PointOnLineConstraintCommand',
             'a2p_PointOnPlaneConstraintCommand',
