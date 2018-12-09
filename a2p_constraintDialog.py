@@ -44,6 +44,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         super(a2p_ConstraintValueWidget,self).__init__()
         self.constraintObject = constraintObject # The documentObject of a constraint!
         self.lineNo = 0
+        self.neededHight = 0
         self.initUI()
 
     def initUI(self):
@@ -65,6 +66,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         if hasattr(self.constraintObject,"directionConstraint"):   
             lbl3 = QtGui.QLabel(self)
             lbl3.setText("Direction")
+            lbl3.setFixedHeight(32)
             self.mainLayout.addWidget(lbl3,self.lineNo,0)
             
             self.directionCombo = QtGui.QComboBox(self)
@@ -75,6 +77,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
                 self.directionCombo.setCurrentIndex(0)
             elif d == "opposed":
                 self.directionCombo.setCurrentIndex(1)
+            self.directionCombo.setFixedHeight(32)
             self.mainLayout.addWidget(self.directionCombo,self.lineNo,1)
             self.lineNo += 1
         
@@ -83,10 +86,13 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             offs = self.constraintObject.offset    
             lbl4 = QtGui.QLabel(self)
             lbl4.setText("Offset")
+            lbl4.setFixedHeight(32)
+            
             self.mainLayout.addWidget(lbl4,self.lineNo,0)
             
             self.offsetEdit = QtGui.QLineEdit(self)
             self.offsetEdit.setText("{}".format(offs.Value))
+            self.offsetEdit.setFixedHeight(32)
             self.mainLayout.addWidget(self.offsetEdit,self.lineNo,1)
             self.lineNo += 1
             
@@ -95,10 +101,12 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             angle = self.constraintObject.angle    
             lbl5 = QtGui.QLabel(self)
             lbl5.setText("Angle")
+            lbl5.setFixedHeight(32)
             self.mainLayout.addWidget(lbl5,self.lineNo,0)
             
             self.angleEdit = QtGui.QLineEdit(self)
             self.angleEdit.setText("{}".format(angle.Value))
+            self.angleEdit.setFixedHeight(32)
             self.mainLayout.addWidget(self.angleEdit,self.lineNo,1)
             self.lineNo += 1
             
@@ -106,6 +114,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         if hasattr(self.constraintObject,"lockRotation"):   
             lbl6 = QtGui.QLabel(self)
             lbl6.setText("lockRotation")
+            lbl6.setFixedHeight(32)
             self.mainLayout.addWidget(lbl6,self.lineNo,0)
             
             self.lockRotationCombo = QtGui.QComboBox(self)
@@ -115,10 +124,12 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
                 self.lockRotationCombo.setCurrentIndex(1)
             else:
                 self.lockRotationCombo.setCurrentIndex(0)
+            self.lockRotationCombo.setFixedHeight(32)
             self.mainLayout.addWidget(self.lockRotationCombo,self.lineNo,1)
             self.lineNo += 1
         
         #==============================
+        
         self.buttonPanel = QtGui.QWidget(self)
         self.buttonPanelLayout = QtGui.QHBoxLayout()
         
@@ -126,7 +137,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         self.cancelButton.setFixedHeight(32)
         self.cancelButton.setIcon(QtGui.QIcon(':/icons/a2p_DeleteConnections.svg')) #need new Icon
         self.cancelButton.setToolTip("delete this constraint")
-        self.cancelButton.setText("Cancel")
+        self.cancelButton.setText("Delete this constraint")
         
         self.solveButton = QtGui.QPushButton(self.buttonPanel)
         self.solveButton.setFixedHeight(32)
@@ -150,6 +161,8 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
 
         #==============================
         self.setLayout(self.mainLayout)
+        self.neededHight = (self.lineNo+1)*36 
+        self.setFixedHeight(self.neededHight)
         QtCore.QObject.connect(self.cancelButton, QtCore.SIGNAL("clicked()"), self.cancel)
         QtCore.QObject.connect(self.solveButton, QtCore.SIGNAL("clicked()"), self.solve)
         QtCore.QObject.connect(self.acceptButton, QtCore.SIGNAL("clicked()"), self.accept)
@@ -184,16 +197,17 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         self.Accepted.emit()
         
 #==============================================================================
-class a2p_ConstraintPanel(QtGui.QWidget):
-    def __init__(self):
-        super(a2p_ConstraintPanel,self).__init__()
+class a2p_ConstraintPanel(QtGui.QDialog):
+    def __init__(self,parent):
+        super(a2p_ConstraintPanel,self).__init__(parent)
         self.constraintButtons = []
         self.activeConstraint = None
+        self.baseHeight = 350
         self.initUI()
         
     def initUI(self):
-        self.setWindowTitle('Create constraints')
-        self.setMinimumHeight(300)
+        self.setWindowTitle('Constraint Tools')
+        self.setMinimumHeight(self.baseHeight)
         
         self.mainLayout = QtGui.QVBoxLayout() # a VBoxLayout for the whole form
         
@@ -202,10 +216,11 @@ class a2p_ConstraintPanel(QtGui.QWidget):
         self.helpText = \
 '''
 Start selecting geometry in 3D view:
-Order: 1) vertexes 2) edges 3) faces
-
 Suitable constraint buttons get
 activated !
+
+Please read constraint's tooltips for
+selection order
 '''
         self.helpPanel = QtGui.QLabel(self)
         self.helpPanel.setText(self.helpText)
@@ -213,7 +228,7 @@ activated !
             QtGui.QFrame.Panel | 
             QtGui.QFrame.Sunken
             )
-        self.helpPanel.setMinimumHeight(50)
+        self.helpPanel.setMinimumHeight(140)
         #-------------------------------------
         self.panel1 = QtGui.QWidget(self)
         self.panel1.setMinimumHeight(32)
@@ -432,17 +447,23 @@ activated !
         self.mainLayout.addWidget(self.constraintValueBox)
         QtCore.QObject.connect(self.constraintValueBox, QtCore.SIGNAL("Canceled()"), self.onCancelConstraint)
         QtCore.QObject.connect(self.constraintValueBox, QtCore.SIGNAL("Accepted()"), self.onAcceptConstraint)
+        self.setFixedHeight(self.baseHeight + self.constraintValueBox.neededHight)
+        self.updateGeometry()
         
     def onAcceptConstraint(self):
         self.constraintValueBox.deleteLater()
         self.activeConstraint = None
         FreeCADGui.Selection.clearSelection()
+        self.setFixedHeight(self.baseHeight)
+        self.updateGeometry()
 
     def onCancelConstraint(self):
         self.constraintValueBox.deleteLater()
         removeConstraint(self.activeConstraint.constraintObject)
         self.activeConstraint = None
         FreeCADGui.Selection.clearSelection()
+        self.setFixedHeight(self.baseHeight)
+        self.updateGeometry()
 
     def onPointIdentityButton(self):
         selection = FreeCADGui.Selection.getSelectionEx()
@@ -498,29 +519,12 @@ activated !
         selection = FreeCADGui.Selection.getSelectionEx()
         self.activeConstraint = a2p_constraints.SphericalConstraint(selection)
         self.manageConstraint()
-
-#==============================================================================
-class a2p_ConstraintTaskDialog:
-    '''
-    Form for definition of constraints
-    ''' 
-    def __init__(self):
-        self.form = a2p_ConstraintPanel()
         
-    def accept(self):
-        return True
-
+    @QtCore.Slot()    
     def reject(self):
-        return True
+        setActiveConstraintToolsDialog(None)
+        self.destroy()
 
-    def getStandardButtons(self):
-        retVal = (
-            #0x02000000 + # Apply
-            #0x00400000 + # Cancel
-            0x00200000 # Close
-            #0x00000400   # Ok
-            )
-        return retVal
 #==============================================================================
 toolTipText = \
 '''
@@ -530,9 +534,24 @@ define constraints
 
 class a2p_ConstraintDialogCommand:
     def Activated(self):
+        d = getActiveConstraintToolsDialog()
+        if d != None:
+            d.activateWindow()
+            return
+        mw = FreeCADGui.getMainWindow() 
+        d = a2p_ConstraintPanel(mw)
         
-        d = a2p_ConstraintTaskDialog()
-        FreeCADGui.Control.showDialog(d)
+        flags = (
+            QtCore.Qt.Window |
+            #QtCore.Qt.WindowMinimizeButtonHint |
+            #QtCore.Qt.WindowMaximizeButtonHint |
+            QtCore.Qt.WindowStaysOnTopHint |
+            QtCore.Qt.WindowCloseButtonHint
+            ) 
+        d.setWindowFlags(flags)       
+        d.show()
+        d.activateWindow()
+        setActiveConstraintToolsDialog(d)
 
     def GetResources(self):
         return {
