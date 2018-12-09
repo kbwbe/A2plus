@@ -691,6 +691,13 @@ FreeCADGui.addCommand('a2p_movePart', a2p_MovePartCommand())
 
 
 
+toolTipText = \
+'''
+delete all constraints
+of exact one selected
+part
+'''
+
 class DeleteConnectionsCommand:
     def Activated(self):
         selection = [s for s in FreeCADGui.Selection.getSelection() if s.Document == FreeCAD.ActiveDocument ]
@@ -721,6 +728,7 @@ class DeleteConnectionsCommand:
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_DeleteConnections.svg',
             'MenuText': 'delete constraints',
+            'ToolTip': toolTipText
             }
 FreeCADGui.addCommand('a2p_DeleteConnectionsCommand', DeleteConnectionsCommand())
 

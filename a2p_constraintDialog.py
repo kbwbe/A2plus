@@ -534,6 +534,7 @@ define constraints
 
 class a2p_ConstraintDialogCommand:
     def Activated(self):
+        FreeCADGui.Selection.clearSelection()
         d = getActiveConstraintToolsDialog()
         if d != None:
             d.activateWindow()
@@ -555,7 +556,7 @@ class a2p_ConstraintDialogCommand:
 
     def GetResources(self):
         return {
-             #'Pixmap' : ':/icons/a2p_PointIdentity.svg',
+             'Pixmap' : ':/icons/a2p_DefineConstraints.svg',
              'MenuText': 'Define constraints',
              'ToolTip': toolTipText
              }
