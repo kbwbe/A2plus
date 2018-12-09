@@ -65,7 +65,16 @@ A2P_DEBUG_LEVEL = A2P_DEBUG_NONE
 PARTIAL_SOLVE_STAGE1 = 1    #solve all rigid fully constrained to tempfixed rigid, enable only involved dep, then set them as tempfixed
 
 ACTIVE_CONSTRAINT_TOOLS_DIALOG = None #no ConstraintToolsDialog active
+CONSTRAINT_VIEWMODE = False
 
+#------------------------------------------------------------------------------
+def setConstraintViewMode(active):
+    global CONSTRAINT_VIEWMODE 
+    CONSTRAINT_VIEWMODE = active
+#------------------------------------------------------------------------------
+def getConstraintViewMode():
+    global CONSTRAINT_VIEWMODE 
+    return CONSTRAINT_VIEWMODE
 #------------------------------------------------------------------------------
 def setActiveConstraintToolsDialog(d):
     global ACTIVE_CONSTRAINT_TOOLS_DIALOG 

@@ -388,7 +388,10 @@ selection order
         
     def parseSelections(self):
         selection = FreeCADGui.Selection.getSelectionEx()
-        if len(selection) != 2:
+        if a2plib.getConstraintViewMode():
+            for btn in self.constraintButtons:
+                btn.setEnabled(False)
+        elif len(selection) != 2:
             for btn in self.constraintButtons:
                 btn.setEnabled(False)
         elif self.activeConstraint != None:

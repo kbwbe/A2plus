@@ -769,6 +769,7 @@ FreeCADGui.addCommand('a2p_ViewConnectionsCommand', ViewConnectionsCommand())
 class ViewConnectionsObserver:
     def __init__(self):
         self.ignoreClear = False
+        a2plib.setConstraintViewMode(True)
 
     def clearSelection(self, doc):
         if self.ignoreClear:
@@ -777,6 +778,7 @@ class ViewConnectionsObserver:
             if a2plib.isTransparencyEnabled():
                 a2plib.restoreTransparency()
                 FreeCADGui.Selection.removeObserver(self)
+                a2plib.setConstraintViewMode(False)
 
     def setSelection(self, doc):
         selected = a2plib.getSelectedConstraint()
