@@ -34,14 +34,14 @@ import a2p_constraints
 
 
 #==============================================================================
-class a2p_ConstraintValueWidget(QtGui.QWidget):
+class a2p_ConstraintValueWidget(QtGui.QDialog):
 
     Canceled = QtCore.Signal()
-    Acceoted = QtCore.Signal()
+    Accepted = QtCore.Signal()
 
     
-    def __init__(self,constraintObject):
-        super(a2p_ConstraintValueWidget,self).__init__()
+    def __init__(self,parent,constraintObject):
+        super(a2p_ConstraintValueWidget,self).__init__(parent=parent)
         self.constraintObject = constraintObject # The documentObject of a constraint!
         self.lineNo = 0
         self.neededHight = 0
@@ -440,33 +440,27 @@ selection order
         self.selectionTimer.start(100)
 
     def manageConstraint(self):
-        try:
-            self.constraintValueBox.deleteLater()
-        except:
-            pass
         self.constraintValueBox = a2p_ConstraintValueWidget(
+            self,
             self.activeConstraint.constraintObject
             )
-        self.mainLayout.addWidget(self.constraintValueBox)
         QtCore.QObject.connect(self.constraintValueBox, QtCore.SIGNAL("Canceled()"), self.onCancelConstraint)
         QtCore.QObject.connect(self.constraintValueBox, QtCore.SIGNAL("Accepted()"), self.onAcceptConstraint)
-        self.setFixedHeight(self.baseHeight + self.constraintValueBox.neededHight)
-        self.updateGeometry()
+        self.hide()
+        self.constraintValueBox.exec_()
         
     def onAcceptConstraint(self):
         self.constraintValueBox.deleteLater()
         self.activeConstraint = None
         FreeCADGui.Selection.clearSelection()
-        self.setFixedHeight(self.baseHeight)
-        self.updateGeometry()
+        self.show()
 
     def onCancelConstraint(self):
         self.constraintValueBox.deleteLater()
         removeConstraint(self.activeConstraint.constraintObject)
         self.activeConstraint = None
         FreeCADGui.Selection.clearSelection()
-        self.setFixedHeight(self.baseHeight)
-        self.updateGeometry()
+        self.show()
 
     def onPointIdentityButton(self):
         selection = FreeCADGui.Selection.getSelectionEx()
