@@ -24,7 +24,7 @@
 
 import FreeCAD, FreeCADGui, Part
 from PySide import QtGui, QtCore
-import os, sys
+import os, sys, math
 from a2p_viewProviderProxies import *
 from  FreeCAD import Base
 
@@ -59,7 +59,7 @@ class a2p_ConstraintValueWidget(QtGui.QDialog):
             QtGui.QFrame.Panel | 
             QtGui.QFrame.Sunken
             )
-        self.mainLayout.addWidget(lbl1,self.lineNo,0,1,2)
+        self.mainLayout.addWidget(lbl1,self.lineNo,0,1,4)
         self.lineNo += 1
         
         #==============================
@@ -79,6 +79,14 @@ class a2p_ConstraintValueWidget(QtGui.QDialog):
                 self.directionCombo.setCurrentIndex(1)
             self.directionCombo.setFixedHeight(32)
             self.mainLayout.addWidget(self.directionCombo,self.lineNo,1)
+            
+            self.flipDirectionButton = QtGui.QPushButton(self)
+            self.flipDirectionButton.setIcon(QtGui.QIcon(':/icons/a2p_flipConstraint.svg'))
+            self.flipDirectionButton.setText("Flip Dir.")
+            self.flipDirectionButton.setFixedHeight(32)
+            QtCore.QObject.connect(self.flipDirectionButton, QtCore.SIGNAL("clicked()"), self.flipDirection)
+            self.mainLayout.addWidget(self.flipDirectionButton,self.lineNo,2)
+            
             self.lineNo += 1
         
         #==============================
@@ -87,13 +95,25 @@ class a2p_ConstraintValueWidget(QtGui.QDialog):
             lbl4 = QtGui.QLabel(self)
             lbl4.setText("Offset")
             lbl4.setFixedHeight(32)
-            
             self.mainLayout.addWidget(lbl4,self.lineNo,0)
             
             self.offsetEdit = QtGui.QLineEdit(self)
             self.offsetEdit.setText("{}".format(offs.Value))
             self.offsetEdit.setFixedHeight(32)
             self.mainLayout.addWidget(self.offsetEdit,self.lineNo,1)
+
+            self.offsetSetZeroButton = QtGui.QPushButton(self)
+            self.offsetSetZeroButton.setText("Set Zero")
+            self.offsetSetZeroButton.setFixedHeight(32)
+            QtCore.QObject.connect(self.offsetSetZeroButton, QtCore.SIGNAL("clicked()"), self.setOffsetZero)
+            self.mainLayout.addWidget(self.offsetSetZeroButton,self.lineNo,2)
+            
+            self.flipOffsetSignButton = QtGui.QPushButton(self)
+            self.flipOffsetSignButton.setText("Flip sign")
+            self.flipOffsetSignButton.setFixedHeight(32)
+            QtCore.QObject.connect(self.flipOffsetSignButton, QtCore.SIGNAL("clicked()"), self.flipOffsetSign)
+            self.mainLayout.addWidget(self.flipOffsetSignButton,self.lineNo,3)
+            
             self.lineNo += 1
             
         #==============================
@@ -126,6 +146,14 @@ class a2p_ConstraintValueWidget(QtGui.QDialog):
                 self.lockRotationCombo.setCurrentIndex(0)
             self.lockRotationCombo.setFixedHeight(32)
             self.mainLayout.addWidget(self.lockRotationCombo,self.lineNo,1)
+            
+            self.flipLockRotationButton = QtGui.QPushButton(self)
+            self.flipLockRotationButton.setIcon(QtGui.QIcon(':/icons/a2p_lockRotation.svg'))
+            self.flipLockRotationButton.setText("Toggle")
+            self.flipLockRotationButton.setFixedHeight(32)
+            QtCore.QObject.connect(self.flipLockRotationButton, QtCore.SIGNAL("clicked()"), self.flipLockRotation)
+            self.mainLayout.addWidget(self.flipLockRotationButton,self.lineNo,2)
+            
             self.lineNo += 1
         
         #==============================
@@ -156,7 +184,7 @@ class a2p_ConstraintValueWidget(QtGui.QDialog):
         self.buttonPanelLayout.addWidget(self.acceptButton)
         self.buttonPanel.setLayout(self.buttonPanelLayout)
         
-        self.mainLayout.addWidget(self.buttonPanel,self.lineNo,0,1,2)
+        self.mainLayout.addWidget(self.buttonPanel,self.lineNo,0,1,4)
         self.lineNo += 1
 
         #==============================
@@ -188,6 +216,32 @@ class a2p_ConstraintValueWidget(QtGui.QDialog):
         doc = FreeCAD.activeDocument()
         if doc != None:
             solveConstraints(doc)
+            
+    def flipLockRotation(self):
+        if self.lockRotationCombo.currentIndex() == 0:
+            self.lockRotationCombo.setCurrentIndex(1)
+        else:
+            self.lockRotationCombo.setCurrentIndex(0)
+    
+    def setOffsetZero(self):
+        self.offsetEdit.setText("0.0")
+    
+    def flipOffsetSign(self):
+        try:
+            o = float(self.offsetEdit.text())
+            o = o * -1.0
+            if abs(o) > 1e-7:
+                self.offsetEdit.setText(str(o))
+            else:
+                self.offsetEdit.setText("0.0")
+        except:
+            self.offsetEdit.setText("0.0")
+            
+    def flipDirection(self):
+        if self.directionCombo.currentIndex() == 0:
+            self.directionCombo.setCurrentIndex(1)
+        else:
+            self.directionCombo.setCurrentIndex(0)
             
     def cancel(self):
         self.Canceled.emit()
