@@ -251,45 +251,36 @@ class a2p_ConstraintValueWidget(QtGui.QDialog):
         self.Accepted.emit()
         
 #==============================================================================
+toolTipText = \
+'''
+Select geometry to be constrained
+within 3D View !
+
+Suitable Constraint buttons will
+get activated.
+
+Please also read tooltips of each
+button.
+'''
+
 class a2p_ConstraintPanel(QtGui.QDialog):
     def __init__(self,parent):
-        super(a2p_ConstraintPanel,self).__init__(parent)
+        super(a2p_ConstraintPanel,self).__init__(parent=parent)
         self.constraintButtons = []
         self.activeConstraint = None
-        self.baseHeight = 350
+        #self.baseHeight = 350
         self.initUI()
         
     def initUI(self):
         self.setWindowTitle('Constraint Tools')
-        self.setMinimumHeight(self.baseHeight)
-        
+        #self.setMinimumHeight(self.baseHeight)
         self.mainLayout = QtGui.QVBoxLayout() # a VBoxLayout for the whole form
         
         
         #-------------------------------------
-        self.helpText = \
-'''
-Start selecting geometry in 3D view:
-Suitable constraint buttons get
-activated !
-
-Please read constraint's tooltips for
-selection order
-'''
-        self.helpPanel = QtGui.QLabel(self)
-        self.helpPanel.setText(self.helpText)
-        self.helpPanel.setFrameStyle(
-            QtGui.QFrame.Panel | 
-            QtGui.QFrame.Sunken
-            )
-        self.helpPanel.setMinimumHeight(140)
-        #-------------------------------------
         self.panel1 = QtGui.QWidget(self)
         self.panel1.setMinimumHeight(32)
         panel1_Layout = QtGui.QHBoxLayout()
-        #-------------------------------------
-        self.pointLabel = QtGui.QLabel('Point Constraints')
-        self.pointLabel.setMinimumWidth(145)
         #-------------------------------------
         self.pointIdentityButton = QtGui.QPushButton(self.panel1)
         self.pointIdentityButton.setFixedSize(32,32)
@@ -323,7 +314,6 @@ selection order
         QtCore.QObject.connect(self.sphericalConstraintButton, QtCore.SIGNAL("clicked()"), self.onSpericalConstraintButton)
         self.constraintButtons.append(self.sphericalConstraintButton)
         #-------------------------------------
-        panel1_Layout.addWidget(self.pointLabel)
         panel1_Layout.addWidget(self.pointIdentityButton)
         panel1_Layout.addWidget(self.pointOnLineButton)
         panel1_Layout.addWidget(self.pointOnPlaneButton)
@@ -337,9 +327,6 @@ selection order
         self.panel2 = QtGui.QWidget(self)
         self.panel2.setMinimumHeight(32)
         panel2_Layout = QtGui.QHBoxLayout()
-        #-------------------------------------
-        self.axisLabel = QtGui.QLabel('Axis Constraints')
-        self.axisLabel.setMinimumWidth(145)
         #-------------------------------------
         self.circularEdgeButton = QtGui.QPushButton(self.panel2)
         self.circularEdgeButton.setFixedSize(32,32)
@@ -373,7 +360,6 @@ selection order
         QtCore.QObject.connect(self.axisPlaneParallelButton, QtCore.SIGNAL("clicked()"), self.onAxisPlaneParallelButton)
         self.constraintButtons.append(self.axisPlaneParallelButton)
         #-------------------------------------
-        panel2_Layout.addWidget(self.axisLabel)
         panel2_Layout.addWidget(self.circularEdgeButton)
         panel2_Layout.addWidget(self.axialButton)
         panel2_Layout.addWidget(self.axisParallelButton)
@@ -387,9 +373,6 @@ selection order
         self.panel3 = QtGui.QWidget(self)
         self.panel3.setMinimumHeight(32)
         panel3_Layout = QtGui.QHBoxLayout()
-        #-------------------------------------
-        self.planesLabel = QtGui.QLabel('Plane Constraints')
-        self.planesLabel.setMinimumWidth(145)
         #-------------------------------------
         self.planesParallelButton = QtGui.QPushButton(self.panel3)
         self.planesParallelButton.setFixedSize(32,32)
@@ -415,7 +398,6 @@ selection order
         QtCore.QObject.connect(self.angledPlanesButton, QtCore.SIGNAL("clicked()"), self.onAngledPlanesButton)
         self.constraintButtons.append(self.angledPlanesButton)
         #-------------------------------------
-        panel3_Layout.addWidget(self.planesLabel)
         panel3_Layout.addWidget(self.planesParallelButton)
         panel3_Layout.addWidget(self.planeCoincidentButton)
         panel3_Layout.addWidget(self.angledPlanesButton)
@@ -423,29 +405,46 @@ selection order
         self.panel3.setLayout(panel3_Layout)
         #-------------------------------------
 
+        self.helpButton = QtGui.QPushButton(self)
+        self.helpButton.setText('Help')
+        self.helpButton.setFixedSize(150,32)
+        QtCore.QObject.connect(self.helpButton, QtCore.SIGNAL("clicked()"), self.showConstraintDialogHelp)
 
         #-------------------------------------
-        self.mainLayout.addWidget(self.helpPanel)
         self.mainLayout.addWidget(self.panel1)
         self.mainLayout.addWidget(self.panel2)
         self.mainLayout.addWidget(self.panel3)
-        self.mainLayout.addStretch(1)
+        self.mainLayout.addWidget(self.helpButton)
         self.setLayout(self.mainLayout)       
         #-------------------------------------
-        
+        for btn in self.constraintButtons:
+            btn.setEnabled(False)
         #-------------------------------------
         self.selectionTimer = QtCore.QTimer()
         QtCore.QObject.connect(self.selectionTimer, QtCore.SIGNAL("timeout()"), self.parseSelections)
         self.selectionTimer.start(100)
         
-        
+    def showConstraintDialogHelp(self):
+        msg = \
+'''
+Select geometry to be constrained
+within 3D View !
+
+Suitable Constraint buttons will
+get activated.
+
+Please also read tooltips of each
+button.
+'''
+        QtGui.QMessageBox.information(
+            QtGui.QApplication.activeWindow(),
+            "Constraint tools help",
+            msg
+            )
         
     def parseSelections(self):
         selection = FreeCADGui.Selection.getSelectionEx()
-        if a2plib.getConstraintViewMode():
-            for btn in self.constraintButtons:
-                btn.setEnabled(False)
-        elif len(selection) != 2:
+        if len(selection) != 2:
             for btn in self.constraintButtons:
                 btn.setEnabled(False)
         elif self.activeConstraint != None:
@@ -573,7 +572,8 @@ selection order
         
     @QtCore.Slot()    
     def reject(self):
-        setActiveConstraintToolsDialog(None)
+        a2plib.setConstraintDialogRef(None)
+
         self.destroy()
 
 #==============================================================================
@@ -584,15 +584,16 @@ define constraints
 '''
 
 class a2p_ConstraintDialogCommand:
+    
     def Activated(self):
-        FreeCADGui.Selection.clearSelection()
-        d = getActiveConstraintToolsDialog()
+        #FreeCADGui.Selection.clearSelection()
+        d = a2plib.getConstraintDialogRef()
         if d != None:
+            d.show()
             d.activateWindow()
             return
         mw = FreeCADGui.getMainWindow() 
         d = a2p_ConstraintPanel(mw)
-        
         flags = (
             QtCore.Qt.Window |
             #QtCore.Qt.WindowMinimizeButtonHint |
@@ -603,7 +604,8 @@ class a2p_ConstraintDialogCommand:
         d.setWindowFlags(flags)       
         d.show()
         d.activateWindow()
-        setActiveConstraintToolsDialog(d)
+        a2plib.setConstraintDialogRef(d)
+        
 
     def GetResources(self):
         return {
