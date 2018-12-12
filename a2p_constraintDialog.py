@@ -36,7 +36,7 @@ import a2p_constraints
 #==============================================================================
 class a2p_ConstraintValueWidget(QtGui.QDialog):
 
-    Canceled = QtCore.Signal()
+    Deleted = QtCore.Signal()
     Accepted = QtCore.Signal()
 
     
@@ -48,7 +48,6 @@ class a2p_ConstraintValueWidget(QtGui.QDialog):
         self.initUI()
 
     def initUI(self):
-        
         self.setMinimumHeight(100)
         self.mainLayout = QtGui.QGridLayout() # a VBoxLayout for the whole form
         
@@ -161,11 +160,11 @@ class a2p_ConstraintValueWidget(QtGui.QDialog):
         self.buttonPanel = QtGui.QWidget(self)
         self.buttonPanelLayout = QtGui.QHBoxLayout()
         
-        self.cancelButton = QtGui.QPushButton(self.buttonPanel)
-        self.cancelButton.setFixedHeight(32)
-        self.cancelButton.setIcon(QtGui.QIcon(':/icons/a2p_DeleteConnections.svg')) #need new Icon
-        self.cancelButton.setToolTip("delete this constraint")
-        self.cancelButton.setText("Delete this constraint")
+        self.deleteButton = QtGui.QPushButton(self.buttonPanel)
+        self.deleteButton.setFixedHeight(32)
+        self.deleteButton.setIcon(QtGui.QIcon(':/icons/a2p_DeleteConnections.svg')) #need new Icon
+        self.deleteButton.setToolTip("delete this constraint")
+        self.deleteButton.setText("Delete this constraint")
         
         self.solveButton = QtGui.QPushButton(self.buttonPanel)
         self.solveButton.setFixedHeight(32)
@@ -179,7 +178,7 @@ class a2p_ConstraintValueWidget(QtGui.QDialog):
         self.acceptButton.setToolTip("solve Constraints")
         self.acceptButton.setText("Accept")
         
-        self.buttonPanelLayout.addWidget(self.cancelButton)
+        self.buttonPanelLayout.addWidget(self.deleteButton)
         self.buttonPanelLayout.addWidget(self.solveButton)
         self.buttonPanelLayout.addWidget(self.acceptButton)
         self.buttonPanel.setLayout(self.buttonPanelLayout)
@@ -191,7 +190,7 @@ class a2p_ConstraintValueWidget(QtGui.QDialog):
         self.setLayout(self.mainLayout)
         self.neededHight = (self.lineNo+1)*36 
         self.setFixedHeight(self.neededHight)
-        QtCore.QObject.connect(self.cancelButton, QtCore.SIGNAL("clicked()"), self.cancel)
+        QtCore.QObject.connect(self.deleteButton, QtCore.SIGNAL("clicked()"), self.delete)
         QtCore.QObject.connect(self.solveButton, QtCore.SIGNAL("clicked()"), self.solve)
         QtCore.QObject.connect(self.acceptButton, QtCore.SIGNAL("clicked()"), self.accept)
         
@@ -243,8 +242,16 @@ class a2p_ConstraintValueWidget(QtGui.QDialog):
         else:
             self.directionCombo.setCurrentIndex(0)
             
-    def cancel(self):
-        self.Canceled.emit()
+    def delete(self):
+        flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
+        response = QtGui.QMessageBox.critical(
+            QtGui.QApplication.activeWindow(),
+            "Confirmation required",
+            "Really delete this constraint ?",
+            flags
+            )
+        if response == QtGui.QMessageBox.Yes:
+            self.Deleted.emit()
         
     def accept(self):
         self.setConstraintEditorData()
@@ -497,7 +504,7 @@ button.
             self,
             self.activeConstraint.constraintObject
             )
-        QtCore.QObject.connect(self.constraintValueBox, QtCore.SIGNAL("Canceled()"), self.onCancelConstraint)
+        QtCore.QObject.connect(self.constraintValueBox, QtCore.SIGNAL("Deleted()"), self.onDeleteConstraint)
         QtCore.QObject.connect(self.constraintValueBox, QtCore.SIGNAL("Accepted()"), self.onAcceptConstraint)
         self.hide()
         self.constraintValueBox.exec_()
@@ -508,7 +515,7 @@ button.
         FreeCADGui.Selection.clearSelection()
         self.show()
 
-    def onCancelConstraint(self):
+    def onDeleteConstraint(self):
         self.constraintValueBox.deleteLater()
         removeConstraint(self.activeConstraint.constraintObject)
         self.activeConstraint = None
@@ -581,6 +588,10 @@ toolTipText = \
 '''
 Open a dialog to
 define constraints
+
+Find all constraints
+within the opening
+dialog !
 '''
 
 class a2p_ConstraintDialogCommand:
@@ -618,7 +629,10 @@ FreeCADGui.addCommand('a2p_ConstraintDialogCommand', a2p_ConstraintDialogCommand
 #==============================================================================
 toolTipText = \
 '''
-Edit constraint's data
+Edit selected constraint
+
+Select a constraint in the
+treeview and hit this button
 '''
 
 class a2p_EditConstraintCommand:
@@ -637,7 +651,7 @@ class a2p_EditConstraintCommand:
             mw,
             self.selectedConstraint
             )
-        QtCore.QObject.connect(self.constraintValueBox, QtCore.SIGNAL("Canceled()"), self.onCancelConstraint)
+        QtCore.QObject.connect(self.constraintValueBox, QtCore.SIGNAL("Deleted()"), self.onDeleteConstraint)
         QtCore.QObject.connect(self.constraintValueBox, QtCore.SIGNAL("Accepted()"), self.onAcceptConstraint)
         self.constraintValueBox.exec_()
         
@@ -645,14 +659,14 @@ class a2p_EditConstraintCommand:
         self.constraintValueBox.deleteLater()
         FreeCADGui.Selection.clearSelection()
 
-    def onCancelConstraint(self):
+    def onDeleteConstraint(self):
         self.constraintValueBox.deleteLater()
         removeConstraint(self.selectedConstraint)
         FreeCADGui.Selection.clearSelection()
 
     def GetResources(self):
         return {
-             #'Pixmap' : ':/icons/a2p_DefineConstraints.svg',
+             'Pixmap' : ':/icons/a2p_EditConstraint.svg',
              'MenuText': 'Edit selected constraint',
              'ToolTip': toolTipText
              }
