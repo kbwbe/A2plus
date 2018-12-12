@@ -616,6 +616,49 @@ class a2p_ConstraintDialogCommand:
 
 FreeCADGui.addCommand('a2p_ConstraintDialogCommand', a2p_ConstraintDialogCommand())
 #==============================================================================
+toolTipText = \
+'''
+Edit constraint's data
+'''
+
+class a2p_EditConstraintCommand:
+    
+    def Activated(self):
+        self.selectedConstraint = a2plib.getSelectedConstraint()
+        if self.selectedConstraint is None:
+            QtGui.QMessageBox.information(
+                QtGui.QApplication.activeWindow(),
+                "Selection Error !",
+                "Please select a constraint first."
+                )
+            return
+        mw = FreeCADGui.getMainWindow() 
+        self.constraintValueBox = a2p_ConstraintValueWidget(
+            mw,
+            self.selectedConstraint
+            )
+        QtCore.QObject.connect(self.constraintValueBox, QtCore.SIGNAL("Canceled()"), self.onCancelConstraint)
+        QtCore.QObject.connect(self.constraintValueBox, QtCore.SIGNAL("Accepted()"), self.onAcceptConstraint)
+        self.constraintValueBox.exec_()
+        
+    def onAcceptConstraint(self):
+        self.constraintValueBox.deleteLater()
+        FreeCADGui.Selection.clearSelection()
+
+    def onCancelConstraint(self):
+        self.constraintValueBox.deleteLater()
+        removeConstraint(self.selectedConstraint)
+        FreeCADGui.Selection.clearSelection()
+
+    def GetResources(self):
+        return {
+             #'Pixmap' : ':/icons/a2p_DefineConstraints.svg',
+             'MenuText': 'Edit selected constraint',
+             'ToolTip': toolTipText
+             }
+
+FreeCADGui.addCommand('a2p_EditConstraintCommand', a2p_EditConstraintCommand())
+#==============================================================================
 
 
 

@@ -67,6 +67,7 @@ class a2pWorkbench (Workbench):
             ]
         constraintCommands = [
             'a2p_ConstraintDialogCommand',
+            'a2p_EditConstraintCommand',
             'a2p_DeleteConnectionsCommand',
             ]
         solverCommands = [
