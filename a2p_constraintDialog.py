@@ -511,6 +511,7 @@ button.
         self.hide()
         self.constraintValueBox.exec_()
         
+    @QtCore.Slot()    
     def onAcceptConstraint(self):
         self.constraintValueBox.deleteLater()
         self.activeConstraint = None
@@ -518,6 +519,7 @@ button.
         self.move(self.position)
         self.show()
 
+    @QtCore.Slot()    
     def onDeleteConstraint(self):
         self.constraintValueBox.deleteLater()
         removeConstraint(self.activeConstraint.constraintObject)
@@ -584,7 +586,6 @@ button.
     @QtCore.Slot()    
     def reject(self):
         a2plib.setConstraintDialogRef(None)
-
         self.destroy()
 
 #==============================================================================
