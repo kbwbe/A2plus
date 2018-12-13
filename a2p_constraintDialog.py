@@ -500,10 +500,12 @@ button.
         self.selectionTimer.start(100)
 
     def manageConstraint(self):
+        self.position = self.pos()
         self.constraintValueBox = a2p_ConstraintValueWidget(
             self,
             self.activeConstraint.constraintObject
             )
+        self.constraintValueBox.move(self.position)
         QtCore.QObject.connect(self.constraintValueBox, QtCore.SIGNAL("Deleted()"), self.onDeleteConstraint)
         QtCore.QObject.connect(self.constraintValueBox, QtCore.SIGNAL("Accepted()"), self.onAcceptConstraint)
         self.hide()
@@ -513,6 +515,7 @@ button.
         self.constraintValueBox.deleteLater()
         self.activeConstraint = None
         FreeCADGui.Selection.clearSelection()
+        self.move(self.position)
         self.show()
 
     def onDeleteConstraint(self):
@@ -520,6 +523,7 @@ button.
         removeConstraint(self.activeConstraint.constraintObject)
         self.activeConstraint = None
         FreeCADGui.Selection.clearSelection()
+        self.move(self.position)
         self.show()
 
     def onPointIdentityButton(self):
