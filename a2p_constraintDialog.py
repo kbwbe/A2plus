@@ -49,6 +49,7 @@ class a2p_ConstraintValueWidget(QtGui.QDialog):
 
     def initUI(self):
         self.setMinimumHeight(100)
+        self.setWindowTitle('Constraint properties')
         self.mainLayout = QtGui.QGridLayout() # a VBoxLayout for the whole form
         
         #==============================
@@ -72,10 +73,18 @@ class a2p_ConstraintValueWidget(QtGui.QDialog):
             self.directionCombo.insertItem(0,"aligned")
             self.directionCombo.insertItem(1,"opposed")
             d = self.constraintObject.directionConstraint # not every constraint has a direction
+            #
+            # for compat with old A2plus assemblies
+            if d == "none":
+                self.directionCombo.insertItem(2,"none")
+            #
             if d == "aligned":
                 self.directionCombo.setCurrentIndex(0)
             elif d == "opposed":
                 self.directionCombo.setCurrentIndex(1)
+            elif d == "none": # will only occur with old A2plus assemblies
+                self.directionCombo.setCurrentIndex(2)
+            #
             self.directionCombo.setFixedHeight(32)
             self.mainLayout.addWidget(self.directionCombo,self.lineNo,1)
             
@@ -198,8 +207,10 @@ class a2p_ConstraintValueWidget(QtGui.QDialog):
         if hasattr(self.constraintObject,"directionConstraint"):
             if self.directionCombo.currentIndex() == 0:
                 self.constraintObject.directionConstraint = "aligned"
-            else:
+            if self.directionCombo.currentIndex() == 1:
                 self.constraintObject.directionConstraint = "opposed"
+            else:
+                self.constraintObject.directionConstraint = "none"
         if hasattr(self.constraintObject,"offset"):
             self.constraintObject.offset = float(self.offsetEdit.text())
         if hasattr(self.constraintObject,"angle"):
