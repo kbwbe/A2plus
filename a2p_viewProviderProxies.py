@@ -67,6 +67,16 @@ class ImportedPartViewProviderProxy:
 
     def __setstate__(self, state):
         return None
+    
+    def getIcon(self):
+        if hasattr(self,"Object"):
+            if hasattr(self.Object,"subassemblyImport"):
+                if self.Object.subassemblyImport:
+                    return ":/icons/a2p_partialProcessing.svg" #Sorry,the name off an assmembly icon ATM...
+            if hasattr(self.Object,"sourceFile"):
+                if self.Object.sourceFile == 'converted':
+                    return ":/icons/a2p_ConvertPart.svg"
+        return ":/icons/a2p_ImportPart.svg"
 
     def attach(self, vobj):
         self.object_Name = vobj.Object.Name
