@@ -139,27 +139,6 @@ class PointIdentityConstraint(BasicConstraint):
         BasicConstraint.__init__(self, selection)
         self.typeInfo = 'pointIdentity'
         self.constraintBaseName = 'pointIdentity'
-        self.iconPath = ':/icons/a2p_PointOnLineConstraint.svg'
-        self.create(selection)
-        
-    def calcInitialValues(self):
-        pass
-
-    @staticmethod
-    def getToolTip():
-        return \
-'''
-Add PointIdentity Constraint:
-selection:
-1.) select a vertex on a part
-2.) select a vertex on another part
-'''
-#==============================================================================
-class PointOnLineConstraint(BasicConstraint):
-    def __init__(self,selection):
-        BasicConstraint.__init__(self, selection)
-        self.typeInfo = 'pointOnLine'
-        self.constraintBaseName = 'pointOnLine'
         self.iconPath = ':/icons/a2p_PointIdentity.svg'
         self.create(selection)
         
@@ -170,7 +149,28 @@ class PointOnLineConstraint(BasicConstraint):
     def getToolTip():
         return \
 '''
-Add a PointOnLine constraint between two objects
+Add a pointIdentity Constraint:
+selection:
+1.) select a vertex on a part
+2.) select a vertex on another part
+'''
+#==============================================================================
+class PointOnLineConstraint(BasicConstraint):
+    def __init__(self,selection):
+        BasicConstraint.__init__(self, selection)
+        self.typeInfo = 'pointOnLine'
+        self.constraintBaseName = 'pointOnLine'
+        self.iconPath = ':/icons/a2p_PointOnLineConstraint.svg'
+        self.create(selection)
+        
+    def calcInitialValues(self):
+        pass
+
+    @staticmethod
+    def getToolTip():
+        return \
+'''
+Add a pointOnLine constraint between two objects
 1.) select a vertex from a part
 2.) select a line (linear edge) on another part
 '''
@@ -198,7 +198,7 @@ class PointOnPlaneConstraint(BasicConstraint):
     def getToolTip():
         return \
 '''
-Add a Point on Plane constraint between two objects
+Add a pointOnPlane constraint between two objects
 1.) select a vertex or a center of a circle
 2.) select a plane on other part
 '''
@@ -207,7 +207,7 @@ class CircularEdgeConstraint(BasicConstraint):
     def __init__(self,selection):
         BasicConstraint.__init__(self, selection)
         self.typeInfo = 'circularEdge'
-        self.constraintBaseName = 'circularEdgeConstraint'
+        self.constraintBaseName = 'circularEdge'
         self.iconPath = ':/icons/a2p_CircularEdgeConstraint.svg'
         self.create(selection)
         
@@ -229,7 +229,7 @@ class CircularEdgeConstraint(BasicConstraint):
     def getToolTip():
         return \
 '''
-Add a circular edge constraint between two parts
+Add a circularEdge constraint between two parts
 selection-hint:
 1.) select circular edge on first importPart
 2.) select circular edge on other importPart
@@ -239,7 +239,7 @@ class AxialConstraint(BasicConstraint):
     def __init__(self,selection):
         BasicConstraint.__init__(self, selection)
         self.typeInfo = 'axial'
-        self.constraintBaseName = 'axialConstraint'
+        self.constraintBaseName = 'axisCoincident'
         self.iconPath = ':/icons/a2p_AxialConstraint.svg'
         self.create(selection)
         
@@ -258,7 +258,7 @@ class AxialConstraint(BasicConstraint):
     def getToolTip():
         return \
 '''
-Add an axialConstraint between two parts
+Add an axisCoincident constraint between two parts
 
 2 axis are aligned and be moved
 to be coincident
@@ -329,7 +329,7 @@ class PlanesParallelConstraint(BasicConstraint):
     def __init__(self,selection):
         BasicConstraint.__init__(self, selection)
         self.typeInfo = 'planeParallel'
-        self.constraintBaseName = 'planeParallel'
+        self.constraintBaseName = 'planesParallel'
         self.iconPath = ':/icons/a2p_PlanesParallelConstraint.svg'
         self.create(selection)
         
@@ -363,7 +363,7 @@ class PlaneConstraint(BasicConstraint):
     def __init__(self,selection):
         BasicConstraint.__init__(self, selection)
         self.typeInfo = 'plane'
-        self.constraintBaseName = 'planeConstraint'
+        self.constraintBaseName = 'planeCoincident'
         self.iconPath = ':/icons/a2p_PlaneCoincidentConstraint.svg'
         self.create(selection)
         
@@ -396,7 +396,7 @@ class AngledPlanesConstraint(BasicConstraint):
     def __init__(self,selection):
         BasicConstraint.__init__(self, selection)
         self.typeInfo = 'angledPlanes'
-        self.constraintBaseName = 'angledPlanesContraint'
+        self.constraintBaseName = 'angledPlanes'
         self.iconPath = ':/icons/a2p_AngleConstraint.svg'
         self.create(selection)
         
@@ -411,7 +411,7 @@ class AngledPlanesConstraint(BasicConstraint):
     def getToolTip():
         return \
 '''
-Creates an angleBetweenPlanes constraint.
+Creates an angledPlanes constraint.
 
 1) select first plane object
 2) select second plane object on another part
@@ -434,7 +434,7 @@ class SphericalConstraint(BasicConstraint):
     def __init__(self,selection):
         BasicConstraint.__init__(self, selection)
         self.typeInfo = 'sphereCenterIdent'
-        self.constraintBaseName = 'sphericalConstraint'
+        self.constraintBaseName = 'sphereCenterIdent'
         self.iconPath = ':/icons/a2p_SphericalSurfaceConstraint.svg'
         self.create(selection)
         
@@ -445,7 +445,7 @@ class SphericalConstraint(BasicConstraint):
     def getToolTip():
         return \
 '''
-Add a spherical constraint between to objects
+Add a sphereCenterIdent constraint between to objects
 
 Selection options:
 - spherical surface or vertex on a part
