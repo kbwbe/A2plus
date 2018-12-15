@@ -524,7 +524,14 @@ button.
         QtCore.QObject.connect(self.constraintValueBox, QtCore.SIGNAL("Deleted()"), self.onDeleteConstraint)
         QtCore.QObject.connect(self.constraintValueBox, QtCore.SIGNAL("Accepted()"), self.onAcceptConstraint)
         self.hide()
-        self.constraintValueBox.exec_()
+        #self.constraintValueBox.exec_()
+        flags = (
+            QtCore.Qt.Window |
+            QtCore.Qt.WindowStaysOnTopHint
+            ) 
+        self.constraintValueBox.setWindowFlags(flags)       
+        self.constraintValueBox.show()
+        self.constraintValueBox.activateWindow()
         
     @QtCore.Slot()    
     def onAcceptConstraint(self):
