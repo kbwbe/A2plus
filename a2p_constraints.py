@@ -191,8 +191,11 @@ class PointOnPlaneConstraint(BasicConstraint):
         planePos = getPos(self.ob2, c.SubElement2)
         #
         # calculate recent offset...
-        delta = point.sub(planePos)
-        self.offset = delta.dot(planeNormal)
+        #delta = point.sub(planePos)
+        #self.offset = delta.dot(planeNormal)
+        #
+        # propose offset = 0 for better usability
+        self.offset = 0.0
 
     @staticmethod
     def getToolTip():

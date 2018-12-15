@@ -133,7 +133,7 @@ class a2p_ConstraintValueWidget(QtGui.QDialog):
             self.mainLayout.addWidget(lbl5,self.lineNo,0)
             
             self.angleEdit = QtGui.QLineEdit(self)
-            self.angleEdit.setText("{}".format(angle.Value))
+            self.angleEdit.setText("%0.6f" % angle.Value)
             self.angleEdit.setFixedHeight(32)
             self.mainLayout.addWidget(self.angleEdit,self.lineNo,1)
             self.lineNo += 1
@@ -227,6 +227,7 @@ class a2p_ConstraintValueWidget(QtGui.QDialog):
         doc = FreeCAD.activeDocument()
         if doc != None:
             solveConstraints(doc)
+            doc.recompute()
             
     def flipLockRotation(self):
         if self.lockRotationCombo.currentIndex() == 0:
@@ -236,6 +237,8 @@ class a2p_ConstraintValueWidget(QtGui.QDialog):
     
     def setOffsetZero(self):
         self.offsetEdit.setText("0.0")
+        if a2plib.getAutoSolveState():
+            self.solve()
     
     def flipOffsetSign(self):
         try:
@@ -243,6 +246,8 @@ class a2p_ConstraintValueWidget(QtGui.QDialog):
             o = o * -1.0
             if abs(o) > 1e-7:
                 self.offsetEdit.setText(str(o))
+                if a2plib.getAutoSolveState():
+                    self.solve()
             else:
                 self.offsetEdit.setText("0.0")
         except:
@@ -253,6 +258,8 @@ class a2p_ConstraintValueWidget(QtGui.QDialog):
             self.directionCombo.setCurrentIndex(1)
         else:
             self.directionCombo.setCurrentIndex(0)
+        if a2plib.getAutoSolveState():
+            self.solve()
             
     def delete(self):
         flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
@@ -527,7 +534,8 @@ button.
         #self.constraintValueBox.exec_()
         flags = (
             QtCore.Qt.Window |
-            QtCore.Qt.WindowStaysOnTopHint
+            QtCore.Qt.WindowStaysOnTopHint |
+            QtCore.Qt.WindowCloseButtonHint
             ) 
         self.constraintValueBox.setWindowFlags(flags)       
         self.constraintValueBox.show()
