@@ -328,7 +328,7 @@ moved to be coincident.
 class PlanesParallelConstraint(BasicConstraint):
     def __init__(self,selection):
         BasicConstraint.__init__(self, selection)
-        self.typeInfo = 'planeParallel'
+        self.typeInfo = 'planesParallel'
         self.constraintBaseName = 'planesParallel'
         self.iconPath = ':/icons/a2p_PlanesParallelConstraint.svg'
         self.create(selection)
