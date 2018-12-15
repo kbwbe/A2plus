@@ -269,6 +269,9 @@ class a2p_ConstraintValueWidget(QtGui.QDialog):
         self.setConstraintEditorData()
         self.Accepted.emit()
         
+    def reject(self):
+        pass #disable closing of dialog via ESC or X-Button
+        
 #==============================================================================
 toolTipText = \
 '''
