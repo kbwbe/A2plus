@@ -94,8 +94,8 @@ class BasicConstraint():
             c,
             self.iconPath,
             True,
-            self.ob1Label,
-            self.ob2Label
+            self.ob2Label,
+            self.ob1Label
             )
     
     def groupUnderParentTreeObject(self):
