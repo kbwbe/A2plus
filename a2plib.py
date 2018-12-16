@@ -64,8 +64,17 @@ A2P_DEBUG_LEVEL = A2P_DEBUG_NONE
 
 PARTIAL_SOLVE_STAGE1 = 1    #solve all rigid fully constrained to tempfixed rigid, enable only involved dep, then set them as tempfixed
 CONSTRAINT_DIALOG_REF = None
+CONSTRAINT_EDITOR__REF = None
 CONSTRAINT_VIEWMODE = False
 
+#------------------------------------------------------------------------------
+def getConstraintEditorRef():
+    global CONSTRAINT_EDITOR__REF
+    return CONSTRAINT_EDITOR__REF
+#------------------------------------------------------------------------------
+def setConstraintEditorRef(ref):
+    global CONSTRAINT_EDITOR__REF
+    CONSTRAINT_EDITOR__REF = ref
 #------------------------------------------------------------------------------
 def setConstraintViewMode(active):
     global CONSTRAINT_VIEWMODE 

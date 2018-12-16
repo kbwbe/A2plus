@@ -45,6 +45,9 @@ class a2p_ConstraintValueWidget(QtGui.QDialog):
         self.constraintObject = constraintObject # The documentObject of a constraint!
         self.lineNo = 0
         self.neededHight = 0
+        self.app = QtCore.QCoreApplication.instance() #reference to FC pyside application for window management
+        self.isTopLevelWin = True  #Window management
+        self.position = None # Window position
         self.initUI()
 
     def initUI(self):
@@ -202,6 +205,26 @@ class a2p_ConstraintValueWidget(QtGui.QDialog):
         QtCore.QObject.connect(self.deleteButton, QtCore.SIGNAL("clicked()"), self.delete)
         QtCore.QObject.connect(self.solveButton, QtCore.SIGNAL("clicked()"), self.solve)
         QtCore.QObject.connect(self.acceptButton, QtCore.SIGNAL("clicked()"), self.accept)
+        #==============================
+        self.timer = QtCore.QTimer()
+        QtCore.QObject.connect(self.timer, QtCore.SIGNAL("timeout()"), self.onTimer)
+        self.timer.start(100)
+        
+
+    def windowMangager(self):
+        if self.isTopLevelWin:
+            if self.isVisible():
+                self.position = self.pos()
+            if not self.app.focusWidget(): #No FC window at all has the focus...
+                self.hide() #otherwise window will stay above other applications
+            else:
+                if self.position != None:
+                    self.move(self.position)
+                self.show()
+
+    def onTimer(self):
+        self.windowMangager()
+        self.timer.start(100)
         
     def setConstraintEditorData(self):
         if hasattr(self.constraintObject,"directionConstraint"):
@@ -270,10 +293,12 @@ class a2p_ConstraintValueWidget(QtGui.QDialog):
             flags
             )
         if response == QtGui.QMessageBox.Yes:
+            a2plib.setConstraintEditorRef(None)
             self.Deleted.emit()
         
     def accept(self):
         self.setConstraintEditorData()
+        a2plib.setConstraintEditorRef(None)
         self.Accepted.emit()
         
     def reject(self):
@@ -297,7 +322,9 @@ class a2p_ConstraintPanel(QtGui.QDialog):
         super(a2p_ConstraintPanel,self).__init__(parent=parent)
         self.constraintButtons = []
         self.activeConstraint = None
-        #self.baseHeight = 350
+        self.app = QtCore.QCoreApplication.instance() #reference to FC pyside application for window management
+        self.isTopLevelWin = True  #Window management
+        self.position = None # Window position
         self.initUI()
         
     def initUI(self):
@@ -444,14 +471,15 @@ class a2p_ConstraintPanel(QtGui.QDialog):
         self.mainLayout.addWidget(self.panel2)
         self.mainLayout.addWidget(self.panel3)
         self.mainLayout.addWidget(self.helpButton)
+        self.mainLayout.addStretch(1)
         self.setLayout(self.mainLayout)       
         #-------------------------------------
         for btn in self.constraintButtons:
             btn.setEnabled(False)
         #-------------------------------------
-        self.selectionTimer = QtCore.QTimer()
-        QtCore.QObject.connect(self.selectionTimer, QtCore.SIGNAL("timeout()"), self.parseSelections)
-        self.selectionTimer.start(100)
+        self.timer = QtCore.QTimer()
+        QtCore.QObject.connect(self.timer, QtCore.SIGNAL("timeout()"), self.onTimer)
+        self.timer.start(100)
         
     def showConstraintDialogHelp(self):
         msg = \
@@ -472,6 +500,12 @@ button.
             )
         
     def parseSelections(self):
+        #constraint editor comannd is active, do not allow defining constraints
+        if a2plib.getConstraintEditorRef():
+            for btn in self.constraintButtons:
+                btn.setEnabled(False)
+            return
+        
         selection = FreeCADGui.Selection.getSelectionEx()
         if len(selection) != 2:
             for btn in self.constraintButtons:
@@ -519,7 +553,22 @@ button.
                     elif sphericalSurfaceSelected(s2):
                         self.sphericalConstraintButton.setEnabled(True)
 
-        self.selectionTimer.start(100)
+            
+    def windowMangager(self):
+        if self.isTopLevelWin:
+            if self.isVisible():
+                self.position = self.pos()
+            if not self.app.focusWidget(): #No FC window at all has the focus...
+                self.hide() #otherwise window will stay above other applications
+            else:
+                if self.position != None:
+                    self.move(self.position)
+                self.show()
+        
+    def onTimer(self):
+        self.parseSelections()
+        self.windowMangager()
+        self.timer.start(100)
 
     def manageConstraint(self):
         self.position = self.pos()
@@ -530,6 +579,7 @@ button.
         self.constraintValueBox.move(self.position)
         QtCore.QObject.connect(self.constraintValueBox, QtCore.SIGNAL("Deleted()"), self.onDeleteConstraint)
         QtCore.QObject.connect(self.constraintValueBox, QtCore.SIGNAL("Accepted()"), self.onAcceptConstraint)
+        self.isTopLevelWin = False
         self.hide()
         #self.constraintValueBox.exec_()
         flags = (
@@ -537,7 +587,8 @@ button.
             QtCore.Qt.WindowStaysOnTopHint |
             QtCore.Qt.WindowCloseButtonHint
             ) 
-        self.constraintValueBox.setWindowFlags(flags)       
+        self.constraintValueBox.setWindowFlags(flags) 
+        a2plib.setConstraintEditorRef(self)
         self.constraintValueBox.show()
         self.constraintValueBox.activateWindow()
         
@@ -547,7 +598,11 @@ button.
         self.activeConstraint = None
         FreeCADGui.Selection.clearSelection()
         self.move(self.position)
+        self.isTopLevelWin = True
         self.show()
+        mw = FreeCADGui.getMainWindow()
+        mw.activateWindow() #Window manager problems on Suse 42.3 Leap
+        self.activateWindow()
 
     @QtCore.Slot()    
     def onDeleteConstraint(self):
@@ -556,7 +611,11 @@ button.
         self.activeConstraint = None
         FreeCADGui.Selection.clearSelection()
         self.move(self.position)
+        self.isTopLevelWin = True
         self.show()
+        mw = FreeCADGui.getMainWindow()
+        mw.activateWindow() #Window manager problems on Suse 42.3 Leap
+        self.activateWindow()
 
     def onPointIdentityButton(self):
         selection = FreeCADGui.Selection.getSelectionEx()
@@ -632,12 +691,6 @@ dialog !
 class a2p_ConstraintDialogCommand:
     
     def Activated(self):
-        #FreeCADGui.Selection.clearSelection()
-        d = a2plib.getConstraintDialogRef()
-        if d != None:
-            d.show()
-            d.activateWindow()
-            return
         mw = FreeCADGui.getMainWindow() 
         d = a2p_ConstraintPanel(mw)
         flags = (
@@ -652,6 +705,10 @@ class a2p_ConstraintDialogCommand:
         d.activateWindow()
         a2plib.setConstraintDialogRef(d)
         
+    def IsActive(self):
+        if a2plib.getConstraintEditorRef(): return False
+        if a2plib.getConstraintDialogRef(): return False
+        return True
 
     def GetResources(self):
         return {
@@ -678,9 +735,10 @@ class a2p_EditConstraintCommand:
             QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
                 "Selection Error !",
-                "Please select a constraint first."
+                "Please select exact one constraint first."
                 )
             return
+        
         mw = FreeCADGui.getMainWindow() 
         self.constraintValueBox = a2p_ConstraintValueWidget(
             mw,
@@ -688,7 +746,23 @@ class a2p_EditConstraintCommand:
             )
         QtCore.QObject.connect(self.constraintValueBox, QtCore.SIGNAL("Deleted()"), self.onDeleteConstraint)
         QtCore.QObject.connect(self.constraintValueBox, QtCore.SIGNAL("Accepted()"), self.onAcceptConstraint)
-        self.constraintValueBox.exec_()
+        a2plib.setConstraintEditorRef(self.constraintValueBox)
+        
+        flags = (
+            QtCore.Qt.Window |
+            #QtCore.Qt.WindowMinimizeButtonHint |
+            #QtCore.Qt.WindowMaximizeButtonHint |
+            QtCore.Qt.WindowStaysOnTopHint |
+            QtCore.Qt.WindowCloseButtonHint
+            ) 
+        self.constraintValueBox.setWindowFlags(flags)       
+        self.constraintValueBox.show()
+        self.constraintValueBox.activateWindow()
+        #self.constraintValueBox.exec_()
+        
+    def IsActive(self):
+        if a2plib.getConstraintEditorRef(): return False
+        return True
         
     def onAcceptConstraint(self):
         self.constraintValueBox.deleteLater()
