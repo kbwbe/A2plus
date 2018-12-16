@@ -61,7 +61,6 @@ class a2p_ConstraintValueWidget(QtGui.QDialog):
         self.winModified = False
         self.lineNo = 0
         self.neededHight = 0
-        self.app = QtCore.QCoreApplication.instance() #reference to FC pyside application for window management
         self.isTopLevelWin = True  #Window management
         self.position = None # Window position
         self.initUI()
@@ -227,11 +226,11 @@ class a2p_ConstraintValueWidget(QtGui.QDialog):
         self.timer.start(100)
         
 
-    def windowMangager(self):
+    def windowManager(self):
         if self.isTopLevelWin:
             if self.isVisible():
                 self.position = self.pos()
-            if not self.app.focusWidget(): #No FC window at all has the focus...
+            if not QtGui.QApplication.focusWidget(): #No FC window at all has the focus...
                 self.hide() #otherwise window will stay above other applications
             else:
                 if self.position != None:
@@ -239,7 +238,7 @@ class a2p_ConstraintValueWidget(QtGui.QDialog):
                 self.show()
 
     def onTimer(self):
-        self.windowMangager()
+        self.windowManager()
         self.timer.start(100)
         
     def setConstraintEditorData(self):
@@ -385,7 +384,6 @@ class a2p_ConstraintPanel(QtGui.QDialog):
         super(a2p_ConstraintPanel,self).__init__(parent=parent)
         self.constraintButtons = []
         self.activeConstraint = None
-        self.app = QtCore.QCoreApplication.instance() #reference to FC pyside application for window management
         self.isTopLevelWin = True  #Window management
         self.position = None # Window position
         self.initUI()
@@ -617,11 +615,11 @@ button.
                         self.sphericalConstraintButton.setEnabled(True)
 
             
-    def windowMangager(self):
+    def windowManager(self):
         if self.isTopLevelWin:
             if self.isVisible():
                 self.position = self.pos()
-            if not self.app.focusWidget(): #No FC window at all has the focus...
+            if not QtGui.QApplication.focusWidget(): #No FC window at all has the focus...
                 self.hide() #otherwise window will stay above other applications
             else:
                 if self.position != None:
@@ -630,7 +628,7 @@ button.
         
     def onTimer(self):
         self.parseSelections()
-        self.windowMangager()
+        self.windowManager()
         self.timer.start(100)
 
     def manageConstraint(self):
@@ -755,6 +753,8 @@ dialog !
 class a2p_ConstraintDialogCommand:
     
     def Activated(self):
+        if a2plib.getConstraintDialogRef(): return #Dialog alread active...
+        
         mw = FreeCADGui.getMainWindow() 
         d = a2p_ConstraintPanel(mw)
         flags = (
