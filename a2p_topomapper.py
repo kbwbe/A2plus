@@ -261,7 +261,7 @@ class TopoMapper(object):
         lst = []
         for ob in _list:
             if hasattr(ob,"Shape"):
-                if len(ob.Shape.Faces) > 0:
+                if len(ob.Shape.Faces) > 0 and len(ob.Shape.Vertexes) > 0:
                     lst.append(ob)
         S = set(lst)
         lst = []
