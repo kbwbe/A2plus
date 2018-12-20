@@ -23,7 +23,7 @@
 #***************************************************************************
 
 from a2plib import *
-from PySide import QtGui
+from PySide import QtGui, QtCore
 import math
 from a2p_viewProviderProxies import *
 
@@ -84,7 +84,7 @@ class BasicConstraint():
         
         self.calcInitialValues() #override in subclass !
         self.setInitialValues()
-        self.groupUnderParentObjectInTree()
+        self.groupUnderParentTreeObject()
         self.setupProxies()
         
     def setupProxies(self):
@@ -94,8 +94,8 @@ class BasicConstraint():
             c,
             self.iconPath,
             True,
-            self.ob1Label,
-            self.ob2Label
+            self.ob2Label,
+            self.ob1Label
             )
     
     def groupUnderParentTreeObject(self):
@@ -111,13 +111,16 @@ class BasicConstraint():
             c.addProperty("App::PropertyEnumeration","directionConstraint", "ConstraintInfo")
             c.directionConstraint = ["aligned","opposed"]
             c.directionConstraint = self.direction
+            c.setEditorMode("directionConstraint", 1) # set not editable...
         if self.offset != None:
             c.addProperty('App::PropertyDistance','offset',"ConstraintInfo").offset = self.offset
+            c.setEditorMode("offset", 1) # set not editable...
         if self.angle != None:
             c.addProperty("App::PropertyAngle","angle","ConstraintInfo").angle = self.angle
+            c.setEditorMode("angle", 1) # set not editable...
         if self.lockRotation != None:
             c.addProperty("App::PropertyBool","lockRotation","ConstraintInfo").lockRotation = self.lockRotation
-            
+            c.setEditorMode("lockRotation", 1) # set not editable...
     
     def calcInitialValues(self):
         raise NotImplementedError(
@@ -136,17 +139,17 @@ class PointIdentityConstraint(BasicConstraint):
         BasicConstraint.__init__(self, selection)
         self.typeInfo = 'pointIdentity'
         self.constraintBaseName = 'pointIdentity'
-        self.iconPath = ':/icons/a2p_PointOnLineConstraint.svg'
+        self.iconPath = ':/icons/a2p_PointIdentity.svg'
         self.create(selection)
         
     def calcInitialValues(self):
         pass
 
     @staticmethod
-    def getToolTip(self):
+    def getToolTip():
         return \
 '''
-Add PointIdentity Constraint:
+Add a pointIdentity Constraint:
 selection:
 1.) select a vertex on a part
 2.) select a vertex on another part
@@ -157,17 +160,17 @@ class PointOnLineConstraint(BasicConstraint):
         BasicConstraint.__init__(self, selection)
         self.typeInfo = 'pointOnLine'
         self.constraintBaseName = 'pointOnLine'
-        self.iconPath = ':/icons/a2p_PointIdentity.svg'
+        self.iconPath = ':/icons/a2p_PointOnLineConstraint.svg'
         self.create(selection)
         
     def calcInitialValues(self):
         pass
 
     @staticmethod
-    def getToolTip(self):
+    def getToolTip():
         return \
 '''
-Add a PointOnLine constraint between two objects
+Add a pointOnLine constraint between two objects
 1.) select a vertex from a part
 2.) select a line (linear edge) on another part
 '''
@@ -188,14 +191,17 @@ class PointOnPlaneConstraint(BasicConstraint):
         planePos = getPos(self.ob2, c.SubElement2)
         #
         # calculate recent offset...
-        delta = point.sub(planePos)
-        self.offset = delta.dot(planeNormal)
+        #delta = point.sub(planePos)
+        #self.offset = delta.dot(planeNormal)
+        #
+        # propose offset = 0 for better usability
+        self.offset = 0.0
 
     @staticmethod
-    def getToolTip(self):
+    def getToolTip():
         return \
 '''
-Add a Point on Plane constraint between two objects
+Add a pointOnPlane constraint between two objects
 1.) select a vertex or a center of a circle
 2.) select a plane on other part
 '''
@@ -204,7 +210,7 @@ class CircularEdgeConstraint(BasicConstraint):
     def __init__(self,selection):
         BasicConstraint.__init__(self, selection)
         self.typeInfo = 'circularEdge'
-        self.constraintBaseName = 'circularEdgeConstraint'
+        self.constraintBaseName = 'circularEdge'
         self.iconPath = ':/icons/a2p_CircularEdgeConstraint.svg'
         self.create(selection)
         
@@ -223,10 +229,10 @@ class CircularEdgeConstraint(BasicConstraint):
         self.lockRotation = False
 
     @staticmethod
-    def getToolTip(self):
+    def getToolTip():
         return \
 '''
-Add a circular edge constraint between two parts
+Add a circularEdge constraint between two parts
 selection-hint:
 1.) select circular edge on first importPart
 2.) select circular edge on other importPart
@@ -236,7 +242,7 @@ class AxialConstraint(BasicConstraint):
     def __init__(self,selection):
         BasicConstraint.__init__(self, selection)
         self.typeInfo = 'axial'
-        self.constraintBaseName = 'axialConstraint'
+        self.constraintBaseName = 'axisCoincident'
         self.iconPath = ':/icons/a2p_AxialConstraint.svg'
         self.create(selection)
         
@@ -252,10 +258,10 @@ class AxialConstraint(BasicConstraint):
         self.lockRotation = False
 
     @staticmethod
-    def getToolTip(self):
+    def getToolTip():
         return \
 '''
-Add an axialConstraint between two parts
+Add an axisCoincident constraint between two parts
 
 2 axis are aligned and be moved
 to be coincident
@@ -284,7 +290,7 @@ class AxisParallelConstraint(BasicConstraint):
             self.direction = "opposed"
 
     @staticmethod
-    def getToolTip(self):
+    def getToolTip():
         return \
 '''
 Add an axisParallel constraint between two objects
@@ -309,7 +315,7 @@ class AxisPlaneParallelConstraint(BasicConstraint):
         pass
 
     @staticmethod
-    def getToolTip(self):
+    def getToolTip():
         return \
 '''
 Creates an axisPlaneParallel constraint.
@@ -325,8 +331,8 @@ moved to be coincident.
 class PlanesParallelConstraint(BasicConstraint):
     def __init__(self,selection):
         BasicConstraint.__init__(self, selection)
-        self.typeInfo = 'planeParallel'
-        self.constraintBaseName = 'planeParallel'
+        self.typeInfo = 'planesParallel'
+        self.constraintBaseName = 'planesParallel'
         self.iconPath = ':/icons/a2p_PlanesParallelConstraint.svg'
         self.create(selection)
         
@@ -343,7 +349,7 @@ class PlanesParallelConstraint(BasicConstraint):
             self.direction = "opposed"
 
     @staticmethod
-    def getToolTip(self):
+    def getToolTip():
         return \
 '''
 Add a planesParallel constraint between two objects
@@ -360,7 +366,7 @@ class PlaneConstraint(BasicConstraint):
     def __init__(self,selection):
         BasicConstraint.__init__(self, selection)
         self.typeInfo = 'plane'
-        self.constraintBaseName = 'planeConstraint'
+        self.constraintBaseName = 'planeCoincident'
         self.iconPath = ':/icons/a2p_PlaneCoincidentConstraint.svg'
         self.create(selection)
         
@@ -378,7 +384,7 @@ class PlaneConstraint(BasicConstraint):
         self.offset = 0.0
 
     @staticmethod
-    def getToolTip(self):
+    def getToolTip():
         return \
 '''
 Add a planeCoincident constraint between two objects
@@ -393,7 +399,7 @@ class AngledPlanesConstraint(BasicConstraint):
     def __init__(self,selection):
         BasicConstraint.__init__(self, selection)
         self.typeInfo = 'angledPlanes'
-        self.constraintBaseName = 'angledPlanesContraint'
+        self.constraintBaseName = 'angledPlanes'
         self.iconPath = ':/icons/a2p_AngleConstraint.svg'
         self.create(selection)
         
@@ -405,10 +411,10 @@ class AngledPlanesConstraint(BasicConstraint):
         self.angle = math.degrees(normal2.getAngle(normal1))
 
     @staticmethod
-    def getToolTip(self):
+    def getToolTip():
         return \
 '''
-Creates an angleBetweenPlanes constraint.
+Creates an angledPlanes constraint.
 
 1) select first plane object
 2) select second plane object on another part
@@ -431,7 +437,7 @@ class SphericalConstraint(BasicConstraint):
     def __init__(self,selection):
         BasicConstraint.__init__(self, selection)
         self.typeInfo = 'sphereCenterIdent'
-        self.constraintBaseName = 'sphericalConstraint'
+        self.constraintBaseName = 'sphereCenterIdent'
         self.iconPath = ':/icons/a2p_SphericalSurfaceConstraint.svg'
         self.create(selection)
         
@@ -439,10 +445,10 @@ class SphericalConstraint(BasicConstraint):
         pass
 
     @staticmethod
-    def getToolTip(self):
+    def getToolTip():
         return \
 '''
-Add a spherical constraint between to objects
+Add a sphereCenterIdent constraint between to objects
 
 Selection options:
 - spherical surface or vertex on a part

@@ -63,7 +63,34 @@ A2P_DEBUG_3         = 3
 A2P_DEBUG_LEVEL = A2P_DEBUG_3
 
 PARTIAL_SOLVE_STAGE1 = 1    #solve all rigid fully constrained to tempfixed rigid, enable only involved dep, then set them as tempfixed
+CONSTRAINT_DIALOG_REF = None
+CONSTRAINT_EDITOR__REF = None
+CONSTRAINT_VIEWMODE = False
 
+#------------------------------------------------------------------------------
+def getConstraintEditorRef():
+    global CONSTRAINT_EDITOR__REF
+    return CONSTRAINT_EDITOR__REF
+#------------------------------------------------------------------------------
+def setConstraintEditorRef(ref):
+    global CONSTRAINT_EDITOR__REF
+    CONSTRAINT_EDITOR__REF = ref
+#------------------------------------------------------------------------------
+def setConstraintViewMode(active):
+    global CONSTRAINT_VIEWMODE 
+    CONSTRAINT_VIEWMODE = active
+#------------------------------------------------------------------------------
+def getConstraintViewMode():
+    global CONSTRAINT_VIEWMODE 
+    return CONSTRAINT_VIEWMODE
+#------------------------------------------------------------------------------
+def getConstraintDialogRef():
+    global CONSTRAINT_DIALOG_REF
+    return CONSTRAINT_DIALOG_REF
+#------------------------------------------------------------------------------
+def setConstraintDialogRef(ref):
+    global CONSTRAINT_DIALOG_REF
+    CONSTRAINT_DIALOG_REF = ref
 #------------------------------------------------------------------------------
 def getUseTopoNaming():
     preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
