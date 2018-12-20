@@ -70,6 +70,10 @@ class ImportedPartViewProviderProxy:
 
         return True # If False is returned the object won't be deleted
 
+    def getIcon(self):
+        import os
+        return (os.path.join( a2plib.path_a2p, 'GuiA2p', 'Resources', 'icons','a2p_obj.svg'))
+
     def __getstate__(self):
         return None
 
