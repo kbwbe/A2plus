@@ -36,6 +36,7 @@ USE_PROJECTFILE = preferences.GetBool('useProjectFolder', False)
 PARTIAL_PROCESSING_ENABLED = preferences.GetBool('usePartialSolver', True)
 AUTOSOLVE_ENABLED = preferences.GetBool('autoSolve', True)
 RELATIVE_PATHES_ENABLED = preferences.GetBool('useRelativePathes',True)
+FORCE_FIXED_POSITION = preferences.GetBool('forceFixedPosition',True)
 
 SAVED_TRANSPARENCY = []
 
@@ -64,6 +65,10 @@ A2P_DEBUG_LEVEL = A2P_DEBUG_NONE
 
 PARTIAL_SOLVE_STAGE1 = 1    #solve all rigid fully constrained to tempfixed rigid, enable only involved dep, then set them as tempfixed
 
+#------------------------------------------------------------------------------
+def getForceFixedPosition():
+    preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
+    return preferences.GetBool('forceFixedPosition',False)
 #------------------------------------------------------------------------------
 def getUseTopoNaming():
     preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
