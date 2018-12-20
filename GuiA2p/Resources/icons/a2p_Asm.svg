@@ -15,7 +15,7 @@
    id="svg3559"
    version="1.1"
    inkscape:version="0.92.3 (2405546, 2018-03-11)"
-   sodipodi:docname="a2p_Obj.svg"
+   sodipodi:docname="a2p_Asm.svg"
    viewBox="0 0 64 64">
   <defs
      id="defs3561">
@@ -117,6 +117,38 @@
          offset="1"
          id="stop3802" />
     </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4383-1"
+       id="linearGradient69717"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(1.285649,1.4142134)"
+       x1="50.714352"
+       y1="25.585787"
+       x2="48.714352"
+       y2="20.585787" />
+    <linearGradient
+       id="linearGradient4383-1"
+       inkscape:collect="always">
+      <stop
+         id="stop69725"
+         offset="0"
+         style="stop-color:#c4a000;stop-opacity:1" />
+      <stop
+         id="stop69727"
+         offset="1"
+         style="stop-color:#fce94f;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4383-1"
+       id="linearGradient69709"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(21.756467,-5.588112)"
+       x1="20.243532"
+       y1="37.588112"
+       x2="17.243532"
+       y2="27.588112" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -127,7 +159,7 @@
      inkscape:pageshadow="2"
      inkscape:zoom="6.046875"
      inkscape:cx="28.341867"
-     inkscape:cy="33.097117"
+     inkscape:cy="9.9953302"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:document-units="px"
@@ -156,7 +188,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
         <dc:title>Path-Stock</dc:title>
         <dc:date>2015-07-04</dc:date>
         <dc:relation>http://www.freecadweb.org/wiki/index.php?title=Artwork</dc:relation>
@@ -232,5 +264,35 @@
        id="path69044"
        d="m 25,36 0,-9 15,-13 0,8 z"
        style="fill:none;stroke:#ad7fa8;stroke-width:2;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none" />
+    <path
+       style="display:inline;fill:url(#linearGradient69709);fill-opacity:1;fill-rule:nonzero;stroke:#302b00;stroke-width:2;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+       d="M 31,33 V 19 l 13,5 v 14.5 z"
+       id="path69705"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       style="display:inline;fill:none;stroke:#fce94f;stroke-width:2;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none"
+       d="M 33,32 V 22 l 9,3 v 10.5 z"
+       id="path69707"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       sodipodi:nodetypes="ccccc"
+       inkscape:connector-curvature="0"
+       id="path69715"
+       d="M 44,38.5 V 24 l 11,-9 v 13 z"
+       style="display:inline;fill:url(#linearGradient69717);fill-opacity:1;fill-rule:nonzero;stroke:#302b00;stroke-width:2;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none" />
+    <path
+       sodipodi:nodetypes="ccccc"
+       inkscape:connector-curvature="0"
+       id="path69719"
+       d="m 46,34 v -9 l 7,-6 v 8 z"
+       style="display:inline;fill:none;stroke:#fce94f;stroke-width:2;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none" />
+    <path
+       sodipodi:nodetypes="ccccc"
+       inkscape:connector-curvature="0"
+       id="path69721"
+       d="M 31,19 42,9.9999998 55,15 44,24 Z"
+       style="display:inline;fill:#fce94f;fill-opacity:1;fill-rule:nonzero;stroke:#302b00;stroke-width:2;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none" />
   </g>
 </svg>

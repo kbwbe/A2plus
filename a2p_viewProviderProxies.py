@@ -72,7 +72,11 @@ class ImportedPartViewProviderProxy:
 
     def getIcon(self):
         import os
-        return (os.path.join( a2plib.path_a2p, 'GuiA2p', 'Resources', 'icons','a2p_obj.svg'))
+        if hasattr(self,"Object"):
+            if hasattr(self.Object,"subassemblyImport"):
+                if self.Object.subassemblyImport:
+                    return (os.path.join( a2plib.path_a2p, 'GuiA2p', 'Resources', 'icons','a2p_Asm.svg'))
+        return (os.path.join( a2plib.path_a2p, 'GuiA2p', 'Resources', 'icons','a2p_Obj.svg'))
 
     def __getstate__(self):
         return None
