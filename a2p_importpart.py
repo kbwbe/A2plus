@@ -183,7 +183,10 @@ def importPartFromFile(_doc, filename, importToCache=False):
     newObj.setEditorMode("timeLastImport",1)
     newObj.timeLastImport = os.path.getmtime( filename )
     newObj.addProperty("App::PropertyBool","fixedPosition","importPart")
-    newObj.fixedPosition = not any([i.fixedPosition for i in doc.Objects if hasattr(i, 'fixedPosition') ])
+    if a2plib.getForceFixedPosition():
+        newObj.fixedPosition = True
+    else:
+        newObj.fixedPosition = not any([i.fixedPosition for i in doc.Objects if hasattr(i, 'fixedPosition') ])
     newObj.addProperty("App::PropertyBool","subassemblyImport","importPart").subassemblyImport = subAssemblyImport
     newObj.setEditorMode("subassemblyImport",1)
     newObj.addProperty("App::PropertyBool","updateColors","importPart").updateColors = True

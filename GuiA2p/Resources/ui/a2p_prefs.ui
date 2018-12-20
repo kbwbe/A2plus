@@ -61,6 +61,19 @@
           </widget>
          </item>
          <item>
+          <widget class="Gui::PrefCheckBox" name="checkBox_3">
+           <property name="text">
+            <string>force FixedPosition to all Imports</string>
+           </property>
+           <property name="prefEntry" stdset="0">
+            <cstring>forceFixedPosition</cstring>
+           </property>
+           <property name="prefPath" stdset="0">
+            <cstring>Mod/A2plus</cstring>
+           </property>
+          </widget>
+         </item>
+         <item>
           <spacer name="verticalSpacer_2">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
