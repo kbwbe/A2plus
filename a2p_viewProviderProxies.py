@@ -70,6 +70,14 @@ class ImportedPartViewProviderProxy:
 
         return True # If False is returned the object won't be deleted
 
+    def getIcon(self):
+        import os
+        if hasattr(self,"Object"):
+            if hasattr(self.Object,"subassemblyImport"):
+                if self.Object.subassemblyImport:
+                    return (os.path.join( a2plib.path_a2p, 'GuiA2p', 'Resources', 'icons','a2p_Asm.svg'))
+        return (os.path.join( a2plib.path_a2p, 'GuiA2p', 'Resources', 'icons','a2p_Obj.svg'))
+
     def __getstate__(self):
         return None
 
