@@ -379,9 +379,9 @@ Please also read tooltips of each
 button.
 '''
 
-class a2p_ConstraintPanel(QtGui.QDialog):
+class a2p_ConstraintCollection(QtGui.QWidget):
     def __init__(self,parent):
-        super(a2p_ConstraintPanel,self).__init__(parent=parent)
+        super(a2p_ConstraintCollection,self).__init__(parent=parent)
         self.constraintButtons = []
         self.activeConstraint = None
         self.isTopLevelWin = True  #Window management
@@ -525,7 +525,7 @@ class a2p_ConstraintPanel(QtGui.QDialog):
         self.helpButton = QtGui.QPushButton(self)
         self.helpButton.setText('Help')
         self.helpButton.setFixedSize(150,32)
-        QtCore.QObject.connect(self.helpButton, QtCore.SIGNAL("clicked()"), self.showConstraintDialogHelp)
+        QtCore.QObject.connect(self.helpButton, QtCore.SIGNAL("clicked()"), self.showConstraintCollectionHelp)
 
         #-------------------------------------
         self.mainLayout.addWidget(self.panel1)
@@ -542,7 +542,7 @@ class a2p_ConstraintPanel(QtGui.QDialog):
         QtCore.QObject.connect(self.timer, QtCore.SIGNAL("timeout()"), self.onTimer)
         self.timer.start(100)
         
-    def showConstraintDialogHelp(self):
+    def showConstraintCollectionHelp(self):
         msg = \
 '''
 Select geometry to be constrained
@@ -628,7 +628,6 @@ button.
         
     def onTimer(self):
         self.parseSelections()
-        self.windowManager()
         self.timer.start(100)
 
     def manageConstraint(self):
@@ -740,6 +739,21 @@ button.
         self.destroy()
 
 #==============================================================================
+class a2p_ConstraintPanel(QtGui.QDockWidget):
+    def __init__(self):
+        super(a2p_ConstraintPanel,self).__init__()
+        self.resize(200,250)
+        cc = a2p_ConstraintCollection(None)
+        self.setWidget(cc)
+        self.setWindowTitle("Constraint Tools")
+        
+        
+    def closeEvent(self,event):
+        a2plib.setConstraintDialogRef(None)
+        event.accept()
+        
+        
+#==============================================================================
 toolTipText = \
 '''
 Open a dialog to
@@ -753,21 +767,19 @@ dialog !
 class a2p_ConstraintDialogCommand:
     
     def Activated(self):
-        if a2plib.getConstraintDialogRef(): return #Dialog alread active...
+        #if a2plib.getConstraintDialogRef(): return #Dialog alread active...
         
+        p = a2p_ConstraintPanel()
         mw = FreeCADGui.getMainWindow() 
-        d = a2p_ConstraintPanel(mw)
-        flags = (
-            QtCore.Qt.Window |
-            #QtCore.Qt.WindowMinimizeButtonHint |
-            #QtCore.Qt.WindowMaximizeButtonHint |
-            QtCore.Qt.WindowStaysOnTopHint |
-            QtCore.Qt.WindowCloseButtonHint
-            ) 
-        d.setWindowFlags(flags)       
-        d.show()
-        d.activateWindow()
-        a2plib.setConstraintDialogRef(d)
+        mw.addDockWidget(QtCore.Qt.RightDockWidgetArea,p)
+
+        p.setFloating(True)
+        #p.resize(200,250)
+        p.activateWindow()
+        p.setAllowedAreas(QtCore.Qt.NoDockWidgetArea)
+        screen_center = lambda widget: QtGui.QApplication.desktop().screen().rect().center()- widget.rect().center()  
+        p.move(screen_center(p))      
+        a2plib.setConstraintDialogRef(p)
         
     def IsActive(self):
         if a2plib.getConstraintEditorRef(): return False
