@@ -384,7 +384,6 @@ class a2p_ConstraintCollection(QtGui.QWidget):
         super(a2p_ConstraintCollection,self).__init__(parent=parent)
         self.constraintButtons = []
         self.activeConstraint = None
-        self.isTopLevelWin = True  #Window management
         self.position = None # Window position
         self.initUI()
         
@@ -640,9 +639,6 @@ button.
         self.constraintValueBox.move(self.position)
         QtCore.QObject.connect(self.constraintValueBox, QtCore.SIGNAL("Deleted()"), self.onDeleteConstraint)
         QtCore.QObject.connect(self.constraintValueBox, QtCore.SIGNAL("Accepted()"), self.onAcceptConstraint)
-        self.isTopLevelWin = False
-        self.hide()
-        #self.constraintValueBox.exec_()
         flags = (
             QtCore.Qt.Window |
             QtCore.Qt.WindowStaysOnTopHint |
@@ -658,12 +654,6 @@ button.
         self.constraintValueBox.deleteLater()
         self.activeConstraint = None
         FreeCADGui.Selection.clearSelection()
-        self.move(self.position)
-        self.isTopLevelWin = True
-        self.show()
-        mw = FreeCADGui.getMainWindow()
-        mw.activateWindow() #Window manager problems on Suse 42.3 Leap
-        self.activateWindow()
 
     @QtCore.Slot()    
     def onDeleteConstraint(self):
@@ -671,12 +661,6 @@ button.
         removeConstraint(self.activeConstraint.constraintObject)
         self.activeConstraint = None
         FreeCADGui.Selection.clearSelection()
-        self.move(self.position)
-        self.isTopLevelWin = True
-        self.show()
-        mw = FreeCADGui.getMainWindow()
-        mw.activateWindow() #Window manager problems on Suse 42.3 Leap
-        self.activateWindow()
 
     def onPointIdentityButton(self):
         selection = FreeCADGui.Selection.getSelectionEx()
