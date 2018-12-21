@@ -466,6 +466,7 @@ class TopoMapper(object):
                         faceColors.append(diffuseCol[i])
 
         shell = Part.makeShell(faces)
+        solid = Part.Solid(shell)
         #-------------------------------------------
         # if toponaming is used, assign toponames to
         # shells geometry
@@ -476,7 +477,7 @@ class TopoMapper(object):
             # map vertexnames to the MUX
             #-------------------------------------------
             muxInfo.append("[VERTEXES]")
-            for i,v in enumerate(shell.Vertexes):
+            for i,v in enumerate(solid.Vertexes):
                 k = self.calcVertexKey(v)
                 name = self.shapeDict.get(k,"None")
                 muxInfo.append(name)
@@ -485,7 +486,7 @@ class TopoMapper(object):
             #-------------------------------------------
             muxInfo.append("[EDGES]")
             pl = FreeCAD.Placement()
-            for i,edge in enumerate(shell.Edges):
+            for i,edge in enumerate(solid.Edges):
                 keys = self.calcEdgeKeys(edge, pl)
                 name = self.shapeDict.get(keys[0],"None")
                 muxInfo.append(name)
@@ -494,12 +495,12 @@ class TopoMapper(object):
             #-------------------------------------------
             muxInfo.append("[FACES]")
             pl = FreeCAD.Placement()
-            for i,face in enumerate(shell.Faces):
+            for i,face in enumerate(solid.Faces):
                 keys = self.calcFaceKeys(face, pl)
                 name = self.shapeDict.get(keys[0],"None")
                 muxInfo.append(name)
 
         if withColor:
-            return muxInfo, shell, faceColors
+            return muxInfo, solid, faceColors
         else:
-            return muxInfo, shell
+            return muxInfo, solid
