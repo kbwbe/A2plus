@@ -733,11 +733,6 @@ button.
         self.activeConstraint = a2p_constraints.SphericalConstraint(selection)
         self.manageConstraint()
         
-    @QtCore.Slot()    
-    def reject(self):
-        a2plib.setConstraintDialogRef(None)
-        self.destroy()
-
 #==============================================================================
 class a2p_ConstraintPanel(QtGui.QDockWidget):
     def __init__(self):
@@ -746,12 +741,25 @@ class a2p_ConstraintPanel(QtGui.QDockWidget):
         cc = a2p_ConstraintCollection(None)
         self.setWidget(cc)
         self.setWindowTitle("Constraint Tools")
+        #
+        self.timer = QtCore.QTimer()
+        QtCore.QObject.connect(self.timer, QtCore.SIGNAL("timeout()"), self.onTimer)
+        self.timer.start(100)
         
+    def onTimer(self):
+        if a2plib.getConstraintEditorRef(): # != None
+            # the editor box is active, do not show self
+            self.hide()
+        else:
+            if not self.isVisible():
+                self.show()
+                self.resize(200,250)
+        self.timer.start(100)
         
     def closeEvent(self,event):
         a2plib.setConstraintDialogRef(None)
+        self.deleteLater()
         event.accept()
-        
         
 #==============================================================================
 toolTipText = \
@@ -767,14 +775,13 @@ dialog !
 class a2p_ConstraintDialogCommand:
     
     def Activated(self):
-        #if a2plib.getConstraintDialogRef(): return #Dialog alread active...
+        if a2plib.getConstraintDialogRef(): return #Dialog alread active...
         
         p = a2p_ConstraintPanel()
         mw = FreeCADGui.getMainWindow() 
         mw.addDockWidget(QtCore.Qt.RightDockWidgetArea,p)
 
         p.setFloating(True)
-        #p.resize(200,250)
         p.activateWindow()
         p.setAllowedAreas(QtCore.Qt.NoDockWidgetArea)
         screen_center = lambda widget: QtGui.QApplication.desktop().screen().rect().center()- widget.rect().center()  
