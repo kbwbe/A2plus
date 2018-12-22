@@ -242,6 +242,17 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
                 self.constraintObject.lockRotation = True
             
     def solve(self):
+        doc = FreeCAD.activeDocument()
+        if self.constraintObject not in doc.Objects:
+            QtGui.QMessageBox.information(
+                QtGui.QApplication.activeWindow(),
+                "Constraint does not exist anymore",
+                "Constraint has been already deleted"
+                )
+            a2plib.setConstraintEditorRef(None)
+            self.Deleted.emit()
+            return
+        
         self.winModified = True
         self.setConstraintEditorData()
         doc = FreeCAD.activeDocument()
@@ -296,6 +307,17 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             self.constraintObject.lockRotation = self.savedLockRotation
             
     def delete(self):
+        doc = FreeCAD.activeDocument()
+        if self.constraintObject not in doc.Objects:
+            QtGui.QMessageBox.information(
+                QtGui.QApplication.activeWindow(),
+                "Constraint does not exist anymore",
+                "Constraint has been already deleted"
+                )
+            a2plib.setConstraintEditorRef(None)
+            self.Deleted.emit()
+            return
+        
         flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
         response = QtGui.QMessageBox.critical(
             QtGui.QApplication.activeWindow(),
@@ -304,14 +326,40 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             flags
             )
         if response == QtGui.QMessageBox.Yes:
+            try:
+                removeConstraint(self.constraintObject)
+            except:
+                pass # perhaps constraint already deleted by user
             a2plib.setConstraintEditorRef(None)
             self.Deleted.emit()
         
     def accept(self):
+        doc = FreeCAD.activeDocument()
+        if self.constraintObject not in doc.Objects:
+            QtGui.QMessageBox.information(
+                QtGui.QApplication.activeWindow(),
+                "Constraint does not exist anymore",
+                "Constraint has been already deleted"
+                )
+            a2plib.setConstraintEditorRef(None)
+            self.Deleted.emit()
+            return
+        
         self.setConstraintEditorData()
         self.Accepted.emit()
         
     def reject(self):
+        doc = FreeCAD.activeDocument()
+        if self.constraintObject not in doc.Objects:
+            QtGui.QMessageBox.information(
+                QtGui.QApplication.activeWindow(),
+                "Constraint does not exist anymore",
+                "Constraint has been already deleted"
+                )
+            a2plib.setConstraintEditorRef(None)
+            self.Deleted.emit()
+            return
+
         if self.mode == 'createConstraint':
             flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
             response = QtGui.QMessageBox.critical(
@@ -618,7 +666,6 @@ button.
     def onDeleteConstraint(self):
         self.constraintValueBox.deleteLater()
         a2plib.setConstraintEditorRef(None)
-        removeConstraint(self.activeConstraint.constraintObject)
         self.activeConstraint = None
         FreeCADGui.Selection.clearSelection()
 
@@ -827,7 +874,6 @@ class a2p_EditConstraintCommand:
     def onDeleteConstraint(self):
         self.constraintValueBox.deleteLater()
         a2plib.setConstraintEditorRef(None)
-        removeConstraint(self.selectedConstraint)
         FreeCADGui.Selection.clearSelection()
 
     def GetResources(self):
