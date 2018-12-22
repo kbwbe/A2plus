@@ -2,7 +2,9 @@
     <qresource prefix="/">
         <file>icons/a2p_Asm.svg</file>        
         <file>icons/a2p_Obj.svg</file>
-	<file>icons/a2p_AngleConstraint.svg</file>
+        <file>icons/a2p_EditConstraint.svg</file>
+        <file>icons/a2p_DefineConstraints.svg</file>
+        <file>icons/a2p_AngleConstraint.svg</file>
         <file>icons/a2p_autoSolve.svg</file>
         <file>icons/a2p_AxialConstraint.svg</file>
         <file>icons/a2p_AxisParallelConstraint.svg</file>
