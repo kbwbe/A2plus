@@ -138,10 +138,11 @@ def muxAssemblyWithTopoNames(doc, withColor=False):
                     faceColors.append(diffuseCol[i])
 
     shell = Part.makeShell(faces)
+    solid = Part.Solid(shell)
     if withColor:
-        return muxInfo, shell, faceColors
+        return muxInfo, solid, faceColors
     else:
-        return muxInfo, shell
+        return muxInfo, solid
 
 def muxObjectsWithKeys(objsIn, withColor=False):
     '''
