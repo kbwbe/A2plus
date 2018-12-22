@@ -63,12 +63,14 @@ class ImportedPartViewProviderProxy:
         return True # If False is returned the object won't be deleted
 
     def getIcon(self):
-        import os
         if hasattr(self,"Object"):
             if hasattr(self.Object,"subassemblyImport"):
                 if self.Object.subassemblyImport:
-                    return (os.path.join( a2plib.path_a2p, 'GuiA2p', 'Resources', 'icons','a2p_Asm.svg'))
-        return (os.path.join( a2plib.path_a2p, 'GuiA2p', 'Resources', 'icons','a2p_Obj.svg'))
+                    return ":/icons/a2p_Asm.svg"
+            if hasattr(self.Object,"sourceFile"):
+                if self.Object.sourceFile == 'converted':
+                    return ":/icons/a2p_ConvertPart.svg"
+        return ":/icons/a2p_Obj.svg"
 
     def __getstate__(self):
         return None
@@ -76,16 +78,6 @@ class ImportedPartViewProviderProxy:
     def __setstate__(self, state):
         return None
     
-    def getIcon(self):
-        if hasattr(self,"Object"):
-            if hasattr(self.Object,"subassemblyImport"):
-                if self.Object.subassemblyImport:
-                    return ":/icons/a2p_partialProcessing.svg" #Sorry,the name off an assmembly icon ATM...
-            if hasattr(self.Object,"sourceFile"):
-                if self.Object.sourceFile == 'converted':
-                    return ":/icons/a2p_ConvertPart.svg"
-        return ":/icons/a2p_ImportPart.svg"
-
     def attach(self, vobj):
         self.object_Name = vobj.Object.Name
         self.Object = vobj.Object
