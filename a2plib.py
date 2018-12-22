@@ -36,6 +36,7 @@ USE_PROJECTFILE = preferences.GetBool('useProjectFolder', False)
 PARTIAL_PROCESSING_ENABLED = preferences.GetBool('usePartialSolver', True)
 AUTOSOLVE_ENABLED = preferences.GetBool('autoSolve', True)
 RELATIVE_PATHES_ENABLED = preferences.GetBool('useRelativePathes',True)
+FORCE_FIXED_POSITION = preferences.GetBool('forceFixedPosition',True)
 
 SAVED_TRANSPARENCY = []
 
@@ -67,6 +68,10 @@ CONSTRAINT_DIALOG_REF = None
 CONSTRAINT_EDITOR__REF = None
 CONSTRAINT_VIEWMODE = False
 
+#------------------------------------------------------------------------------
+def getForceFixedPosition():
+    preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
+    return preferences.GetBool('forceFixedPosition',False)
 #------------------------------------------------------------------------------
 def getConstraintEditorRef():
     global CONSTRAINT_EDITOR__REF
