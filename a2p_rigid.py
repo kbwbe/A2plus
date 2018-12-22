@@ -94,7 +94,8 @@ class Rigid():
         self.spin = None
         self.moveVectorSum = None
         self.maxPosError = 0.0
-        self.maxAxisError = 0.0
+        self.maxAxisError = 0.0         # This is an avaverage of all single spins
+        self.maxSingleAxisError = 0.0   # Also the max single Axis spin has to be checked for solvability       
         self.refPointsBoundBoxSize = 0.0
         self.countSpinVectors = 0
         self.currentDOFCount = 6
@@ -302,7 +303,8 @@ class Rigid():
         depMoveVectors_Spin = []        #depMoveVectors, relevant for spin generation...
         #
         self.maxPosError = 0.0
-        self.maxAxisError = 0.0
+        self.maxAxisError = 0.0         # SpinError is an average of all single spins
+        self.maxSingleAxisError = 0.0   # avoid average, to detect unsolvable assemblies
         self.countSpinVectors = 0
         self.moveVectorSum = Base.Vector(0,0,0)
         self.spin = None
@@ -354,11 +356,14 @@ class Rigid():
                     vec1.normalize()
                     vec1.multiply(self.refPointsBoundBoxSize)
                     vec3 = vec1.add(vec2)
-                    beta = vec3.getAngle(vec1)
+                    beta = math.degrees(vec3.getAngle(vec1))
+                    
+                    if beta > self.maxSingleAxisError:
+                        self.maxSingleAxisError = beta 
 
                     axis.multiply(1.0e6)
                     axis.normalize()
-                    axis.multiply(math.degrees(beta)*WEIGHT_REFPOINT_ROTATION) #here use degrees
+                    axis.multiply(beta*WEIGHT_REFPOINT_ROTATION) #here use degrees
                     self.spin = self.spin.add(axis)
                     self.countSpinVectors += 1
                 except:
@@ -374,6 +379,9 @@ class Rigid():
 
                 # Accumulate all rotations for later average calculation
                 self.spin = self.spin.add(rotation)
+                rotationLength = rotation.Length
+                if rotationLength > self.maxSingleAxisError:
+                    self.maxSingleAxisError = rotationLength
                 self.countSpinVectors += 1
 
         # Calculate max rotation error

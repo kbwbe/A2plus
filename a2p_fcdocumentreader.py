@@ -20,7 +20,7 @@
 #*                                                                         *
 #***************************************************************************
 
-import FreeCAD, FreeCADGui
+import FreeCAD, FreeCADGui, os
 
 import zipfile
 try:
@@ -182,6 +182,10 @@ class FCdocumentReader(object):
         
     def openDocument(self,fileName):
         self.clear()
+        # check whether file exists or not...
+        if not os.path.exists( fileName ):
+            print (u"fcDocumentReader: file {} does not exist!".format(fileName))
+            return
         #
         # decompress the file
         f = zipfile.ZipFile(fileName,'r')
