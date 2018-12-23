@@ -622,7 +622,8 @@ class PartMover:
         self.view.removeEventCallback("SoKeyboardEvent",self.callbackKey)
     def clickMouse(self, info):
         if info['Button'] == 'BUTTON1' and info['State'] == 'DOWN':
-            if not info['ShiftDown'] and not info['CtrlDown']:
+            #if not info['ShiftDown'] and not info['CtrlDown']: #struggles within Inventor Navigation
+            if not info['ShiftDown']:
                 self.removeCallbacks()
                 FreeCAD.activeDocument().recompute()
     def KeyboardEvent(self, info):

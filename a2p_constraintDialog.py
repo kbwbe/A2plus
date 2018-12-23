@@ -224,7 +224,6 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         
     def setConstraintEditorData(self):
         if hasattr(self.constraintObject,"directionConstraint"):
-            print ("Index of directionCombo: {}".format(self.directionCombo.currentIndex()))
             if self.directionCombo.currentIndex() == 0:
                 self.constraintObject.directionConstraint = "aligned"
             elif self.directionCombo.currentIndex() == 1:
