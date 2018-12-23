@@ -347,7 +347,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         self.setConstraintEditorData()
         self.Accepted.emit()
         
-    def reject(self):
+    def cancelOperation(self):
         doc = FreeCAD.activeDocument()
         if self.constraintObject not in doc.Objects:
             QtGui.QMessageBox.information(
@@ -724,6 +724,12 @@ button.
         self.manageConstraint()
         
 #==============================================================================
+def getMoveDistToScreenCenter(widg):
+    w = QtGui.QApplication.desktop().width()
+    h = QtGui.QApplication.desktop().height()
+    center = QtCore.QPoint(w/2,h/2)
+    return center- widg.rect().center()  
+#==============================================================================
 class a2p_ConstraintValuePanel(QtGui.QDockWidget):
     
     Deleted = QtCore.Signal()
@@ -750,8 +756,8 @@ class a2p_ConstraintValuePanel(QtGui.QDockWidget):
         self.setFloating(True)
         self.activateWindow()
         self.setAllowedAreas(QtCore.Qt.NoDockWidgetArea)
-        screen_center = lambda widget: QtGui.QApplication.desktop().screen().rect().center()- widget.rect().center()  
-        self.move(screen_center(self))      
+        self.move(getMoveDistToScreenCenter(self))
+              
         a2plib.setConstraintEditorRef(self)
         
     def onAcceptConstraint(self):
@@ -761,7 +767,7 @@ class a2p_ConstraintValuePanel(QtGui.QDockWidget):
         self.Deleted.emit()
 
     def closeEvent(self,event):
-        self.widget().reject()
+        self.widget().cancelOperation()
         event.ignore()
 
 #==============================================================================
@@ -779,8 +785,8 @@ class a2p_ConstraintPanel(QtGui.QDockWidget):
         self.setFloating(True)
         self.activateWindow()
         self.setAllowedAreas(QtCore.Qt.NoDockWidgetArea)
-        screen_center = lambda widget: QtGui.QApplication.desktop().screen().rect().center()- widget.rect().center()  
-        self.move(screen_center(self))      
+        self.move(getMoveDistToScreenCenter(self))
+
         a2plib.setConstraintDialogRef(self)
         #
         self.timer = QtCore.QTimer()
