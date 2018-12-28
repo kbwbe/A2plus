@@ -100,57 +100,129 @@ Mac Installation Instructions
 * unzip downloaded repository in the folder "Contents/Mod/A2plus"
 
 
-Usage of A2plus workbench:
---------------------------
-(Work in progress)
-
-As your first steps learning this workbench, please have look at tutorials related to Hamish's Assembly 2. A2plus is very similar.
-
-You can follow the tool-tips in the workbench's toolbar. They describe exactly what to do in which order.
+Features of the A2plus workbench
+--------------------------------
+(work in progress)
 
 Current Features like shown in the workbench's toolbar:
-* Add a part from external file (Shift+A) -
-    Begin and continue here with adding (importing existing files) .fcstd parts
-* Update parts imported into the assembly -
+
+* Add a part from external file (Shift+A) - 
+    Begin and continue here with importing existing part or subassembly .fcstd files to the assembly
+* Update parts imported into the assembly - 
     Use this to refresh changed parts already assembled
 * Move part - 
     Just move selected part
-* Duplicate part -
-    Adds one or more previously imported part into assembly
-* Edit -
-    Opens the selected assembly part to be changed in a new tab
-* Add a point-to-point identity {pointIdentityConstraint} -
-    Fix a point vertex to another point vertex
-* Add a point-on-line match {pointOnLineConstraint} -
-    Fix a point vertex to a line vertex
-* Add a point-on-plane match {pointOnPlaneConstraint} -
-    Fix a point vertex to be on a plane
-* Add a circular-to-circular edge match {circularEdgeConstraint} -
-    Fix one circular edge to another. You can choose a special direction (aligned, opposed or none).
-    An offset can be applied
-* Add a plane-to-plane parallelism {planeParallel} -
-    Adjust selected planes to be parallel. You can choose a special direction (aligned, opposed)
-* Add a plane-to-plane offset {planeConstraint} -
-    Makes planes parallel and offers to give an offset value and direction (aligned, opposed,none)
-* Add an axis-to-axis identity {axialConstraint} -
-    Makes cylindrical objects or two axes to be axially aligned
-* Add an angle between planes {angledPlanesConstraint} -
+* Duplicate part - 
+    Adds one or more previously imported part(s) into assembly (hold Shift for multiple times)
+* Convert part to A2plus form - 
+    Converts an imported part to internal representation without external dependency
+* Edit - 
+    Opens the selected assembly part or subassembly in a new tab, to be changed, don't forget
+    to save and refresh the assembly
+  
+* Constraint Tools - 
+    Open a dialog to define constraints. Find all constraints in the opening dialog! 
+    This is the access to the A2plus constraining possibilities.
+  
+  Depending on the context, like selected faces, edges, vertices, one or more of the following 
+  list of constraints may get selectable:
+  (After selecting the constraint, a 'Constraint Properties' dialog will appear to appropriately ask 
+  you for details, like offsets, angles and directions.) 
+  Below, first selection is meant for the first part of the constraint (parent) and the second 
+  for the second part (child). Choices lists, what you can expect to edit in "Constraint Properties"
+  and with the "Edit selected constraint" button later  on.
+  - Add a point-to-point identity {pointIdentity constraint} - 
+    (1. one point vertex, 2. second point vertex)
+  - Add a point-on-line match {pointOnLine constraint} - 
+    (1. one point vertex, 2. a line vertex/ edge)
+  - Add a point-on-plane match {pointOnPlane constraint} - 
+    (1. point vertex or center of a circle, 2. a plane)
+    Choices: offset
+  - Add a sphere-to-sphere constraint {sphereCenterIdent constraint} - 
+    (1. first spherical surface or vertex, 2. second spherical surface or vertex)
+  - Add a circular-to-circular-edge match {circularEdge constraint} -
+    (1. parent's circular edge, 2. child's circular edge)
+    Choices: direction (aligned, opposed) +Flip, offset
+  - Add an axis-to-axis identity {axisCoincident constraint} -
+    (1. first cylinder face/linear edge, 2. second cylinder face/linear edge)
+    Choices: direction (aligned, opposed) + Flip, lockRotation
+  - Add an axis-to-axis parallelism {axisParallel constraint}
+    (1. first cylinder face/linear edge, 2. second cylinder face/linear edge)
+    Selected parts will get rotated, but the axis not coincident.
+  - Add an axis-to-plane parallelism {axisPlaneParallel constraint}
+    (1. first cylinder axis or linear edge, 2. second part's plane face)
+  - Add a plane-to-plane parallelism {planesParallel constraint} -
+    (1. parent's plane, 2. child's plane)
+    Selected planes would be parallel but not coincident.
+    Choices: direction (aligned, opposed) +Flip
+  - Add a plane-to-plane coincident match {planeCoincident constraint} -
+    (1. parent's plane, 2. child's plane)
+    Selected planes would be parallel and you have more choices:
+    Choices: direction (aligned, opposed) +Flip, offset
+  - Add an angle-between-planes {angledPlanes constraint} -
     Selected planes make the latter object to be rotated by your edited 'angle' value.
-    Keep the angle between aprox 0.1° and 179.9° or use workarounds.
-* Add a spherical constraint between objects -
-    Select spheres to be aligned or vertex/sphere or vertex/vertex
-* Solve A2plus constraints -
-    Manually invoke the A2pus solver (especially when AutoSolve is OFF)
-* Delete constraints -
-    Remove all constraints of selected part in one step
-* View constrained element -
-    Show all elements for a Tree view selected constraint
-* SAS Create or refresh simple shape of complete assembly -
-    the newly created compound can be found in tree vies
-* Toggle transparency of assembly -
-    The whole assembly will get transparent
-* Show only selected items (or all if none selected) -
-    Just another visibility helper
-* Toggle AutoSolve -
-    Normally the solver defaults to and works with AutoSolve, but for larger
-    assemblies one may chose OFF and solve manually, as it saves computation time.
+    Keep the angle between aprox. 0.1° and 179.9° and use planesParallel for 0° and 180°.
+
+* Edit selected constraint - 
+  Select a constraint in the treeview and hit this button to edit it's properties
+* Delete constraints - 
+  Remove all constraints of exactly one selected part in one step
+  
+* Solve A2plus constraints - 
+  Manually invoke the A2pus solver (especially when AutoSolve is OFF) 
+* Toggle Autosolve - 
+  By pressing this button you can enable or disable automatic solving after a constraint
+  has been edited. If Autosolve is disabled you have to start it manually by hitting the
+  Solve button. Disabled, this can save computation time.
+* Flip direction of last constraint - 
+  does exactly what it means for suitable constraints
+* Print detailed DOF information to console - 
+  shows the degrees-of-freedom for the current constraints' solving state,
+  useful for analysing eventually missing constraints
+* Generate HTML file with detailed constraining structure - 
+  useful to visualize the current constraint dependencies
+  
+* Show connected elements - 
+  highlights the parts connected by a constraint selected in treeview
+* Toggle transparency of assembly - 
+  The whole assembly will get transparent
+* Show only selected items, or all if none selected - 
+  Another visibility helper for assembly analysis
+  
+* Create or refresh simple shape of complete assembly -
+  the newly created compound can be found in treeview
+* Repair the treeview, if damaged somehow - 
+  After pressing this button constraints will be grouped under corresponding parts again
+* Create a spreadsheet with logistic/ordering information - 
+  Adds a spreadsheet to the treeview, editable by double-click in a new tab for part's info
+* Create a spreadsheet with a partlist of this file -
+  Adds a spreadsheet to the treeview, editable by double-click in a new tab for assembly's BOM info
+
+
+Usage hints for the A2plus workbench
+------------------------------------
+(work in progress)
+
+Have a look on the Feature list above, and...
+Please, follow the Tooltips in the workbench's toolbar and in the "Constraint Tools" toolbox. They 
+describe what to do in which order.
+
+First steps to create an A2plus assembly:
+
+* Open a new .fcstd file and save it with a name. (If not, you'd be asked for by A2plus.)
+* Import a .fcstd file.
+* The first imported file gets set as fixed (position) by default. (You can change later.)
+* Import a second .fcstd file
+* Select some faces or edges or vertices, you want to constrain, and push the "Constraint Tools" button, 
+  the Tools menu pops-up,
+  alternatively you can push the button first and select the constraint's context afterwards
+* Related to the context you'd be asked in the "Constraints Properties" (sub-menu), to edit the
+  appropriate parameters, to delete the constraint, to solve and or accept it.
+* You can edit once-set "Constraints Properties" at any time later via the "Edit selected constraint" button.
+
+
+Editing a subassembly:
+
+* As you can also load a subassembly as a .fcstd file, you can also open it via the A2plus edit command,
+  to edit it. Please just make sure for higher assembly stages, to reload the changes file(s).
+

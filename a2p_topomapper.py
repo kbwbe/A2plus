@@ -161,8 +161,8 @@ class TopoMapper(object):
         # workaround for hasattr(edge,"Curve"), which does not work with spheres on conda builds
         curveAttributeExists = False
         try:
-            hasattr(edge,"Curve") # throws exception on Conda build (spheres),
-            curveAttributeExists = True
+            if hasattr(edge,"Curve"): # throws exception on Conda build (spheres),
+                curveAttributeExists = True
         except:
             pass
         #circular edge #hasattr(edge,"Curve") because of spheres...
