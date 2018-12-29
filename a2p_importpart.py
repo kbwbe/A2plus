@@ -734,7 +734,8 @@ class ViewConnectionsCommand:
         if selected is None:
             return
 
-        if not a2plib.isTransparencyEnabled():
+        initialTransparencyState = a2plib.isTransparencyEnabled()
+        if not initialTransparencyState:
             a2plib.setTransparency()
 
         FreeCADGui.Selection.clearSelection()
@@ -745,10 +746,11 @@ class ViewConnectionsCommand:
             doc.getObject(selected.Object2), selected.SubElement2)
 
         # Add observer to remove the transparency when the selection is changing or removing
-        FreeCADGui.Selection.addObserver(ViewConnectionsObserver())
+        FreeCADGui.Selection.addObserver(ViewConnectionsObserver(initialTransparencyState))
 
     def IsActive(self):
-        return (a2plib.getSelectedConstraint() is not None and a2plib.isTransparencyEnabled() == False)
+        #return (a2plib.getSelectedConstraint() is not None and a2plib.isTransparencyEnabled() == False)
+        return (a2plib.getSelectedConstraint() is not None)
 
     def GetResources(self):
         return {
@@ -760,18 +762,20 @@ class ViewConnectionsCommand:
 FreeCADGui.addCommand('a2p_ViewConnectionsCommand', ViewConnectionsCommand())
 
 class ViewConnectionsObserver:
-    def __init__(self):
+    def __init__(self,initialTransparencyState):
         self.ignoreClear = False
+        self.initialTransparencyState = initialTransparencyState
         a2plib.setConstraintViewMode(True)
 
     def clearSelection(self, doc):
         if self.ignoreClear:
             self.ignoreClear = False
         else:
-            if a2plib.isTransparencyEnabled():
+            if a2plib.isTransparencyEnabled() and not self.initialTransparencyState:
                 a2plib.restoreTransparency()
-                FreeCADGui.Selection.removeObserver(self)
-                a2plib.setConstraintViewMode(False)
+                
+            FreeCADGui.Selection.removeObserver(self)
+            a2plib.setConstraintViewMode(False)
 
     def setSelection(self, doc):
         selected = a2plib.getSelectedConstraint()
