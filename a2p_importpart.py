@@ -318,10 +318,6 @@ def updateImportedParts(doc):
                         )
         return
         
-    # modififying object's subelements causes solving of the assembly, disable autosolve here
-    autoSolveState = a2plib.getAutoSolveState()
-    a2plib.setAutoSolve(False)
-            
     doc.openTransaction("updateImportParts")    
     objectCache.cleanUp(doc)
     for obj in doc.Objects:
@@ -372,19 +368,12 @@ def updateImportedParts(doc):
     sub = mdi.activeSubWindow()
     if sub != None:
         sub.showMaximized()
-
     objectCache.cleanUp(doc)
-    a2plib.setAutoSolve(autoSolveState)
-    
-    if not a2plib.getUseTopoNaming():
-        # This is only needed when not using toponames. 
-        # Otherwise updating constraints.subelements triggers this.
-        a2p_solversystem.autoSolveConstraints(
-            doc, 
-            useTransaction = False, 
-            callingFuncName = "updateImportedParts"
-            ) #transaction is already open...
-    
+    a2p_solversystem.autoSolveConstraints(
+        doc, 
+        useTransaction = False, 
+        callingFuncName = "updateImportedParts"
+        ) #transaction is already open...
     doc.recompute()
     doc.commitTransaction()    
 
