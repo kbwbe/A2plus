@@ -318,10 +318,6 @@ def updateImportedParts(doc):
                         )
         return
         
-    # modififying object's subelements causes solving of the assembly, disable autosolve here
-    autoSolveState = a2plib.getAutoSolveState()
-    a2plib.setAutoSolve(False)
-            
     doc.openTransaction("updateImportParts")    
     objectCache.cleanUp(doc)
     for obj in doc.Objects:
@@ -372,19 +368,12 @@ def updateImportedParts(doc):
     sub = mdi.activeSubWindow()
     if sub != None:
         sub.showMaximized()
-
     objectCache.cleanUp(doc)
-    a2plib.setAutoSolve(autoSolveState)
-    
-    if not a2plib.getUseTopoNaming():
-        # This is only needed when not using toponames. 
-        # Otherwise updating constraints.subelements triggers this.
-        a2p_solversystem.autoSolveConstraints(
-            doc, 
-            useTransaction = False, 
-            callingFuncName = "updateImportedParts"
-            ) #transaction is already open...
-    
+    a2p_solversystem.autoSolveConstraints(
+        doc, 
+        useTransaction = False, 
+        callingFuncName = "updateImportedParts"
+        ) #transaction is already open...
     doc.recompute()
     doc.commitTransaction()    
 
@@ -745,7 +734,8 @@ class ViewConnectionsCommand:
         if selected is None:
             return
 
-        if not a2plib.isTransparencyEnabled():
+        initialTransparencyState = a2plib.isTransparencyEnabled()
+        if not initialTransparencyState:
             a2plib.setTransparency()
 
         FreeCADGui.Selection.clearSelection()
@@ -756,11 +746,12 @@ class ViewConnectionsCommand:
             doc.getObject(selected.Object2), selected.SubElement2)
 
         # Add observer to remove the transparency when the selection is changing or removing
-        FreeCADGui.Selection.addObserver(ViewConnectionsObserver())
+        FreeCADGui.Selection.addObserver(ViewConnectionsObserver(initialTransparencyState))
 
     def IsActive(self):
-        return (a2plib.getSelectedConstraint() is not None and a2plib.isTransparencyEnabled() == False)
-
+        #return (a2plib.getSelectedConstraint() is not None and a2plib.isTransparencyEnabled() == False)
+        return (a2plib.getSelectedConstraint() is not None)
+    
     def GetResources(self):
         return {
             'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_ViewConnection.svg',
@@ -771,18 +762,19 @@ class ViewConnectionsCommand:
 FreeCADGui.addCommand('a2p_ViewConnectionsCommand', ViewConnectionsCommand())
 
 class ViewConnectionsObserver:
-    def __init__(self):
+    def __init__(self,initialTransparencyState):
         self.ignoreClear = False
+        self.initialTransparencyState = initialTransparencyState
         a2plib.setConstraintViewMode(True)
 
     def clearSelection(self, doc):
         if self.ignoreClear:
             self.ignoreClear = False
         else:
-            if a2plib.isTransparencyEnabled():
+            if a2plib.isTransparencyEnabled() and not self.initialTransparencyState:
                 a2plib.restoreTransparency()
-                FreeCADGui.Selection.removeObserver(self)
-                a2plib.setConstraintViewMode(False)
+            FreeCADGui.Selection.removeObserver(self)
+            a2plib.setConstraintViewMode(False)
 
     def setSelection(self, doc):
         selected = a2plib.getSelectedConstraint()
@@ -864,6 +856,9 @@ class a2p_ToggleTransparencyCommand:
 
     def IsChecked(self):
         return a2plib.isTransparencyEnabled()
+
+    def IsActive(self):
+        return not a2plib.getConstraintViewMode()
 
     def GetResources(self):
         return {
