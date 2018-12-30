@@ -158,9 +158,16 @@ class TopoMapper(object):
 
     def calcEdgeKeys(self, edge, pl):
         keys = []
+        # workaround for hasattr(edge,"Curve"), which does not work with spheres on conda builds
+        curveAttributeExists = False
+        try:
+            if hasattr(edge,"Curve"): # throws exception on Conda build (spheres),
+                curveAttributeExists = True
+        except:
+            pass
         #circular edge #hasattr(edge,"Curve") because of spheres...
         if (
-            hasattr(edge,"Curve") and
+            curveAttributeExists and
             hasattr(edge.Curve,'Axis') and
             hasattr(edge.Curve,'Radius')
             ):

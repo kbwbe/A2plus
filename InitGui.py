@@ -51,20 +51,10 @@ class a2pWorkbench (Workbench):
         import a2plib #QtCore.QResource.registerResource happens in assembly2lib
         import a2p_importpart
         import a2p_convertPart
-        import a2p_CircularEdgeConnection
-        import a2p_planesParallelConstraint
-        import a2p_axisParallelConstraint
-        import a2p_axisPlaneParallelConstraint
-        import a2p_planeConstraint
-        import a2p_AxialConnection
-        import a2p_angleConnection
-        import a2p_pointIdentityConnection
-        import a2p_pointOnLineConstraint
-        import a2p_pointOnPlaneConstraint
-        import a2p_sphericalConnection
         import a2p_solversystem
         import a2p_MuxAssembly
         import a2p_partinformation
+        import a2p_constraintDialog
         import a2p_bom #bill of materials == partslist
 
         partCommands = [
@@ -76,17 +66,8 @@ class a2pWorkbench (Workbench):
             'a2p_editImportedPart',
             ]
         constraintCommands = [
-            'a2p_PointIdentityConnectionCommand',
-            'a2p_PointOnLineConstraintCommand',
-            'a2p_PointOnPlaneConstraintCommand',
-            'a2p_CircularEdgeConnection',
-            'a2p_AxialConnection',
-            'a2p_AxisParallelCommand',
-            'a2p_AxisPlaneParallelCommand',
-            'a2p_PlanesParallelConnectionCommand',
-            'a2p_PlaneConnection',
-            'a2p_AngledPlanesCommand',
-            'a2p_SphericalConnection',
+            'a2p_ConstraintDialogCommand',
+            'a2p_EditConstraintCommand',
             'a2p_DeleteConnectionsCommand',
             ]
         solverCommands = [

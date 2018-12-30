@@ -98,6 +98,7 @@ class SolverSystem():
         self.solvedCounter = 0
         self.maxPosError = 0.0
         self.maxAxisError = 0.0
+        self.maxSingleAxisError = 0.0
 
     def clear(self):
         for r in self.rigids:
@@ -347,16 +348,20 @@ class SolverSystem():
                 if not completeSolvingRequired: systemSolved = True
                 break
         self.maxAxisError = 0.0
+        self.maxSingleAxisError = 0.0
         self.maxPosError = 0.0
         for rig in self.rigids:
             if rig.maxPosError > self.maxPosError:
                 self.maxPosError = rig.maxPosError
             if rig.maxAxisError > self.maxAxisError:
                 self.maxAxisError = rig.maxAxisError
+            if rig.maxSingleAxisError > self.maxSingleAxisError:
+                self.maxSingleAxisError = rig.maxSingleAxisError
         Msg( 'TARGET   POS-ACCURACY :{}\n'.format(self.mySOLVER_POS_ACCURACY) )
         Msg( 'REACHED  POS-ACCURACY :{}\n'.format(self.maxPosError) )
         Msg( 'TARGET  SPIN-ACCURACY :{}\n'.format(self.mySOLVER_SPIN_ACCURACY) )
         Msg( 'REACHED SPIN-ACCURACY :{}\n'.format(self.maxAxisError) )
+        Msg( 'SA SPIN-ACCURACY      :{}\n'.format(self.maxSingleAxisError) )
             
         return systemSolved
 
@@ -443,6 +448,7 @@ class SolverSystem():
         while not goodAccuracy:
             maxPosError = 0.0
             maxAxisError = 0.0
+            maxSingleAxisError = 0.0
 
             calcCount += 1
             self.stepCount += 1
@@ -454,14 +460,19 @@ class SolverSystem():
                     maxPosError = w.maxPosError
                 if w.maxAxisError > maxAxisError:
                     maxAxisError = w.maxAxisError
+                if w.maxSingleAxisError > maxSingleAxisError:
+                    maxSingleAxisError = w.maxSingleAxisError
 
             # Perform the move
             for w in workList:
                 w.move(doc)
 
             # The accuracy is good, apply the solution to FreeCAD's objects
-            if (maxPosError <= reqPosAccuracy and
-                maxAxisError <= reqSpinAccuracy):
+            if (maxPosError <= reqPosAccuracy and # relevant check
+                maxAxisError <= reqSpinAccuracy and # relevant check
+                maxSingleAxisError <= reqSpinAccuracy * 10  # additional check for insolvable assemblies
+                                                            # sometimes spin can be solved but singleAxis not..
+                ):
                 # The accuracy is good, we're done here
                 goodAccuracy = True
                 # Mark the rigids as tempfixed and add its constrained rigids to pending list to be processed next
@@ -499,6 +510,7 @@ class SolverSystem():
                 
                 self.lastPositionError = maxPosError
                 self.lastAxisError = maxAxisError
+                self.maxSingleAxisError = maxSingleAxisError
                 self.convergencyCounter = 0
 
             if self.stepCount > SOLVER_MAXSTEPS:

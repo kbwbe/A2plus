@@ -30,11 +30,6 @@ import a2plib
 
 
 #---------------------------------------------------------------------------
-# Module global vars, automatically managed, hands off !!
-#---------------------------------------------------------------------------
-a2p_NeedToSolveSystem = False
-#---------------------------------------------------------------------------
-
 class ImportedPartViewProviderProxy:
 
     def claimChildren(self):
@@ -54,7 +49,6 @@ class ImportedPartViewProviderProxy:
     def onDelete(self, viewObject, subelements): # subelements is a tuple of strings
         if FreeCAD.activeDocument() != viewObject.Object.Document:
             return False # only delete objects in the active Document anytime !!
-
         obj = viewObject.Object
         doc = obj.Document
 
@@ -63,27 +57,27 @@ class ImportedPartViewProviderProxy:
             if 'ConstraintInfo' in c.Content: # a related Constraint
                 if obj.Name in [ c.Object1, c.Object2 ]:
                     deleteList.append(c)
-
         if len(deleteList) > 0:
             for c in deleteList:
                 a2plib.removeConstraint(c) #also deletes the mirrors...
-
         return True # If False is returned the object won't be deleted
 
     def getIcon(self):
-        import os
         if hasattr(self,"Object"):
             if hasattr(self.Object,"subassemblyImport"):
                 if self.Object.subassemblyImport:
-                    return (os.path.join( a2plib.path_a2p, 'GuiA2p', 'Resources', 'icons','a2p_Asm.svg'))
-        return (os.path.join( a2plib.path_a2p, 'GuiA2p', 'Resources', 'icons','a2p_Obj.svg'))
+                    return ":/icons/a2p_Asm.svg"
+            if hasattr(self.Object,"sourceFile"):
+                if self.Object.sourceFile == 'converted':
+                    return ":/icons/a2p_ConvertPart.svg"
+        return ":/icons/a2p_Obj.svg"
 
     def __getstate__(self):
         return None
 
     def __setstate__(self, state):
         return None
-
+    
     def attach(self, vobj):
         self.object_Name = vobj.Object.Name
         self.Object = vobj.Object
@@ -255,26 +249,13 @@ class ConstraintObjectProxy:
         self.disable_onChanged = False
 
     def execute(self, obj):
-        global a2p_NeedToSolveSystem
-        if a2p_NeedToSolveSystem:
-            a2p_NeedToSolveSystem = False # Solve only once after editing a constraint's property
-            self.callSolveConstraints()
+        return # functionality removed with new UserInterface, avoid nested recomputes...
 
     def onChanged(self, obj, prop):
         # Add new property "disable_onChanged" if not already existing...
         if not hasattr(self, 'disable_onChanged'):
             self.disable_onChanged = False
-        '''
-        # add new property offset of pointOnPlane, if not already existing...
-        # introduced above version v0.1.5    
-        if obj.Type == 'pointOnPlane':
-            if not hasattr(obj,'offset'):
-                obj.addProperty('App::PropertyDistance','offset',"ConstraintInfo")
-                obj.offset = 0.0
-        #
-        '''
         if self.disable_onChanged: return
-        global a2p_NeedToSolveSystem
         if hasattr(self, 'mirror_name'):
             cMirror = obj.Document.getObject( self.mirror_name )
             if cMirror == None: return #catch issues during deleting...
@@ -283,7 +264,6 @@ class ConstraintObjectProxy:
             if obj.getGroupOfProperty( prop ) == 'ConstraintInfo':
                 cMirror.Proxy.disable_onChanged = True
                 setattr( cMirror, prop, getattr( obj, prop) )
-                a2p_NeedToSolveSystem = True
                 cMirror.Proxy.disable_onChanged = False
 
     def reduceDirectionChoices( self, obj, value):
