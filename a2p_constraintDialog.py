@@ -124,7 +124,6 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             self.mainLayout.addWidget(lbl4,self.lineNo,0)
             
             self.offsetEdit = QtGui.QLineEdit(self)
-            self.offsetEdit.setText("{}".format(offs.Value))
             self.offsetEdit.setText(FreeCAD.Units.Quantity(offs.Value, FreeCAD.Units.Length).UserString)
             self.offsetEdit.setFixedHeight(32)
             self.mainLayout.addWidget(self.offsetEdit,self.lineNo,1)
@@ -269,24 +268,22 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
     
     def setOffsetZero(self):
         self.winModified = True
-        self.offsetEdit.setText("0.0")
-        if a2plib.getAutoSolveState():
-            self.solve()
+        q = FreeCAD.Units.Quantity(self.offsetEdit.text())
+        q.Value = 0.0
+        self.offsetEdit.setText(q.UserString)
     
     def flipOffsetSign(self):
         self.winModified = True
-        try:
-            o = float(self.offsetEdit.text())
-            o = o * -1.0
-            if abs(o) > 1e-7:
-                self.offsetEdit.setText(str(o))
-                if a2plib.getAutoSolveState():
-                    self.solve()
-            else:
-                self.offsetEdit.setText("0.0")
-        except:
-            self.offsetEdit.setText("0.0")
-            
+        q = FreeCAD.Units.Quantity(self.offsetEdit.text())
+        q.Value = -q.Value
+        if abs(q.Value) > 1e-7:
+            self.offsetEdit.setText(q.UserString)
+            if a2plib.getAutoSolveState():
+                self.solve()
+        else:
+            q.Value = 0.0
+            self.offsetEdit.setText(q.UserString)
+        
     def flipDirection(self):
         self.winModified = True
         if self.directionCombo.currentIndex() == 0:
