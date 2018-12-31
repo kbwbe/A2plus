@@ -125,6 +125,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             
             self.offsetEdit = QtGui.QLineEdit(self)
             self.offsetEdit.setText("{}".format(offs.Value))
+            self.offsetEdit.setText(FreeCAD.Units.Quantity(offs.Value, FreeCAD.Units.Length).UserString)
             self.offsetEdit.setFixedHeight(32)
             self.mainLayout.addWidget(self.offsetEdit,self.lineNo,1)
 
@@ -231,7 +232,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             else:
                 self.constraintObject.directionConstraint = "none"
         if hasattr(self.constraintObject,"offset"):
-            self.constraintObject.offset = float(self.offsetEdit.text())
+            self.constraintObject.offset = FreeCAD.Units.Quantity(self.offsetEdit.text()).Value
         if hasattr(self.constraintObject,"angle"):
             self.constraintObject.angle = float(self.angleEdit.text())
         if hasattr(self.constraintObject,"lockRotation"):
