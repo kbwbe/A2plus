@@ -55,7 +55,8 @@ class a2pWorkbench (Workbench):
         import a2p_MuxAssembly
         import a2p_partinformation
         import a2p_constraintDialog
-        import a2p_bom #bill of materials == partslist
+        import a2p_constraintcommands
+        import a2p_bom # bom == bill of materials == partslist
 
         partCommands = [
             'a2p_ImportPart',
@@ -68,6 +69,18 @@ class a2pWorkbench (Workbench):
         constraintCommands = [
             'a2p_ConstraintDialogCommand',
             'a2p_EditConstraintCommand',
+            'a2p_PointIdentityConstraintCommand',
+            'a2p_PointOnLineConstraintCommand',
+            'a2p_PointOnPlaneConstraintCommand',
+            'a2p_SphericalSurfaceConstraintCommand',
+            'a2p_CircularEdgeConnection',
+            'a2p_AxialConstraintCommand',
+            'a2p_AxisParallelConstraintCommand',
+            'a2p_AxisPlaneParallelCommand',
+            'a2p_PlanesParallelConstraintCommand',
+            'a2p_PlaneCoincidentConstraintCommand',
+            'a2p_AngledPlanesConstraintCommand',
+            
             'a2p_DeleteConnectionsCommand',
             ]
         solverCommands = [

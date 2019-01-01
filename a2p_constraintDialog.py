@@ -654,14 +654,14 @@ button.
         
     @QtCore.Slot()    
     def onAcceptConstraint(self):
-        self.constraintValueBox.deleteLater()
+        #self.constraintValueBox.deleteLater()
         a2plib.setConstraintEditorRef(None)
         self.activeConstraint = None
         FreeCADGui.Selection.clearSelection()
 
     @QtCore.Slot()    
     def onDeleteConstraint(self):
-        self.constraintValueBox.deleteLater()
+        #self.constraintValueBox.deleteLater()
         a2plib.setConstraintEditorRef(None)
         self.activeConstraint = None
         FreeCADGui.Selection.clearSelection()
@@ -738,6 +738,7 @@ class a2p_ConstraintValuePanel(QtGui.QDockWidget):
         self.constraintObject = constraintObject
         self.resize(300,300)
         #
+        print (constraintObject)
         cvw = a2p_ConstraintValueWidget(
             None,
             constraintObject,
@@ -760,9 +761,13 @@ class a2p_ConstraintValuePanel(QtGui.QDockWidget):
         
     def onAcceptConstraint(self):
         self.Accepted.emit()
+        a2plib.setConstraintEditorRef(None)
+        self.deleteLater()
         
     def onDeleteConstraint(self):
         self.Deleted.emit()
+        a2plib.setConstraintEditorRef(None)
+        self.deleteLater()
 
     def closeEvent(self,event):
         self.widget().cancelOperation()

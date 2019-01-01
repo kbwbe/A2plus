@@ -132,6 +132,11 @@ class BasicConstraint():
     @staticmethod
     def getToolTip(self):
         return 'Invalid Base Class BasicConstraint'
+    
+    @staticmethod
+    def isValidSelection():
+        return True
+    
         
 #==============================================================================
 class PointIdentityConstraint(BasicConstraint):
