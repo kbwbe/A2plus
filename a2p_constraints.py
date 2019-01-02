@@ -134,7 +134,7 @@ class BasicConstraint():
         return 'Invalid Base Class BasicConstraint'
     
     @staticmethod
-    def isValidSelection():
+    def isValidSelection(selection):
         return True
     
         
@@ -159,6 +159,17 @@ selection:
 1.) select a vertex on a part
 2.) select a vertex on another part
 '''
+
+    @staticmethod
+    def isValidSelection(selection):
+        validSelection = False
+        if len(selection) == 2:
+            s1, s2 = selection
+            if s1.ObjectName != s2.ObjectName:
+                if vertexSelected(s1) and vertexSelected(s2):
+                    validSelection = True
+        return validSelection
+    
 #==============================================================================
 class PointOnLineConstraint(BasicConstraint):
     def __init__(self,selection):
@@ -179,6 +190,17 @@ Add a pointOnLine constraint between two objects
 1.) select a vertex from a part
 2.) select a line (linear edge) on another part
 '''
+
+    @staticmethod
+    def isValidSelection(selection):
+        validSelection = False
+        if len(selection) == 2:
+            s1, s2 = selection
+            if s1.ObjectName != s2.ObjectName:
+                if vertexSelected(s1) and LinearEdgeSelected(s2):
+                    validSelection = True
+        return validSelection
+    
 #==============================================================================
 class PointOnPlaneConstraint(BasicConstraint):
     def __init__(self,selection):
@@ -210,6 +232,20 @@ Add a pointOnPlane constraint between two objects
 1.) select a vertex or a center of a circle
 2.) select a plane on other part
 '''
+
+    @staticmethod
+    def isValidSelection(selection):
+        validSelection = False
+        if len(selection) == 2:
+            s1, s2 = selection
+            if s1.ObjectName != s2.ObjectName:
+                if ( 
+                     (vertexSelected(s1) or CircularEdgeSelected(s1)) and 
+                     planeSelected(s2)
+                    ):
+                    validSelection = True
+        return validSelection
+    
 #==============================================================================
 class CircularEdgeConstraint(BasicConstraint):
     def __init__(self,selection):
@@ -242,6 +278,17 @@ selection-hint:
 1.) select circular edge on first importPart
 2.) select circular edge on other importPart
 '''
+
+    @staticmethod
+    def isValidSelection(selection):
+        validSelection = False
+        if len(selection) == 2:
+            s1, s2 = selection
+            if s1.ObjectName != s2.ObjectName:
+                if CircularEdgeSelected(s1) and CircularEdgeSelected(s2):
+                    validSelection = True
+        return validSelection
+    
 #==============================================================================
 class AxialConstraint(BasicConstraint):
     def __init__(self,selection):
@@ -275,6 +322,22 @@ Selection:
 1.) Select cylindrical face or linear edge on a part
 2.) Select cylindrical face or linear edge on another part
 '''
+
+    @staticmethod
+    def isValidSelection(selection):
+        
+        def ValidSelection(selectionExObj):
+            return cylindricalPlaneSelected(selectionExObj) \
+                or LinearEdgeSelected(selectionExObj) 
+        
+        validSelection = False
+        if len(selection) == 2:
+            s1, s2 = selection
+            if s1.ObjectName != s2.ObjectName:
+                if ValidSelection(s1) and ValidSelection(s2):
+                    validSelection = True
+        return validSelection
+    
 #==============================================================================
 class AxisParallelConstraint(BasicConstraint):
     def __init__(self,selection):
@@ -307,6 +370,20 @@ select:
 1.) linearEdge or cylinderFace from a part
 2.) linearEdge or cylinderFace from another part
 '''
+
+    @staticmethod
+    def isValidSelection(selection):
+        validSelection = False
+        if len(selection) == 2:
+            s1, s2 = selection
+            if s1.ObjectName != s2.ObjectName:
+                if (
+                    (LinearEdgeSelected(s1) or cylindricalPlaneSelected(s1)) and
+                    (LinearEdgeSelected(s2) or cylindricalPlaneSelected(s2))
+                    ): 
+                    validSelection = True
+        return validSelection
+
 #==============================================================================
 class AxisPlaneParallelConstraint(BasicConstraint):
     def __init__(self,selection):
@@ -332,6 +409,20 @@ This constraint adjusts an axis parallel
 to a selected plane. The parts are not
 moved to be coincident.
 '''
+
+    @staticmethod
+    def isValidSelection(selection):
+        validSelection = False
+        if len(selection) == 2:
+            s1, s2 = selection
+            if s1.ObjectName != s2.ObjectName:
+                if (
+                    (LinearEdgeSelected(s1) or cylindricalPlaneSelected(s1)) and
+                    planeSelected(s2)
+                    ):
+                    validSelection = True
+        return validSelection
+
 #==============================================================================
 class PlanesParallelConstraint(BasicConstraint):
     def __init__(self,selection):
@@ -366,6 +457,19 @@ select:
 1.) select a plane on a part
 2.) select a plane from another part
 '''
+
+    @staticmethod
+    def isValidSelection(selection):
+        validSelection = False
+        if len(selection) == 2:
+            s1, s2 = selection
+            if s1.ObjectName != s2.ObjectName:
+                #if not planeSelected(s1): #????
+                #    s2, s1 = s1, s2 #?????
+                if planeSelected(s1) and planeSelected(s2):
+                    validSelection = True
+        return validSelection
+
 #==============================================================================
 class PlaneConstraint(BasicConstraint):
     def __init__(self,selection):
@@ -399,6 +503,19 @@ select:
 1.) select a plane on a part
 2.) select a plane from another part
 '''
+
+    @staticmethod
+    def isValidSelection(selection):
+        validSelection = False
+        if len(selection) == 2:
+            s1, s2 = selection
+            if s1.ObjectName != s2.ObjectName:
+                #if not planeSelected(s1):
+                #    s2, s1 = s1, s2
+                if planeSelected(s1) and planeSelected(s2):
+                    validSelection = True
+        return validSelection
+
 #==============================================================================
 class AngledPlanesConstraint(BasicConstraint):
     def __init__(self,selection):
@@ -437,6 +554,17 @@ You could get strange results.
 
 Better for that is using planesParallelConstraint.
 '''
+
+    @staticmethod
+    def isValidSelection(selection):
+        validSelection = False
+        if len(selection) == 2:
+            s1, s2 = selection
+            if s1.ObjectName != s2.ObjectName:
+                if ( planeSelected(s1) and planeSelected(s2)):
+                    validSelection = True
+        return validSelection
+    
 #==============================================================================
 class SphericalConstraint(BasicConstraint):
     def __init__(self,selection):
@@ -459,6 +587,18 @@ Selection options:
 - spherical surface or vertex on a part
 - spherical surface or vertex on another part
 '''
+    
+    @staticmethod
+    def isValidSelection(selection):
+        validSelection = False
+        if len(selection) == 2:
+            s1, s2 = selection
+            if s1.ObjectName != s2.ObjectName:
+                if ( vertexSelected(s1) or sphericalSurfaceSelected(s1)) \
+                        and ( vertexSelected(s2) or sphericalSurfaceSelected(s2)):
+                        validSelection = True
+        return validSelection
+
 #==============================================================================
         
 
