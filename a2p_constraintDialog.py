@@ -654,14 +654,14 @@ button.
         
     @QtCore.Slot()    
     def onAcceptConstraint(self):
-        self.constraintValueBox.deleteLater()
+        #self.constraintValueBox.deleteLater()
         a2plib.setConstraintEditorRef(None)
         self.activeConstraint = None
         FreeCADGui.Selection.clearSelection()
 
     @QtCore.Slot()    
     def onDeleteConstraint(self):
-        self.constraintValueBox.deleteLater()
+        #self.constraintValueBox.deleteLater()
         a2plib.setConstraintEditorRef(None)
         self.activeConstraint = None
         FreeCADGui.Selection.clearSelection()
@@ -722,11 +722,19 @@ button.
         self.manageConstraint()
         
 #==============================================================================
-def getMoveDistToScreenCenter(widg):
-    w = QtGui.QApplication.desktop().width()
-    h = QtGui.QApplication.desktop().height()
-    center = QtCore.QPoint(w/2,h/2)
-    return center- widg.rect().center()  
+def getMoveDistToFcCenter(widg):
+    mw = FreeCADGui.getMainWindow()
+    fcFrame = QtGui.QDesktopWidget.geometry(mw)
+    x = fcFrame.x()
+    y = fcFrame.y()
+    width = fcFrame.width()
+    height = fcFrame.height()
+    
+    centerX = x + width/2
+    centerY = y + height/2
+    fcCenter = QtCore.QPoint(centerX,centerY)
+
+    return fcCenter- widg.rect().center()  
 #==============================================================================
 class a2p_ConstraintValuePanel(QtGui.QDockWidget):
     
@@ -738,6 +746,7 @@ class a2p_ConstraintValuePanel(QtGui.QDockWidget):
         self.constraintObject = constraintObject
         self.resize(300,300)
         #
+        print (constraintObject)
         cvw = a2p_ConstraintValueWidget(
             None,
             constraintObject,
@@ -754,15 +763,19 @@ class a2p_ConstraintValuePanel(QtGui.QDockWidget):
         self.setFloating(True)
         self.activateWindow()
         self.setAllowedAreas(QtCore.Qt.NoDockWidgetArea)
-        self.move(getMoveDistToScreenCenter(self))
+        self.move(getMoveDistToFcCenter(self))
               
         a2plib.setConstraintEditorRef(self)
         
     def onAcceptConstraint(self):
         self.Accepted.emit()
+        a2plib.setConstraintEditorRef(None)
+        self.deleteLater()
         
     def onDeleteConstraint(self):
         self.Deleted.emit()
+        a2plib.setConstraintEditorRef(None)
+        self.deleteLater()
 
     def closeEvent(self,event):
         self.widget().cancelOperation()
@@ -783,7 +796,7 @@ class a2p_ConstraintPanel(QtGui.QDockWidget):
         self.setFloating(True)
         self.activateWindow()
         self.setAllowedAreas(QtCore.Qt.NoDockWidgetArea)
-        self.move(getMoveDistToScreenCenter(self))
+        self.move(getMoveDistToFcCenter(self))
 
         a2plib.setConstraintDialogRef(self)
         #

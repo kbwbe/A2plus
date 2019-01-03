@@ -132,6 +132,11 @@ class BasicConstraint():
     @staticmethod
     def getToolTip(self):
         return 'Invalid Base Class BasicConstraint'
+    
+    @staticmethod
+    def isValidSelection(selection):
+        return True
+    
         
 #==============================================================================
 class PointIdentityConstraint(BasicConstraint):
@@ -153,7 +158,21 @@ Add a pointIdentity Constraint:
 selection:
 1.) select a vertex on a part
 2.) select a vertex on another part
+
+Button gets active after
+correct selection.
 '''
+
+    @staticmethod
+    def isValidSelection(selection):
+        validSelection = False
+        if len(selection) == 2:
+            s1, s2 = selection
+            if s1.ObjectName != s2.ObjectName:
+                if vertexSelected(s1) and vertexSelected(s2):
+                    validSelection = True
+        return validSelection
+    
 #==============================================================================
 class PointOnLineConstraint(BasicConstraint):
     def __init__(self,selection):
@@ -173,7 +192,21 @@ class PointOnLineConstraint(BasicConstraint):
 Add a pointOnLine constraint between two objects
 1.) select a vertex from a part
 2.) select a line (linear edge) on another part
+
+Button gets active after
+correct selection.
 '''
+
+    @staticmethod
+    def isValidSelection(selection):
+        validSelection = False
+        if len(selection) == 2:
+            s1, s2 = selection
+            if s1.ObjectName != s2.ObjectName:
+                if vertexSelected(s1) and LinearEdgeSelected(s2):
+                    validSelection = True
+        return validSelection
+    
 #==============================================================================
 class PointOnPlaneConstraint(BasicConstraint):
     def __init__(self,selection):
@@ -204,7 +237,24 @@ class PointOnPlaneConstraint(BasicConstraint):
 Add a pointOnPlane constraint between two objects
 1.) select a vertex or a center of a circle
 2.) select a plane on other part
+
+Button gets active after
+correct selection.
 '''
+
+    @staticmethod
+    def isValidSelection(selection):
+        validSelection = False
+        if len(selection) == 2:
+            s1, s2 = selection
+            if s1.ObjectName != s2.ObjectName:
+                if ( 
+                     (vertexSelected(s1) or CircularEdgeSelected(s1)) and 
+                     planeSelected(s2)
+                    ):
+                    validSelection = True
+        return validSelection
+    
 #==============================================================================
 class CircularEdgeConstraint(BasicConstraint):
     def __init__(self,selection):
@@ -236,7 +286,21 @@ Add a circularEdge constraint between two parts
 selection-hint:
 1.) select circular edge on first importPart
 2.) select circular edge on other importPart
+
+Button gets active after
+correct selection.
 '''
+
+    @staticmethod
+    def isValidSelection(selection):
+        validSelection = False
+        if len(selection) == 2:
+            s1, s2 = selection
+            if s1.ObjectName != s2.ObjectName:
+                if CircularEdgeSelected(s1) and CircularEdgeSelected(s2):
+                    validSelection = True
+        return validSelection
+    
 #==============================================================================
 class AxialConstraint(BasicConstraint):
     def __init__(self,selection):
@@ -269,7 +333,26 @@ to be coincident
 Selection:
 1.) Select cylindrical face or linear edge on a part
 2.) Select cylindrical face or linear edge on another part
+
+Button gets active after
+correct selection.
 '''
+
+    @staticmethod
+    def isValidSelection(selection):
+        
+        def ValidSelection(selectionExObj):
+            return cylindricalPlaneSelected(selectionExObj) \
+                or LinearEdgeSelected(selectionExObj) 
+        
+        validSelection = False
+        if len(selection) == 2:
+            s1, s2 = selection
+            if s1.ObjectName != s2.ObjectName:
+                if ValidSelection(s1) and ValidSelection(s2):
+                    validSelection = True
+        return validSelection
+    
 #==============================================================================
 class AxisParallelConstraint(BasicConstraint):
     def __init__(self,selection):
@@ -301,7 +384,24 @@ moved to be coincident
 select:
 1.) linearEdge or cylinderFace from a part
 2.) linearEdge or cylinderFace from another part
+
+Button gets active after
+correct selection.
 '''
+
+    @staticmethod
+    def isValidSelection(selection):
+        validSelection = False
+        if len(selection) == 2:
+            s1, s2 = selection
+            if s1.ObjectName != s2.ObjectName:
+                if (
+                    (LinearEdgeSelected(s1) or cylindricalPlaneSelected(s1)) and
+                    (LinearEdgeSelected(s2) or cylindricalPlaneSelected(s2))
+                    ): 
+                    validSelection = True
+        return validSelection
+
 #==============================================================================
 class AxisPlaneParallelConstraint(BasicConstraint):
     def __init__(self,selection):
@@ -326,7 +426,24 @@ Creates an axisPlaneParallel constraint.
 This constraint adjusts an axis parallel
 to a selected plane. The parts are not
 moved to be coincident.
+
+Button gets active after
+correct selection.
 '''
+
+    @staticmethod
+    def isValidSelection(selection):
+        validSelection = False
+        if len(selection) == 2:
+            s1, s2 = selection
+            if s1.ObjectName != s2.ObjectName:
+                if (
+                    (LinearEdgeSelected(s1) or cylindricalPlaneSelected(s1)) and
+                    planeSelected(s2)
+                    ):
+                    validSelection = True
+        return validSelection
+
 #==============================================================================
 class PlanesParallelConstraint(BasicConstraint):
     def __init__(self,selection):
@@ -360,7 +477,23 @@ moved to be coincident
 select:
 1.) select a plane on a part
 2.) select a plane from another part
+
+Button gets active after
+correct selection.
 '''
+
+    @staticmethod
+    def isValidSelection(selection):
+        validSelection = False
+        if len(selection) == 2:
+            s1, s2 = selection
+            if s1.ObjectName != s2.ObjectName:
+                #if not planeSelected(s1): #????
+                #    s2, s1 = s1, s2 #?????
+                if planeSelected(s1) and planeSelected(s2):
+                    validSelection = True
+        return validSelection
+
 #==============================================================================
 class PlaneConstraint(BasicConstraint):
     def __init__(self,selection):
@@ -393,7 +526,23 @@ Add a planeCoincident constraint between two objects
 select:
 1.) select a plane on a part
 2.) select a plane from another part
+
+Button gets active after
+correct selection.
 '''
+
+    @staticmethod
+    def isValidSelection(selection):
+        validSelection = False
+        if len(selection) == 2:
+            s1, s2 = selection
+            if s1.ObjectName != s2.ObjectName:
+                #if not planeSelected(s1):
+                #    s2, s1 = s1, s2
+                if planeSelected(s1) and planeSelected(s2):
+                    validSelection = True
+        return validSelection
+
 #==============================================================================
 class AngledPlanesConstraint(BasicConstraint):
     def __init__(self,selection):
@@ -431,7 +580,21 @@ Avoid use of angle 0 degrees and 180 degrees.
 You could get strange results.
 
 Better for that is using planesParallelConstraint.
+
+Button gets active after
+correct selection.
 '''
+
+    @staticmethod
+    def isValidSelection(selection):
+        validSelection = False
+        if len(selection) == 2:
+            s1, s2 = selection
+            if s1.ObjectName != s2.ObjectName:
+                if ( planeSelected(s1) and planeSelected(s2)):
+                    validSelection = True
+        return validSelection
+    
 #==============================================================================
 class SphericalConstraint(BasicConstraint):
     def __init__(self,selection):
@@ -453,7 +616,22 @@ Add a sphereCenterIdent constraint between to objects
 Selection options:
 - spherical surface or vertex on a part
 - spherical surface or vertex on another part
+
+Button gets active after
+correct selection.
 '''
+    
+    @staticmethod
+    def isValidSelection(selection):
+        validSelection = False
+        if len(selection) == 2:
+            s1, s2 = selection
+            if s1.ObjectName != s2.ObjectName:
+                if ( vertexSelected(s1) or sphericalSurfaceSelected(s1)) \
+                        and ( vertexSelected(s2) or sphericalSurfaceSelected(s2)):
+                        validSelection = True
+        return validSelection
+
 #==============================================================================
         
 
