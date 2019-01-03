@@ -722,11 +722,19 @@ button.
         self.manageConstraint()
         
 #==============================================================================
-def getMoveDistToScreenCenter(widg):
-    w = QtGui.QApplication.desktop().width()
-    h = QtGui.QApplication.desktop().height()
-    center = QtCore.QPoint(w/2,h/2)
-    return center- widg.rect().center()  
+def getMoveDistToFcCenter(widg):
+    mw = FreeCADGui.getMainWindow()
+    fcFrame = QtGui.QDesktopWidget.geometry(mw)
+    x = fcFrame.x()
+    y = fcFrame.y()
+    width = fcFrame.width()
+    height = fcFrame.height()
+    
+    centerX = x + width/2
+    centerY = y + height/2
+    fcCenter = QtCore.QPoint(centerX,centerY)
+
+    return fcCenter- widg.rect().center()  
 #==============================================================================
 class a2p_ConstraintValuePanel(QtGui.QDockWidget):
     
@@ -755,7 +763,7 @@ class a2p_ConstraintValuePanel(QtGui.QDockWidget):
         self.setFloating(True)
         self.activateWindow()
         self.setAllowedAreas(QtCore.Qt.NoDockWidgetArea)
-        self.move(getMoveDistToScreenCenter(self))
+        self.move(getMoveDistToFcCenter(self))
               
         a2plib.setConstraintEditorRef(self)
         
@@ -788,7 +796,7 @@ class a2p_ConstraintPanel(QtGui.QDockWidget):
         self.setFloating(True)
         self.activateWindow()
         self.setAllowedAreas(QtCore.Qt.NoDockWidgetArea)
-        self.move(getMoveDistToScreenCenter(self))
+        self.move(getMoveDistToFcCenter(self))
 
         a2plib.setConstraintDialogRef(self)
         #
