@@ -158,6 +158,9 @@ Add a pointIdentity Constraint:
 selection:
 1.) select a vertex on a part
 2.) select a vertex on another part
+
+Button gets active after
+correct selection.
 '''
 
     @staticmethod
@@ -189,6 +192,9 @@ class PointOnLineConstraint(BasicConstraint):
 Add a pointOnLine constraint between two objects
 1.) select a vertex from a part
 2.) select a line (linear edge) on another part
+
+Button gets active after
+correct selection.
 '''
 
     @staticmethod
@@ -231,6 +237,9 @@ class PointOnPlaneConstraint(BasicConstraint):
 Add a pointOnPlane constraint between two objects
 1.) select a vertex or a center of a circle
 2.) select a plane on other part
+
+Button gets active after
+correct selection.
 '''
 
     @staticmethod
@@ -277,6 +286,9 @@ Add a circularEdge constraint between two parts
 selection-hint:
 1.) select circular edge on first importPart
 2.) select circular edge on other importPart
+
+Button gets active after
+correct selection.
 '''
 
     @staticmethod
@@ -321,6 +333,9 @@ to be coincident
 Selection:
 1.) Select cylindrical face or linear edge on a part
 2.) Select cylindrical face or linear edge on another part
+
+Button gets active after
+correct selection.
 '''
 
     @staticmethod
@@ -369,6 +384,9 @@ moved to be coincident
 select:
 1.) linearEdge or cylinderFace from a part
 2.) linearEdge or cylinderFace from another part
+
+Button gets active after
+correct selection.
 '''
 
     @staticmethod
@@ -408,6 +426,9 @@ Creates an axisPlaneParallel constraint.
 This constraint adjusts an axis parallel
 to a selected plane. The parts are not
 moved to be coincident.
+
+Button gets active after
+correct selection.
 '''
 
     @staticmethod
@@ -456,6 +477,9 @@ moved to be coincident
 select:
 1.) select a plane on a part
 2.) select a plane from another part
+
+Button gets active after
+correct selection.
 '''
 
     @staticmethod
@@ -502,6 +526,9 @@ Add a planeCoincident constraint between two objects
 select:
 1.) select a plane on a part
 2.) select a plane from another part
+
+Button gets active after
+correct selection.
 '''
 
     @staticmethod
@@ -553,6 +580,9 @@ Avoid use of angle 0 degrees and 180 degrees.
 You could get strange results.
 
 Better for that is using planesParallelConstraint.
+
+Button gets active after
+correct selection.
 '''
 
     @staticmethod
@@ -586,6 +616,9 @@ Add a sphereCenterIdent constraint between to objects
 Selection options:
 - spherical surface or vertex on a part
 - spherical surface or vertex on another part
+
+Button gets active after
+correct selection.
 '''
     
     @staticmethod

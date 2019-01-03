@@ -196,10 +196,26 @@
         <x>30</x>
         <y>40</y>
         <width>521</width>
-        <height>71</height>
+        <height>95</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <widget class="Gui::PrefCheckBox" name="checkBox_4">
+         <property name="text">
+          <string>Show constraints on toolbar</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>showConstraintsOnToolbar</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/A2plus</cstring>
+         </property>
+        </widget>
+       </item>
        <item>
         <widget class="Gui::PrefCheckBox" name="checkBox_2">
          <property name="text">

@@ -66,23 +66,32 @@ class a2pWorkbench (Workbench):
             'a2p_ConvertPart',
             'a2p_editImportedPart',
             ]
-        constraintCommands = [
-            'a2p_ConstraintDialogCommand',
-            'a2p_EditConstraintCommand',
-            'a2p_PointIdentityConstraintCommand',
-            'a2p_PointOnLineConstraintCommand',
-            'a2p_PointOnPlaneConstraintCommand',
-            'a2p_SphericalSurfaceConstraintCommand',
-            'a2p_CircularEdgeConnection',
-            'a2p_AxialConstraintCommand',
-            'a2p_AxisParallelConstraintCommand',
-            'a2p_AxisPlaneParallelCommand',
-            'a2p_PlanesParallelConstraintCommand',
-            'a2p_PlaneCoincidentConstraintCommand',
-            'a2p_AngledPlanesConstraintCommand',
-            
-            'a2p_DeleteConnectionsCommand',
-            ]
+        
+        if a2plib.SHOW_CONSTRAINTS_ON_TOOLBAR:
+            constraintCommands = [
+                'a2p_ConstraintDialogCommand',
+                'a2p_EditConstraintCommand',
+                'a2p_PointIdentityConstraintCommand',
+                'a2p_PointOnLineConstraintCommand',
+                'a2p_PointOnPlaneConstraintCommand',
+                'a2p_SphericalSurfaceConstraintCommand',
+                'a2p_CircularEdgeConnection',
+                'a2p_AxialConstraintCommand',
+                'a2p_AxisParallelConstraintCommand',
+                'a2p_AxisPlaneParallelCommand',
+                'a2p_PlanesParallelConstraintCommand',
+                'a2p_PlaneCoincidentConstraintCommand',
+                'a2p_AngledPlanesConstraintCommand',
+                
+                'a2p_DeleteConnectionsCommand',
+                ]
+        else:
+            constraintCommands = [
+                'a2p_ConstraintDialogCommand',
+                'a2p_EditConstraintCommand',
+                'a2p_DeleteConnectionsCommand',
+                ]
+        
         solverCommands = [
             'a2p_SolverCommand',
             #'a2p_newSolverCommand',

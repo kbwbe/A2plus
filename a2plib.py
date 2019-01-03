@@ -37,6 +37,7 @@ PARTIAL_PROCESSING_ENABLED = preferences.GetBool('usePartialSolver', True)
 AUTOSOLVE_ENABLED = preferences.GetBool('autoSolve', True)
 RELATIVE_PATHES_ENABLED = preferences.GetBool('useRelativePathes',True)
 FORCE_FIXED_POSITION = preferences.GetBool('forceFixedPosition',True)
+SHOW_CONSTRAINTS_ON_TOOLBAR= preferences.GetBool('showConstraintsOnToolbar',True)
 
 SAVED_TRANSPARENCY = []
 
