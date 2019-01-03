@@ -37,13 +37,6 @@ class a2p_PointIdentityConstraintCommand:
     def Activated(self):
         selection = FreeCADGui.Selection.getSelectionEx()
         
-        if not a2p_constraints.PointIdentityConstraint.isValidSelection(selection):
-            msg = '''
-                  To add a point Identity constraint select exactly two vertexes!
-                  '''
-            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Incorrect Usage", msg)
-            return
-        
         c = a2p_constraints.PointIdentityConstraint(selection)
         cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
             c.constraintObject,
@@ -69,18 +62,6 @@ FreeCADGui.addCommand('a2p_PointIdentityConstraintCommand', a2p_PointIdentityCon
 class a2p_PointOnLineConstraintCommand:
     def Activated(self):
         selection = FreeCADGui.Selection.getSelectionEx()
-        
-        if not a2p_constraints.PointOnLineConstraint.isValidSelection(selection):
-            msg = '''
-                  for PointOnLine constraint select in this order:
-                  1.) a vertex
-                  2.) a line (linear edge)  
-    
-                  Selection made: %s
-                  ''' % printSelection(selection)
-    
-            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Incorrect Usage", msg)
-            return 
         
         c = a2p_constraints.PointOnLineConstraint(selection)
         cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
@@ -108,18 +89,6 @@ class a2p_PointOnPlaneConstraintCommand:
     def Activated(self):
         selection = FreeCADGui.Selection.getSelectionEx()
         
-        if not a2p_constraints.PointOnPlaneConstraint.isValidSelection(selection):
-            msg = '''
-                  for Point on Plane constraint select in this order:
-                  1.) a vertex or a center of a circle
-                  2.) a plane
-    
-                  Selection made: %s
-                  ''' % printSelection(selection)
-    
-            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Incorrect Usage", msg)
-            return
-        
         c = a2p_constraints.PointOnPlaneConstraint(selection)
         cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
             c.constraintObject,
@@ -144,16 +113,6 @@ FreeCADGui.addCommand('a2p_PointOnPlaneConstraintCommand', a2p_PointOnPlaneConst
 class a2p_SphericalSurfaceConstraintCommand:
     def Activated(self):
         selection = FreeCADGui.Selection.getSelectionEx()
-        
-        if not a2p_constraints.SphericalConstraint.isValidSelection(selection):
-            msg = '''
-                  To add a spherical surface constraint select two
-                  spherical surfaces (or vertexs),
-                  each from a different part.
-                  Selection made: %s
-                  '''  % printSelection(selection)
-            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Incorrect Usage", msg)
-            return
         
         c = a2p_constraints.SphericalConstraint(selection)
         cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
@@ -180,15 +139,6 @@ class a2p_CircularEdgeConnectionCommand:
     def Activated(self):
         selection = FreeCADGui.Selection.getSelectionEx()
         
-        if not a2p_constraints.CircularEdgeConstraint.isValidSelection(selection):
-            msg = '''
-                 Please select two circular edges from different parts. 
-                 But election made is:
-                 %s
-                 '''  % printSelection(selection)
-            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Incorrect Usage", msg)
-            return
-        
         c = a2p_constraints.CircularEdgeConstraint(selection)
         cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
             c.constraintObject,
@@ -213,14 +163,6 @@ FreeCADGui.addCommand('a2p_CircularEdgeConnection', a2p_CircularEdgeConnectionCo
 class a2p_AxialConstraintCommand:
     def Activated(self):
         selection = FreeCADGui.Selection.getSelectionEx()
-        
-        if not a2p_constraints.AxialConstraint.isValidSelection(selection):
-            msg = '''
-                  To add an axial constraint select two cylindrical surfaces or two
-                  straight lines, each from a different part. Selection made:%s
-                  '''  % printSelection(selection)
-            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Incorrect Usage", msg)
-            return
         
         c = a2p_constraints.AxialConstraint(selection)
         cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
@@ -247,17 +189,6 @@ class a2p_AxisParallelConstraintCommand:
     def Activated(self):
         selection = FreeCADGui.Selection.getSelectionEx()
         
-        if not a2p_constraints.AxisParallelConstraint.isValidSelection(selection):
-            msg = '''
-                  axisParallelConstraint requires a selection of:
-                  - cylinderAxis or linearEdge on a part
-                  - cylinderAxis or linearEdge on another part
-                  Selection made: %s
-                  ''' % printSelection(selection)
-    
-            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Incorrect Usage", msg)
-            return
-        
         c = a2p_constraints.AxisParallelConstraint(selection)
         cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
             c.constraintObject,
@@ -282,17 +213,6 @@ FreeCADGui.addCommand('a2p_AxisParallelConstraintCommand', a2p_AxisParallelConst
 class a2p_AxisPlaneParallelCommand:
     def Activated(self):
         selection = FreeCADGui.Selection.getSelectionEx()
-        
-        if not a2p_constraints.AxisPlaneParallelConstraint.isValidSelection(selection):
-            msg = '''
-                  AxisPlaneParallel constraint requires a selection of 
-                  1) linear edge or axis of cylinder
-                  2) a plane face
-                  each on different objects. Selection made:
-                  %s
-                  '''  % printSelection(selection)
-            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Incorrect Usage", msg)
-            return
         
         c = a2p_constraints.AxisPlaneParallelConstraint(selection)
         cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
@@ -319,17 +239,6 @@ class a2p_PlanesParallelConstraintCommand:
     def Activated(self):
         selection = FreeCADGui.Selection.getSelectionEx()
         
-        if not a2p_constraints.PlanesParallelConstraint.isValidSelection(selection):
-            msg = '''
-                  PlanesParallel constraint requires a selection of:
-                  - exactly 2 planes on different parts
-    
-                  Selection made: %s
-                  ''' % printSelection(selection)
-    
-            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Incorrect Usage", msg)
-            return
-        
         c = a2p_constraints.PlanesParallelConstraint(selection)
         cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
             c.constraintObject,
@@ -355,17 +264,6 @@ class a2p_PlaneCoincidentConstraintCommand:
     def Activated(self):
         selection = FreeCADGui.Selection.getSelectionEx()
         
-        if not a2p_constraints.PlaneConstraint.isValidSelection(selection):
-            msg = '''
-                  Plane constraint requires a selection of:
-                  - exactly 2 planes on different parts
-    
-                  Selection made: %s
-                  ''' % printSelection(selection)
-    
-            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Incorrect Usage", msg)
-            return
-        
         c = a2p_constraints.PlaneConstraint(selection)
         cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
             c.constraintObject,
@@ -390,15 +288,6 @@ FreeCADGui.addCommand('a2p_PlaneCoincidentConstraintCommand', a2p_PlaneCoinciden
 class a2p_AngledPlanesConstraintCommand:
     def Activated(self):
         selection = FreeCADGui.Selection.getSelectionEx()
-        
-        if not a2p_constraints.AngledPlanesConstraint.isValidSelection(selection):
-            msg = '''
-                  Angle constraint requires a selection of 2 planes
-                  each on different objects. Selection made:
-                  %s
-                  '''  % printSelection(selection)
-            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Incorrect Usage", msg)
-            return
         
         c = a2p_constraints.AngledPlanesConstraint(selection)
         cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
