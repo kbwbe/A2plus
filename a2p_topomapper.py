@@ -381,6 +381,25 @@ class TopoMapper(object):
         tempShape.Placement = plmGlobal
         return tempShape
 
+    def addedByPathWB(self,obName):
+        '''
+        function detects, whether special object belongs to
+        a milling job of Path WB
+        
+        It is looking for "Stock" and contents of Model-group
+        '''
+        ob = self.doc.getObject(obName)
+        if ob.Name.startswith('Stock'):
+            for o in ob.InList:
+                if o.Name.startswith('Job'):
+                    return True
+        for o in ob.InList:
+            if o.Name.startswith('Model'):
+                for o1 in o.InList:
+                    if o1.Name.startswith('Job'):
+                        return True
+        return False
+
     def getTopLevelObjects(self):
         #-------------------------------------------
         # Create treenodes of the importable Objects with a shape
@@ -416,6 +435,14 @@ class TopoMapper(object):
                     addList.append(outList[0].Name)
         if len(addList) > 0:
             self.topLevelShapes.extend(addList)
+        #-------------------------------------------
+        # Got some shapes created by PathWB? filter out...
+        #-------------------------------------------
+        tmp = []
+        for n in self.topLevelShapes:
+            if self.addedByPathWB(n): continue
+            tmp.append(n)
+        self.topLevelShapes = tmp
         #-------------------------------------------
         # return complete topLevel document objects for external use
         #-------------------------------------------
