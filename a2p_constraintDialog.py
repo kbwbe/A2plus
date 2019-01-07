@@ -33,6 +33,8 @@ from a2p_solversystem import solveConstraints
 import a2p_constraints
 
 
+CONSTRAINT_DIALOG_STORED_POSITION = QtCore.QPoint(-1,-1)
+
 #==============================================================================
 class a2p_ConstraintValueWidget(QtGui.QWidget):
 
@@ -722,19 +724,23 @@ button.
         self.manageConstraint()
         
 #==============================================================================
-def getMoveDistToFcCenter(widg):
-    mw = FreeCADGui.getMainWindow()
-    fcFrame = QtGui.QDesktopWidget.geometry(mw)
-    x = fcFrame.x()
-    y = fcFrame.y()
-    width = fcFrame.width()
-    height = fcFrame.height()
+def getMoveDistToStoredPosition(widg):
+    if CONSTRAINT_DIALOG_STORED_POSITION == QtCore.QPoint(-1,-1): 
+        mw = FreeCADGui.getMainWindow()
+        fcFrame = QtGui.QDesktopWidget.geometry(mw)
+        x = fcFrame.x()
+        y = fcFrame.y()
+        width = fcFrame.width()
+        height = fcFrame.height()
+        
+        centerX = x + width/2
+        centerY = y + height/2
+        fcCenter = QtCore.QPoint(centerX,centerY)
     
-    centerX = x + width/2
-    centerY = y + height/2
-    fcCenter = QtCore.QPoint(centerX,centerY)
-
-    return fcCenter- widg.rect().center()  
+        return fcCenter- widg.rect().center()
+    else:
+        #center = QtCore.QPoint(centerX,centerY)  
+        return CONSTRAINT_DIALOG_STORED_POSITION - widg.rect().center()
 #==============================================================================
 class a2p_ConstraintValuePanel(QtGui.QDockWidget):
     
@@ -763,16 +769,39 @@ class a2p_ConstraintValuePanel(QtGui.QDockWidget):
         self.setFloating(True)
         self.activateWindow()
         self.setAllowedAreas(QtCore.Qt.NoDockWidgetArea)
-        self.move(getMoveDistToFcCenter(self))
+        self.move(getMoveDistToStoredPosition(self))
               
         a2plib.setConstraintEditorRef(self)
+        if mode == 'createConstraint':
+            if a2plib.getAutoSolveState():
+                doc = FreeCAD.activeDocument()
+                if doc != None:
+                    solveConstraints(doc)
+        
+    def storeWindowCenterPosition(self):
+        # ConstraintDialog has Priority on storing its position
+        if a2plib.getConstraintDialogRef() != None:
+            return
+        # self.rect().center() does not work here somehow
+        frame = QtGui.QDockWidget.geometry(self)
+        x = frame.x()
+        y = frame.y()
+        width = frame.width()
+        height = frame.height()
+        centerX = x + width/2
+        centerY = y + height/2
+        
+        global CONSTRAINT_DIALOG_STORED_POSITION
+        CONSTRAINT_DIALOG_STORED_POSITION = QtCore.QPoint(centerX,centerY)
         
     def onAcceptConstraint(self):
+        self.storeWindowCenterPosition()
         self.Accepted.emit()
         a2plib.setConstraintEditorRef(None)
         self.deleteLater()
         
     def onDeleteConstraint(self):
+        self.storeWindowCenterPosition()
         self.Deleted.emit()
         a2plib.setConstraintEditorRef(None)
         self.deleteLater()
@@ -796,7 +825,7 @@ class a2p_ConstraintPanel(QtGui.QDockWidget):
         self.setFloating(True)
         self.activateWindow()
         self.setAllowedAreas(QtCore.Qt.NoDockWidgetArea)
-        self.move(getMoveDistToFcCenter(self))
+        self.move(getMoveDistToStoredPosition(self))
 
         a2plib.setConstraintDialogRef(self)
         #
@@ -812,6 +841,19 @@ class a2p_ConstraintPanel(QtGui.QDockWidget):
             if not self.isVisible():
                 self.show()
                 self.resize(200,250)
+            # calculate window center position and save it
+            # self.rect().center() does not work here somehow
+            frame = QtGui.QDockWidget.geometry(self)
+            x = frame.x()
+            y = frame.y()
+            width = frame.width()
+            height = frame.height()
+            centerX = x + width/2
+            centerY = y + height/2
+            
+            global CONSTRAINT_DIALOG_STORED_POSITION
+            CONSTRAINT_DIALOG_STORED_POSITION = QtCore.QPoint(centerX,centerY)
+            
         self.timer.start(100)
         
     def closeEvent(self,event):
