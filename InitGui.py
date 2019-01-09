@@ -50,6 +50,7 @@ class a2pWorkbench (Workbench):
             import a2p_Resources3
         import a2plib #QtCore.QResource.registerResource happens in assembly2lib
         import a2p_importpart
+        import a2p_recursiveUpdatePlanner
         import a2p_convertPart
         import a2p_solversystem
         import a2p_MuxAssembly
@@ -61,6 +62,7 @@ class a2pWorkbench (Workbench):
         partCommands = [
             'a2p_ImportPart',
             'a2p_updateImportedParts',
+            'a2p_recursiveUpdateImportedPartsCommand',
             'a2p_movePart',
             'a2p_duplicatePart',
             'a2p_ConvertPart',

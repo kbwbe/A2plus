@@ -176,7 +176,7 @@ class A2p_xmldoc_FeaturePython(A2p_xmldoc_Object):
                 return False
         return False
     
-    def getModificationTime(self):
+    def getTimeLastImport(self):
         if self.isA2pObject:
             propFound = self.propertyDict.get('timeLastImport',None)
             if propFound:
