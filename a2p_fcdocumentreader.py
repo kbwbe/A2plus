@@ -59,6 +59,13 @@ class A2p_xmldoc_PropertyBool(A2p_xmldoc_Property):
             return False
     
 #------------------------------------------------------------------------------
+class A2p_xmldoc_PropertyFloat(A2p_xmldoc_Property):
+    
+    def getFloat(self):
+        s = self.treeElement.find('Float')
+        return float( s.attrib['value'] )
+    
+#------------------------------------------------------------------------------
 class A2p_xmldoc_PropertyFile(A2p_xmldoc_Property):
     
     def getStringValue(self):
@@ -119,6 +126,13 @@ class A2p_xmldoc_Object(object):
                             e.attrib['type']
                             )
                         self.propertyDict[e.attrib['name']] = p
+                    elif e.attrib['type'] == 'App::PropertyFloat':
+                        p = A2p_xmldoc_PropertyFloat(
+                            e,
+                            e.attrib['name'],
+                            e.attrib['type']
+                            )
+                        self.propertyDict[e.attrib['name']] = p
                     elif e.attrib['type'] == 'App::PropertyFile':
                         p = A2p_xmldoc_PropertyFile(
                             e,
@@ -161,6 +175,15 @@ class A2p_xmldoc_FeaturePython(A2p_xmldoc_Object):
             else:
                 return False
         return False
+    
+    def getModificationTime(self):
+        if self.isA2pObject:
+            propFound = self.propertyDict.get('timeLastImport',None)
+            if propFound:
+                return propFound.getFloat()
+            else:
+                return 0
+        return 0
 
 #------------------------------------------------------------------------------
 class FCdocumentReader(object):
