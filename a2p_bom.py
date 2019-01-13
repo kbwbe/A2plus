@@ -209,15 +209,12 @@ class a2p_CreatePartlist():
             ss.set('A'+str(idx+2),str(idx+1))
             ss.set('B'+str(idx+2),str(partListEntries[k][0]))
             values = partListEntries[k][1]
-            for j,tx in enumerate(values):
-                #tx2 = a2plib.to_str(tx)
-                tx2 = tx
-                print(
-                    u"a2pbom: tx2 type {}, tx2 vaL: {}".format(
-                        type(tx2),
-                        tx2
-                        )
-                      )
+            for j,tx in enumerate(values): # all strings inside values are unicode!
+                #ss.set needs 2. argument as unicode for py3 and utf-8 string for py2!!!
+                if a2plib.PYVERSION > 2:
+                    tx2 = tx # preserve unicode
+                else:
+                    tx2 = a2plib.to_bytes(tx) # convert to utf-8
                 ss.set(chr(idx3+2+j)+str(idx+2),tx2)
         
         # recompute to finish..
