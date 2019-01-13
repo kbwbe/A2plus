@@ -210,9 +210,14 @@ class a2p_CreatePartlist():
             ss.set('B'+str(idx+2),str(partListEntries[k][0]))
             values = partListEntries[k][1]
             for j,tx in enumerate(values):
+                #tx2 = a2plib.to_str(tx)
                 tx2 = tx
-                if a2plib.PYVERSION > 2:
-                    tx2 = a2plib.to_str(tx)
+                print(
+                    u"a2pbom: tx2 type {}, tx2 vaL: {}".format(
+                        type(tx2),
+                        tx2
+                        )
+                      )
                 ss.set(chr(idx3+2+j)+str(idx+2),tx2)
         
         # recompute to finish..

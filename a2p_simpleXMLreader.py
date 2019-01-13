@@ -87,7 +87,7 @@ class simpleXMLObject(object):
                 line = self.xmlDefs[idx]
                 segments = line.split(b'"')
                 fileName = segments[1]
-                self.propertyDict[b'sourceFile'] = fileName
+                self.propertyDict[b'sourceFile'] = a2plib.to_str(fileName)
                 sourceFileFound = True
                 
             elif not a2pVersionFound and line.startswith(b'<Property name="a2p_Version"'):
@@ -95,7 +95,7 @@ class simpleXMLObject(object):
                 line = self.xmlDefs[idx]
                 segments = line.split(b'"')
                 a2pVersion = segments[1]
-                self.propertyDict[b'a2p_Version'] = a2pVersion
+                self.propertyDict[b'a2p_Version'] = a2plib.to_str(a2pVersion)
                 a2pVersionFound = True
                 
             elif not a2pVersionFound and line.startswith(b'<Property name="assembly2Version"'):
@@ -103,7 +103,7 @@ class simpleXMLObject(object):
                 line = self.xmlDefs[idx]
                 segments = line.split(b'"')
                 a2pVersion = segments[1]
-                self.propertyDict[b'a2p_Version'] = a2pVersion
+                self.propertyDict[b'a2p_Version'] = a2plib.to_str(a2pVersion)
                 a2pVersionFound = True
                 
             # for very old a2p versions do additionally...
@@ -136,7 +136,7 @@ class simpleXMLObject(object):
                     if line.startswith(b'</Cells>'): break
                     if line.startswith(b'<Cell address="'):
                         cellAdress,cellContent = self.parseCellLine(line)
-                        cellDict[cellAdress] = cellContent
+                        cellDict[cellAdress] = a2plib.to_str(cellContent)
                     idx += 1
                 self.propertyDict[b'cells'] = cellDict
             idx+=1
