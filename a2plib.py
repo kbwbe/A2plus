@@ -69,6 +69,21 @@ CONSTRAINT_DIALOG_REF = None
 CONSTRAINT_EDITOR__REF = None
 CONSTRAINT_VIEWMODE = False
 
+
+#------------------------------------------------------------------------------
+def to_bytes(tx):
+    if isinstance(tx, str):
+        value = tx.encode("utf-8")
+    else:
+        value = tx
+    return value # Instance of bytes
+#------------------------------------------------------------------------------
+def to_str(tx):
+    if isinstance(tx, bytes):
+        value = tx.decode("utf-8")
+    else:
+        value = tx
+    return value # Instance of str
 #------------------------------------------------------------------------------
 def getForceFixedPosition():
     preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
@@ -199,13 +214,13 @@ def findFile(name, path):
     '''
     for root, dirs, files in os.walk(path):
         if PYVERSION < 3:
-            if name.encode('utf-8') in files:
+            if to_bytes(name) in files:
                 return os.path.join(root, name)
         else:
             if name in files:
                 return os.path.join(root, name)
 #------------------------------------------------------------------------------
-def findSourceFileInProject(pathImportPart, assemblyPath):
+def findSourceFileInProject(_pathImportPart, _assemblyPath):
     '''
     #------------------------------------------------------------------------------------
     # interpret the sourcefile name of imported part
@@ -218,28 +233,44 @@ def findSourceFileInProject(pathImportPart, assemblyPath):
     # - path is interpreted in appropriate way
     #------------------------------------------------------------------------------------
     '''
+    pathImportPart = _pathImportPart
+    assemblyPath = _assemblyPath
+    
+    if PYVERSION == 3:
+        pathImportPart = to_bytes(pathImportPart)
+        assemblyPath = to_bytes(assemblyPath)
+    
     preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
     if not preferences.GetBool('useProjectFolder', False): 
         # not working with useProjectFolder preference,
         # check whether path is relative or absolute...
         if (
-            pathImportPart.startswith('../') or
-            pathImportPart.startswith('..\\') or
-            pathImportPart.startswith('./') or
-            pathImportPart.startswith('.\\')
+            pathImportPart.startswith(b'../') or
+            pathImportPart.startswith(b'..\\') or
+            pathImportPart.startswith(b'./') or
+            pathImportPart.startswith(b'.\\')
             ):
             # relative path
             # calculate the absolute path
             absolutePath = os.path.normpath(  os.path.join(assemblyPath,pathImportPart) )
-            return absolutePath
+            if PYVERSION == 3:
+                return to_str(absolutePath)
+            else:
+                return absolutePath
         else:
             #absolute path
-            return pathImportPart
+            if PYVERSION == 3:
+                return to_str(pathImportPart)
+            else:
+                return pathImportPart
 
     projectFolder = os.path.abspath(getProjectFolder()) # get normalized path
     fileName = os.path.basename(pathImportPart)
     retval = findFile(fileName,projectFolder)
-    return retval
+    if PYVERSION == 3:
+        return to_str(retval)
+    else:
+        return retval
 #------------------------------------------------------------------------------
 def checkFileIsInProjectFolder(path):
     preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")

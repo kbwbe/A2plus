@@ -27,7 +27,8 @@ import os
 import string
 
 import a2plib
-from a2p_fcdocumentreader import FCdocumentReader
+#from a2p_fcdocumentreader import FCdocumentReader
+from a2p_simpleXMLreader import FCdocumentReader
 
 from a2p_partlistglobals import (
     PARTLIST_COLUMN_NAMES,
@@ -62,8 +63,18 @@ def createPartList(
     docReader1 = FCdocumentReader()
     
     docReader1.openDocument(fileNameInProject)
+    
     for ob in docReader1.getA2pObjects():
-        #print(u'{}, Subassembly? = {}'.format(ob,ob.isSubassembly()))
+        for key in ob.propertyDict:
+            print(
+                "a2pObjectProp: {}, value: {}".format(
+                    key,
+                    ob.propertyDict[key]
+                    )
+                )
+        print("")
+
+    for ob in docReader1.getA2pObjects():
         if ob.isSubassembly() and recursive:
             partListEntries = createPartList(
                                         ob.getA2pSource(),
@@ -76,7 +87,7 @@ def createPartList(
         if not ob.isSubassembly() or not recursive:
             # Try to get spreadsheetdata _PARTINFO_ from linked source
             linkedSource = ob.getA2pSource()
-            linkedSource = a2plib.findSourceFileInProject(
+            linkedSource = a2plib.findSourceFileInProject( #this returns unicode on py2 systems!
                             linkedSource,
                             workingDir
                             ) 
@@ -89,21 +100,24 @@ def createPartList(
             # There is no entry in dict, need to read out information from importFile...
             docReader2 = FCdocumentReader()
             docReader2.openDocument(linkedSource)
+
             # Initialize a default parts information...
             partInformation = []
             for i in range(0,len(PARTLIST_COLUMN_NAMES)):
                 partInformation.append("*")
-            # last entry of partinformations is reserved for filename
-            partInformation[-1] = os.path.split(linkedSource)[1] #without complete path...
+            
             # if there is a proper spreadsheat, then read it...
             for ob in docReader2.getSpreadsheetObjects():
                 if ob.name == PARTINFORMATION_SHEET_NAME:
                     cells = ob.getCells()
                     for addr in cells.keys():
-                        if addr[:1] == 'B': #column B contains the information
+                        if addr[:1] == 'B': #column B contains the data, A only the titles
                             idx = int(addr[1:])-1
                             if idx < len(PARTLIST_COLUMN_NAMES): # don't read further!
                                 partInformation[idx] = cells[addr]
+            # last entry of partinformations is reserved for filename
+            partInformation[-1] = os.path.split(linkedSource)[1] #without complete path...
+
             # put information to dict and count usage of sourcefiles..
             entry = partListEntries.get(linkedSource,None)
             if entry == None:
@@ -166,6 +180,14 @@ class a2p_CreatePartlist():
             {},
             recursive=subAssyRecursion
             )
+        
+        for e in partListEntries:
+            print(
+                "Partlist-Key: {}, val: {}".format(
+                    e,
+                    partListEntries[e]
+                    )
+                )
         
         ss = None
         try:

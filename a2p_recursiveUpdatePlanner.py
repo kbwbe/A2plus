@@ -27,7 +27,8 @@ import string
 
 import a2plib
 from a2p_importpart import updateImportedParts
-from a2p_fcdocumentreader import FCdocumentReader
+#from a2p_fcdocumentreader import FCdocumentReader
+from a2p_simpleXMLreader import FCdocumentReader
 
 
 #==============================================================================

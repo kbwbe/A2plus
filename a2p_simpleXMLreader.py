@@ -34,6 +34,7 @@
 
 import FreeCAD, FreeCADGui, os
 import zipfile
+import a2plib
 
 #===========================================================================
 class simpleXMLObject(object):
@@ -51,14 +52,14 @@ class simpleXMLObject(object):
         remainingLines = []
         inputXML = xmlDefs
         #if len(inputXML) == 0: return xmlDefs #todo: raise error
-        strippedLine = inputXML[0].lstrip(' ')
-        if not strippedLine.startswith('<Object name'): return [] # XML trailers ignored
+        strippedLine = inputXML[0].lstrip(b' ')
+        if not strippedLine.startswith(b'<Object name'): return [] # XML trailers ignored
         idx = 0
         for line in inputXML:
-            strippedLine = line.lstrip(' ')
+            strippedLine = line.lstrip(b' ')
             self.xmlDefs.append(strippedLine)
             idx += 1
-            if strippedLine.startswith('</Object>'):
+            if strippedLine.startswith(b'</Object>'):
                 remainingLines = xmlDefs[idx:]
                 break
         self.scanForProperties()
@@ -75,116 +76,119 @@ class simpleXMLObject(object):
         # Readout object's name and save it (1rst line)
         if numLines > 0:
             line = self.xmlDefs[0]
-            segments = line.split('"')
+            segments = line.split(b'"')
             self.name = segments[1]
-            
         idx = 0
         while idx<numLines:
             line = self.xmlDefs[idx]
             
-            if not sourceFileFound and line.startswith('<Property name="sourceFile"'):
+            if not sourceFileFound and line.startswith(b'<Property name="sourceFile"'):
                 idx+=1
                 line = self.xmlDefs[idx]
-                segments = line.split('"')
+                segments = line.split(b'"')
                 fileName = segments[1]
-                self.propertyDict['sourceFile'] = fileName
+                self.propertyDict[b'sourceFile'] = fileName
                 sourceFileFound = True
                 
-            elif not a2pVersionFound and line.startswith('<Property name="a2p_Version"'):
+            elif not a2pVersionFound and line.startswith(b'<Property name="a2p_Version"'):
                 idx+=1
                 line = self.xmlDefs[idx]
-                segments = line.split('"')
+                segments = line.split(b'"')
                 a2pVersion = segments[1]
-                self.propertyDict['a2p_Version'] = a2pVersion
+                self.propertyDict[b'a2p_Version'] = a2pVersion
                 a2pVersionFound = True
                 
-            elif not a2pVersionFound and line.startswith('<Property name="assembly2Version"'):
+            elif not a2pVersionFound and line.startswith(b'<Property name="assembly2Version"'):
                 idx+=1
                 line = self.xmlDefs[idx]
-                segments = line.split('"')
+                segments = line.split(b'"')
                 a2pVersion = segments[1]
-                self.propertyDict['a2p_Version'] = a2pVersion
+                self.propertyDict[b'a2p_Version'] = a2pVersion
                 a2pVersionFound = True
                 
             # for very old a2p versions do additionally...
-            elif not subAssemblyImportFound and line.startswith('<Property name="subassemblyImport"'):
+            elif not subAssemblyImportFound and line.startswith(b'<Property name="subassemblyImport"'):
                 idx+=1
                 line = self.xmlDefs[idx]
-                segments = line.split('"')
+                segments = line.split(b'"')
                 tmp = segments[1]
                 val = True
-                if tmp == "false":
+                if tmp == b"false":
                     val = False
-                self.propertyDict['subassemblyImport'] = val
+                self.propertyDict[b'subassemblyImport'] = val
                 subAssemblyImportFound = True
                 
-            elif not timeLastImportFound and line.startswith('<Property name="timeLastImport"'):
+            elif not timeLastImportFound and line.startswith(b'<Property name="timeLastImport"'):
                 idx+=1
                 line = self.xmlDefs[idx]
-                segments = line.split('"')
+                segments = line.split(b'"')
                 tmp = segments[1]
                 floatVal = float(tmp)
-                self.propertyDict['timeLastImport'] = floatVal
+                self.propertyDict[b'timeLastImport'] = floatVal
                 timeLastImportFound = True
                 
-            elif not spreadSheetCellsFound and line == '<Property name="cells" type="Spreadsheet::PropertySheet">':
+            elif not spreadSheetCellsFound and line == b'<Property name="cells" type="Spreadsheet::PropertySheet">':
                 spreadSheetCellsFound = True
                 idx += 2
                 cellDict = {}
                 while True:
                     line = self.xmlDefs[idx]
-                    if line.startswith('</Cells>'): break
-                    if line.startswith('<Cell address="'):
+                    if line.startswith(b'</Cells>'): break
+                    if line.startswith(b'<Cell address="'):
                         cellAdress,cellContent = self.parseCellLine(line)
                         cellDict[cellAdress] = cellContent
                     idx += 1
-                self.propertyDict['cells'] = cellDict
+                self.propertyDict[b'cells'] = cellDict
             idx+=1
         self.xmlDefs = [] # we are done, free memory...
+        
     
     def parseCellLine(self,line):
         '''
         parse XML cell entries within an spreadsheet object
         '''
-        segments = line.split('"')
+        segments = line.split(b'"')
         cellAdress = segments[1]
         cellContent = ""
         if len(segments) >= 4:
             if len(segments[2]) > 0:
-                if "content" in segments[2]:
+                if b"content" in segments[2]:
                     cellContent = segments[3]
         return cellAdress, cellContent
     
     def isA2pObject(self):
-        if self.propertyDict.get('a2p_Version',None) != None: return True
+        if self.propertyDict.get(b'a2p_Version',None) != None: return True
         return False
     
     def isSpreadSheet(self):
-        if self.propertyDict.get('cells',None) != None: return True
+        if self.propertyDict.get(b'cells',None) != None: return True
         return False
     
     def getA2pSource(self):
         if self.isA2pObject:
-            return self.propertyDict['sourceFile']
+            return self.propertyDict[b'sourceFile']
         return None
     
     def isSubassembly(self):
         if self.isA2pObject:
-            propFound = self.propertyDict.get('subassemblyImport',None)
+            propFound = self.propertyDict.get(b'subassemblyImport',None)
             if propFound:
-                return self.propertyDict['subassemblyImport']
+                return self.propertyDict[b'subassemblyImport']
             else:
                 return False
         return False
     
     def getTimeLastImport(self):
         if self.isA2pObject:
-            propFound = self.propertyDict.get('timeLastImport',None)
+            propFound = self.propertyDict.get(b'timeLastImport',None)
             if propFound:
-                return self.propertyDict['timeLastImport']
+                return self.propertyDict[b'timeLastImport']
             else:
                 return 0.0
         return 0.0
+    
+    def getCells(self):
+        return self.propertyDict[b'cells']
     
 #==============================================================================
 class FCdocumentReader(object):
@@ -204,7 +208,12 @@ class FCdocumentReader(object):
         self.xmlLines = []
         self.objects = []
         
-    def openDocument(self,fileName):
+    def openDocument(self,_fileName):
+        fileName = _fileName
+        
+        if a2plib.PYVERSION == 3:
+            fileName = a2plib.to_str(fileName)
+        
         self.clear()
         # check whether file exists or not...
         if not os.path.exists( fileName ):
@@ -215,22 +224,23 @@ class FCdocumentReader(object):
         xml = f.read('Document.xml')
         f.close()
         #
-        self.xmlLines = xml.split("\r\n") #Windows
+        #self.xmlLines = xml.split("\r\n") #Windows
+        self.xmlLines = xml.split(b'\r\n') #Windows
         if len(self.xmlLines) <= 1:
-            self.xmlLines = xml.split("\n") #Linux
+            self.xmlLines = xml.split(b"\n") #Linux
         del(xml)
         
         # remove not needed data above first section <objects name=...
         idx = 0
         for line in self.xmlLines:
-            if line.lstrip(' ').startswith('<Object name'):
+            if line.lstrip(b' ').startswith(b'<Object name'):
                 break
             else:
                 idx+=1
         self.xmlLines = self.xmlLines[idx:] #reduce list size instantly
         
         while len(self.xmlLines) > 0:
-            if not self.xmlLines[0].strip(' ').startswith('<Object name'): break
+            if not self.xmlLines[0].strip(b' ').startswith(b'<Object name'): break
             ob = simpleXMLObject()
             self.xmlLines = ob.initialize(self.xmlLines)
             self.objects.append(ob)
@@ -242,21 +252,10 @@ class FCdocumentReader(object):
                 tmp.append(ob)
         self.objects = tmp
         
-        for ob in self.objects:
-            print(ob.name)
-            print(ob.propertyDict)
-            print("")
-            
-        print(
-            "Number of objects: {}".format(
-                len(self.objects)
-                )
-            )
-        
     def getA2pObjects(self):
         out = []
         for ob in self.objects:
-            if ob.propertyDict.get('a2p_Version',None) != None:
+            if ob.propertyDict.get(b'a2p_Version',None) != None:
                 out.append(ob)
                 continue
         return out
@@ -264,7 +263,7 @@ class FCdocumentReader(object):
     def getSpreadsheetObjects(self):
         out = []
         for ob in self.objects:
-            if ob.propertyDict.get('cells',None) != None:
+            if ob.propertyDict.get(b'cells',None) != None:
                 out.append(ob)
         return out
             
