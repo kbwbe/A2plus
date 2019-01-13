@@ -61,19 +61,8 @@ def createPartList(
         )
     workingDir,basicFileName = os.path.split(fileNameInProject)
     docReader1 = FCdocumentReader()
-    
     docReader1.openDocument(fileNameInProject)
     
-    for ob in docReader1.getA2pObjects():
-        for key in ob.propertyDict:
-            print(
-                "a2pObjectProp: {}, value: {}".format(
-                    key,
-                    ob.propertyDict[key]
-                    )
-                )
-        print("")
-
     for ob in docReader1.getA2pObjects():
         if ob.isSubassembly() and recursive:
             partListEntries = createPartList(
@@ -105,13 +94,18 @@ def createPartList(
             partInformation = []
             for i in range(0,len(PARTLIST_COLUMN_NAMES)):
                 partInformation.append("*")
-            
+                
             # if there is a proper spreadsheat, then read it...
             for ob in docReader2.getSpreadsheetObjects():
-                if ob.name == PARTINFORMATION_SHEET_NAME:
+                
+                sheetName = PARTINFORMATION_SHEET_NAME
+                if a2plib.PYVERSION > 2:
+                    sheetName = a2plib.to_bytes(PARTINFORMATION_SHEET_NAME)
+                    
+                if ob.name == sheetName:
                     cells = ob.getCells()
                     for addr in cells.keys():
-                        if addr[:1] == 'B': #column B contains the data, A only the titles
+                        if addr[:1] == b'B': #column B contains the data, A only the titles
                             idx = int(addr[1:])-1
                             if idx < len(PARTLIST_COLUMN_NAMES): # don't read further!
                                 partInformation[idx] = cells[addr]
@@ -181,14 +175,6 @@ class a2p_CreatePartlist():
             recursive=subAssyRecursion
             )
         
-        for e in partListEntries:
-            print(
-                "Partlist-Key: {}, val: {}".format(
-                    e,
-                    partListEntries[e]
-                    )
-                )
-        
         ss = None
         try:
             ss = doc.getObject(BOM_SHEET_NAME)
@@ -212,10 +198,10 @@ class a2p_CreatePartlist():
         # Set the background color of the column headers
         ss.setBackground('A1:'+chr(idx2-1)+'1', (0.000000,1.000000,0.000000,1.000000))
         # Set the columnwith to proper values
-        ss.setColumnWidth('A',75)
+        ss.setColumnWidth('A',40)
         i=0
         for c in range(idx1,idx2):
-            ss.setColumnWidth(chr(c),250)
+            ss.setColumnWidth(chr(c),150)
             i+=1
         # fill entries for partsList...
         idx3 = ord('A')
@@ -224,10 +210,9 @@ class a2p_CreatePartlist():
             ss.set('B'+str(idx+2),str(partListEntries[k][0]))
             values = partListEntries[k][1]
             for j,tx in enumerate(values):
-                if a2plib.PYVERSION == 2:
-                    tx2 = tx.encode('UTF-8')
-                else:
-                    tx2 = tx
+                tx2 = tx
+                if a2plib.PYVERSION > 2:
+                    tx2 = a2plib.to_str(tx)
                 ss.set(chr(idx3+2+j)+str(idx+2),tx2)
         
         # recompute to finish..
