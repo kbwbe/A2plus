@@ -500,7 +500,11 @@ class TopoMapper(object):
                         faceColors.append(diffuseCol[i])
 
         shell = Part.makeShell(faces)
-        solid = Part.Solid(shell)
+        try:
+            solid = Part.Solid(shell)
+        except:
+            # keeping a shell if solid is failing
+            solid = shell
         #-------------------------------------------
         # if toponaming is used, assign toponames to
         # shells geometry
