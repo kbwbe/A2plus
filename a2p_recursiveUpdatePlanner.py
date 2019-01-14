@@ -38,6 +38,16 @@ def createUpdateFileList(
             filesToUpdate,
             recursive=False
             ):
+    
+    # do not update converted parts
+    print(
+        "createUpdateFileList importPath = {}".format(
+            importPath
+            )
+        )
+    if a2plib.to_bytes(importPath) == b'converted':
+        return False, filesToUpdate
+    
     fileNameInProject = a2plib.findSourceFileInProject(
         importPath,
         parentAssemblyDir
@@ -49,6 +59,14 @@ def createUpdateFileList(
     needToUpdate = False
     subAsmNeedsUpdate = False
     for ob in docReader1.getA2pObjects():
+        if a2plib.to_bytes(ob.getA2pSource()) == b'converted':
+            print(
+                "Did not update converted part '{}'".format(
+                    ob.name
+                    )
+                )
+            continue
+        
         if ob.isSubassembly() and recursive:
             subAsmNeedsUpdate, filesToUpdate = createUpdateFileList(
                                                 ob.getA2pSource(),
@@ -115,7 +133,15 @@ class a2p_recursiveUpdateImportedPartsCommand:
                     return
             
             updateImportedParts(importDoc)
+            FreeCADGui.updateGui()
             importDoc.save()
+            print(
+                u"==== Assembly '{}' has been updated! =====".format(
+                    importDoc.FileName
+                    )
+                )
+            if importDoc != doc:
+                FreeCAD.closeDocument(importDoc.Name)
             
         
 
