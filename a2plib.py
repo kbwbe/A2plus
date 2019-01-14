@@ -38,6 +38,7 @@ AUTOSOLVE_ENABLED = preferences.GetBool('autoSolve', True)
 RELATIVE_PATHES_ENABLED = preferences.GetBool('useRelativePathes',True)
 FORCE_FIXED_POSITION = preferences.GetBool('forceFixedPosition',True)
 SHOW_CONSTRAINTS_ON_TOOLBAR= preferences.GetBool('showConstraintsOnToolbar',True)
+RECURSIVE_UPDATE_ENABLED = preferences.GetBool('enableRecursiveUpdate',False)
 
 SAVED_TRANSPARENCY = []
 
@@ -96,6 +97,10 @@ def to_str(tx):
         else:
             value = tx.decode("utf-8")
     return value # Instance of unicode string
+#------------------------------------------------------------------------------
+def getRecursiveUpdateEnabled():
+    preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
+    return preferences.GetBool('enableRecursiveUpdate',False)
 #------------------------------------------------------------------------------
 def getForceFixedPosition():
     preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")

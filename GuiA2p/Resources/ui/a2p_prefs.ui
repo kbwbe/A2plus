@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>705</width>
-    <height>731</height>
+    <height>776</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -101,9 +101,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>140</y>
+        <y>173</y>
         <width>687</width>
-        <height>234</height>
+        <height>201</height>
        </rect>
       </property>
       <property name="title">
@@ -112,10 +112,10 @@
       <widget class="QWidget" name="verticalLayoutWidget_3">
        <property name="geometry">
         <rect>
-         <x>49</x>
-         <y>40</y>
+         <x>30</x>
+         <y>30</y>
          <width>537</width>
-         <height>171</height>
+         <height>151</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -194,9 +194,9 @@
       <property name="geometry">
        <rect>
         <x>30</x>
-        <y>40</y>
+        <y>27</y>
         <width>521</width>
-        <height>95</height>
+        <height>131</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -233,6 +233,19 @@
         </widget>
        </item>
        <item>
+        <widget class="Gui::PrefCheckBox" name="checkBox_5">
+         <property name="text">
+          <string>enable recursive update of imported parts</string>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>enableRecursiveUpdate</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/A2plus</cstring>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="Gui::PrefCheckBox" name="checkBox">
          <property name="text">
           <string>use experimental topological naming</string>
@@ -244,6 +257,19 @@
           <cstring>Mod/A2plus</cstring>
          </property>
         </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>

@@ -92,7 +92,7 @@ class a2p_recursiveUpdateImportedPartsCommand:
         
         for f in filesToUpdate:
             #-------------------------------------------
-            # Get the importDocument
+            # update necessary documents
             #-------------------------------------------
             
             # look only for filenames, not paths, as there are problems on WIN10 (Address-translation??)
@@ -121,7 +121,7 @@ class a2p_recursiveUpdateImportedPartsCommand:
 
     def GetResources(self):
         return {
-            #'Pixmap' : a2plib.path_a2p + '/icons/a2p_ImportPart_Update.svg',
+            'Pixmap' : ':/icons/a2p_recursiveUpdate.svg',
             'MenuText': 'update imports recursively',
             'ToolTip': 'Update parts imported into the assembly'
             }

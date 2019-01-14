@@ -60,15 +60,25 @@ class a2pWorkbench (Workbench):
         import a2p_constraintcommands
         import a2p_bom # bom == bill of materials == partslist
 
-        partCommands = [
-            'a2p_ImportPart',
-            'a2p_updateImportedParts',
-            'a2p_recursiveUpdateImportedPartsCommand',
-            'a2p_movePart',
-            'a2p_duplicatePart',
-            'a2p_ConvertPart',
-            'a2p_editImportedPart',
-            ]
+        if a2plib.getRecursiveUpdateEnabled():
+            partCommands = [
+                'a2p_ImportPart',
+                'a2p_updateImportedParts',
+                'a2p_recursiveUpdateImportedPartsCommand',
+                'a2p_movePart',
+                'a2p_duplicatePart',
+                'a2p_ConvertPart',
+                'a2p_editImportedPart',
+                ]
+        else:
+            partCommands = [
+                'a2p_ImportPart',
+                'a2p_updateImportedParts',
+                'a2p_movePart',
+                'a2p_duplicatePart',
+                'a2p_ConvertPart',
+                'a2p_editImportedPart',
+                ]
         
         if a2plib.SHOW_CONSTRAINTS_ON_TOOLBAR:
             constraintCommands = [
