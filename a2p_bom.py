@@ -27,7 +27,8 @@ import os
 import string
 
 import a2plib
-from a2p_fcdocumentreader import FCdocumentReader
+#from a2p_fcdocumentreader import FCdocumentReader
+from a2p_simpleXMLreader import FCdocumentReader
 
 from a2p_partlistglobals import (
     PARTLIST_COLUMN_NAMES,
@@ -60,10 +61,9 @@ def createPartList(
         )
     workingDir,basicFileName = os.path.split(fileNameInProject)
     docReader1 = FCdocumentReader()
-    
     docReader1.openDocument(fileNameInProject)
+    
     for ob in docReader1.getA2pObjects():
-        #print(u'{}, Subassembly? = {}'.format(ob,ob.isSubassembly()))
         if ob.isSubassembly() and recursive:
             partListEntries = createPartList(
                                         ob.getA2pSource(),
@@ -76,7 +76,7 @@ def createPartList(
         if not ob.isSubassembly() or not recursive:
             # Try to get spreadsheetdata _PARTINFO_ from linked source
             linkedSource = ob.getA2pSource()
-            linkedSource = a2plib.findSourceFileInProject(
+            linkedSource = a2plib.findSourceFileInProject( #this returns unicode on py2 systems!
                             linkedSource,
                             workingDir
                             ) 
@@ -89,21 +89,29 @@ def createPartList(
             # There is no entry in dict, need to read out information from importFile...
             docReader2 = FCdocumentReader()
             docReader2.openDocument(linkedSource)
+
             # Initialize a default parts information...
             partInformation = []
             for i in range(0,len(PARTLIST_COLUMN_NAMES)):
                 partInformation.append("*")
-            # last entry of partinformations is reserved for filename
-            partInformation[-1] = os.path.split(linkedSource)[1] #without complete path...
+                
             # if there is a proper spreadsheat, then read it...
             for ob in docReader2.getSpreadsheetObjects():
-                if ob.name == PARTINFORMATION_SHEET_NAME:
+                
+                sheetName = PARTINFORMATION_SHEET_NAME
+                if a2plib.PYVERSION > 2:
+                    sheetName = a2plib.to_bytes(PARTINFORMATION_SHEET_NAME)
+                    
+                if ob.name == sheetName:
                     cells = ob.getCells()
                     for addr in cells.keys():
-                        if addr[:1] == 'B': #column B contains the information
+                        if addr[:1] == b'B': #column B contains the data, A only the titles
                             idx = int(addr[1:])-1
                             if idx < len(PARTLIST_COLUMN_NAMES): # don't read further!
                                 partInformation[idx] = cells[addr]
+            # last entry of partinformations is reserved for filename
+            partInformation[-1] = os.path.split(linkedSource)[1] #without complete path...
+
             # put information to dict and count usage of sourcefiles..
             entry = partListEntries.get(linkedSource,None)
             if entry == None:
@@ -190,10 +198,10 @@ class a2p_CreatePartlist():
         # Set the background color of the column headers
         ss.setBackground('A1:'+chr(idx2-1)+'1', (0.000000,1.000000,0.000000,1.000000))
         # Set the columnwith to proper values
-        ss.setColumnWidth('A',75)
+        ss.setColumnWidth('A',40)
         i=0
         for c in range(idx1,idx2):
-            ss.setColumnWidth(chr(c),250)
+            ss.setColumnWidth(chr(c),150)
             i+=1
         # fill entries for partsList...
         idx3 = ord('A')
@@ -201,11 +209,12 @@ class a2p_CreatePartlist():
             ss.set('A'+str(idx+2),str(idx+1))
             ss.set('B'+str(idx+2),str(partListEntries[k][0]))
             values = partListEntries[k][1]
-            for j,tx in enumerate(values):
-                if a2plib.PYVERSION == 2:
-                    tx2 = tx.encode('UTF-8')
+            for j,tx in enumerate(values): # all strings inside values are unicode!
+                #ss.set needs 2. argument as unicode for py3 and utf-8 string for py2!!!
+                if a2plib.PYVERSION > 2:
+                    tx2 = tx # preserve unicode
                 else:
-                    tx2 = tx
+                    tx2 = a2plib.to_bytes(tx) # convert to utf-8
                 ss.set(chr(idx3+2+j)+str(idx+2),tx2)
         
         # recompute to finish..

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #***************************************************************************
 #*                                                                         *
 #*   Copyright (c) 2018 kbwbe                                              *
@@ -38,7 +39,7 @@ class a2pWorkbench (Workbench):
     def __init__(self):
         import a2plib
         self.__class__.Icon = a2plib.pathOfModule() + "/icons/a2p_workbench.svg"
-        self.__class__.MenuText = 'A2plus V0.2.4'
+        self.__class__.MenuText = 'A2plus V0.2.5'
         self.__class__.ToolTip  = 'An other assembly workbench for FreeCAD'
 
     def Initialize(self):
@@ -50,6 +51,7 @@ class a2pWorkbench (Workbench):
             import a2p_Resources3
         import a2plib #QtCore.QResource.registerResource happens in assembly2lib
         import a2p_importpart
+        import a2p_recursiveUpdatePlanner
         import a2p_convertPart
         import a2p_solversystem
         import a2p_MuxAssembly
@@ -58,14 +60,25 @@ class a2pWorkbench (Workbench):
         import a2p_constraintcommands
         import a2p_bom # bom == bill of materials == partslist
 
-        partCommands = [
-            'a2p_ImportPart',
-            'a2p_updateImportedParts',
-            'a2p_movePart',
-            'a2p_duplicatePart',
-            'a2p_ConvertPart',
-            'a2p_editImportedPart',
-            ]
+        if a2plib.getRecursiveUpdateEnabled():
+            partCommands = [
+                'a2p_ImportPart',
+                'a2p_updateImportedParts',
+                'a2p_recursiveUpdateImportedPartsCommand',
+                'a2p_movePart',
+                'a2p_duplicatePart',
+                'a2p_ConvertPart',
+                'a2p_editImportedPart',
+                ]
+        else:
+            partCommands = [
+                'a2p_ImportPart',
+                'a2p_updateImportedParts',
+                'a2p_movePart',
+                'a2p_duplicatePart',
+                'a2p_ConvertPart',
+                'a2p_editImportedPart',
+                ]
         
         if a2plib.SHOW_CONSTRAINTS_ON_TOOLBAR:
             constraintCommands = [
