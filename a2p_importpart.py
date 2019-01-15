@@ -362,6 +362,12 @@ def updateImportedParts(doc):
                     obj.ViewObject.DiffuseColor = copy.copy(newObject.ViewObject.DiffuseColor)
                     obj.ViewObject.Transparency = newObject.ViewObject.Transparency
                     obj.Placement = savedPlacement # restore the old placement
+        if hasattr (obj, 'ViewObject'):
+            if hasattr (obj.ViewObject, 'Transparency'):
+                if obj.ViewObject.Transparency < 100:
+                    transparency = obj.ViewObject.Transparency
+                    obj.ViewObject.Transparency = transparency + 1
+                    obj.ViewObject.Transparency = transparency
 
     mw = FreeCADGui.getMainWindow()
     mdi = mw.findChild(QtGui.QMdiArea)
