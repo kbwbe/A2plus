@@ -364,10 +364,12 @@ def updateImportedParts(doc):
                     obj.Placement = savedPlacement # restore the old placement
         if hasattr (obj, 'ViewObject'):
             if hasattr (obj.ViewObject, 'Transparency'):
-                if obj.ViewObject.Transparency < 100:
+                if obj.ViewObject.Transparency > 0:
                     transparency = obj.ViewObject.Transparency
-                    obj.ViewObject.Transparency = transparency + 1
+                    obj.ViewObject.Transparency = 0
                     obj.ViewObject.Transparency = transparency
+                    FreeCADGui.Selection.addSelection(obj)
+                    FreeCADGui.Selection.removeSelection(obj)
 
     mw = FreeCADGui.getMainWindow()
     mdi = mw.findChild(QtGui.QMdiArea)
