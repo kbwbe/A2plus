@@ -481,13 +481,15 @@ class TopoMapper(object):
         #-------------------------------------------
         faces = []
         faceColors = []
-
+        transparency = 0
+        
         for objName in self.topLevelShapes:
             ob = self.doc.getObject(objName)
             colorFlag = ( len(ob.ViewObject.DiffuseColor) < len(ob.Shape.Faces) )
             shapeCol = ob.ViewObject.ShapeColor
             diffuseCol = ob.ViewObject.DiffuseColor
             tempShape = self.makePlacedShape(ob)
+            transparency = ob.ViewObject.Transparency
 
             # now start the loop with use of the stored values..(much faster)
             for i, face in enumerate(tempShape.Faces):
@@ -539,6 +541,6 @@ class TopoMapper(object):
                 muxInfo.append(name)
 
         if withColor:
-            return muxInfo, solid, faceColors
+            return muxInfo, solid, faceColors, transparency
         else:
             return muxInfo, solid
