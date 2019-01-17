@@ -194,13 +194,13 @@ def importPartFromFile(_doc, filename, importToCache=False):
     if subAssemblyImport:
     #if False:
         #newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor = muxObjectsWithKeys(importableObjects, withColor=True)
-        newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor = muxAssemblyWithTopoNames(
+        newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = muxAssemblyWithTopoNames(
             importDoc, 
             withColor=True
             )
     else:
         # TopoMapper manages import of non A2p-Files. It generates the shapes and appropriate topo names...
-        newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor = topoMapper.createTopoNames(withColor=True)
+        newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = topoMapper.createTopoNames(withColor=True)
         
 
     doc.recompute()

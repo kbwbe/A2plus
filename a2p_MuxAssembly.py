@@ -82,6 +82,7 @@ def muxAssemblyWithTopoNames(doc, withColor=False):
                        and hasattr(obj,'muxInfo')
                        ]
     
+    transparency = 0
     for obj in visibleObjects:
         #
         extendNames = False 
@@ -118,6 +119,7 @@ def muxAssemblyWithTopoNames(doc, withColor=False):
         shapeCol = obj.ViewObject.ShapeColor
         diffuseCol = obj.ViewObject.DiffuseColor
         tempShape = makePlacedShape(obj)
+        transparency = obj.ViewObject.Transparency
 
         # now start the loop with use of the stored values..(much faster)
         topoNaming = a2plib.getUseTopoNaming()
@@ -144,7 +146,7 @@ def muxAssemblyWithTopoNames(doc, withColor=False):
         # keeping a shell if solid is failing
         solid = shell
     if withColor:
-        return muxInfo, solid, faceColors
+        return muxInfo, solid, faceColors, transparency
     else:
         return muxInfo, solid
 
