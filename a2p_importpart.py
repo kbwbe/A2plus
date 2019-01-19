@@ -120,6 +120,18 @@ def importPartFromFile(_doc, filename, importToCache=False):
             return
 
     #-------------------------------------------
+    # recalculate imported part if requested by preferences
+    # This can be useful if the imported part depends on an
+    # external master-spreadsheet
+    #-------------------------------------------
+    if a2plib.getRecalculateImportedParts():
+        for ob in importDoc.Objects:
+            #ob.touch()
+            ob.recompute()
+        #importDoc.recompute()
+        importDoc.save() # useless without saving...
+    
+    #-------------------------------------------
     # Initialize the new TopoMapper
     #-------------------------------------------
     topoMapper = TopoMapper(importDoc)
@@ -322,9 +334,6 @@ def updateImportedParts(doc):
     objectCache.cleanUp(doc)
     for obj in doc.Objects:
         if hasattr(obj, 'sourceFile'):
-            if not hasattr( obj, 'timeLastImport'):
-                obj.addProperty("App::PropertyFloat", "timeLastImport","importPart") #should default to zero which will force update.
-                obj.setEditorMode("timeLastImport",1)
             if not hasattr( obj, 'a2p_Version'):
                 obj.addProperty("App::PropertyString", "a2p_Version","importPart").a2p_Version = 'V0.0'
                 obj.setEditorMode("a2p_Version",1)
@@ -345,7 +354,8 @@ def updateImportedParts(doc):
                 newPartCreationTime = os.path.getmtime( absPath )
                 if ( 
                     newPartCreationTime > obj.timeLastImport or
-                    obj.a2p_Version != A2P_VERSION
+                    obj.a2p_Version != A2P_VERSION or
+                    a2plib.getRecalculateImportedParts() # open always all parts as they could depend on spreadsheets
                     ):
                     if not objectCache.isCached(absPath): # Load every changed object one time to cache
                         importPartFromFile(doc, absPath, importToCache=True) # the version is now in the cache
