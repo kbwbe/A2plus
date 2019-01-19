@@ -497,7 +497,10 @@ class TopoMapper(object):
 
                 if withColor:
                     if colorFlag:
-                        faceColors.append(shapeCol)
+                        if not a2plib.getPerFaceTransparency():
+                            faceColors.append(shapeCol)
+                        else:
+                            faceColors.append(a2plib.makeDiffuseElement(shapeCol,transparency))
                     else:
                         faceColors.append(diffuseCol[i])
 

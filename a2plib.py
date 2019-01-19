@@ -39,6 +39,8 @@ RELATIVE_PATHES_ENABLED = preferences.GetBool('useRelativePathes',True)
 FORCE_FIXED_POSITION = preferences.GetBool('forceFixedPosition',True)
 SHOW_CONSTRAINTS_ON_TOOLBAR= preferences.GetBool('showConstraintsOnToolbar',True)
 RECURSIVE_UPDATE_ENABLED = preferences.GetBool('enableRecursiveUpdate',False)
+# temporary preference predecessor:
+PER_FACE_TRANSPARENCY = True
 
 SAVED_TRANSPARENCY = []
 
@@ -63,7 +65,7 @@ A2P_DEBUG_1         = 1
 A2P_DEBUG_2         = 2
 A2P_DEBUG_3         = 3
 
-A2P_DEBUG_LEVEL = A2P_DEBUG_NONE
+A2P_DEBUG_LEVEL = A2P_DEBUG_3
 
 PARTIAL_SOLVE_STAGE1 = 1    #solve all rigid fully constrained to tempfixed rigid, enable only involved dep, then set them as tempfixed
 CONSTRAINT_DIALOG_REF = None
@@ -105,6 +107,10 @@ def getRecursiveUpdateEnabled():
 def getForceFixedPosition():
     preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
     return preferences.GetBool('forceFixedPosition',False)
+#------------------------------------------------------------------------------
+def getPerFaceTransparency():
+    global PER_FACE_TRANSPARENCY
+    return PER_FACE_TRANSPARENCY
 #------------------------------------------------------------------------------
 def getConstraintEditorRef():
     global CONSTRAINT_EDITOR__REF
@@ -164,9 +170,11 @@ def setTransparency():
     for obj in doc.Objects:
         if hasattr(obj,'ViewObject'):
             if hasattr(obj.ViewObject,'Transparency'):
-#                if hasattr(obj.ViewObject,'DiffuseColor'):
-                SAVED_TRANSPARENCY.append(
-                    (obj.Name, obj.ViewObject.Transparency, obj.ViewObject.DiffuseColor)
+                if not a2plib.getPerFaceTransparency():
+                    SAVED_TRANSPARENCY.append(obj.Name, obj.ViewObject.Transparency, obj.ViewObject.ShapeColor)
+                else:
+                    SAVED_TRANSPARENCY.append(
+                        (obj.Name, obj.ViewObject.Transparency, obj.ViewObject.DiffuseColor)
                     )
                 obj.ViewObject.Transparency = 80
 #------------------------------------------------------------------------------
@@ -179,7 +187,11 @@ def restoreTransparency():
         obj = doc.getObject(setting[0])
         if obj is not None:
             obj.ViewObject.Transparency = setting[1]
-            obj.ViewObject.DiffuseColor = setting[2]
+            if not a2plib.getPerFaceTransparency():
+                obj.ViewObject.ShapeColor = setting[2]
+            else:
+                obj.ViewObject.DiffuseColor = setting[2]
+
     SAVED_TRANSPARENCY = []
 #------------------------------------------------------------------------------
 def isTransparencyEnabled():
@@ -635,4 +647,7 @@ def isA2pObject(obj):
         result = True
     return result
 #------------------------------------------------------------------------------
-
+def makeDiffuseElement(color,trans):
+    elem = (color[0],color[1],color[2],trans/100.0)
+    return elem
+#------------------------------------------------------------------------------

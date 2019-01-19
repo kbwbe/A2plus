@@ -359,17 +359,22 @@ def updateImportedParts(doc):
                     # save Placement because following newObject.Shape.copy() isn't resetting it to zeroes...
                     savedPlacement  = obj.Placement
                     obj.Shape = newObject.Shape.copy()
-                    obj.ViewObject.DiffuseColor = copy.copy(newObject.ViewObject.DiffuseColor)
-                    obj.ViewObject.Transparency = newObject.ViewObject.Transparency
                     obj.Placement = savedPlacement # restore the old placement
-        if hasattr (obj, 'ViewObject'):
-            if hasattr (obj.ViewObject, 'Transparency'):
-                if obj.ViewObject.Transparency > 0:
-                    transparency = obj.ViewObject.Transparency
-                    obj.ViewObject.Transparency = 0
-                    obj.ViewObject.Transparency = transparency
-                    FreeCADGui.Selection.addSelection(obj)
-                    FreeCADGui.Selection.removeSelection(obj)
+
+                    if not a2plib.getPerFaceTransparency():
+                        obj.ViewObject.DiffuseColor = copy.copy(newObject.ViewObject.DiffuseColor)
+                        obj.ViewObject.Transparency = newObject.ViewObject.Transparency
+
+                    if obj.ViewObject.Transparency > 0:
+                        transparency = obj.ViewObject.Transparency
+                        obj.ViewObject.Transparency = 0
+                        obj.ViewObject.Transparency = transparency
+                        FreeCADGui.Selection.addSelection(obj)
+                        FreeCADGui.Selection.removeSelection(obj)
+
+                    if a2plib.getPerFaceTransparency():
+                        obj.ViewObject.DiffuseColor = copy.copy(newObject.ViewObject.DiffuseColor)    # diffuse must be set last
+
 
     mw = FreeCADGui.getMainWindow()
     mdi = mw.findChild(QtGui.QMdiArea)
