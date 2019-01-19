@@ -6,28 +6,178 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>705</width>
-    <height>776</height>
+    <width>675</width>
+    <height>794</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>A2plus Settings</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
+   <item row="4" column="0">
+    <widget class="QGroupBox" name="groupBox_4">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>100</height>
+      </size>
+     </property>
+     <property name="title">
+      <string>User interface settings</string>
+     </property>
+     <widget class="QWidget" name="verticalLayoutWidget_4">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>30</y>
+        <width>621</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <widget class="Gui::PrefCheckBox" name="checkBox_6">
+         <property name="text">
+          <string>show constraints on toolbar</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>showConstraintsOnToolbar</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/A2plus</cstring>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QGroupBox" name="groupBox_3">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>200</height>
+      </size>
+     </property>
+     <property name="title">
+      <string>behavior when updating imported parts</string>
+     </property>
+     <widget class="QWidget" name="verticalLayoutWidget_3">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>30</y>
+        <width>621</width>
+        <height>141</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <widget class="Gui::PrefCheckBox" name="checkBox_4">
+         <property name="text">
+          <string>recalculate imported parts before updating them</string>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>recalculateImportedParts</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/A2plus</cstring>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="Gui::PrefCheckBox" name="checkBox_5">
+         <property name="text">
+          <string>enable recursive update of imported parts (process all subassemblies)</string>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>enableRecursiveUpdate</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/A2plus</cstring>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="Gui::PrefCheckBox" name="checkBox_2">
+         <property name="text">
+          <string>use experimental topological naming</string>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>useTopoNaming</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/A2plus</cstring>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="Gui::PrefCheckBox" name="checkBox_7">
+         <property name="text">
+          <string>inherit per face transparency from sub-assemblies</string>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>usePerFaceTransparency</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/A2plus</cstring>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
    <item row="1" column="0">
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
       <widget class="QGroupBox" name="groupBox">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>150</height>
+        </size>
+       </property>
        <property name="title">
         <string>default solving method</string>
        </property>
        <widget class="QWidget" name="verticalLayoutWidget_2">
         <property name="geometry">
          <rect>
-          <x>9</x>
+          <x>19</x>
           <y>29</y>
-          <width>591</width>
-          <height>141</height>
+          <width>621</width>
+          <height>111</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -92,124 +242,37 @@
      </item>
     </layout>
    </item>
-   <item row="2" column="0">
-    <widget class="QGroupBox" name="groupBox_3">
-     <property name="title">
-      <string>default Solver Behaviour</string>
+   <item row="5" column="0">
+    <widget class="QGroupBox" name="groupBox_6">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>200</height>
+      </size>
      </property>
-     <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>storage of files</string>
+     </property>
+     <widget class="QWidget" name="verticalLayoutWidget_5">
       <property name="geometry">
        <rect>
-        <x>0</x>
-        <y>173</y>
-        <width>687</width>
-        <height>201</height>
+        <x>20</x>
+        <y>30</y>
+        <width>621</width>
+        <height>161</height>
        </rect>
       </property>
-      <property name="title">
-       <string>Storage of files</string>
-      </property>
-      <widget class="QWidget" name="verticalLayoutWidget_3">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>30</y>
-         <width>537</width>
-         <height>151</height>
-        </rect>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_3">
-        <item>
-         <widget class="Gui::PrefRadioButton" name="radioButton_3">
-          <property name="text">
-           <string>use relative paths for imported parts</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-          <property name="prefEntry" stdset="0">
-           <cstring>useRelativePathes</cstring>
-          </property>
-          <property name="prefPath" stdset="0">
-           <cstring>Mod/A2plus</cstring>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="Gui::PrefRadioButton" name="radioButton_4">
-          <property name="text">
-           <string>use absolute paths for imported parts</string>
-          </property>
-          <property name="prefEntry" stdset="0">
-           <cstring>useAbsolutePathes</cstring>
-          </property>
-          <property name="prefPath" stdset="0">
-           <cstring>Mod/A2plus</cstring>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="Gui::PrefRadioButton" name="radioButton_5">
-          <property name="text">
-           <string>Use project-folder, all files are below this</string>
-          </property>
-          <property name="prefEntry" stdset="0">
-           <cstring>useProjectFolder</cstring>
-          </property>
-          <property name="prefPath" stdset="0">
-           <cstring>Mod/A2plus</cstring>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="Gui::PrefFileChooser" name="fileChooser">
-          <property name="mode">
-           <enum>Gui::FileChooser::Directory</enum>
-          </property>
-          <property name="prefEntry" stdset="0">
-           <cstring>projectFolder</cstring>
-          </property>
-          <property name="prefPath" stdset="0">
-           <cstring>Mod/A2plus</cstring>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="verticalSpacer">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </widget>
-     </widget>
-     <widget class="QWidget" name="verticalLayoutWidget">
-      <property name="geometry">
-       <rect>
-        <x>30</x>
-        <y>27</y>
-        <width>521</width>
-        <height>131</height>
-       </rect>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_4">
+      <layout class="QVBoxLayout" name="verticalLayout_6">
        <item>
-        <widget class="Gui::PrefCheckBox" name="checkBox_4">
+        <widget class="Gui::PrefRadioButton" name="radioButton_3">
          <property name="text">
-          <string>Show constraints on toolbar</string>
+          <string>use relative paths for imported parts</string>
          </property>
          <property name="checked">
           <bool>true</bool>
          </property>
          <property name="prefEntry" stdset="0">
-          <cstring>showConstraintsOnToolbar</cstring>
+          <cstring>useRelativePathes</cstring>
          </property>
          <property name="prefPath" stdset="0">
           <cstring>Mod/A2plus</cstring>
@@ -217,7 +280,74 @@
         </widget>
        </item>
        <item>
-        <widget class="Gui::PrefCheckBox" name="checkBox_2">
+        <widget class="Gui::PrefRadioButton" name="radioButton_4">
+         <property name="text">
+          <string>use absolute paths for imported parts</string>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>useAbsolutePathes</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/A2plus</cstring>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="Gui::PrefRadioButton" name="radioButton_5">
+         <property name="text">
+          <string>use project-folder, all files are below this</string>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>useProjectFolder</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/A2plus</cstring>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="Gui::PrefFileChooser" name="fileChooser"/>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_6">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>100</height>
+      </size>
+     </property>
+     <property name="title">
+      <string>default solver behavior</string>
+     </property>
+     <widget class="QWidget" name="verticalLayoutWidget">
+      <property name="geometry">
+       <rect>
+        <x>19</x>
+        <y>39</y>
+        <width>621</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="Gui::PrefCheckBox" name="checkBox">
          <property name="text">
           <string>solve automatically if a constraints property is changed</string>
          </property>
@@ -233,33 +363,7 @@
         </widget>
        </item>
        <item>
-        <widget class="Gui::PrefCheckBox" name="checkBox_5">
-         <property name="text">
-          <string>enable recursive update of imported parts</string>
-         </property>
-         <property name="prefEntry" stdset="0">
-          <cstring>enableRecursiveUpdate</cstring>
-         </property>
-         <property name="prefPath" stdset="0">
-          <cstring>Mod/A2plus</cstring>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="Gui::PrefCheckBox" name="checkBox">
-         <property name="text">
-          <string>use experimental topological naming</string>
-         </property>
-         <property name="prefEntry" stdset="0">
-          <cstring>useTopoNaming</cstring>
-         </property>
-         <property name="prefPath" stdset="0">
-          <cstring>Mod/A2plus</cstring>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer_3">
+        <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
@@ -274,6 +378,19 @@
       </layout>
      </widget>
     </widget>
+   </item>
+   <item row="6" column="0">
+    <spacer name="verticalSpacer_5">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>
