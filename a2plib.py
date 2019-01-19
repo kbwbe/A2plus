@@ -98,6 +98,14 @@ def to_str(tx):
             value = tx.decode("utf-8")
     return value # Instance of unicode string
 #------------------------------------------------------------------------------
+def getPerFaceTransparency():
+    preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
+    return preferences.GetBool('usePerFaceTransparency',False)
+#------------------------------------------------------------------------------
+def getRecalculateImportedParts():
+    preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
+    return preferences.GetBool('recalculateImportedParts',False)
+#------------------------------------------------------------------------------
 def getRecursiveUpdateEnabled():
     preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
     return preferences.GetBool('enableRecursiveUpdate',False)
