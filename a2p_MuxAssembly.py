@@ -135,7 +135,10 @@ def muxAssemblyWithTopoNames(doc, withColor=False):
 
             if withColor:
                 if colorFlag:
-                    faceColors.append(shapeCol)
+                    if not a2plib.getPerFaceTransparency():
+                        faceColors.append(shapeCol)
+                    else:
+                        faceColors.append(makeDiffuseElement(shapeCol,transparency))
                 else:
                     faceColors.append(diffuseCol[i])
 
@@ -165,6 +168,7 @@ def muxObjectsWithKeys(objsIn, withColor=False):
         shapeCol = obj.ViewObject.ShapeColor
         diffuseCol = obj.ViewObject.DiffuseColor
         tempShape = makePlacedShape(obj)
+        transparency = obj.ViewObject.Transparency
 
         # now start the loop with use of the stored values..(much faster)
         for i, face in enumerate(tempShape.Faces):
@@ -173,17 +177,23 @@ def muxObjectsWithKeys(objsIn, withColor=False):
 
             if withColor:
                 if colorFlag:
-                    faceColors.append(shapeCol)
+                    if not a2plib.getPerFaceTransparency():
+                        faceColors.append(shapeCol)
+                    else:
+                        faceColors.append(makeDiffuseElement(shapeCol,transparency))
                 else:
                     faceColors.append(diffuseCol[i])
 
     shell = Part.makeShell(faces)
-    Msg("A2P MUX: result: {}\n".format(shell))
-    DebugMsg(A2P_DEBUG_3,"a2p MUX: faceColors:\n{}\n".format(faceColors))            # has result all faces' color values?
+    try:
+        solid = Part.Solid(shell)
+    except:
+        # keeping a shell if solid is failing
+        solid = shell
     if withColor:
-        return muxInfo, shell, faceColors
+        return muxInfo, solid, faceColors, transparency
     else:
-        return muxInfo, shell
+        return muxInfo, solid
 
 #NOTE: muxObjects is never called in A2plus
 def muxObjects(doc, mode=0):

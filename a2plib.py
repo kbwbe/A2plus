@@ -172,9 +172,11 @@ def setTransparency():
     for obj in doc.Objects:
         if hasattr(obj,'ViewObject'):
             if hasattr(obj.ViewObject,'Transparency'):
-#                if hasattr(obj.ViewObject,'DiffuseColor'):
-                SAVED_TRANSPARENCY.append(
-                    (obj.Name, obj.ViewObject.Transparency, obj.ViewObject.DiffuseColor)
+                if not a2plib.getPerFaceTransparency():
+                    SAVED_TRANSPARENCY.append(obj.Name, obj.ViewObject.Transparency, obj.ViewObject.ShapeColor)
+                else:
+                    SAVED_TRANSPARENCY.append(
+                        (obj.Name, obj.ViewObject.Transparency, obj.ViewObject.DiffuseColor)
                     )
                 obj.ViewObject.Transparency = 80
 #------------------------------------------------------------------------------
@@ -187,7 +189,11 @@ def restoreTransparency():
         obj = doc.getObject(setting[0])
         if obj is not None:
             obj.ViewObject.Transparency = setting[1]
-            obj.ViewObject.DiffuseColor = setting[2]
+            if not a2plib.getPerFaceTransparency():
+                obj.ViewObject.ShapeColor = setting[2]
+            else:
+                obj.ViewObject.DiffuseColor = setting[2]
+
     SAVED_TRANSPARENCY = []
 #------------------------------------------------------------------------------
 def isTransparencyEnabled():
@@ -643,4 +649,7 @@ def isA2pObject(obj):
         result = True
     return result
 #------------------------------------------------------------------------------
-
+def makeDiffuseElement(color,trans):
+    elem = (color[0],color[1],color[2],trans/100.0)
+    return elem
+#------------------------------------------------------------------------------

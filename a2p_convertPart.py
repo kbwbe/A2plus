@@ -73,8 +73,9 @@ def convertToImportedPart(doc, obj):
     for p in obj.ViewObject.PropertiesList: 
         if hasattr(obj.ViewObject, p) and p not in ['DiffuseColor','Proxy','MappedColors']:
             setattr(newObj.ViewObject, p, getattr( obj.ViewObject, p))
-    newObj.ViewObject.DiffuseColor = copy.copy( obj.ViewObject.DiffuseColor )
-    newObj.ViewObject.Transparency = obj.ViewObject.Transparency
+#    newObj.ViewObject.Transparency = obj.ViewObject.Transparency               # should have been done within the above loop
+    newObj.ViewObject.DiffuseColor = copy.copy( obj.ViewObject.DiffuseColor )   # diffuse needs to happen last
+
     newObj.Placement.Base = obj.Placement.Base
     newObj.Placement.Rotation = obj.Placement.Rotation
 
