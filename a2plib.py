@@ -39,6 +39,7 @@ RELATIVE_PATHES_ENABLED = preferences.GetBool('useRelativePathes',True)
 FORCE_FIXED_POSITION = preferences.GetBool('forceFixedPosition',True)
 SHOW_CONSTRAINTS_ON_TOOLBAR= preferences.GetBool('showConstraintsOnToolbar',True)
 RECURSIVE_UPDATE_ENABLED = preferences.GetBool('enableRecursiveUpdate',False)
+USE_SOLID_UNION = preferences.GetBool('useSolidUnion',True)
 
 SAVED_TRANSPARENCY = []
 
@@ -113,6 +114,10 @@ def getRecursiveUpdateEnabled():
 def getForceFixedPosition():
     preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
     return preferences.GetBool('forceFixedPosition',False)
+#------------------------------------------------------------------------------
+def getUseSolidUnion():
+    preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
+    return preferences.GetBool('useSolidUnion',False)
 #------------------------------------------------------------------------------
 def getConstraintEditorRef():
     global CONSTRAINT_EDITOR__REF

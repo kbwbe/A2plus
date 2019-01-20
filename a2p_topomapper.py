@@ -506,7 +506,10 @@ class TopoMapper(object):
 
         shell = Part.makeShell(faces)
         try:
-            solid = Part.Solid(shell)
+            if a2plib.getUseSolidUnion():
+                solid = ob.Shape
+            else:
+                solid = Part.Solid(shell)
         except:
             # keeping a shell if solid is failing
             solid = shell

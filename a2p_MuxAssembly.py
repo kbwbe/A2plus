@@ -83,6 +83,7 @@ def muxAssemblyWithTopoNames(doc, withColor=False):
                        ]
     
     transparency = 0
+    shape_list = []
     for obj in visibleObjects:
         #
         extendNames = False 
@@ -120,6 +121,7 @@ def muxAssemblyWithTopoNames(doc, withColor=False):
         diffuseCol = obj.ViewObject.DiffuseColor
         tempShape = makePlacedShape(obj)
         transparency = obj.ViewObject.Transparency
+        shape_list.append(obj.Shape)
 
         # now start the loop with use of the stored values..(much faster)
         topoNaming = a2plib.getUseTopoNaming()
@@ -144,7 +146,17 @@ def muxAssemblyWithTopoNames(doc, withColor=False):
 
     shell = Part.makeShell(faces)
     try:
-        solid = Part.Solid(shell)
+        # solid = Part.Solid(shell)
+        # solid = Part.makeCompound (shape_list)
+        if a2plib.getUseSolidUnion():
+            if len(shape_list) > 0:
+                shape_base=shape_list[0]
+                shapes=shape_list[1:]
+                solid = shape_base.fuse(shapes)
+            else:   #one drill ONLY
+                solid = shape_list[0]
+        else:
+            solid = Part.Solid(shell)
     except:
         # keeping a shell if solid is failing
         solid = shell
@@ -161,7 +173,8 @@ def muxObjectsWithKeys(objsIn, withColor=False):
     faces = []
     faceColors = []
     muxInfo = [] # List of keys, not used at moment...
-
+    shape_list = []
+    
     for obj in objsIn:
         # Save Computing time, store this before the for..enumerate loop later...
         colorFlag = ( len(obj.ViewObject.DiffuseColor) < len(obj.Shape.Faces) )
@@ -169,6 +182,7 @@ def muxObjectsWithKeys(objsIn, withColor=False):
         diffuseCol = obj.ViewObject.DiffuseColor
         tempShape = makePlacedShape(obj)
         transparency = obj.ViewObject.Transparency
+        shape_list.append(obj.Shape)
 
         # now start the loop with use of the stored values..(much faster)
         for i, face in enumerate(tempShape.Faces):
@@ -186,10 +200,19 @@ def muxObjectsWithKeys(objsIn, withColor=False):
 
     shell = Part.makeShell(faces)
     try:
-        solid = Part.Solid(shell)
+        if a2plib.getUseSolidUnion():
+            if len(shape_list) > 0:
+                shape_base=shape_list[0]
+                shapes=shape_list[1:]
+                solid = shape_base.fuse(shapes)
+            else:   #one drill ONLY
+                solid = shape_list[0]
+        else:
+            solid = Part.Solid(shell)
     except:
         # keeping a shell if solid is failing
         solid = shell
+
     if withColor:
         return muxInfo, solid, faceColors, transparency
     else:
