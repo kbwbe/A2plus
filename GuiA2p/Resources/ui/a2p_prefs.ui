@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>675</width>
-    <height>800</height>
+    <height>850</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -73,7 +73,7 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>200</height>
+       <height>230</height>
       </size>
      </property>
      <property name="title">
@@ -85,7 +85,7 @@
         <x>20</x>
         <y>30</y>
         <width>621</width>
-        <height>141</height>
+        <height>181</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -135,6 +135,19 @@
          </property>
          <property name="prefEntry" stdset="0">
           <cstring>usePerFaceTransparency</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/A2plus</cstring>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="Gui::PrefCheckBox" name="checkBox_8">
+         <property name="text">
+          <string>do not import invisible shapes (use with caution, can break assemblies)</string>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>doNotImportInvisibleShapes</cstring>
          </property>
          <property name="prefPath" stdset="0">
           <cstring>Mod/A2plus</cstring>
