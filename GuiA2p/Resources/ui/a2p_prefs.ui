@@ -155,6 +155,19 @@
         </widget>
        </item>
        <item>
+        <widget class="Gui::PrefCheckBox" name="checkBox_9">
+         <property name="text">
+          <string>use solid union for importing parts and subassemblies (experimental)</string>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>useSolidUnion</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/A2plus</cstring>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer_3">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
