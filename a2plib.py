@@ -99,6 +99,10 @@ def to_str(tx):
             value = tx.decode("utf-8")
     return value # Instance of unicode string
 #------------------------------------------------------------------------------
+def doNotImportInvisibleShapes():
+    preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
+    return preferences.GetBool('doNotImportInvisibleShapes',True)
+#------------------------------------------------------------------------------
 def getPerFaceTransparency():
     preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
     return preferences.GetBool('usePerFaceTransparency',False)
