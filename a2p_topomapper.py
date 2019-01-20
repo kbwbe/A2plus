@@ -437,10 +437,23 @@ class TopoMapper(object):
             self.topLevelShapes.extend(addList)
         #-------------------------------------------
         # Got some shapes created by PathWB? filter out...
+        # also filter out invisible shapes...
         #-------------------------------------------
         tmp = []
         for n in self.topLevelShapes:
             if self.addedByPathWB(n): continue
+            #
+            if a2plib.doNotImportInvisibleShapes():
+                ob = self.doc.getObject(n)
+                if hasattr(ob,"ViewObject"):
+                    if hasattr(ob.ViewObject,"Visibility"):
+                        if ob.ViewObject.Visibility == False:
+                            print(
+                                "Import ignored invisible shape! {}".format(
+                                    ob.Name
+                                    )
+                                  )
+                            continue
             tmp.append(n)
         self.topLevelShapes = tmp
         #-------------------------------------------
