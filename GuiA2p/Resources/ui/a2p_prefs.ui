@@ -332,7 +332,23 @@
         </widget>
        </item>
        <item>
-        <widget class="Gui::PrefFileChooser" name="fileChooser"/>
+        <widget class="Gui::PrefFileChooser" name="fileChooser">
+         <property name="minimumSize">
+          <size>
+           <width>250</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>400</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="mode">
+          <enum>Gui::FileChooser::Directory</enum>
+         </property>
+        </widget>
        </item>
        <item>
         <spacer name="verticalSpacer_6">

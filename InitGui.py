@@ -39,7 +39,7 @@ class a2pWorkbench (Workbench):
     def __init__(self):
         import a2plib
         self.__class__.Icon = a2plib.pathOfModule() + "/icons/a2p_workbench.svg"
-        self.__class__.MenuText = 'A2plus V0.2.6'
+        self.__class__.MenuText = 'A2plus V0.2.9'
         self.__class__.ToolTip  = 'An other assembly workbench for FreeCAD'
 
     def Initialize(self):
