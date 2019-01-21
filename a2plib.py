@@ -22,11 +22,16 @@
 #*                                                                         *
 #***************************************************************************
 
-import FreeCAD, FreeCADGui, Part
-from PySide import QtGui, QtCore
-import numpy, os, sys
+import FreeCAD
+import FreeCADGui
+from FreeCAD import Base
+from FreeCAD import  Part
+from PySide import QtGui
+from PySide import QtCore
+import os
+import sys
+import platform
 from a2p_viewProviderProxies import *
-from  FreeCAD import Base
 
 PYVERSION =  sys.version_info[0]
 
@@ -39,6 +44,7 @@ RELATIVE_PATHES_ENABLED = preferences.GetBool('useRelativePathes',True)
 FORCE_FIXED_POSITION = preferences.GetBool('forceFixedPosition',True)
 SHOW_CONSTRAINTS_ON_TOOLBAR= preferences.GetBool('showConstraintsOnToolbar',True)
 RECURSIVE_UPDATE_ENABLED = preferences.GetBool('enableRecursiveUpdate',False)
+USE_SOLID_UNION = preferences.GetBool('useSolidUnion',True)
 
 SAVED_TRANSPARENCY = []
 
@@ -69,6 +75,23 @@ PARTIAL_SOLVE_STAGE1 = 1    #solve all rigid fully constrained to tempfixed rigi
 CONSTRAINT_DIALOG_REF = None
 CONSTRAINT_EDITOR__REF = None
 CONSTRAINT_VIEWMODE = False
+
+#------------------------------------------------------------------------------
+# Detect the operating system...
+#------------------------------------------------------------------------------
+tmp = platform.system()
+tmp = tmp.upper()
+print("loading A2plus on operating system '{}'".format(tmp))
+tmp = tmp.split(' ')
+
+OPERATING_SYSTEM = 'UNKNOWN'
+if "WINDOWS" in tmp:
+    OPERATING_SYSTEM = "WINDOWS"
+elif "LINUX" in tmp:
+    OPERATING_SYSTEM = "LINUX"
+else:
+    OPERATING_SYSTEM = "OTHER"
+
 
 
 #------------------------------------------------------------------------------
@@ -117,6 +140,10 @@ def getRecursiveUpdateEnabled():
 def getForceFixedPosition():
     preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
     return preferences.GetBool('forceFixedPosition',False)
+#------------------------------------------------------------------------------
+def getUseSolidUnion():
+    preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
+    return preferences.GetBool('useSolidUnion',False)
 #------------------------------------------------------------------------------
 def getConstraintEditorRef():
     global CONSTRAINT_EDITOR__REF
@@ -243,17 +270,28 @@ def getProjectFolder():
     return preferences.GetString('projectFolder', '~')
 
 #------------------------------------------------------------------------------
-def findFile(name, path):
+def pathToOS(path):
+    if path == None: return None
+    p = to_str(path)
+    print(u"p = {}".format(p))
+    if OPERATING_SYSTEM == 'WINDOWS':
+        p = p.replace(u'/',u'\\')
+    else:
+        p = p.replace(u'\\',u'/')
+    return p # binary string
+
+#------------------------------------------------------------------------------
+def findFile(_name, _path):
     '''
     Searches a file within a directory and it's subdirectories
     '''
+    name = to_str(_name)
+    path = to_str(_path)
     for root, dirs, files in os.walk(path):
-        if PYVERSION < 3:
-            if to_bytes(name) in files:
-                return os.path.join(root, name)
-        else:
-            if name in files:
-                return os.path.join(root, name)
+        if name in files:
+            return os.path.join(root, name)
+    return None
+            
 #------------------------------------------------------------------------------
 def findSourceFileInProject(_pathImportPart, _assemblyPath):
     '''
@@ -291,13 +329,16 @@ def findSourceFileInProject(_pathImportPart, _assemblyPath):
             joinedPath = os.path.join(p1,p2)
             
             absolutePath = os.path.normpath(joinedPath)
+            absolutePath = pathToOS(absolutePath)
             return to_str(absolutePath)
         else:
+            pathImportPart = pathToOS(pathImportPart)
             return to_str(pathImportPart)
 
     projectFolder = os.path.abspath(getProjectFolder()) # get normalized path
     fileName = os.path.basename(pathImportPart)
     retval = findFile(fileName,projectFolder)
+    retval = pathToOS(retval)
     return to_str(retval)
 #------------------------------------------------------------------------------
 def checkFileIsInProjectFolder(path):
