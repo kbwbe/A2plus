@@ -25,7 +25,7 @@
 import FreeCAD
 import FreeCADGui
 from FreeCAD import Base
-from FreeCAD import  Part
+import  Part
 from PySide import QtGui
 from PySide import QtCore
 import os
