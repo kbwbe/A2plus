@@ -495,7 +495,7 @@ class TopoMapper(object):
         faces = []
         faceColors = []
         transparency = 0
-        
+        shape_list = []
         for objName in self.topLevelShapes:
             ob = self.doc.getObject(objName)
             colorFlag = ( len(ob.ViewObject.DiffuseColor) < len(ob.Shape.Faces) )
@@ -503,7 +503,7 @@ class TopoMapper(object):
             diffuseCol = ob.ViewObject.DiffuseColor
             tempShape = self.makePlacedShape(ob)
             transparency = ob.ViewObject.Transparency
-
+            shape_list.append(ob.Shape)
             # now start the loop with use of the stored values..(much faster)
             for i, face in enumerate(tempShape.Faces):
                 faces.append(face)
@@ -520,7 +520,11 @@ class TopoMapper(object):
         shell = Part.makeShell(faces)
         try:
             if a2plib.getUseSolidUnion():
-                solid = ob.Shape
+                if len(shape_list) > 0:
+                    shape_base=shape_list[0]
+                    shapes=shape_list[1:]
+                    solid = shape_base.fuse(shapes)
+                    #solid = ob.Shape
             else:
                 solid = Part.Solid(shell)
         except:
