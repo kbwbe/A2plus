@@ -30,7 +30,7 @@ App=FreeCAD
 Gui=FreeCADGui
 
 A2P_VERSION = 'V0.1'
-
+#to be aligned with InitGui A2P Version
 
 class SubAssemblyWalk():
     '''

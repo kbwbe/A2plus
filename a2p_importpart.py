@@ -114,9 +114,17 @@ def importPartFromFile(_doc, filename, importToCache=False):
     if not importDocIsOpen:
         if filename.lower().endswith('.fcstd'):
             importDoc = FreeCAD.openDocument(filename)
+        elif filename.lower().endswith('.stp') or filename.lower().endswith('.step'):
+            import ImportGui
+            fname =  os.path.splitext(os.path.basename(filename))[0]
+            FreeCAD.newDocument(fname)
+            newname = FreeCAD.ActiveDocument.Name
+            FreeCAD.setActiveDocument(newname)
+            ImportGui.insert(filename,newname)
+            importDoc = FreeCAD.ActiveDocument
         else:
             msg = "A part can only be imported from a FreeCAD '*.fcstd' file"
-            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Value Error", msg )
+            QtGui.QMessageBox.information( QtGui.QApplication.activeWindow(), "Value Error", msg )
             return
 
     #-------------------------------------------
@@ -260,7 +268,8 @@ class a2p_ImportPartCommand():
             QtGui.QApplication.activeWindow(),
             "Select FreeCAD document to import part from"
             )
-        dialog.setNameFilter("Supported Formats (*.FCStd);;All files (*.*)")
+        #dialog.setNameFilter("Supported Formats (*.FCStd);;STEP files (*.stp *.step);;All files (*.*)")
+        dialog.setNameFilter("Supported Formats (*.FCStd *.stp *.step)") #;;All files (*.*)")
         if dialog.exec_():
             if PYVERSION < 3:
                 filename = unicode(dialog.selectedFiles()[0])
@@ -589,7 +598,18 @@ This is not allowed when using preference
         docFilenames = [ d.FileName for d in docs ]
         
         if not fileNameWithinProjectFile in docFilenames :
-            FreeCAD.open(fileNameWithinProjectFile)
+            if fileNameWithinProjectFile.lower().endswith('.stp') or fileNameWithinProjectFile.lower().endswith('.step'):
+                import ImportGui
+                fname =  os.path.splitext(os.path.basename(fileNameWithinProjectFile))[0]
+                FreeCAD.newDocument(fname)
+                newname = FreeCAD.ActiveDocument.Name
+                ImportGui.open(fileNameWithinProjectFile, newname)
+                FreeCAD.ActiveDocument.Label = fname
+                FreeCADGui.SendMsgToActiveView("ViewFit")
+                msg = "Editing a STEP file as '*.FCStd' file\nPlease export the saved file as \'.step\'\n" + fileNameWithinProjectFile
+                QtGui.QMessageBox.information( QtGui.QApplication.activeWindow(), "Info", msg )                
+            else:
+                FreeCAD.open(fileNameWithinProjectFile)
         else:
             idx = docFilenames.index(fileNameWithinProjectFile)
             name = docs[idx].Name
