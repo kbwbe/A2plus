@@ -127,6 +127,14 @@ class a2p_recursiveUpdateImportedPartsCommand:
             if not importDocIsOpen:
                 if f.lower().endswith('.fcstd'):
                     importDoc = FreeCAD.openDocument(f)
+                elif f.lower().endswith('.stp') or f.lower().endswith('.step'):
+                    import ImportGui
+                    fname =  os.path.splitext(os.path.basename(f))[0]
+                    FreeCAD.newDocument(fname)
+                    newname = FreeCAD.ActiveDocument.Name
+                    FreeCAD.setActiveDocument(newname)
+                    ImportGui.insert(filename,newname)
+                    importDoc = FreeCAD.ActiveDocument
                 else:
                     msg = "A part can only be imported from a FreeCAD '*.fcstd' file"
                     QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Value Error", msg )

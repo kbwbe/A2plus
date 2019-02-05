@@ -26,6 +26,8 @@
 __title__ = 'A2plus assembly Workbench - InitGui file'
 __author__ = 'kbwbe'
 
+A2P_VERSION = 'V0.3.0'
+
 import sys
 PyVersion = sys.version_info[0]
 if PyVersion == 2:
@@ -37,9 +39,10 @@ else:
 class a2pWorkbench (Workbench):
 
     def __init__(self):
+        global A2P_VERSION
         import a2plib
         self.__class__.Icon = a2plib.pathOfModule() + "/icons/a2p_workbench.svg"
-        self.__class__.MenuText = 'A2plus V0.2.9'
+        self.__class__.MenuText = 'A2plus '+A2P_VERSION
         self.__class__.ToolTip  = 'An other assembly workbench for FreeCAD'
 
     def Initialize(self):
