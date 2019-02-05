@@ -203,13 +203,25 @@ def setTransparency():
     for obj in doc.Objects:
         if hasattr(obj,'ViewObject'):
             if hasattr(obj.ViewObject,'Transparency'):
-                if not a2plib.getPerFaceTransparency():
-                    SAVED_TRANSPARENCY.append(obj.Name, obj.ViewObject.Transparency, obj.ViewObject.ShapeColor)
+                if hasattr(obj.ViewObject,'DiffuseColor'):
+                        SAVED_TRANSPARENCY.append(
+                            (obj.Name, obj.ViewObject.Transparency, obj.ViewObject.DiffuseColor)
+                        )
                 else:
                     SAVED_TRANSPARENCY.append(
-                        (obj.Name, obj.ViewObject.Transparency, obj.ViewObject.DiffuseColor)
+                        (obj.Name, obj.ViewObject.Transparency, obj.ViewObject.ShapeColor)
                     )
-                obj.ViewObject.Transparency = 80
+            else:
+                if hasattr(obj.ViewObject,'DiffuseColor'):
+                        SAVED_TRANSPARENCY.append(
+                            (obj.Name, obj.ViewObject.DiffuseColor)
+                        )
+                else:
+                    if hasattr(obj.ViewObject,'ShapeColor'):
+                        SAVED_TRANSPARENCY.append(
+                            (obj.Name, obj.ViewObject.ShapeColor)
+                        )
+        obj.ViewObject.Transparency = 80
 #------------------------------------------------------------------------------
 def restoreTransparency():
     global SAVED_TRANSPARENCY
@@ -219,11 +231,17 @@ def restoreTransparency():
     for setting in SAVED_TRANSPARENCY:
         obj = doc.getObject(setting[0])
         if obj is not None:
-            obj.ViewObject.Transparency = setting[1]
-            if not a2plib.getPerFaceTransparency():
-                obj.ViewObject.ShapeColor = setting[2]
+            if hasattr(obj.ViewObject,'Transparency'):
+                if not hasattr(obj.ViewObject,'DiffuseColor'):
+                    obj.ViewObject.ShapeColor = setting[2]
+                else:
+                    obj.ViewObject.DiffuseColor = setting[2]
+                obj.ViewObject.Transparency = setting[1]
             else:
-                obj.ViewObject.DiffuseColor = setting[2]
+                if not hasattr(obj.ViewObject,'DiffuseColor'):
+                    obj.ViewObject.ShapeColor = setting[1]
+                else:
+                    obj.ViewObject.DiffuseColor = setting[1]
 
     SAVED_TRANSPARENCY = []
 #------------------------------------------------------------------------------
