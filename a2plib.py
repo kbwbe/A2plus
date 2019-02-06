@@ -191,6 +191,17 @@ def setPartialProcessing(enabled):
 def isPartialProcessing():
     return PARTIAL_PROCESSING_ENABLED
 #------------------------------------------------------------------------------
+def filterShapeObs(_list):
+    lst = []
+    for ob in _list:
+        if hasattr(ob,"Shape"):
+            if len(ob.Shape.Faces) > 0 and len(ob.Shape.Vertexes) > 0:
+                lst.append(ob)
+    S = set(lst)
+    lst = []
+    lst.extend(S)
+    return lst
+#------------------------------------------------------------------------------
 def setTransparency():
     global SAVED_TRANSPARENCY
     # Save Transparency of Objects and make all transparent
@@ -200,30 +211,57 @@ def setTransparency():
         # Transparency is already saved, no need to set transparency again
         return
 
-    for obj in doc.Objects:
+    shapedObs = filterShapeObs(doc.Objects) # filter out partlist, spreadsheets etc..
+
+    sel = FreeCADGui.Selection
+    for obj in shapedObs:
         if hasattr(obj,'ViewObject'):
             if hasattr(obj.ViewObject,'Transparency'):
-                if not a2plib.getPerFaceTransparency():
-                    SAVED_TRANSPARENCY.append(obj.Name, obj.ViewObject.Transparency, obj.ViewObject.ShapeColor)
+                if hasattr(obj.ViewObject,'DiffuseColor'):
+                        SAVED_TRANSPARENCY.append(
+                            (obj.Name, obj.ViewObject.Transparency, obj.ViewObject.DiffuseColor)
+                        )
                 else:
                     SAVED_TRANSPARENCY.append(
-                        (obj.Name, obj.ViewObject.Transparency, obj.ViewObject.DiffuseColor)
+                        (obj.Name, obj.ViewObject.Transparency, obj.ViewObject.ShapeColor)
                     )
-                obj.ViewObject.Transparency = 80
+            else:
+                if hasattr(obj.ViewObject,'DiffuseColor'):
+                        SAVED_TRANSPARENCY.append(
+                            (obj.Name, obj.ViewObject.DiffuseColor)
+                        )
+                else:
+                    if hasattr(obj.ViewObject,'ShapeColor'):
+                        SAVED_TRANSPARENCY.append(
+                            (obj.Name, obj.ViewObject.ShapeColor)
+                        )
+        obj.ViewObject.Transparency = 80
+        sel.addSelection(obj) # Transparency workaround. Transparency is taken when once been selected
+    sel.clearSelection()
+    
 #------------------------------------------------------------------------------
 def restoreTransparency():
     global SAVED_TRANSPARENCY
     # restore transparency of objects...
     doc = FreeCAD.ActiveDocument
 
+    sel = FreeCADGui.Selection
     for setting in SAVED_TRANSPARENCY:
         obj = doc.getObject(setting[0])
         if obj is not None:
-            obj.ViewObject.Transparency = setting[1]
-            if not a2plib.getPerFaceTransparency():
-                obj.ViewObject.ShapeColor = setting[2]
+            if hasattr(obj.ViewObject,'Transparency'):
+                if not hasattr(obj.ViewObject,'DiffuseColor'):
+                    obj.ViewObject.ShapeColor = setting[2]
+                else:
+                    obj.ViewObject.DiffuseColor = setting[2]
+                obj.ViewObject.Transparency = setting[1]
             else:
-                obj.ViewObject.DiffuseColor = setting[2]
+                if not hasattr(obj.ViewObject,'DiffuseColor'):
+                    obj.ViewObject.ShapeColor = setting[1]
+                else:
+                    obj.ViewObject.DiffuseColor = setting[1]
+            sel.addSelection(obj)
+    sel.clearSelection()
 
     SAVED_TRANSPARENCY = []
 #------------------------------------------------------------------------------

@@ -264,17 +264,6 @@ class TopoMapper(object):
         return keys #FIXME
 
 
-    def filterShapeObs(self,_list):
-        lst = []
-        for ob in _list:
-            if hasattr(ob,"Shape"):
-                if len(ob.Shape.Faces) > 0 and len(ob.Shape.Vertexes) > 0:
-                    lst.append(ob)
-        S = set(lst)
-        lst = []
-        lst.extend(S)
-        return lst
-
     def populateShapeDict(self,objName):
         self.doneObjects.append(objName)
         ob = self.doc.getObject(objName)
@@ -405,12 +394,12 @@ class TopoMapper(object):
         # Create treenodes of the importable Objects with a shape
         #-------------------------------------------
         self.treeNodes = {}
-        shapeObs = self.filterShapeObs(self.doc.Objects)
+        shapeObs = a2plib.filterShapeObs(self.doc.Objects)
         S = set(shapeObs)
         for ob in S:
             self.treeNodes[ob.Name] = (
-                    self.filterShapeObs(ob.InList),
-                    self.filterShapeObs(ob.OutList)
+                    a2plib.filterShapeObs(ob.InList),
+                    a2plib.filterShapeObs(ob.OutList)
                     )
         #-------------------------------------------
         # nodes with empty inList are top level shapes for sure

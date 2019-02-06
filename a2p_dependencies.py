@@ -337,7 +337,34 @@ class Dependency():
 
             normal2 = plane2.Surface.Axis
             dep2.refAxisEnd = dep2.refPoint.add(normal2)
+
+        elif c.Type == "CenterOfMass":
+            dep1 = DependencyCenterOfMass(c, "point")
+            dep2 = DependencyCenterOfMass(c, "point")
             
+            ob1 = doc.getObject(c.Object1)
+            ob2 = doc.getObject(c.Object2)
+            
+            plane1 = getObjectFaceFromName(ob1, c.SubElement1)
+            plane2 = getObjectFaceFromName(ob2, c.SubElement2)
+            dep1.refPoint = plane1.Faces[0].CenterOfMass
+            dep2.refPoint = plane2.Faces[0].CenterOfMass
+
+            normal1 = plane1.Surface.Axis
+            normal2 = plane2.Surface.Axis
+            print(normal2)
+            if dep2.direction == "opposed":
+                normal2.multiply(-1.0)
+            print(normal2)
+            dep1.refAxisEnd = dep1.refPoint.add(normal1)
+            dep2.refAxisEnd = dep2.refPoint.add(normal2)
+            #  to be improved: toggle direction even if offset == 0.0
+            if abs(dep2.offset) > solver.mySOLVER_SPIN_ACCURACY * 1e-1:
+                offsetAdjustVec = Base.Vector(normal2.x,normal2.y,normal2.z)
+                offsetAdjustVec.multiply(dep2.offset)
+                dep2.refPoint = dep2.refPoint.add(offsetAdjustVec)
+                dep2.refAxisEnd = dep2.refAxisEnd.add(offsetAdjustVec)
+
         else:
             raise NotImplementedError("Constraint type {} was not implemented!".format(c.Type))
 
@@ -793,43 +820,27 @@ class DependencyAxisPlaneParallel(Dependency):
         tmpaxis.Direction.Length = 2.0
         return _dofPos, AngleAlignment(tmpaxis,_dofRot)
 
+class DependencyCenterOfMass(Dependency):
+    def __init__(self, constraint, refType):
+        Dependency.__init__(self, constraint, refType, False)
+        self.isPointConstraint = True
+        self.useRefPointSpin = True
 
+    def getMovement(self):
+        if not self.Enabled: return None, None
 
+        moveVector = self.foreignDependency.refPoint.sub(self.refPoint)
+        return self.refPoint, moveVector
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    def calcDOF(self, _dofPos, _dofRot, _pointconstraints=[]):
+        #PointIdentity, PointOnLine, PointOnPlane, Spherical Constraints:
+        #    PointIdentityPos()    needs to know the point constrained as vector, the dofpos array, the rigid center point as vector and
+        #                        the pointconstraints which stores all point constraints of the rigid
+        #    PointIdentityRot()    needs to know the point constrained as vector, the dofrot array, and
+        #                        the pointconstraints which stores all point constraints of the rigid
+        # These constraint have to be the last evaluated in the chain of constraints.
+            
+        tmpaxis = cleanAxis(create_Axis(self.refPoint, self.currentRigid.getRigidCenter()))
+        #dofpos = PointIdentityPos(tmpaxis,_dofPos,_pointconstraints)
+        #dofrot = PointIdentityRot(tmpaxis,_dofRot,_pointconstraints)
+        return PointIdentity(tmpaxis, _dofPos, _dofRot, _pointconstraints)

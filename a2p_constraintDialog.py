@@ -541,9 +541,18 @@ class a2p_ConstraintCollection(QtGui.QWidget):
         QtCore.QObject.connect(self.angledPlanesButton, QtCore.SIGNAL("clicked()"), self.onAngledPlanesButton)
         self.constraintButtons.append(self.angledPlanesButton)
         #-------------------------------------
+        self.centerOfMassButton = QtGui.QPushButton(self.panel3)
+        self.centerOfMassButton.setFixedSize(32,32)
+        self.centerOfMassButton.setIcon(QtGui.QIcon(':/icons/a2p_CenterOfMassConstraint.svg'))
+        self.centerOfMassButton.setToolTip(a2p_constraints.CenterOfMassConstraint.getToolTip())
+        self.centerOfMassButton.setText("")
+        QtCore.QObject.connect(self.centerOfMassButton, QtCore.SIGNAL("clicked()"), self.onCenterOfMassButton)
+        self.constraintButtons.append(self.centerOfMassButton)
+        #-------------------------------------
         panel3_Layout.addWidget(self.planesParallelButton)
         panel3_Layout.addWidget(self.planeCoincidentButton)
         panel3_Layout.addWidget(self.angledPlanesButton)
+        panel3_Layout.addWidget(self.centerOfMassButton)
         panel3_Layout.addStretch(1)
         self.panel3.setLayout(panel3_Layout)
         #-------------------------------------
@@ -633,6 +642,7 @@ button.
                         self.planesParallelButton.setEnabled(True)
                         self.planeCoincidentButton.setEnabled(True)
                         self.angledPlanesButton.setEnabled(True)
+                        self.centerOfMassButton.setEnabled(True)
                 #=============================
                 if sphericalSurfaceSelected(s1):
                     if vertexSelected(s2):
@@ -716,6 +726,11 @@ button.
     def onAngledPlanesButton(self):
         selection = FreeCADGui.Selection.getSelectionEx()
         self.activeConstraint = a2p_constraints.AngledPlanesConstraint(selection)
+        self.manageConstraint()
+
+    def onCenterOfMassButton(self):
+        selection = FreeCADGui.Selection.getSelectionEx()
+        self.activeConstraint = a2p_constraints.CenterOfMassConstraint(selection)
         self.manageConstraint()
 
     def onSpericalConstraintButton(self):

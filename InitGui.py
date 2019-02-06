@@ -26,7 +26,7 @@
 __title__ = 'A2plus assembly Workbench - InitGui file'
 __author__ = 'kbwbe'
 
-A2P_VERSION = 'V0.3.0'
+A2P_VERSION = 'V0.3.1'
 
 import sys
 PyVersion = sys.version_info[0]
@@ -98,6 +98,7 @@ class a2pWorkbench (Workbench):
                 'a2p_PlanesParallelConstraintCommand',
                 'a2p_PlaneCoincidentConstraintCommand',
                 'a2p_AngledPlanesConstraintCommand',
+                'a2p_CenterOfMassConstraintCommand',
                 
                 'a2p_DeleteConnectionsCommand',
                 ]
