@@ -381,18 +381,23 @@ def updateImportedParts(doc):
                     obj.Placement = savedPlacement # restore the old placement
 
                     if not a2plib.getPerFaceTransparency():
-                        obj.ViewObject.DiffuseColor = copy.copy(newObject.ViewObject.DiffuseColor)
+                        #obj.ViewObject.DiffuseColor = copy.copy(newObject.ViewObject.DiffuseColor)
                         obj.ViewObject.Transparency = newObject.ViewObject.Transparency
+                        obj.ViewObject.ShapeColor = copy.copy(newObject.ViewObject.ShapeColor)
+                        
 
                     if obj.ViewObject.Transparency > 0:
                         transparency = obj.ViewObject.Transparency
                         obj.ViewObject.Transparency = 0
                         obj.ViewObject.Transparency = transparency
-                        FreeCADGui.Selection.addSelection(obj)
-                        FreeCADGui.Selection.removeSelection(obj)
+                        #FreeCADGui.Selection.addSelection(obj)
+                        #FreeCADGui.Selection.removeSelection(obj)
 
                     if a2plib.getPerFaceTransparency():
                         obj.ViewObject.DiffuseColor = copy.copy(newObject.ViewObject.DiffuseColor)    # diffuse must be set last
+                        
+                    FreeCADGui.Selection.addSelection(obj)
+                    FreeCADGui.Selection.removeSelection(obj)
 
 
     mw = FreeCADGui.getMainWindow()
