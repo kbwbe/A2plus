@@ -312,3 +312,30 @@ class a2p_AngledPlanesConstraintCommand:
 FreeCADGui.addCommand('a2p_AngledPlanesConstraintCommand', a2p_AngledPlanesConstraintCommand())
 
 #==============================================================================
+class a2p_CenterOfMassConstraintCommand:
+    def Activated(self):
+        selection = FreeCADGui.Selection.getSelectionEx()
+        
+        c = a2p_constraints.CenterOfMassConstraint(selection)
+        cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
+            c.constraintObject,
+            'createConstraint'
+            )
+        FreeCADGui.Selection.clearSelection()
+
+
+    def IsActive(self):
+        return a2p_constraints.CenterOfMassConstraint.isValidSelection(
+            FreeCADGui.Selection.getSelectionEx()
+            )
+
+    def GetResources(self):
+        return {
+             'Pixmap' : path_a2p + '/icons/a2p_CenterOfMassConstraint.svg',
+             'MenuText': 'center of mass constraint',
+             'ToolTip': a2p_constraints.CenterOfMassConstraint.getToolTip()
+             }
+
+FreeCADGui.addCommand('a2p_CenterOfMassConstraintCommand', a2p_CenterOfMassConstraintCommand())
+
+#==============================================================================

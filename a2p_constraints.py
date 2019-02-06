@@ -633,43 +633,56 @@ correct selection.
         return validSelection
 
 #==============================================================================
+
+class CenterOfMassConstraint(BasicConstraint):
+    def __init__(self,selection):
+        BasicConstraint.__init__(self, selection)
+        self.typeInfo = 'CenterOfMass'
+        self.constraintBaseName = 'CenterOfMass'
+        #self.iconPath = ':/icons/a2p_CenterOfMassConstraint.svg'
+        #self.iconPath = a2plib.pathOfModule() + '/GuiA2p/Resources/icons/a2p_CenterOfMassConstraint.svg'
+        self.iconPath = path_a2p + '/icons/a2p_CenterOfMassConstraint.svg'
+        self.create(selection)
         
+    def calcInitialValues(self):
+        plane1 = getObjectFaceFromName(self.ob1, self.sub1)
+        plane2 = getObjectFaceFromName(self.ob2, self.sub2)
+        CoM1 = plane1.CenterOfMass
+        CoM2 = plane2.CenterOfMass
+        axis1 = plane1.Surface.Axis
+        axis2 = plane2.Surface.Axis
+        angle = math.degrees(axis1.getAngle(axis2))
+        if angle <= 90.0:
+            self.direction = "aligned"
+        else:
+            self.direction = "opposed"
+        self.offset = 0.0
+        self.lockRotation = False
 
+    @staticmethod
+    def getToolTip():
+        return \
+'''
+Creates a Center of Mass constraint.
 
+1) select first face object
+2) select second face object on another part
 
+After creating this constraint you can change
+entry "offset" in object editor to desired value.
 
+Button gets active after
+correct selection.
+'''
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    @staticmethod
+    def isValidSelection(selection):
+        validSelection = False
+        if len(selection) == 2:
+            s1, s2 = selection
+            if s1.ObjectName != s2.ObjectName:
+                if ( planeSelected(s1) and planeSelected(s2)):
+                    validSelection = True
+        return validSelection
+    
+#==============================================================================
