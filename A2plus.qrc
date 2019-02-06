@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
+        <file>icons/a2p_CenterOfMassConstraint.svg</file>
         <file>icons/a2p_recursiveUpdate.svg</file>        
         <file>icons/a2p_Asm.svg</file>        
         <file>icons/a2p_Obj.svg</file>
