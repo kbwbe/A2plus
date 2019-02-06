@@ -320,6 +320,24 @@ class Dependency():
             dep1.refAxisEnd = dep1.refPoint.add(axis1)
             dep2.refAxisEnd = dep2.refPoint.add(axis2)
             
+        elif c.Type == "axisPlaneParallel":
+            dep1 = DependencyAxisPlaneParallel(c, "pointAxis")
+            dep2 = DependencyAxisPlaneParallel(c, "pointNormal")
+
+            ob1 = doc.getObject(c.Object1)
+            ob2 = doc.getObject(c.Object2)
+            axis1 = getAxis(ob1, c.SubElement1)
+            plane2 = getObjectFaceFromName(ob2, c.SubElement2)
+            dep1.refPoint = getPos(ob1,c.SubElement1)
+            dep2.refPoint = plane2.Faces[0].BoundBox.Center
+
+            axis1Normalized = Base.Vector(axis1)
+            axis1Normalized.normalize()
+            dep1.refAxisEnd = dep1.refPoint.add(axis1Normalized)
+
+            normal2 = plane2.Surface.Axis
+            dep2.refAxisEnd = dep2.refPoint.add(normal2)
+
         elif c.Type == "CenterOfMass":
             dep1 = DependencyCenterOfMass(c, "point")
             dep2 = DependencyCenterOfMass(c, "point")
