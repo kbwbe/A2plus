@@ -665,6 +665,9 @@ class CenterOfMassConstraint(BasicConstraint):
 '''
 Creates a Center of Mass constraint.
 
+(Join centerOfMass of face1 to 
+centerOfMass of face2) 
+
 1) select first face object
 2) select second face object on another part
 
