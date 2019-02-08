@@ -831,8 +831,8 @@ class DependencyAxisPlaneParallel(Dependency):
 
 class DependencyCenterOfMass(Dependency):
     def __init__(self, constraint, refType):
-        Dependency.__init__(self, constraint, refType, False)
-        self.isPointConstraint = True
+        Dependency.__init__(self, constraint, refType, True)
+        self.isPointConstraint = False
         self.useRefPointSpin = True
 
     def getMovement(self):
@@ -840,16 +840,24 @@ class DependencyCenterOfMass(Dependency):
 
         moveVector = self.foreignDependency.refPoint.sub(self.refPoint)
         return self.refPoint, moveVector
-
+      
     def calcDOF(self, _dofPos, _dofRot, _pointconstraints=[]):
-        #PointIdentity, PointOnLine, PointOnPlane, Spherical Constraints:
-        #    PointIdentityPos()    needs to know the point constrained as vector, the dofpos array, the rigid center point as vector and
-        #                        the pointconstraints which stores all point constraints of the rigid
-        #    PointIdentityRot()    needs to know the point constrained as vector, the dofrot array, and
-        #                        the pointconstraints which stores all point constraints of the rigid
-        # These constraint have to be the last evaluated in the chain of constraints.
-            
-        tmpaxis = cleanAxis(create_Axis(self.refPoint, self.currentRigid.getRigidCenter()))
-        #dofpos = PointIdentityPos(tmpaxis,_dofPos,_pointconstraints)
-        #dofrot = PointIdentityRot(tmpaxis,_dofRot,_pointconstraints)
-        return PointIdentity(tmpaxis, _dofPos, _dofRot, _pointconstraints)
+        #function used to determine the dof lost due to this constraint
+        #CircularEdgeConstraint:
+        #    AxisAlignment()    needs to know the axis normal to circle (stored in dep as refpoint and refAxisEnd) and the dofrot array
+        #    AxisDistance()     needs to know the axis normal to circle (stored in dep as refpoint and refAxisEnd) and the dofpos array
+        #    PlaneOffset()      needs to know the axis normal to circle (stored in dep as refpoint and refAxisEnd) and the dofpos array
+        #    LockRotation()     need to know if LockRotation is True or False and the array dofrot
+        #
+        #    honestly speaking this would be simplified like this:
+        #    if LockRotation:
+        #        dofpos = []
+        #        dofrot = []
+        #    else:
+        #        dofpos = []
+        #        dofrot = AxisAlignment(ConstraintAxis, dofrot)
+        if self.lockRotation:
+            return [], []
+        else:
+            tmpaxis = cleanAxis(create_Axis2Points(self.refPoint,self.refAxisEnd))
+            return [], AxisAlignment(tmpaxis,_dofRot)
