@@ -570,6 +570,17 @@ def CircularEdgeSelected( selection ):
                 return True
     return False
 #------------------------------------------------------------------------------
+def ClosedEdgeSelected( selection ):
+    if len( selection.SubElementNames ) == 1:
+        subElement = selection.SubElementNames[0]
+        if subElement.startswith('Edge'):
+            edge = getObjectEdgeFromName( selection.Object, subElement)
+            if edge.isClosed():
+                return True
+            else:
+                return False
+    return False
+#------------------------------------------------------------------------------
 def AxisOfPlaneSelected( selection ): #adding Planes/Faces selection for Axial constraints
     if len( selection.SubElementNames ) == 1:
         subElement = selection.SubElementNames[0]

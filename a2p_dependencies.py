@@ -345,17 +345,26 @@ class Dependency():
             ob1 = doc.getObject(c.Object1)
             ob2 = doc.getObject(c.Object2)
             
-            plane1 = getObjectFaceFromName(ob1, c.SubElement1)
-            plane2 = getObjectFaceFromName(ob2, c.SubElement2)
-            dep1.refPoint = plane1.Faces[0].CenterOfMass
-            dep2.refPoint = plane2.Faces[0].CenterOfMass
-
+            if c.SubElement1.startswith('Face'):
+                plane1 = getObjectFaceFromName(ob1, c.SubElement1)
+                dep1.refPoint = plane1.Faces[0].CenterOfMass
+            elif c.SubElement1.startswith('Edge'):
+                plane1 = Part.Face(Part.Wire(getObjectEdgeFromName(ob1, c.SubElement1)))
+                dep1.refPoint = plane1.CenterOfMass
+            if c.SubElement2.startswith('Face'):
+                plane2 = getObjectFaceFromName(ob2, c.SubElement2)
+                dep2.refPoint = plane2.Faces[0].CenterOfMass
+            elif c.SubElement2.startswith('Edge'):
+                plane2 = Part.Face(Part.Wire(getObjectEdgeFromName(ob2, c.SubElement2)))
+                dep2.refPoint = plane2.CenterOfMass
+            #plane1 = getObjectFaceFromName(ob1, c.SubElement1)
+            #plane2 = getObjectFaceFromName(ob2, c.SubElement2)
+            # dep1.refPoint = plane1.Faces[0].CenterOfMass
+            # dep2.refPoint = plane2.Faces[0].CenterOfMass
             normal1 = plane1.Surface.Axis
             normal2 = plane2.Surface.Axis
-            print(normal2)
             if dep2.direction == "opposed":
                 normal2.multiply(-1.0)
-            print(normal2)
             dep1.refAxisEnd = dep1.refPoint.add(normal1)
             dep2.refAxisEnd = dep2.refPoint.add(normal2)
             #  to be improved: toggle direction even if offset == 0.0
