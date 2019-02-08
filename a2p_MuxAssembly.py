@@ -149,7 +149,7 @@ def muxAssemblyWithTopoNames(doc, withColor=False):
         # solid = Part.Solid(shell)
         # solid = Part.makeCompound (shape_list)
         if a2plib.getUseSolidUnion():
-            if len(shape_list) > 0:
+            if len(shape_list) > 1:
                 shape_base=shape_list[0]
                 shapes=shape_list[1:]
                 solid = shape_base.fuse(shapes)
@@ -307,11 +307,11 @@ def createOrUpdateSimpleAssemblyShape(doc):
         # solid = Part.Solid(shell)
         # solid = Part.makeCompound (shape_list)
         if a2plib.getUseSolidUnion():
-            if len(shape_list) > 0:
+            if len(shape_list) > 1:
                 shape_base=shape_list[0]
                 shapes=shape_list[1:]
                 solid = shape_base.fuse(shapes)
-            else:   #one drill ONLY
+            else:   #one shape only
                 solid = shape_list[0]
         else:
             solid = Part.Solid(shell)
