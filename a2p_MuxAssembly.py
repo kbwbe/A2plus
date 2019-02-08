@@ -298,11 +298,27 @@ def createOrUpdateSimpleAssemblyShape(doc):
         #sas.ViewObject.Proxy = 0
         ViewProviderSimpleAssemblyShape(sas.ViewObject)
     faces = []
-
+    shape_list = []
     for obj in visibleImportObjects:
         faces = faces + obj.Shape.Faces
+        shape_list.append(obj.Shape)
     shell = Part.makeShell(faces)
-    sas.Shape = shell
+    try:
+        # solid = Part.Solid(shell)
+        # solid = Part.makeCompound (shape_list)
+        if a2plib.getUseSolidUnion():
+            if len(shape_list) > 0:
+                shape_base=shape_list[0]
+                shapes=shape_list[1:]
+                solid = shape_base.fuse(shapes)
+            else:   #one drill ONLY
+                solid = shape_list[0]
+        else:
+            solid = Part.Solid(shell)
+    except:
+        # keeping a shell if solid is failing
+        solid = shell
+    sas.Shape = solid #shell
     sas.ViewObject.Visibility = False
 
 
