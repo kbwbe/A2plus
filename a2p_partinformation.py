@@ -35,6 +35,19 @@ from a2p_partlistglobals import (
 
 
 #------------------------------------------------------------------------------
+toolTip = \
+'''
+Create a spreadSheet for ordering or
+logistics information.
+
+The created spreadSheet can be found
+within the treeview.
+
+Please fill in your information.
+This spreadSheet will be read out
+by the partlist function of A2plus.
+'''
+
 class a2p_CreatePartInformationSheet_Command:
 
     def Activated(self):
@@ -70,7 +83,7 @@ class a2p_CreatePartInformationSheet_Command:
         return {
             'Pixmap'  :     ':/icons/a2p_partsInfo.svg',
             'MenuText':     'create a spreadSheet with logistics/ordering information',
-            'ToolTip':      'create a spreadSheet with logistics/ordering information'
+            'ToolTip':      toolTip
             }
         
 FreeCADGui.addCommand('a2p_CreatePartInformationSheet_Command', a2p_CreatePartInformationSheet_Command())

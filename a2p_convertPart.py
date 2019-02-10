@@ -83,6 +83,26 @@ def convertToImportedPart(doc, obj):
     newObj.recompute()
 
 
+toolTip = \
+'''
+Convert a part, created with
+another WB, to a full functional
+A2plus part.
+
+After converting, constraints
+can be applied. Also you can
+duplicate the converted part.
+
+(The shape of the converted part
+is not editable anymore, as it
+is a static copy of the original
+shape.)
+
+This function is useful, if
+you want to use e.g. fasteners
+within this workbench.
+'''
+
 class a2p_ConvertPartCommand():
 
     def GetResources(self):
@@ -90,7 +110,7 @@ class a2p_ConvertPartCommand():
         return {'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_ConvertPart.svg',
 #                'Accel' : "Shift+C", # a default shortcut (optional)
                 'MenuText': "convert Part to A2plus form",
-                'ToolTip' : "convert Part to A2plus form"
+                'ToolTip' : toolTip
                 }
 
     def Activated(self):

@@ -274,6 +274,20 @@ class ViewProviderSimpleAssemblyShape:
     def setDisplayMode(self,mode):
         return mode
 
+toolTip = \
+'''
+Create or refresh a simple shape
+of the complete Assembly.
+
+All parts within the assembly
+are combined to a single shape.
+This shape can be used e.g. for the
+techdraw module or 3D printing.
+
+The created shape can be found
+in the treeview. By default it
+is invisible at first time.
+'''
 
 def createOrUpdateSimpleAssemblyShape(doc):
     visibleImportObjects = [ obj for obj in doc.Objects
@@ -327,8 +341,8 @@ class a2p_SimpleAssemblyShapeCommand():
     def GetResources(self):
         import a2plib
         return {'Pixmap'  : a2plib.path_a2p +'/icons/a2p_SimpleAssemblyShape.svg',
-                'MenuText': "create or refresh simple Shape of complete Assembly",
-                'ToolTip': "create or refresh simple Shape of complete Assembly"
+                'MenuText': "Create or refresh simple shape of complete Assembly",
+                'ToolTip': toolTip
                 }
 
     def Activated(self):

@@ -91,6 +91,24 @@ def createUpdateFileList(
         
     return needToUpdate, filesToUpdate
 #==============================================================================
+toolTip = \
+'''
+Update parts, which have been
+imported to the assembly.
+
+(If you modify a part in an
+external file, the new shape
+is taken to the assembly by
+this function.)
+
+This command does this recursively
+over all involved subassemblies.
+
+Subassemblies are updated,
+if necessary, too.
+'''
+
+
 class a2p_recursiveUpdateImportedPartsCommand:
 
     def Activated(self):
@@ -157,7 +175,7 @@ class a2p_recursiveUpdateImportedPartsCommand:
         return {
             'Pixmap' : ':/icons/a2p_recursiveUpdate.svg',
             'MenuText': 'update imports recursively',
-            'ToolTip': 'Update parts imported into the assembly'
+            'ToolTip': toolTip
             }
 
 FreeCADGui.addCommand('a2p_recursiveUpdateImportedPartsCommand', a2p_recursiveUpdateImportedPartsCommand())

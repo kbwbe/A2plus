@@ -233,6 +233,12 @@ def importPartFromFile(_doc, filename, importToCache=False):
 
     return newObj
 
+toolTip = \
+'''
+Add a part from an external file
+to the assembly
+'''
+
 
 class a2p_ImportPartCommand():
 
@@ -240,7 +246,7 @@ class a2p_ImportPartCommand():
         return {'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_ImportPart.svg',
                 'Accel' : "Shift+A", # a default shortcut (optional)
                 'MenuText': "add Part from external file",
-                'ToolTip' : "add Part from external file"
+                'ToolTip' : toolTip
                 }
 
     def Activated(self):
@@ -416,6 +422,17 @@ def updateImportedParts(doc):
 
 
 
+toolTip = \
+'''
+Update parts, which have been
+imported to the assembly.
+
+(If you modify a part in an
+external file, the new shape
+is taken to the assembly by
+this function.)
+'''
+
 class a2p_UpdateImportedPartsCommand:
 
     def Activated(self):
@@ -426,7 +443,7 @@ class a2p_UpdateImportedPartsCommand:
         return {
             'Pixmap' : a2plib.path_a2p + '/icons/a2p_ImportPart_Update.svg',
             'MenuText': 'Update parts imported into the assembly',
-            'ToolTip': 'Update parts imported into the assembly'
+            'ToolTip': toolTip
             }
 
 FreeCADGui.addCommand('a2p_updateImportedParts', a2p_UpdateImportedPartsCommand())
@@ -480,6 +497,18 @@ def duplicateImportedPart( part ):
     newObj.Placement.Rotation = part.Placement.Rotation
     return newObj
 
+toolTip = \
+'''
+Make a duplicate of a
+part, which is already
+imported to the assembly.
+
+Select a part and hit
+this button. A duplicate
+will be created and can be 
+placed somewhere by mouse.
+'''
+
 class a2p_DuplicatePartCommand:
     def Activated(self):
         #====================================================
@@ -526,14 +555,31 @@ class a2p_DuplicatePartCommand:
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_DuplicatePart.svg',
             'MenuText': 'duplicate',
-            'ToolTip': 'duplicate part (hold shift for multiple)'
+            'ToolTip':  toolTip
             }
 
 FreeCADGui.addCommand('a2p_duplicatePart', a2p_DuplicatePartCommand())
 
 
 
+toolTip = \
+'''
+Edit an imported part.
 
+Select an imported part
+and hit this button.
+
+The appropiate FCStd file,
+linked to this part will
+be opened and you can modify
+this part at this place.
+
+After editing and saving,
+you have to use the function
+'update imported parts' in
+order to see the new shape
+within the assembly.
+'''
 
 class a2p_EditPartCommand:
     def Activated(self):
@@ -631,6 +677,7 @@ This is not allowed when using preference
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_EditPart.svg',
             'MenuText': 'edit',
+            'ToolTip':  toolTip
             }
 
 FreeCADGui.addCommand('a2p_editImportedPart', a2p_EditPartCommand())
@@ -681,6 +728,19 @@ class PartMoverSelectionObserver:
         view = FreeCADGui.activeDocument().activeView()
         PartMover( view, obj )
 
+toolTip = \
+'''
+Move the selected part.
+
+Select a part and hit this
+button. The part can be moved
+around by mouse.
+
+If the part is constrained, it
+will jump back by next solving
+of the assembly.
+'''
+
 class a2p_MovePartCommand:
     def Activated(self):
         #====================================================
@@ -724,7 +784,7 @@ class a2p_MovePartCommand:
             #'Pixmap' : ':/assembly2/icons/MovePart.svg',
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_MovePart.svg',
             'MenuText': 'move selected part',
-            'ToolTip': 'move selected part'
+            'ToolTip': toolTip
             }
 
 FreeCADGui.addCommand('a2p_movePart', a2p_MovePartCommand())
@@ -734,9 +794,19 @@ FreeCADGui.addCommand('a2p_movePart', a2p_MovePartCommand())
 
 toolTipText = \
 '''
-delete all constraints
-of exact one selected
-part
+Delete all constraints
+of a selected part.
+
+Select exact one part 
+and hit this button.
+
+A confirmation dialog pops
+up, showing all constraints
+related to the selected part.
+
+After confirmation all related
+constraints are deleted
+at once.
 '''
 
 class DeleteConnectionsCommand:
@@ -773,6 +843,18 @@ class DeleteConnectionsCommand:
             }
 FreeCADGui.addCommand('a2p_DeleteConnectionsCommand', DeleteConnectionsCommand())
 
+toolTip = \
+'''
+Highlight both parts, which are
+related to a selected constraint.
+
+Select a constraint within
+the treeview and hit this button.
+
+The whole assembly is switched to
+transparent mode and you can inspect
+the desired constraint.
+'''
 
 class ViewConnectionsCommand:
     def Activated(self):
@@ -803,8 +885,8 @@ class ViewConnectionsCommand:
     def GetResources(self):
         return {
             'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_ViewConnection.svg',
-            'MenuText':     'show connected elements',
-            'ToolTip':      'show connected elements',
+            'MenuText':     'show connected parts',
+            'ToolTip':      toolTip,
             }
 
 FreeCADGui.addCommand('a2p_ViewConnectionsCommand', ViewConnectionsCommand())
@@ -835,7 +917,22 @@ class ViewConnectionsObserver:
             FreeCADGui.Selection.addSelection(
                 FreeCAD.ActiveDocument.getObject(selected.Object2), selected.SubElement2)
 
-            
+toolTip = \
+'''
+Show only selected elements,
+or all if none is selected.
+
+Select one ore more parts,
+which are the only ones you
+want to see in a big assembly.
+
+Hit this button, and all other
+parts will be made invisible.
+
+If you select nothing and hit
+this button, all invisible parts
+will be made visible again.
+'''
 
 class a2p_isolateCommand:
 
@@ -879,8 +976,8 @@ class a2p_isolateCommand:
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_Isolate_Element.svg',
-            'MenuText': 'show only selected elements, or all if none is selected',
-            'ToolTip': 'show only selected elements, or all if none is selected'
+            'MenuText': 'Show only selected elements, or all if none is selected',
+            'ToolTip': toolTip
             }
 
 FreeCADGui.addCommand('a2p_isolateCommand', a2p_isolateCommand())
@@ -911,8 +1008,8 @@ class a2p_ToggleTransparencyCommand:
     def GetResources(self):
         return {
             'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_ToggleTranparency.svg',
-            'MenuText':     'toggle transparency of assembly',
-            'ToolTip':      'toggle transparency of assembly',
+            'MenuText':     'Toggle transparency of assembly',
+            'ToolTip':      'Toggle transparency of assembly',
             'Checkable':    self.IsChecked()
         }
 FreeCADGui.addCommand('a2p_ToggleTransparencyCommand', a2p_ToggleTransparencyCommand())
@@ -921,7 +1018,7 @@ FreeCADGui.addCommand('a2p_ToggleTransparencyCommand', a2p_ToggleTransparencyCom
 
 toolTipMessage = \
 '''
-toggle AutoSolve
+Toggle AutoSolve
 
 By pressing this button you can
 enable or disable automatic solving
@@ -1007,12 +1104,12 @@ def a2p_repairTreeView():
 
 toolTipMessage = \
 '''
-repair the treeview,
-if being damaged somehow.
+Repair the treeview, if it
+is damaged somehow.
 
 After pressing this button,
 constraints will grouped under
-corresponding parts again
+corresponding parts again.
 '''
 
 class a2p_repairTreeViewCommand:
@@ -1029,10 +1126,23 @@ class a2p_repairTreeViewCommand:
     def GetResources(self):
         return {
             'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_RepairTree.svg',
-            'MenuText':     'repair treeView',
+            'MenuText':     'Repair treeView',
             'ToolTip':      toolTipMessage
             }
 FreeCADGui.addCommand('a2p_repairTreeViewCommand', a2p_repairTreeViewCommand())
+
+toolTip = \
+'''
+Flip direction of last constraint.
+
+If the last constraint, which has
+been defined, has a property
+'direction', it's value will be
+toggled between 'aligned' and
+'opposed'
+
+(alignment of axis's)
+'''
 
 
 class a2p_FlipConstraintDirectionCommand:
@@ -1050,7 +1160,7 @@ class a2p_FlipConstraintDirectionCommand:
         return {
             'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_flipConstraint.svg',
             'MenuText':     'flip direction of last constraint',
-            'ToolTip':      'flip direction of last constraint'
+            'ToolTip':      toolTip
             }
 FreeCADGui.addCommand('a2p_FlipConstraintDirectionCommand', a2p_FlipConstraintDirectionCommand())
 
@@ -1096,8 +1206,8 @@ class a2p_Show_Hierarchy_Command:
     def GetResources(self):
         return {
             'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_treeview.svg',
-            'MenuText':     'generate HTML file with detailed constraining structure',
-            'ToolTip':      'generate HTML file with detailed constraining structure'
+            'MenuText':     'Generate HTML file with detailed constraining structure',
+            'ToolTip':      'Generate HTML file with detailed constraining structure'
             }
 FreeCADGui.addCommand('a2p_Show_Hierarchy_Command', a2p_Show_Hierarchy_Command())
 
@@ -1118,8 +1228,8 @@ class a2p_Show_DOF_info_Command:
     def GetResources(self):
         return {
             'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_DOFs.svg',
-            'MenuText':     'print detailed DOF information to console',
-            'ToolTip':      'print detailed DOF information to console'
+            'MenuText':     'Print detailed DOF information to console',
+            'ToolTip':      'Print detailed DOF information to console'
             }
 FreeCADGui.addCommand('a2p_Show_DOF_info_Command', a2p_Show_DOF_info_Command())
 
