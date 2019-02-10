@@ -642,7 +642,8 @@ button.
                         self.planesParallelButton.setEnabled(True)
                         self.planeCoincidentButton.setEnabled(True)
                         self.angledPlanesButton.setEnabled(True)
-                        self.centerOfMassButton.setEnabled(True)
+                if ((planeSelected(s1) or ClosedEdgeSelected(s1)) and (planeSelected(s2) or ClosedEdgeSelected(s2))):
+                    self.centerOfMassButton.setEnabled(True)
                 #=============================
                 if sphericalSurfaceSelected(s1):
                     if vertexSelected(s2):

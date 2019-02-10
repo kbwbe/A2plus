@@ -645,8 +645,16 @@ class CenterOfMassConstraint(BasicConstraint):
         self.create(selection)
         
     def calcInitialValues(self):
-        plane1 = getObjectFaceFromName(self.ob1, self.sub1)
-        plane2 = getObjectFaceFromName(self.ob2, self.sub2)
+        if self.sub1.startswith('Face'):
+            plane1 = getObjectFaceFromName(self.ob1, self.sub1)
+        elif self.sub1.startswith('Edge'):
+            #print(self.sub1)
+            plane1 = Part.Face(Part.Wire(getObjectEdgeFromName(self.ob1, self.sub1)))
+        if self.sub2.startswith('Face'):
+            plane2 = getObjectFaceFromName(self.ob2, self.sub2)
+        elif self.sub2.startswith('Edge'):
+            plane2 = Part.Face(Part.Wire(getObjectEdgeFromName(self.ob2, self.sub2)))
+        #plane2 = getObjectFaceFromName(self.ob2, self.sub2)
         CoM1 = plane1.CenterOfMass
         CoM2 = plane2.CenterOfMass
         axis1 = plane1.Surface.Axis
@@ -665,11 +673,11 @@ class CenterOfMassConstraint(BasicConstraint):
 '''
 Creates a Center of Mass constraint.
 
-(Join centerOfMass of face1 to 
-centerOfMass of face2) 
+(Join centerOfMass of \'face1\' or \'closed edge1\' to 
+centerOfMass of \'face2\' or \'closed edge2\') 
 
-1) select first face object
-2) select second face object on another part
+1) select first \'face\' or \'closed edge\' object
+2) select second \'face\' or \'closed edge\' object on another part
 
 After creating this constraint you can change
 entry "offset" in object editor to desired value.
@@ -684,7 +692,7 @@ correct selection.
         if len(selection) == 2:
             s1, s2 = selection
             if s1.ObjectName != s2.ObjectName:
-                if ( planeSelected(s1) and planeSelected(s2)):
+                if ( planeSelected(s1) or ClosedEdgeSelected(s1)) and (planeSelected(s2) or ClosedEdgeSelected(s2)):
                     validSelection = True
         return validSelection
     

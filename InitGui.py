@@ -26,7 +26,7 @@
 __title__ = 'A2plus assembly Workbench - InitGui file'
 __author__ = 'kbwbe'
 
-A2P_VERSION = 'V0.3.1'
+A2P_VERSION = 'V0.3.2'
 
 import sys
 PyVersion = sys.version_info[0]
