@@ -509,11 +509,13 @@ class TopoMapper(object):
         shell = Part.makeShell(faces)
         try:
             if a2plib.getUseSolidUnion():
-                if len(shape_list) > 0:
+                if len(shape_list) > 1:
                     shape_base=shape_list[0]
                     shapes=shape_list[1:]
                     solid = shape_base.fuse(shapes)
                     #solid = ob.Shape
+                else:   #one shape only
+                    solid = shape_list[0]
             else:
                 solid = Part.Solid(shell)
         except:
