@@ -126,6 +126,35 @@ def createPartList(
 
 
 #------------------------------------------------------------------------------
+toolTip = \
+'''
+Create a spreadsheet with a
+partlist of this file.
+
+This function will read out
+the partInfo spreadSheet of
+all involved parts of the
+assembly and create a new
+spreadSheet, containing the
+partlist. (see tree view)
+
+After hitting this button
+a dialog will pop up:
+
+Question:
+- iterate recursively over
+     all subassenblies?
+
+Answer Yes:
+All parts of all subassemblies are
+collected to the partlist
+
+Answer No:
+Only the parts within the
+recent assembly are collected.
+
+'''
+
 class a2p_CreatePartlist():
     
     def clearPartList(self):
@@ -225,8 +254,8 @@ class a2p_CreatePartlist():
     def GetResources(self):
         return {
             'Pixmap'  :     ':/icons/a2p_partsList.svg',
-            'MenuText':     'create a spreadsheet with a partlist of this file',
-            'ToolTip':      'create a spreadsheet with a partlist of this file'
+            'MenuText':     'Create a spreadsheet with a partlist of this file',
+            'ToolTip':      toolTip
             }
         
 FreeCADGui.addCommand('a2p_CreatePartlist', a2p_CreatePartlist())
