@@ -642,13 +642,18 @@ This is not allowed when using preference
         #====================================================
         # Open the file for editing and switch the window
         #====================================================
-        docs = []
-        for d in FreeCAD.listDocuments().values(): #dict_values not indexable, docs now is...
-            docs.append(d)
-        #docs = FreeCAD.listDocuments().values()
-        docFilenames = [ d.FileName for d in docs ]
         
-        if not fileNameWithinProjectFile in docFilenames :
+        #Workaround to detect open files on Win10 (Address Translation problem??)
+        importDocIsOpen = False
+        requestedFile = os.path.split(fileNameWithinProjectFile)[1]
+        for d in FreeCAD.listDocuments().values():
+            recentFile = os.path.split(d.FileName)[1]
+            if requestedFile == recentFile:
+                importDoc = d # file is already open...
+                importDocIsOpen = True
+                break
+        
+        if not importDocIsOpen:
             if fileNameWithinProjectFile.lower().endswith('.stp') or fileNameWithinProjectFile.lower().endswith('.step'):
                 import ImportGui
                 fname =  os.path.splitext(os.path.basename(fileNameWithinProjectFile))[0]
@@ -662,8 +667,7 @@ This is not allowed when using preference
             else:
                 FreeCAD.open(fileNameWithinProjectFile)
         else:
-            idx = docFilenames.index(fileNameWithinProjectFile)
-            name = docs[idx].Name
+            name = importDoc.Name
             # Search and activate the corresponding document window..
             mw=FreeCADGui.getMainWindow()
             mdi=mw.findChild(QtGui.QMdiArea)
