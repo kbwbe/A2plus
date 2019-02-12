@@ -81,8 +81,8 @@ class a2p_CreatePartInformationSheet_Command:
 
     def GetResources(self):
         return {
-            'Pixmap'  :     ':/icons/a2p_partsInfo.svg',
-            'MenuText':     'create a spreadSheet with logistics/ordering information',
+            'Pixmap'  :     ':/icons/a2p_PartsInfo.svg',
+            'MenuText':     'Create a spreadSheet for ordering or logistics information',
             'ToolTip':      toolTip
             }
         

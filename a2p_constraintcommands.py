@@ -229,7 +229,7 @@ class a2p_AxisPlaneParallelCommand:
     def GetResources(self):
         return {
              'Pixmap' : ':/icons/a2p_AxisPlaneParallelConstraint.svg',
-             'MenuText': 'axisPlaneParallel constraint',
+             'MenuText': 'Add axisPlaneParallel constraint',
              'ToolTip': a2p_constraints.AxisPlaneParallelConstraint.getToolTip()
              }
 
@@ -305,7 +305,7 @@ class a2p_AngledPlanesConstraintCommand:
     def GetResources(self):
         return {
              'Pixmap' : path_a2p + '/icons/a2p_AngleConstraint.svg',
-             'MenuText': 'angle between planes constraint',
+             'MenuText': 'Add angleBetweenPlanes constraint',
              'ToolTip': a2p_constraints.AngledPlanesConstraint.getToolTip()
              }
 
@@ -332,7 +332,7 @@ class a2p_CenterOfMassConstraintCommand:
     def GetResources(self):
         return {
              'Pixmap' : path_a2p + '/icons/a2p_CenterOfMassConstraint.svg',
-             'MenuText': 'center of mass constraint',
+             'MenuText': 'Add centerOfMass constraint',
              'ToolTip': a2p_constraints.CenterOfMassConstraint.getToolTip()
              }
 

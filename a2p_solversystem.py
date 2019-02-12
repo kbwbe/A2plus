@@ -548,7 +548,7 @@ class a2p_SolverCommand:
 
     def GetResources(self):
         return {
-            'Pixmap' : path_a2p + '/icons/a2p_solver.svg',
+            'Pixmap' : path_a2p + '/icons/a2p_Solver.svg',
             'MenuText': 'Solve',
             'ToolTip': 'Solve A2plus constraints'
             }
