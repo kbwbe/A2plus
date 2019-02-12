@@ -639,8 +639,6 @@ class CenterOfMassConstraint(BasicConstraint):
         BasicConstraint.__init__(self, selection)
         self.typeInfo = 'CenterOfMass'
         self.constraintBaseName = 'CenterOfMass'
-        #self.iconPath = ':/icons/a2p_CenterOfMassConstraint.svg'
-        #self.iconPath = a2plib.pathOfModule() + '/GuiA2p/Resources/icons/a2p_CenterOfMassConstraint.svg'
         self.iconPath = path_a2p + '/icons/a2p_CenterOfMassConstraint.svg'
         self.create(selection)
         

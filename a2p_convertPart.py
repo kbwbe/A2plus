@@ -109,7 +109,7 @@ class a2p_ConvertPartCommand():
         import a2plib
         return {'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_ConvertPart.svg',
 #                'Accel' : "Shift+C", # a default shortcut (optional)
-                'MenuText': "convert Part to A2plus form",
+                'MenuText': "Convert a Part to A2plus",
                 'ToolTip' : toolTip
                 }
 

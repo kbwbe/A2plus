@@ -253,7 +253,7 @@ class a2p_CreatePartlist():
 
     def GetResources(self):
         return {
-            'Pixmap'  :     ':/icons/a2p_partsList.svg',
+            'Pixmap'  :     ':/icons/a2p_PartsList.svg',
             'MenuText':     'Create a spreadsheet with a partlist of this file',
             'ToolTip':      toolTip
             }

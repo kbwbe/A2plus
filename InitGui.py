@@ -41,7 +41,7 @@ class a2pWorkbench (Workbench):
     def __init__(self):
         global A2P_VERSION
         import a2plib
-        self.__class__.Icon = a2plib.pathOfModule() + "/icons/a2p_workbench.svg"
+        self.__class__.Icon = a2plib.pathOfModule() + "/icons/a2p_Workbench.svg"
         self.__class__.MenuText = 'A2plus '+A2P_VERSION
         self.__class__.ToolTip  = 'An other assembly workbench for FreeCAD'
 
@@ -159,7 +159,7 @@ class a2pWorkbench (Workbench):
         commandslist.extend(miscCommands)
 
         self.appendMenu(
-            'A2p',
+            'A2plus',
             commandslist
             )
 
@@ -168,11 +168,11 @@ class a2pWorkbench (Workbench):
             'a2p_absPath_to_relPath_Command'
             ]
         self.appendMenu(
-            'A2p',
+            'A2plus',
             menuEntries
             )
         FreeCADGui.addIconPath(':/icons')
-        #FreeCADGui.addPreferencePage( a2plib.pathOfModule() + '/GuiA2p/ui/a2p_prefs.ui','A2plus' )
+        
         FreeCADGui.addPreferencePage(
             a2plib.pathOfModule() +
             '/GuiA2p/Resources/ui/a2p_prefs.ui','A2plus'

@@ -109,7 +109,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             self.mainLayout.addWidget(self.directionCombo,self.lineNo,1)
             
             self.flipDirectionButton = QtGui.QPushButton(self)
-            self.flipDirectionButton.setIcon(QtGui.QIcon(':/icons/a2p_flipConstraint.svg'))
+            self.flipDirectionButton.setIcon(QtGui.QIcon(':/icons/a2p_FlipConstraint.svg'))
             self.flipDirectionButton.setText("Flip Dir.")
             self.flipDirectionButton.setFixedHeight(32)
             QtCore.QObject.connect(self.flipDirectionButton, QtCore.SIGNAL("clicked()"), self.flipDirection)
@@ -176,7 +176,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             self.mainLayout.addWidget(self.lockRotationCombo,self.lineNo,1)
             
             self.flipLockRotationButton = QtGui.QPushButton(self)
-            self.flipLockRotationButton.setIcon(QtGui.QIcon(':/icons/a2p_lockRotation.svg'))
+            self.flipLockRotationButton.setIcon(QtGui.QIcon(':/icons/a2p_LockRotation.svg'))
             self.flipLockRotationButton.setText("Toggle")
             self.flipLockRotationButton.setFixedHeight(32)
             QtCore.QObject.connect(self.flipLockRotationButton, QtCore.SIGNAL("clicked()"), self.flipLockRotation)
@@ -197,13 +197,13 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         
         self.solveButton = QtGui.QPushButton(self.buttonPanel)
         self.solveButton.setFixedHeight(32)
-        self.solveButton.setIcon(QtGui.QIcon(':/icons/a2p_solver.svg'))
+        self.solveButton.setIcon(QtGui.QIcon(':/icons/a2p_Solver.svg'))
         self.solveButton.setToolTip("solve Constraints")
         self.solveButton.setText("Solve")
         
         self.acceptButton = QtGui.QPushButton(self.buttonPanel)
         self.acceptButton.setFixedHeight(32)
-        self.acceptButton.setIcon(QtGui.QIcon(':/icons/a2p_checkAssembly.svg')) #need new Icon
+        self.acceptButton.setIcon(QtGui.QIcon(':/icons/a2p_CheckAssembly.svg')) #need new Icon
         self.acceptButton.setToolTip("solve Constraints")
         self.acceptButton.setText("Accept")
         

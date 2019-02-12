@@ -245,7 +245,7 @@ class a2p_ImportPartCommand():
     def GetResources(self):
         return {'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_ImportPart.svg',
                 'Accel' : "Shift+A", # a default shortcut (optional)
-                'MenuText': "add Part from external file",
+                'MenuText': "Add a Part from an external file",
                 'ToolTip' : toolTip
                 }
 
@@ -554,7 +554,7 @@ class a2p_DuplicatePartCommand:
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_DuplicatePart.svg',
-            'MenuText': 'duplicate',
+            'MenuText': 'Make a duplicate of a part',
             'ToolTip':  toolTip
             }
 
@@ -676,7 +676,7 @@ This is not allowed when using preference
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_EditPart.svg',
-            'MenuText': 'edit',
+            'MenuText': 'Edit an imported Part (open linked fcstd file)',
             'ToolTip':  toolTip
             }
 
@@ -783,7 +783,7 @@ class a2p_MovePartCommand:
         return {
             #'Pixmap' : ':/assembly2/icons/MovePart.svg',
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_MovePart.svg',
-            'MenuText': 'move selected part',
+            'MenuText': 'Move the selected part',
             'ToolTip': toolTip
             }
 
@@ -838,7 +838,7 @@ class DeleteConnectionsCommand:
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_DeleteConnections.svg',
-            'MenuText': 'delete constraints',
+            'MenuText': 'Delete all constraints of selected parts',
             'ToolTip': toolTipText
             }
 FreeCADGui.addCommand('a2p_DeleteConnectionsCommand', DeleteConnectionsCommand())
@@ -885,7 +885,7 @@ class ViewConnectionsCommand:
     def GetResources(self):
         return {
             'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_ViewConnection.svg',
-            'MenuText':     'show connected parts',
+            'MenuText':     'Highlight both constrained parts',
             'ToolTip':      toolTip,
             }
 
@@ -1007,7 +1007,7 @@ class a2p_ToggleTransparencyCommand:
 
     def GetResources(self):
         return {
-            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_ToggleTranparency.svg',
+            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_ToggleTransparency.svg',
             'MenuText':     'Toggle transparency of assembly',
             'ToolTip':      'Toggle transparency of assembly',
             'Checkable':    self.IsChecked()
@@ -1041,7 +1041,7 @@ class a2p_ToggleAutoSolveCommand:
     def GetResources(self):
         return {
             'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_ToggleAutoSolve.svg',
-            'MenuText':     'toggle AutoSolve',
+            'MenuText':     'Toggle AutoSolve',
             'ToolTip':      toolTipMessage,
             'Checkable':    self.IsChecked()
             }
@@ -1126,7 +1126,7 @@ class a2p_repairTreeViewCommand:
     def GetResources(self):
         return {
             'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_RepairTree.svg',
-            'MenuText':     'Repair treeView',
+            'MenuText':     'Repair the treeView, if it is damaged somehow',
             'ToolTip':      toolTipMessage
             }
 FreeCADGui.addCommand('a2p_repairTreeViewCommand', a2p_repairTreeViewCommand())
@@ -1158,8 +1158,8 @@ class a2p_FlipConstraintDirectionCommand:
 
     def GetResources(self):
         return {
-            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_flipConstraint.svg',
-            'MenuText':     'flip direction of last constraint',
+            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_FlipConstraint.svg',
+            'MenuText':     'Flip direction of last constraint',
             'ToolTip':      toolTip
             }
 FreeCADGui.addCommand('a2p_FlipConstraintDirectionCommand', a2p_FlipConstraintDirectionCommand())
@@ -1205,7 +1205,7 @@ class a2p_Show_Hierarchy_Command:
 
     def GetResources(self):
         return {
-            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_treeview.svg',
+            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_Treeview.svg',
             'MenuText':     'Generate HTML file with detailed constraining structure',
             'ToolTip':      'Generate HTML file with detailed constraining structure'
             }
@@ -1262,8 +1262,9 @@ class a2p_absPath_to_relPath_Command:
             
     def GetResources(self):
         return {
-            'MenuText':     'convert absolute paths of importParts to relative ones',
-            'ToolTip':      'convert absolute paths of importParts to relative ones'
+            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_SetRelativePathes.svg',
+            'MenuText':     'Convert absolute paths of importParts to relative ones',
+            'ToolTip':      'Convert absolute paths of importParts to relative ones'
             }
 FreeCADGui.addCommand('a2p_absPath_to_relPath_Command', a2p_absPath_to_relPath_Command())
 
