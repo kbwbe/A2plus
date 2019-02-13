@@ -106,6 +106,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
                 self.directionCombo.setCurrentIndex(2)
             #
             self.directionCombo.setFixedHeight(32)
+            self.directionCombo.currentIndexChanged[int].connect(self.flipDirection2)            
             self.mainLayout.addWidget(self.directionCombo,self.lineNo,1)
             
             self.flipDirectionButton = QtGui.QPushButton(self)
@@ -286,6 +287,12 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             q.Value = 0.0
             self.offsetEdit.setText(q.UserString)
         
+    def flipDirection2(self,idx):
+        print("flipDirection2 called..")
+        self.winModified = True
+        if a2plib.getAutoSolveState():
+            self.solve()
+            
     def flipDirection(self):
         self.winModified = True
         if self.directionCombo.currentIndex() == 0:
