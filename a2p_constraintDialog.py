@@ -37,6 +37,7 @@ CONSTRAINT_DIALOG_STORED_POSITION = QtCore.QPoint(-1,-1)
 
 #==============================================================================
 class a2p_ConstraintValueWidget(QtGui.QWidget):
+#class a2p_ConstraintValueWidget(QtGui.QDialog):
 
     Deleted = QtCore.Signal()
     Accepted = QtCore.Signal()
@@ -207,6 +208,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         self.acceptButton.setIcon(QtGui.QIcon(':/icons/a2p_CheckAssembly.svg')) #need new Icon
         self.acceptButton.setToolTip("solve Constraints")
         self.acceptButton.setText("Accept")
+        #self.acceptButton.setDefault(True)
         
         self.buttonPanelLayout.addWidget(self.deleteButton)
         self.buttonPanelLayout.addWidget(self.solveButton)
@@ -288,7 +290,6 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             self.offsetEdit.setText(q.UserString)
         
     def flipDirection2(self,idx):
-        print("flipDirection2 called..")
         self.winModified = True
         if a2plib.getAutoSolveState():
             self.solve()
@@ -338,6 +339,12 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
                 pass # perhaps constraint already deleted by user
             a2plib.setConstraintEditorRef(None)
             self.Deleted.emit()
+        
+    def keyPressEvent(self,e):
+        if e.key() == QtCore.Qt.Key_Enter:
+            self.accept()
+        if e.key() == QtCore.Qt.Key_Return:
+            self.accept()
         
     def accept(self):
         doc = FreeCAD.activeDocument()
@@ -776,15 +783,15 @@ class a2p_ConstraintValuePanel(QtGui.QDockWidget):
         self.resize(300,300)
         #
         print (constraintObject)
-        cvw = a2p_ConstraintValueWidget(
+        self.cvw = a2p_ConstraintValueWidget(
             None,
             constraintObject,
             mode
             )
-        self.setWidget(cvw)
+        self.setWidget(self.cvw)
         self.setWindowTitle("Constraint Properties")
-        QtCore.QObject.connect(cvw, QtCore.SIGNAL("Accepted()"), self.onAcceptConstraint)
-        QtCore.QObject.connect(cvw, QtCore.SIGNAL("Deleted()"), self.onDeleteConstraint)
+        QtCore.QObject.connect(self.cvw, QtCore.SIGNAL("Accepted()"), self.onAcceptConstraint)
+        QtCore.QObject.connect(self.cvw, QtCore.SIGNAL("Deleted()"), self.onDeleteConstraint)
         
         mw = FreeCADGui.getMainWindow() 
         mw.addDockWidget(QtCore.Qt.RightDockWidgetArea,self)
@@ -800,6 +807,20 @@ class a2p_ConstraintValuePanel(QtGui.QDockWidget):
                 doc = FreeCAD.activeDocument()
                 if doc != None:
                     solveConstraints(doc)
+                    
+        self.timer = QtCore.QTimer()
+        QtCore.QObject.connect(self.timer, QtCore.SIGNAL("timeout()"), self.onTimer)
+        self.timer.start(100)
+        
+        self.cvw.activateWindow()
+        
+        
+    def onTimer(self):
+        # The dialog is not modal, so that still zooming/rotating is possible
+        # within the 3D view. As this widget then looses his input focus, it
+        # is activated by timer regularly.
+        #self.cvw.acceptButton.activateWindow() # pushe whole App to foreground, not so good.
+        self.cvw.acceptButton.setFocus()
         
     def storeWindowCenterPosition(self):
         # ConstraintDialog has Priority on storing its position
