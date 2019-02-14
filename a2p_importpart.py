@@ -835,10 +835,22 @@ class DeleteConnectionsCommand:
         else:
             flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
             msg = "Delete %s's constraint(s):\n  - %s?" % ( part.Name, '\n  - '.join( c.Name for c in deleteList))
-            response = QtGui.QMessageBox.critical(QtGui.QApplication.activeWindow(), "Delete constraints?", msg, flags )
+            response = QtGui.QMessageBox.information(QtGui.QApplication.activeWindow(), "Delete constraints?", msg, flags )
             if response == QtGui.QMessageBox.Yes:
                 for c in deleteList:
                     a2plib.removeConstraint(c)
+                    
+    def IsActive(self):
+        selection = FreeCADGui.Selection.getSelection()
+        if len(selection) != 1: 
+            return False
+
+        obj = selection[0]
+        if a2plib.isA2pPart(obj):
+            return True
+        else:
+            return False
+                    
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_DeleteConnections.svg',
