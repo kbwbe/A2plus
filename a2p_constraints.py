@@ -382,8 +382,8 @@ Axis' will only rotate to be parallel, but not be
 moved to be coincident
 
 select:
-1.) linearEdge or cylinderFace from a part
-2.) linearEdge or cylinderFace from another part
+1.) linear edge or cylindrical face from a part
+2.) linear edge or cylindrical face from another part
 
 Button gets active after
 correct selection.
@@ -420,7 +420,7 @@ class AxisPlaneParallelConstraint(BasicConstraint):
 '''
 Creates an axisPlaneParallel constraint.
 
-1) select a linearEdge or cylinderAxis
+1) select a linear edge or cylinder axis
 2) select a plane face on another part
 
 This constraint adjusts an axis parallel
