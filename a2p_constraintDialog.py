@@ -807,20 +807,7 @@ class a2p_ConstraintValuePanel(QtGui.QDockWidget):
                 doc = FreeCAD.activeDocument()
                 if doc != None:
                     solveConstraints(doc)
-                    
-        self.timer = QtCore.QTimer()
-        QtCore.QObject.connect(self.timer, QtCore.SIGNAL("timeout()"), self.onTimer)
-        self.timer.start(100)
-        
         self.cvw.activateWindow()
-        
-        
-    def onTimer(self):
-        # The dialog is not modal, so that still zooming/rotating is possible
-        # within the 3D view. As this widget then looses his input focus, it
-        # is activated by timer regularly.
-        #self.cvw.acceptButton.activateWindow() # pushe whole App to foreground, not so good.
-        self.cvw.acceptButton.setFocus()
         
     def storeWindowCenterPosition(self):
         # ConstraintDialog has Priority on storing its position
