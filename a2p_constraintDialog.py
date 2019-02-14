@@ -163,7 +163,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         #==============================
         if hasattr(self.constraintObject,"lockRotation"):   
             lbl6 = QtGui.QLabel(self)
-            lbl6.setText("lockRotation")
+            lbl6.setText("Lock Rotation")
             lbl6.setFixedHeight(32)
             self.mainLayout.addWidget(lbl6,self.lineNo,0)
             
