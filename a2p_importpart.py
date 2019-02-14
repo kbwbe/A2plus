@@ -835,7 +835,7 @@ class DeleteConnectionsCommand:
         else:
             flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
             msg = "Delete %s's constraint(s):\n  - %s?" % ( part.Name, '\n  - '.join( c.Name for c in deleteList))
-            response = QtGui.QMessageBox.critical(QtGui.QApplication.activeWindow(), "Delete constraints?", msg, flags )
+            response = QtGui.QMessageBox.information(QtGui.QApplication.activeWindow(), "Delete constraints?", msg, flags )
             if response == QtGui.QMessageBox.Yes:
                 for c in deleteList:
                     a2plib.removeConstraint(c)
