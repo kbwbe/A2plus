@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>A2plus Settings</string>
+   <string>A2plus settings</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <item row="4" column="0">
@@ -38,7 +38,7 @@
        <item>
         <widget class="Gui::PrefCheckBox" name="checkBox_6">
          <property name="text">
-          <string>show constraints on toolbar</string>
+          <string>Show constraints on toolbar</string>
          </property>
          <property name="checked">
           <bool>true</bool>
@@ -77,7 +77,7 @@
       </size>
      </property>
      <property name="title">
-      <string>behavior when updating imported parts</string>
+      <string>Behavior when updating imported parts</string>
      </property>
      <widget class="QWidget" name="verticalLayoutWidget_3">
       <property name="geometry">
@@ -92,7 +92,7 @@
        <item>
         <widget class="Gui::PrefCheckBox" name="checkBox_4">
          <property name="text">
-          <string>recalculate imported parts before updating them (experimental)</string>
+          <string>Recalculate imported parts before updating them (experimental)</string>
          </property>
          <property name="prefEntry" stdset="0">
           <cstring>recalculateImportedParts</cstring>
@@ -105,7 +105,7 @@
        <item>
         <widget class="Gui::PrefCheckBox" name="checkBox_5">
          <property name="text">
-          <string>enable recursive update of imported parts (process all subassemblies)</string>
+          <string>Enable recursive update of imported parts (process all subassemblies)</string>
          </property>
          <property name="prefEntry" stdset="0">
           <cstring>enableRecursiveUpdate</cstring>
@@ -118,7 +118,7 @@
        <item>
         <widget class="Gui::PrefCheckBox" name="checkBox_2">
          <property name="text">
-          <string>use experimental topological naming</string>
+          <string>Use experimental topological naming</string>
          </property>
          <property name="prefEntry" stdset="0">
           <cstring>useTopoNaming</cstring>
@@ -131,7 +131,7 @@
        <item>
         <widget class="Gui::PrefCheckBox" name="checkBox_7">
          <property name="text">
-          <string>inherit per face transparency from parts and sub-assemblies (experimental)</string>
+          <string>Inherit per face transparency from parts and sub-assemblies (experimental)</string>
          </property>
          <property name="prefEntry" stdset="0">
           <cstring>usePerFaceTransparency</cstring>
@@ -144,7 +144,7 @@
        <item>
         <widget class="Gui::PrefCheckBox" name="checkBox_8">
          <property name="text">
-          <string>do not import invisible shapes (use with caution, can break assemblies)</string>
+          <string>Do not import invisible shapes (use with caution, can break assemblies)</string>
          </property>
          <property name="prefEntry" stdset="0">
           <cstring>doNotImportInvisibleShapes</cstring>
@@ -157,7 +157,7 @@
        <item>
         <widget class="Gui::PrefCheckBox" name="checkBox_9">
          <property name="text">
-          <string>use solid union for importing parts and subassemblies (experimental)</string>
+          <string>Use solid union for importing parts and subassemblies (experimental)</string>
          </property>
          <property name="prefEntry" stdset="0">
           <cstring>useSolidUnion</cstring>
@@ -195,7 +195,7 @@
         </size>
        </property>
        <property name="title">
-        <string>default solving method</string>
+        <string>Default solving method</string>
        </property>
        <widget class="QWidget" name="verticalLayoutWidget_2">
         <property name="geometry">
@@ -210,7 +210,7 @@
          <item>
           <widget class="Gui::PrefRadioButton" name="radioButton">
            <property name="text">
-            <string>use solving of partial systems (recommended for static assemblies)</string>
+            <string>Use solving of partial systems (recommended for static assemblies)</string>
            </property>
            <property name="checked">
             <bool>true</bool>
@@ -226,7 +226,7 @@
          <item>
           <widget class="Gui::PrefRadioButton" name="radioButton_2">
            <property name="text">
-            <string>use &quot;magnetic&quot; solver, solving all parts at once (for dynamical assemblies)</string>
+            <string>Use &quot;magnetic&quot; solver, solving all parts at once (for dynamical assemblies)</string>
            </property>
            <property name="prefEntry" stdset="0">
             <cstring>useMagneticSolver</cstring>
@@ -239,7 +239,7 @@
          <item>
           <widget class="Gui::PrefCheckBox" name="checkBox_3">
            <property name="text">
-            <string>force FixedPosition to all Imports</string>
+            <string>Force fixed position to all imports</string>
            </property>
            <property name="prefEntry" stdset="0">
             <cstring>forceFixedPosition</cstring>
@@ -277,7 +277,7 @@
       </size>
      </property>
      <property name="title">
-      <string>storage of files</string>
+      <string>Storage of files</string>
      </property>
      <widget class="QWidget" name="verticalLayoutWidget_5">
       <property name="geometry">
@@ -292,7 +292,7 @@
        <item>
         <widget class="Gui::PrefRadioButton" name="radioButton_3">
          <property name="text">
-          <string>use relative paths for imported parts</string>
+          <string>Use relative paths for imported parts</string>
          </property>
          <property name="checked">
           <bool>true</bool>
@@ -308,7 +308,7 @@
        <item>
         <widget class="Gui::PrefRadioButton" name="radioButton_4">
          <property name="text">
-          <string>use absolute paths for imported parts</string>
+          <string>Use absolute paths for imported parts</string>
          </property>
          <property name="prefEntry" stdset="0">
           <cstring>useAbsolutePathes</cstring>
@@ -321,7 +321,7 @@
        <item>
         <widget class="Gui::PrefRadioButton" name="radioButton_5">
          <property name="text">
-          <string>use project-folder, all files are below this</string>
+          <string>Use project-folder, all files are below this</string>
          </property>
          <property name="prefEntry" stdset="0">
           <cstring>useProjectFolder</cstring>
@@ -332,7 +332,7 @@
         </widget>
        </item>
        <item>
-        <widget class="Gui::PrefFileChooser" name="fileChooser">
+        <widget class="Gui::PrefFileChooser" name="fileChooser" native="true">
          <property name="minimumSize">
           <size>
            <width>250</width>
@@ -344,9 +344,6 @@
            <width>400</width>
            <height>16777215</height>
           </size>
-         </property>
-         <property name="mode">
-          <enum>Gui::FileChooser::Directory</enum>
          </property>
         </widget>
        </item>
@@ -376,7 +373,7 @@
       </size>
      </property>
      <property name="title">
-      <string>default solver behavior</string>
+      <string>Default solver behavior</string>
      </property>
      <widget class="QWidget" name="verticalLayoutWidget">
       <property name="geometry">
@@ -391,7 +388,7 @@
        <item>
         <widget class="Gui::PrefCheckBox" name="checkBox">
          <property name="text">
-          <string>solve automatically if a constraints property is changed</string>
+          <string>Solve automatically if a constraints property is changed</string>
          </property>
          <property name="checked">
           <bool>true</bool>
