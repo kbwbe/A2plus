@@ -60,6 +60,7 @@ def createPartList(
         parentAssemblyDir
         )
     workingDir,basicFileName = os.path.split(fileNameInProject)
+    
     docReader1 = FCdocumentReader()
     docReader1.openDocument(fileNameInProject)
     

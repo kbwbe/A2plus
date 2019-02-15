@@ -203,10 +203,12 @@ class FCdocumentReader(object):
     def __init__(self):
         self.xmlLines = []
         self.objects = []
+        self.successfulOpened = False
         
     def clear(self):
         self.xmlLines = []
         self.objects = []
+        self.successfulOpened = False
         
     def openDocument(self,_fileName):
         fileName = _fileName
@@ -215,14 +217,24 @@ class FCdocumentReader(object):
             fileName = a2plib.to_str(fileName)
         
         self.clear()
+
         # check whether file exists or not...
         if not os.path.exists( fileName ):
             print (u"fcDocumentReader: file {} does not exist!".format(fileName))
+            successfulOpened = False
             return
+        
+        # check for fcstd file
+        if not fileName.lower().endswith(a2plib.to_str('.fcstd')):
+            print (u"fcDocumentReader: file {} is no FCStd file!".format(fileName))
+            successfulOpened = False
+            return
+        
         # decompress the file
         f = zipfile.ZipFile(fileName,'r')
         xml = f.read('Document.xml')
         f.close()
+        self.successfulOpened = True
         #
         #self.xmlLines = xml.split("\r\n") #Windows
         self.xmlLines = xml.split(b'\r\n') #Windows
@@ -253,6 +265,7 @@ class FCdocumentReader(object):
         self.objects = tmp
         
     def getA2pObjects(self):
+        if not self.successfulOpened: return []
         out = []
         for ob in self.objects:
             if ob.propertyDict.get(b'a2p_Version',None) != None:
@@ -261,6 +274,7 @@ class FCdocumentReader(object):
         return out
         
     def getSpreadsheetObjects(self):
+        if not self.successfulOpened: return []
         out = []
         for ob in self.objects:
             if ob.propertyDict.get(b'cells',None) != None:
@@ -268,6 +282,7 @@ class FCdocumentReader(object):
         return out
             
     def getObjectByName(self,name):
+        if not self.successfulOpened: return None
         for ob in self.objects:
             if ob.name == name:
                 return ob
