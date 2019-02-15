@@ -638,7 +638,7 @@ class CenterOfMassConstraint(BasicConstraint):
     def __init__(self,selection):
         BasicConstraint.__init__(self, selection)
         self.typeInfo = 'CenterOfMass'
-        self.constraintBaseName = 'CenterOfMass'
+        self.constraintBaseName = 'centerOfMass'
         self.iconPath = path_a2p + '/icons/a2p_CenterOfMassConstraint.svg'
         self.create(selection)
         
@@ -669,7 +669,7 @@ class CenterOfMassConstraint(BasicConstraint):
     def getToolTip():
         return \
 '''
-Creates a Center of Mass constraint.
+Creates a centerOfMass constraint.
 
 (Join centerOfMass of \'face1\' or \'closed edge1\' to 
 centerOfMass of \'face2\' or \'closed edge2\') 
