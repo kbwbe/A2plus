@@ -251,7 +251,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
                 "Constraint does not exist anymore",
-                "Constraint has been already deleted"
+                "Constraint has already been deleted"
                 )
             a2plib.setConstraintEditorRef(None)
             self.Deleted.emit()
@@ -326,10 +326,10 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             return
         
         flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
-        response = QtGui.QMessageBox.critical(
+        response = QtGui.QMessageBox.information(
             QtGui.QApplication.activeWindow(),
             "Confirmation required",
-            "Really delete this constraint ?",
+            "Really delete this constraint?",
             flags
             )
         if response == QtGui.QMessageBox.Yes:
@@ -352,7 +352,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
                 "Constraint does not exist anymore",
-                "Constraint has been already deleted"
+                "Constraint has already been deleted"
                 )
             a2plib.setConstraintEditorRef(None)
             self.Deleted.emit()
@@ -367,7 +367,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
                 "Constraint does not exist anymore",
-                "Constraint has been already deleted"
+                "Constraint has already been deleted"
                 )
             a2plib.setConstraintEditorRef(None)
             self.Deleted.emit()
@@ -375,10 +375,10 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
 
         if self.mode == 'createConstraint':
             flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
-            response = QtGui.QMessageBox.critical(
+            response = QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
                 "Confirmation required",
-                "Exit and delete new constraint ?",
+                "Exit and delete new constraint?",
                 flags
                 )
             if response == QtGui.QMessageBox.Yes:
@@ -389,7 +389,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         else:
             if self.isWindowModified() or self.winModified:
                 flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
-                response = QtGui.QMessageBox.critical(
+                response = QtGui.QMessageBox.information(
                     QtGui.QApplication.activeWindow(),
                     "Information",
                     "Values changed! Accept Constraint?",
@@ -895,12 +895,8 @@ class a2p_ConstraintPanel(QtGui.QDockWidget):
 #==============================================================================
 toolTipText = \
 '''
-Open a dialog to
+Opens a dialog to
 define constraints
-
-Find all constraints
-within the opening
-dialog !
 '''
 
 class a2p_ConstraintDialogCommand:
@@ -974,19 +970,3 @@ class a2p_EditConstraintCommand:
 
 FreeCADGui.addCommand('a2p_EditConstraintCommand', a2p_EditConstraintCommand())
 #==============================================================================
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
