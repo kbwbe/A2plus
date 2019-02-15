@@ -85,7 +85,7 @@
         <x>20</x>
         <y>30</y>
         <width>621</width>
-        <height>181</height>
+        <height>200</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -332,7 +332,7 @@
         </widget>
        </item>
        <item>
-        <widget class="Gui::PrefFileChooser" name="fileChooser" native="true">
+        <widget class="Gui::PrefFileChooser" name="fileChooser">
          <property name="minimumSize">
           <size>
            <width>250</width>
@@ -344,6 +344,9 @@
            <width>400</width>
            <height>16777215</height>
           </size>
+         </property>
+         <property name="mode">
+          <enum>Gui::FileChooser::Directory</enum>
          </property>
         </widget>
        </item>
