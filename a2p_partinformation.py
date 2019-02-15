@@ -55,7 +55,7 @@ class a2p_CreatePartInformationSheet_Command:
         if doc == None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
                                         "No active document found!",
-                                        "You have to open a FCstd file first."
+                                        "You have to open a FCStd file first."
                                     )
             return
         
