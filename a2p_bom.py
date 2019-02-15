@@ -129,20 +129,18 @@ def createPartList(
 toolTip = \
 '''
 Create a spreadsheet with a
-partlist of this file.
+parts list of this file.
 
 This function will read out
-the partInfo spreadSheet of
+the #PARTINFO# spreadsheet of
 all involved parts of the
 assembly and create a new
-spreadSheet, containing the
-partlist. (see tree view)
+spreadsheet containing the
+parts list.
 
-After hitting this button
-a dialog will pop up:
-
-Question:
-- iterate recursively over
+This button will open a dialog
+with the Question:
+- Iterate recursively over
      all subassenblies?
 
 Answer Yes:
@@ -254,7 +252,7 @@ class a2p_CreatePartlist():
     def GetResources(self):
         return {
             'Pixmap'  :     ':/icons/a2p_PartsList.svg',
-            'MenuText':     'Create a spreadsheet with a partlist of this file',
+            'MenuText':     'Create a spreadsheet with a parts list of this file',
             'ToolTip':      toolTip
             }
         
