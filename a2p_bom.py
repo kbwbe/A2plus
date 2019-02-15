@@ -246,7 +246,7 @@ class a2p_CreatePartlist():
         
         # recompute to finish..
         doc.recompute()
-        print("#PARTsLIST' spreadsheet has been created")
+        print("#PARTSLIST# spreadsheet has been created")
         
 
     def GetResources(self):
