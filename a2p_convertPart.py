@@ -157,13 +157,14 @@ Please select a Part.
                 )
             return
 
+        doc.openTransaction("part converted to A2plus")
         convertToImportedPart(doc, selection[0])
-
-        return
+        doc.commitTransaction()
 
     def IsActive(self):
         """Here you can define if the command must be active or not (greyed) if certain conditions
         are met or not. This function is optional."""
+        
         return True
 
 

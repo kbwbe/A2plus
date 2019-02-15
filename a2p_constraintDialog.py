@@ -769,8 +769,12 @@ def getMoveDistToStoredPosition(widg):
     
         return fcCenter- widg.rect().center()
     else:
-        #center = QtCore.QPoint(centerX,centerY)  
-        return CONSTRAINT_DIALOG_STORED_POSITION - widg.rect().center()
+        widgetFrame = widg.frameGeometry()
+        x = widgetFrame.x()
+        y = widgetFrame.y()
+        widgetCorner = QtCore.QPoint(x,y)
+        
+        return CONSTRAINT_DIALOG_STORED_POSITION - widgetCorner
 #==============================================================================
 class a2p_ConstraintValuePanel(QtGui.QDockWidget):
     
@@ -782,7 +786,6 @@ class a2p_ConstraintValuePanel(QtGui.QDockWidget):
         self.constraintObject = constraintObject
         self.resize(300,300)
         #
-        print (constraintObject)
         self.cvw = a2p_ConstraintValueWidget(
             None,
             constraintObject,
@@ -809,30 +812,25 @@ class a2p_ConstraintValuePanel(QtGui.QDockWidget):
                     solveConstraints(doc)
         self.cvw.activateWindow()
         
-    def storeWindowCenterPosition(self):
+    def storeWindowPosition(self):
         # ConstraintDialog has Priority on storing its position
         if a2plib.getConstraintDialogRef() != None:
             return
-        # self.rect().center() does not work here somehow
-        frame = QtGui.QDockWidget.geometry(self)
+        frame = QtGui.QDockWidget.frameGeometry(self)
         x = frame.x()
         y = frame.y()
-        width = frame.width()
-        height = frame.height()
-        centerX = x + width/2
-        centerY = y + height/2
         
         global CONSTRAINT_DIALOG_STORED_POSITION
-        CONSTRAINT_DIALOG_STORED_POSITION = QtCore.QPoint(centerX,centerY)
+        CONSTRAINT_DIALOG_STORED_POSITION = QtCore.QPoint(x,y)
         
     def onAcceptConstraint(self):
-        self.storeWindowCenterPosition()
+        self.storeWindowPosition()
         self.Accepted.emit()
         a2plib.setConstraintEditorRef(None)
         self.deleteLater()
         
     def onDeleteConstraint(self):
-        self.storeWindowCenterPosition()
+        self.storeWindowPosition()
         self.Deleted.emit()
         a2plib.setConstraintEditorRef(None)
         self.deleteLater()
@@ -874,16 +872,12 @@ class a2p_ConstraintPanel(QtGui.QDockWidget):
                 self.resize(200,250)
             # calculate window center position and save it
             # self.rect().center() does not work here somehow
-            frame = QtGui.QDockWidget.geometry(self)
+            frame = QtGui.QDockWidget.frameGeometry(self)
             x = frame.x()
             y = frame.y()
-            width = frame.width()
-            height = frame.height()
-            centerX = x + width/2
-            centerY = y + height/2
             
             global CONSTRAINT_DIALOG_STORED_POSITION
-            CONSTRAINT_DIALOG_STORED_POSITION = QtCore.QPoint(centerX,centerY)
+            CONSTRAINT_DIALOG_STORED_POSITION = QtCore.QPoint(x,y)
             
         self.timer.start(100)
         

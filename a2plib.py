@@ -747,3 +747,12 @@ def makeDiffuseElement(color,trans):
     elem = (color[0],color[1],color[2],trans/100.0)
     return elem
 #------------------------------------------------------------------------------
+def isConstrainedPart(doc,obj):
+    if not isA2pPart(obj): return False
+    constraints = [ ob for ob in doc.Objects if 'ConstraintInfo' in ob.Content]
+    for c in constraints:
+        if c.Object1 == obj.Name:
+            return True
+        if c.Object2 == obj.Name:
+            return True
+    return False
