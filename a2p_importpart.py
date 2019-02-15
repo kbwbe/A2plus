@@ -846,7 +846,7 @@ class DeleteConnectionsCommand:
             return False
 
         obj = selection[0]
-        if a2plib.isA2pPart(obj):
+        if a2plib.isConstrainedPart(FreeCAD.activeDocument(), obj):
             return True
         else:
             return False
