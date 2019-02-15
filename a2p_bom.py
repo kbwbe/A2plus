@@ -169,18 +169,18 @@ class a2p_CreatePartlist():
         if doc == None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
                                         u"No active document found!",
-                                        u"You have to open an fcstd file first."
+                                        u"You have to open a FCStd file first."
                                     )
             return
         completeFilePath = doc.FileName
         p,f = os.path.split(completeFilePath)
         
         flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
-        msg = u"Please save before generating a partlist!\nSave now ?"
+        msg = u"Please save before generating a parts list!\nSave now ?"
         response = QtGui.QMessageBox.information(QtGui.QApplication.activeWindow(), u"Save document?", msg, flags )
         if response == QtGui.QMessageBox.No:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
-                                        u"Partlist generation aborted!",
+                                        u"Parts list generation aborted!",
                                         u"You have to save the assembly file first."
                                     )
             return
@@ -188,8 +188,8 @@ class a2p_CreatePartlist():
             doc.save()
         
         flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
-        msg = u"Partslist/BOM: Do recursively over all included subassemblies ?"
-        response = QtGui.QMessageBox.information(QtGui.QApplication.activeWindow(), u"PARTSLIST/BOM mode?", msg, flags )
+        msg = u"Do you want to iterate recursively over all included subassemblies?"
+        response = QtGui.QMessageBox.information(QtGui.QApplication.activeWindow(), u"PARTSLIST", msg, flags )
         if response == QtGui.QMessageBox.Yes:
             subAssyRecursion = True
         else:
@@ -246,7 +246,7 @@ class a2p_CreatePartlist():
         
         # recompute to finish..
         doc.recompute()
-        print("partslist/BOM spreadsheet has been created!")
+        print("#PARTsLIST' spreadsheet has been created")
         
 
     def GetResources(self):
@@ -258,20 +258,3 @@ class a2p_CreatePartlist():
         
 FreeCADGui.addCommand('a2p_CreatePartlist', a2p_CreatePartlist())
 #------------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
