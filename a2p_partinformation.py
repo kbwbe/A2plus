@@ -37,15 +37,15 @@ from a2p_partlistglobals import (
 #------------------------------------------------------------------------------
 toolTip = \
 '''
-Create a spreadSheet for ordering or
+Create a spreadsheet for ordering or
 logistics information.
 
-The created spreadSheet can be found
-within the treeview.
+The created spreadsheet can be found
+within the tree view.
 
 Please fill in your information.
-This spreadSheet will be read out
-by the partlist function of A2plus.
+This spreadsheet will be read out
+by the parts list function of A2plus.
 '''
 
 class a2p_CreatePartInformationSheet_Command:
@@ -55,7 +55,7 @@ class a2p_CreatePartInformationSheet_Command:
         if doc == None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
                                         "No active document found!",
-                                        "You have to open an fcstd file first."
+                                        "You have to open a FCStd file first."
                                     )
             return
         
@@ -82,31 +82,9 @@ class a2p_CreatePartInformationSheet_Command:
     def GetResources(self):
         return {
             'Pixmap'  :     ':/icons/a2p_PartsInfo.svg',
-            'MenuText':     'Create a spreadSheet for ordering or logistics information',
+            'MenuText':     'Create a spreadsheet for ordering or logistics information',
             'ToolTip':      toolTip
             }
         
 FreeCADGui.addCommand('a2p_CreatePartInformationSheet_Command', a2p_CreatePartInformationSheet_Command())
 #------------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
