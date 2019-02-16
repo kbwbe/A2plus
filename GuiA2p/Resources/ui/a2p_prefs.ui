@@ -38,7 +38,7 @@
        <item>
         <widget class="Gui::PrefCheckBox" name="checkBox_6">
          <property name="text">
-          <string>Show constraints on toolbar</string>
+          <string>Show constraints in toolbar</string>
          </property>
          <property name="checked">
           <bool>true</bool>
