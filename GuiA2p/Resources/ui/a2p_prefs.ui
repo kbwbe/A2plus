@@ -144,7 +144,7 @@
        <item>
         <widget class="Gui::PrefCheckBox" name="checkBox_8">
          <property name="text">
-          <string>Do not import invisible shapes (use with caution, can break assemblies)</string>
+          <string>Do not import invisible shapes (for expert users)</string>
          </property>
          <property name="prefEntry" stdset="0">
           <cstring>doNotImportInvisibleShapes</cstring>
