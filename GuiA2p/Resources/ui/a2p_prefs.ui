@@ -391,7 +391,7 @@
        <item>
         <widget class="Gui::PrefCheckBox" name="checkBox">
          <property name="text">
-          <string>Solve automatically if a constraints property is changed</string>
+          <string>Solve automatically if a constraint property is changed</string>
          </property>
          <property name="checked">
           <bool>true</bool>
