@@ -834,11 +834,22 @@ class DeleteConnectionsCommand:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Info", 'No constraints refer to "%s"' % part.Name)
         else:
             flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
-            msg = "Delete %s's constraint(s):\n  - %s?" % ( part.Name, '\n  - '.join( c.Name for c in deleteList))
-            response = QtGui.QMessageBox.information(QtGui.QApplication.activeWindow(), "Delete constraints?", msg, flags )
+            msg = u"Delete {}'s constraint(s):\n  - {}?".format(
+                part.Label,
+                u'\n  - '.join( c.Name for c in deleteList)
+                )
+            response = QtGui.QMessageBox.information(
+                QtGui.QApplication.activeWindow(), 
+                "Delete constraints?", 
+                msg, 
+                flags
+                )
             if response == QtGui.QMessageBox.Yes:
+                doc = FreeCAD.activeDocument()
+                doc.openTransaction("Deleting part's constraints")
                 for c in deleteList:
                     a2plib.removeConstraint(c)
+                doc.commitTransaction()
                     
     def IsActive(self):
         selection = FreeCADGui.Selection.getSelection()
