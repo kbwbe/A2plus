@@ -756,3 +756,75 @@ def isConstrainedPart(doc,obj):
         if c.Object2 == obj.Name:
             return True
     return False
+#------------------------------------------------------------------------------
+def objectExists(name):
+    doc = FreeCAD.activeDocument()
+    try:
+        ob = doc.getObject(name)
+        if ob != None: return True
+    except:
+        pass
+    return False
+#------------------------------------------------------------------------------
+def deleteConstraintsOfDeletedObjects():
+    doc = FreeCAD.activeDocument()
+    deleteList = []
+    missingObjects = []
+    for c in doc.Objects:
+        if 'ConstraintInfo' in c.Content:
+            if not objectExists(c.Object1):
+                deleteList.append(c)
+                missingObjects.append(c.Object1)
+                continue
+            if not objectExists(c.Object2):
+                deleteList.append(c)
+                missingObjects.append(c.Object2)
+    if len(deleteList) != 0:
+        for c in deleteList:
+            removeConstraint(c)
+
+        missingObjects = set(missingObjects)
+    
+        flags = QtGui.QMessageBox.StandardButton.Yes
+        msg = u"Not existing part(s):\n  - {}".format(
+            u'\n  - '.join( objName for objName in missingObjects)
+            )
+        QtGui.QMessageBox.information(
+            QtGui.QApplication.activeWindow(), 
+            u"Constraints of missing parts removed!", 
+            msg, 
+            flags
+            )
+#------------------------------------------------------------------------------
+def a2p_repairTreeView():
+    doc = FreeCAD.activeDocument()
+    if doc == None: return
+    
+    deleteConstraintsOfDeletedObjects()
+
+    constraints = [ obj for obj in doc.Objects if 'ConstraintInfo' in obj.Content]
+    for c in constraints:
+        if c.Proxy != None:
+            c.Proxy.disable_onChanged = True
+        if not hasattr(c,"ParentTreeObject"):
+            c.addProperty("App::PropertyLink","ParentTreeObject","ConstraintInfo")
+            c.setEditorMode("ParentTreeObject", 1)
+        parent = doc.getObject(c.Object1)
+        c.ParentTreeObject = parent
+        parent.Label = parent.Label # trigger an update...
+        if c.Proxy != None:
+            c.Proxy.disable_onChanged = False
+    #
+    mirrors = [ obj for obj in doc.Objects if 'ConstraintNfo' in obj.Content]
+    for m in mirrors:
+        if m.Proxy != None:
+            m.Proxy.disable_onChanged = True
+        if not hasattr(m,"ParentTreeObject"):
+            m.addProperty("App::PropertyLink","ParentTreeObject","ConstraintNfo")
+            m.setEditorMode("ParentTreeObject", 1)
+        parent = doc.getObject(m.Object2)
+        m.ParentTreeObject = parent
+        parent.Label = parent.Label # trigger an update...
+        if m.Proxy != None:
+            m.Proxy.disable_onChanged = False
+#------------------------------------------------------------------------------

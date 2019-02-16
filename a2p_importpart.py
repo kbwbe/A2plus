@@ -1095,40 +1095,6 @@ FreeCADGui.addCommand('a2p_TogglePartialProcessingCommand', a2p_TogglePartialPro
 
 
 
-def a2p_repairTreeView():
-    doc = FreeCAD.activeDocument()
-    if doc == None: return
-
-    constraints = [ obj for obj in doc.Objects if 'ConstraintInfo' in obj.Content]
-    for c in constraints:
-        if c.Proxy != None:
-            c.Proxy.disable_onChanged = True
-        if not hasattr(c,"ParentTreeObject"):
-            c.addProperty("App::PropertyLink","ParentTreeObject","ConstraintInfo")
-            c.setEditorMode("ParentTreeObject", 1)
-        parent = doc.getObject(c.Object1)
-        c.ParentTreeObject = parent
-        parent.Label = parent.Label # trigger an update...
-        if c.Proxy != None:
-            c.Proxy.disable_onChanged = False
-    #
-    mirrors = [ obj for obj in doc.Objects if 'ConstraintNfo' in obj.Content]
-    for m in mirrors:
-        if m.Proxy != None:
-            m.Proxy.disable_onChanged = True
-        if not hasattr(m,"ParentTreeObject"):
-            m.addProperty("App::PropertyLink","ParentTreeObject","ConstraintNfo")
-            m.setEditorMode("ParentTreeObject", 1)
-        parent = doc.getObject(m.Object2)
-        m.ParentTreeObject = parent
-        parent.Label = parent.Label # trigger an update...
-        if m.Proxy != None:
-            m.Proxy.disable_onChanged = False
-
-    global a2p_NeedToSolveSystem
-    a2p_NeedToSolveSystem = False # Solve only once after editing a constraint's property
-
-
 toolTipMessage = \
 '''
 Repair the treeview, if it
@@ -1148,7 +1114,7 @@ class a2p_repairTreeViewCommand:
                                         "You have to open an assembly file first."
                                     )
             return
-        a2p_repairTreeView()
+        a2plib.a2p_repairTreeView()
 
     def GetResources(self):
         return {

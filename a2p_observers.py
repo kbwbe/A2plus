@@ -25,13 +25,12 @@ import FreeCADGui,FreeCAD
 from PySide import QtGui, QtCore
 import os, copy, time
 import a2plib
-import a2p_importpart
 
 
 class RedoUndoObserver(object):
     def slotRedoDocument(self,doc):
-        a2p_importpart.a2p_repairTreeView()
+        a2plib.a2p_repairTreeView()
     def slotUndoDocument(self,doc):
-        a2p_importpart.a2p_repairTreeView()
+        a2plib.a2p_repairTreeView()
 
 redoUndoObserver = RedoUndoObserver()
