@@ -105,7 +105,7 @@
        <item>
         <widget class="Gui::PrefCheckBox" name="checkBox_5">
          <property name="text">
-          <string>Enable recursive update of imported parts (process all subassemblies)</string>
+          <string>Enable recursive update of imported parts</string>
          </property>
          <property name="prefEntry" stdset="0">
           <cstring>enableRecursiveUpdate</cstring>
