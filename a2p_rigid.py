@@ -77,6 +77,7 @@ class Rigid():
         self.label = label
         self.fixed = fixed
         self.tempfixed = fixed
+        self.moved = False
         self.placement = placement
         self.savedPlacement = placement
         self.dependencies = []
@@ -394,6 +395,7 @@ class Rigid():
     def move(self,doc):
         if self.tempfixed or self.fixed: return
         #
+        self.moved = True
         #Linear moving of a rigid
         moveDist = Base.Vector(0,0,0)
         if self.moveVectorSum != None:

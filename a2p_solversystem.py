@@ -374,6 +374,7 @@ class SolverSystem():
         if systemSolved:
             self.status = "solved"
             Msg( "===== System solved using partial + recursive unfixing =====\n")
+            self.checkForUnmovedParts()
         else:
             self.status = "unsolved"
             Msg( "===== Could not solve system ====== \n" )
@@ -388,7 +389,36 @@ class SolverSystem():
                 msg
                 )
 
-
+    def checkForUnmovedParts(self):
+        '''
+        If there are parts, which are constrained but have no
+        constraint path to a fixed part, the solver will
+        ignore them and they are not moved.
+        This function detects this and signals it to the user.
+        '''
+        doc = FreeCAD.activeDocument()
+        
+        unmovedParts = []
+        for rig in self.rigids:
+            if rig.fixed: continue
+            if not rig.moved:
+                unmovedParts.append(
+                    doc.getObject(rig.objectName)
+                    )
+        if len(unmovedParts) != 0:
+            FreeCADGui.Selection.clearSelection()
+            for obj in unmovedParts:
+                FreeCADGui.Selection.addSelection(obj)
+            msg = '''    
+The highlighted parts where not moved. They are
+not constrained (also over constraint chains)
+to a fixed part!
+'''
+            QtGui.QMessageBox.information(
+                QtGui.QApplication.activeWindow(),
+                "Could not move some parts",
+                msg
+                )
 
     def printList(self, name, l):
         Msg("{} = (".format(name))

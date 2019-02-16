@@ -785,15 +785,13 @@ def deleteConstraintsOfDeletedObjects():
 
         missingObjects = set(missingObjects)
     
-        flags = QtGui.QMessageBox.StandardButton.Yes
         msg = u"Not existing part(s):\n  - {}".format(
             u'\n  - '.join( objName for objName in missingObjects)
             )
         QtGui.QMessageBox.information(
             QtGui.QApplication.activeWindow(), 
             u"Constraints of missing parts removed!", 
-            msg, 
-            flags
+            msg 
             )
 #------------------------------------------------------------------------------
 def a2p_repairTreeView():
