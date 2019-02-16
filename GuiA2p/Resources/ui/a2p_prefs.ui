@@ -320,6 +320,9 @@
        </item>
        <item>
         <widget class="Gui::PrefRadioButton" name="radioButton_5">
+         <property name="toolTip">
+          <string>Specify the project folder in the field below</string>
+         </property>
          <property name="text">
           <string>All files are in this project folder:</string>
          </property>
