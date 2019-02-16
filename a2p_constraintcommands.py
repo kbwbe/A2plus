@@ -52,7 +52,7 @@ class a2p_PointIdentityConstraintCommand:
     def GetResources(self):
         return {
              'Pixmap' : path_a2p + '/icons/a2p_PointIdentity.svg',
-             'MenuText': 'Add PointIdentity Constraint',
+             'MenuText': 'Add pointIdentity constraint',
              'ToolTip': a2p_constraints.PointIdentityConstraint.getToolTip()
              }
 
@@ -78,7 +78,7 @@ class a2p_PointOnLineConstraintCommand:
     def GetResources(self): 
         return {
              'Pixmap' : path_a2p + '/icons/a2p_PointOnLineConstraint.svg', 
-             'MenuText': 'Add PointOnLine constraint', 
+             'MenuText': 'Add pointOnLine constraint', 
              'ToolTip': a2p_constraints.PointOnLineConstraint.getToolTip()
              } 
 
@@ -104,7 +104,7 @@ class a2p_PointOnPlaneConstraintCommand:
     def GetResources(self):
         return {
              'Pixmap' : path_a2p + '/icons/a2p_PointOnPlaneConstraint.svg',
-             'MenuText': 'Add PointOnPlane constraint',
+             'MenuText': 'Add pointOnPlane constraint',
              'ToolTip': a2p_constraints.PointOnPlaneConstraint.getToolTip()
              }
 
@@ -129,7 +129,7 @@ class a2p_SphericalSurfaceConstraintCommand:
     def GetResources(self):
         return {
             'Pixmap' : path_a2p + '/icons/a2p_SphericalSurfaceConstraint.svg',
-            'MenuText': 'Add a spherical constraint',
+            'MenuText': 'Add sphereCenterIdent constraint',
              'ToolTip': a2p_constraints.SphericalConstraint.getToolTip()
             }
 
@@ -154,7 +154,7 @@ class a2p_CircularEdgeConnectionCommand:
     def GetResources(self):
         return {
             'Pixmap' : path_a2p + '/icons/a2p_CircularEdgeConstraint.svg' ,
-            'MenuText': 'Add circular edge connection',
+            'MenuText': 'Add circularEdge constraint',
              'ToolTip': a2p_constraints.CircularEdgeConstraint.getToolTip()
             }
 
@@ -179,7 +179,7 @@ class a2p_AxialConstraintCommand:
     def GetResources(self):
         return {
              'Pixmap' : path_a2p + '/icons/a2p_AxialConstraint.svg',
-             'MenuText': 'Add axial constraint',
+             'MenuText': 'Add axis Coincident constraint',
              'ToolTip': a2p_constraints.AxialConstraint.getToolTip()
              }
 
@@ -279,7 +279,7 @@ class a2p_PlaneCoincidentConstraintCommand:
     def GetResources(self):
         return {
              'Pixmap' : path_a2p + '/icons/a2p_PlaneCoincidentConstraint.svg',
-             'MenuText': 'Add plane constraint',
+             'MenuText': 'Add planeCoincident constraint',
              'ToolTip': a2p_constraints.PlaneConstraint.getToolTip()
              }
 
@@ -305,7 +305,7 @@ class a2p_AngledPlanesConstraintCommand:
     def GetResources(self):
         return {
              'Pixmap' : path_a2p + '/icons/a2p_AngleConstraint.svg',
-             'MenuText': 'Add angleBetweenPlanes constraint',
+             'MenuText': 'Add angledPlanes constraint',
              'ToolTip': a2p_constraints.AngledPlanesConstraint.getToolTip()
              }
 
