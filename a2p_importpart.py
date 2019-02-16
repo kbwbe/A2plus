@@ -123,7 +123,7 @@ def importPartFromFile(_doc, filename, importToCache=False):
             ImportGui.insert(filename,newname)
             importDoc = FreeCAD.ActiveDocument
         else:
-            msg = "A part can only be imported from a FreeCAD '*.fcstd' file"
+            msg = "A part can only be imported from a FreeCAD '*.FCStd' file"
             QtGui.QMessageBox.information( QtGui.QApplication.activeWindow(), "Value Error", msg )
             return
 
@@ -245,7 +245,7 @@ class a2p_ImportPartCommand():
     def GetResources(self):
         return {'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_ImportPart.svg',
                 'Accel' : "Shift+A", # a default shortcut (optional)
-                'MenuText': "Add a Part from an external file",
+                'MenuText': "Add a part from an external file",
                 'ToolTip' : toolTip
                 }
 
@@ -554,7 +554,7 @@ class a2p_DuplicatePartCommand:
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_DuplicatePart.svg',
-            'MenuText': 'Make a duplicate of a part',
+            'MenuText': 'Create duplicate of a part',
             'ToolTip':  toolTip
             }
 
@@ -680,7 +680,7 @@ This is not allowed when using preference
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_EditPart.svg',
-            'MenuText': 'Edit an imported Part (open linked fcstd file)',
+            'MenuText': 'Edit an imported part (open linked FCStd file)',
             'ToolTip':  toolTip
             }
 
@@ -822,7 +822,7 @@ class DeleteConnectionsCommand:
             QtGui.QMessageBox.critical(
                 QtGui.QApplication.activeWindow(),
                "Selection Error",
-               "Select exactly 1 Part")
+               "Select exactly 1 part")
             return
         part = selection[0]
         deleteList = []
@@ -992,7 +992,7 @@ class a2p_isolateCommand:
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_Isolate_Element.svg',
-            'MenuText': 'Show only selected elements, or all if none is selected',
+            'MenuText': 'Show only selected elements or all if none is selected',
             'ToolTip': toolTip
             }
 
@@ -1025,7 +1025,7 @@ class a2p_ToggleTransparencyCommand:
         return {
             'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_ToggleTransparency.svg',
             'MenuText':     'Toggle transparency of assembly',
-            'ToolTip':      'Toggle transparency of assembly',
+            'ToolTip':      'Toggles transparency of assembly',
             'Checkable':    self.IsChecked()
         }
 FreeCADGui.addCommand('a2p_ToggleTransparencyCommand', a2p_ToggleTransparencyCommand())
@@ -1057,7 +1057,7 @@ class a2p_ToggleAutoSolveCommand:
     def GetResources(self):
         return {
             'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_ToggleAutoSolve.svg',
-            'MenuText':     'Toggle AutoSolve',
+            'MenuText':     'Toggle auto solve',
             'ToolTip':      toolTipMessage,
             'Checkable':    self.IsChecked()
             }
@@ -1076,8 +1076,8 @@ class a2p_TogglePartialProcessingCommand:
     def GetResources(self):
         return {
             'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_TogglePartial.svg',
-            'MenuText':     'toggle partial processing',
-            'ToolTip':      'toggle partial processing',
+            'MenuText':     'Toggle partial processing',
+            'ToolTip':      'Toggles partial processing',
             'Checkable':    self.IsChecked()
             }
 FreeCADGui.addCommand('a2p_TogglePartialProcessingCommand', a2p_TogglePartialProcessingCommand())
@@ -1142,7 +1142,7 @@ class a2p_repairTreeViewCommand:
     def GetResources(self):
         return {
             'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_RepairTree.svg',
-            'MenuText':     'Repair the treeView, if it is damaged somehow',
+            'MenuText':     'Repair the tree view if it is somehow damaged',
             'ToolTip':      toolTipMessage
             }
 FreeCADGui.addCommand('a2p_repairTreeViewCommand', a2p_repairTreeViewCommand())
@@ -1153,11 +1153,9 @@ Flip direction of last constraint.
 
 If the last constraint, which has
 been defined, has a property
-'direction', it's value will be
+'direction', its value will be
 toggled between 'aligned' and
-'opposed'
-
-(alignment of axis's)
+'opposed' (alignment of axis)
 '''
 
 
@@ -1223,7 +1221,7 @@ class a2p_Show_Hierarchy_Command:
         return {
             'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_Treeview.svg',
             'MenuText':     'Generate HTML file with detailed constraining structure',
-            'ToolTip':      'Generate HTML file with detailed constraining structure'
+            'ToolTip':      'Generates HTML file with detailed constraining structure'
             }
 FreeCADGui.addCommand('a2p_Show_Hierarchy_Command', a2p_Show_Hierarchy_Command())
 
@@ -1245,7 +1243,7 @@ class a2p_Show_DOF_info_Command:
         return {
             'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_DOFs.svg',
             'MenuText':     'Print detailed DOF information to console',
-            'ToolTip':      'Print detailed DOF information to console'
+            'ToolTip':      'Prints detailed DOF information to console'
             }
 FreeCADGui.addCommand('a2p_Show_DOF_info_Command', a2p_Show_DOF_info_Command())
 
@@ -1279,8 +1277,8 @@ class a2p_absPath_to_relPath_Command:
     def GetResources(self):
         return {
             'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_SetRelativePathes.svg',
-            'MenuText':     'Convert absolute paths of importParts to relative ones',
-            'ToolTip':      'Convert absolute paths of importParts to relative ones'
+            'MenuText':     'Convert absolute paths of imported parts to relative ones',
+            'ToolTip':      'Converts absolute paths of imported parts to relative ones'
             }
 FreeCADGui.addCommand('a2p_absPath_to_relPath_Command', a2p_absPath_to_relPath_Command())
 
@@ -1395,12 +1393,12 @@ def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
         for cName in deletionList:
         
             flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.Abort
-            message = "constraint %s is broken. Delete constraint? otherwise check for wrong linkage." % cName
+            message = "Constraint %s is broken. Delete constraint? Otherwise check for wrong linkage." % cName
             #response = QtGui.QMessageBox.critical(QtGui.qApp.activeWindow(), "Broken Constraint", message, flags )
             response = QtGui.QMessageBox.critical(None, "Broken Constraint", message, flags )
         
             if response == QtGui.QMessageBox.Yes:
-                FreeCAD.Console.PrintError("removing constraint %s" % cName)
+                FreeCAD.Console.PrintError("Removing constraint %s" % cName)
                 c = doc.getObject(cName)
                 a2plib.removeConstraint(c)
                 
