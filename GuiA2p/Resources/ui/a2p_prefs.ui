@@ -131,7 +131,7 @@
        <item>
         <widget class="Gui::PrefCheckBox" name="checkBox_7">
          <property name="text">
-          <string>Inherit per face transparency from parts and sub-assemblies (experimental)</string>
+          <string>Inherit per face transparency from parts and subassemblies (experimental)</string>
          </property>
          <property name="prefEntry" stdset="0">
           <cstring>usePerFaceTransparency</cstring>
