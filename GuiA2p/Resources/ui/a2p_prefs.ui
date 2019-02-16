@@ -321,7 +321,7 @@
        <item>
         <widget class="Gui::PrefRadioButton" name="radioButton_5">
          <property name="text">
-          <string>Use project-folder, all files are below this</string>
+          <string>All files are in this project folder:</string>
          </property>
          <property name="prefEntry" stdset="0">
           <cstring>useProjectFolder</cstring>
