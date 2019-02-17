@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>463</width>
-    <height>562</height>
+    <width>644</width>
+    <height>659</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,8 +17,8 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>350</y>
-     <width>441</width>
+     <y>370</y>
+     <width>621</width>
      <height>51</height>
     </rect>
    </property>
@@ -56,8 +56,8 @@
     <rect>
      <x>10</x>
      <y>170</y>
-     <width>441</width>
-     <height>171</height>
+     <width>621</width>
+     <height>181</height>
     </rect>
    </property>
    <property name="toolTip">
@@ -71,8 +71,8 @@
      <rect>
       <x>21</x>
       <y>20</y>
-      <width>391</width>
-      <height>134</height>
+      <width>611</width>
+      <height>194</height>
      </rect>
     </property>
     <layout class="QFormLayout" name="formLayout">
@@ -178,10 +178,10 @@
   <widget class="QGroupBox" name="groupBox_6">
    <property name="geometry">
     <rect>
-     <x>9</x>
-     <y>410</y>
+     <x>10</x>
+     <y>420</y>
      <width>441</width>
-     <height>141</height>
+     <height>161</height>
     </rect>
    </property>
    <property name="title">
@@ -193,7 +193,7 @@
       <x>20</x>
       <y>20</y>
       <width>391</width>
-      <height>101</height>
+      <height>139</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -282,7 +282,7 @@
     <rect>
      <x>10</x>
      <y>110</y>
-     <width>441</width>
+     <width>621</width>
      <height>51</height>
     </rect>
    </property>
@@ -317,7 +317,7 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>441</width>
+     <width>621</width>
      <height>91</height>
     </rect>
    </property>
@@ -329,8 +329,8 @@
      <rect>
       <x>20</x>
       <y>20</y>
-      <width>384</width>
-      <height>65</height>
+      <width>599</width>
+      <height>95</height>
      </rect>
     </property>
     <layout class="QFormLayout" name="formLayout_2">
