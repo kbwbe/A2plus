@@ -66,7 +66,7 @@
    <property name="title">
     <string>Behavior when updating imported parts</string>
    </property>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>21</x>
@@ -192,7 +192,7 @@
      <rect>
       <x>20</x>
       <y>20</y>
-      <width>252</width>
+      <width>391</width>
       <height>101</height>
      </rect>
     </property>
@@ -246,7 +246,7 @@
       <widget class="Gui::PrefFileChooser" name="fileChooser">
        <property name="minimumSize">
         <size>
-         <width>250</width>
+         <width>350</width>
          <height>0</height>
         </size>
        </property>
@@ -324,7 +324,7 @@
    <property name="title">
     <string>Default solving method</string>
    </property>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>20</x>
