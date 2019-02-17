@@ -579,8 +579,8 @@ class a2p_SolverCommand:
     def GetResources(self):
         return {
             'Pixmap' : path_a2p + '/icons/a2p_Solver.svg',
-            'MenuText': 'Solve',
-            'ToolTip': 'Solve A2plus constraints'
+            'MenuText': 'Solve constraints',
+            'ToolTip': 'Solves constraints'
             }
 
 FreeCADGui.addCommand('a2p_SolverCommand', a2p_SolverCommand())

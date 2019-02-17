@@ -112,7 +112,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             
             self.flipDirectionButton = QtGui.QPushButton(self)
             self.flipDirectionButton.setIcon(QtGui.QIcon(':/icons/a2p_FlipConstraint.svg'))
-            self.flipDirectionButton.setText("Flip Dir.")
+            self.flipDirectionButton.setText("Flip direction")
             self.flipDirectionButton.setFixedHeight(32)
             QtCore.QObject.connect(self.flipDirectionButton, QtCore.SIGNAL("clicked()"), self.flipDirection)
             self.mainLayout.addWidget(self.flipDirectionButton,self.lineNo,2)
@@ -194,19 +194,19 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         self.deleteButton = QtGui.QPushButton(self.buttonPanel)
         self.deleteButton.setFixedHeight(32)
         self.deleteButton.setIcon(QtGui.QIcon(':/icons/a2p_DeleteConnections.svg')) #need new Icon
-        self.deleteButton.setToolTip("delete this constraint")
+        self.deleteButton.setToolTip("Delete this constraint")
         self.deleteButton.setText("Delete this constraint")
         
         self.solveButton = QtGui.QPushButton(self.buttonPanel)
         self.solveButton.setFixedHeight(32)
         self.solveButton.setIcon(QtGui.QIcon(':/icons/a2p_Solver.svg'))
-        self.solveButton.setToolTip("solve Constraints")
+        self.solveButton.setToolTip("Solve constraints")
         self.solveButton.setText("Solve")
         
         self.acceptButton = QtGui.QPushButton(self.buttonPanel)
         self.acceptButton.setFixedHeight(32)
         self.acceptButton.setIcon(QtGui.QIcon(':/icons/a2p_CheckAssembly.svg')) #need new Icon
-        self.acceptButton.setToolTip("solve Constraints")
+        self.acceptButton.setToolTip("Solve constraints")
         self.acceptButton.setText("Accept")
         #self.acceptButton.setDefault(True)
         

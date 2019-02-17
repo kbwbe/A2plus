@@ -341,7 +341,7 @@ class a2p_SimpleAssemblyShapeCommand():
     def GetResources(self):
         import a2plib
         return {'Pixmap'  : a2plib.path_a2p +'/icons/a2p_SimpleAssemblyShape.svg',
-                'MenuText': "Create or refresh simple shape of complete Assembly",
+                'MenuText': "Create or refresh simple shape of complete assembly",
                 'ToolTip': toolTip
                 }
 
