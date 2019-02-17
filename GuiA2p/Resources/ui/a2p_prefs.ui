@@ -79,7 +79,8 @@
      <item row="0" column="0">
       <widget class="Gui::PrefCheckBox" name="checkBox_4">
        <property name="toolTip">
-        <string>All parts of the assembly will be opened in FreeCAD to be reconstructed using values from spreadsheets</string>
+        <string>All parts of the assembly will be opened in FreeCAD to be
+reconstructed using values from spreadsheets</string>
        </property>
        <property name="text">
         <string>Recalculate imported parts before updating them (experimental)</string>
@@ -95,7 +96,8 @@
      <item row="1" column="0">
       <widget class="Gui::PrefCheckBox" name="checkBox_5">
        <property name="toolTip">
-        <string>Opens all subassemblies recursively to update them</string>
+        <string>Opens all subassemblies recursively
+to update them</string>
        </property>
        <property name="text">
         <string>Enable recursive update of imported parts</string>
@@ -111,7 +113,10 @@
      <item row="2" column="0">
       <widget class="Gui::PrefCheckBox" name="checkBox_2">
        <property name="toolTip">
-        <string>While importing parts to the assembly, the topological names are written into &quot;mux Info&quot; property. When the parts are later updated the properties &quot;Sub Elementx&quot; of the constraints will be updated according to the &quot;mux Info&quot; topology.</string>
+        <string>While importing parts to the assembly, the topological names
+are written into &quot;mux Info&quot; property. When the parts are
+later updated the properties &quot;Sub Elementx&quot; of the constraints
+will be updated according to the &quot;mux Info&quot; topology.</string>
        </property>
        <property name="text">
         <string>Use experimental topological naming</string>
@@ -127,7 +132,8 @@
      <item row="3" column="0">
       <widget class="Gui::PrefCheckBox" name="checkBox_7">
        <property name="toolTip">
-        <string>Use color and transparency settings from imported parts</string>
+        <string>Use color and transparency settings
+from imported parts</string>
        </property>
        <property name="text">
         <string>Inherit per face transparency from parts and subassemblies (experimental)</string>
@@ -143,7 +149,10 @@
      <item row="4" column="0">
       <widget class="Gui::PrefCheckBox" name="checkBox_8">
        <property name="toolTip">
-        <string>Invisible datum/construction shapes will be hidden. Note: No constraints must be connected to datum/construction shapes in higher or other subassemblies. Otherwise you can break the assembly.</string>
+        <string>Invisible datum/construction shapes will be hidden.
+Note: No constraints must be connected to
+datum/construction shapes in higher or other
+subassemblies. Otherwise you can break the assembly.</string>
        </property>
        <property name="statusTip">
         <string>All imported parts will directly be put together as union.</string>
@@ -337,7 +346,10 @@
      <item row="0" column="0">
       <widget class="Gui::PrefRadioButton" name="radioButton">
        <property name="toolTip">
-        <string>Solver begins with a fixed part and a part constrained to it. All other parts are not calculated. If a solution could be found, the next constrained part is added for the calculation and so on.</string>
+        <string>Solver begins with a fixed part and a part constrained to it.
+All other parts are not calculated. If a solution could be
+found, the next constrained part is added for the
+calculation and so on.</string>
        </property>
        <property name="text">
         <string>Use solving of partial systems (recommended for static assemblies)</string>
@@ -356,7 +368,8 @@
      <item row="1" column="0">
       <widget class="Gui::PrefRadioButton" name="radioButton_2">
        <property name="toolTip">
-        <string>Solver tries to move all parts at once in direction to a fixed part</string>
+        <string>Solver tries to move all parts at once
+in direction to a fixed part</string>
        </property>
        <property name="text">
         <string>Use &quot;magnetic&quot; solver, solving all parts at once (for dynamical assemblies)</string>
@@ -372,7 +385,8 @@
      <item row="2" column="0">
       <widget class="Gui::PrefCheckBox" name="checkBox_3">
        <property name="toolTip">
-        <string>All parts will be fixed to the positions where they were created</string>
+        <string>All parts will be fixed to the positions
+where they were created</string>
        </property>
        <property name="text">
         <string>Force fixed position to all imports</string>
