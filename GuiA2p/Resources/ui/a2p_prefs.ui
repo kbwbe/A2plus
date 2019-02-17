@@ -38,7 +38,7 @@
        <item>
         <widget class="Gui::PrefCheckBox" name="checkBox_6">
          <property name="text">
-          <string>Show constraints on toolbar</string>
+          <string>Show constraints in toolbar</string>
          </property>
          <property name="checked">
           <bool>true</bool>
@@ -105,7 +105,7 @@
        <item>
         <widget class="Gui::PrefCheckBox" name="checkBox_5">
          <property name="text">
-          <string>Enable recursive update of imported parts (process all subassemblies)</string>
+          <string>Enable recursive update of imported parts</string>
          </property>
          <property name="prefEntry" stdset="0">
           <cstring>enableRecursiveUpdate</cstring>
@@ -131,7 +131,7 @@
        <item>
         <widget class="Gui::PrefCheckBox" name="checkBox_7">
          <property name="text">
-          <string>Inherit per face transparency from parts and sub-assemblies (experimental)</string>
+          <string>Inherit per face transparency from parts and subassemblies (experimental)</string>
          </property>
          <property name="prefEntry" stdset="0">
           <cstring>usePerFaceTransparency</cstring>
@@ -144,7 +144,7 @@
        <item>
         <widget class="Gui::PrefCheckBox" name="checkBox_8">
          <property name="text">
-          <string>Do not import invisible shapes (use with caution, can break assemblies)</string>
+          <string>Do not import invisible shapes (for expert users)</string>
          </property>
          <property name="prefEntry" stdset="0">
           <cstring>doNotImportInvisibleShapes</cstring>
@@ -320,8 +320,11 @@
        </item>
        <item>
         <widget class="Gui::PrefRadioButton" name="radioButton_5">
+         <property name="toolTip">
+          <string>Specify the project folder in the field below</string>
+         </property>
          <property name="text">
-          <string>Use project-folder, all files are below this</string>
+          <string>All files are in this project folder:</string>
          </property>
          <property name="prefEntry" stdset="0">
           <cstring>useProjectFolder</cstring>
@@ -391,7 +394,7 @@
        <item>
         <widget class="Gui::PrefCheckBox" name="checkBox">
          <property name="text">
-          <string>Solve automatically if a constraints property is changed</string>
+          <string>Solve automatically if a constraint property is changed</string>
          </property>
          <property name="checked">
           <bool>true</bool>

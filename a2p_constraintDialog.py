@@ -112,7 +112,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             
             self.flipDirectionButton = QtGui.QPushButton(self)
             self.flipDirectionButton.setIcon(QtGui.QIcon(':/icons/a2p_FlipConstraint.svg'))
-            self.flipDirectionButton.setText("Flip Dir.")
+            self.flipDirectionButton.setText("Flip direction")
             self.flipDirectionButton.setFixedHeight(32)
             QtCore.QObject.connect(self.flipDirectionButton, QtCore.SIGNAL("clicked()"), self.flipDirection)
             self.mainLayout.addWidget(self.flipDirectionButton,self.lineNo,2)
