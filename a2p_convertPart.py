@@ -109,7 +109,7 @@ class a2p_ConvertPartCommand():
         import a2plib
         return {'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_ConvertPart.svg',
 #                'Accel' : "Shift+C", # a default shortcut (optional)
-                'MenuText': "Convert a Part to A2plus",
+                'MenuText': "Convert a part to A2plus",
                 'ToolTip' : toolTip
                 }
 
@@ -117,8 +117,8 @@ class a2p_ConvertPartCommand():
         if FreeCAD.activeDocument() == None:
             QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
-               "No active Document error",
-               "First please open an assembly file!"
+               "No active document error",
+               "Please open an assembly file first!"
                )
             return
         doc = FreeCAD.activeDocument()
