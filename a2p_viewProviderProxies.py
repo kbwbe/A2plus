@@ -126,6 +126,10 @@ class ConstraintViewProviderProxy:
 
     def getIcon(self):
         return self.iconPath
+    
+    def doubleClicked(self,vobj):
+        print("ConstraintViewProviderProxy doubleClicked")
+        FreeCADGui.runCommand("a2p_EditConstraintCommand")
 
 #WF: next 3 methods not required
     def attach(self, vobj): #attach to what document?
@@ -164,6 +168,10 @@ class ConstraintMirrorViewProviderProxy:
         self.iconPath = iconPath
         self.constraintObj_name = constraintObj.Name
         self.enableDeleteCounterPart = True #allow to delete the original of the mirror
+
+    def doubleClicked(self,vobj):
+        print("ConstraintMirrorViewProviderProxy doubleClicked")
+        FreeCADGui.runCommand("a2p_EditConstraintCommand")
 
     def getIcon(self):
         return self.iconPath
