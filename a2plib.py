@@ -81,7 +81,7 @@ CONSTRAINT_VIEWMODE = False
 #------------------------------------------------------------------------------
 tmp = platform.system()
 tmp = tmp.upper()
-print("loading A2plus on operating system '{}'".format(tmp))
+#print("loading A2plus on operating system '{}'".format(tmp))
 tmp = tmp.split(' ')
 
 OPERATING_SYSTEM = 'UNKNOWN'
@@ -246,6 +246,7 @@ def restoreTransparency():
     doc = FreeCAD.ActiveDocument
 
     sel = FreeCADGui.Selection
+    sel.clearSelection()
     for setting in SAVED_TRANSPARENCY:
         obj = doc.getObject(setting[0])
         if obj is not None:
@@ -261,7 +262,7 @@ def restoreTransparency():
                 else:
                     obj.ViewObject.DiffuseColor = setting[1]
             sel.addSelection(obj)
-    sel.clearSelection()
+            sel.clearSelection()
 
     SAVED_TRANSPARENCY = []
 #------------------------------------------------------------------------------

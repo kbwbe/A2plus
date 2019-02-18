@@ -928,9 +928,11 @@ class ViewConnectionsObserver:
         if self.ignoreClear:
             self.ignoreClear = False
         else:
+            # remove observer at once, as restoreTransparency would trigger it again...
+            FreeCADGui.Selection.removeObserver(self)
+            #
             if a2plib.isTransparencyEnabled() and not self.initialTransparencyState:
                 a2plib.restoreTransparency()
-            FreeCADGui.Selection.removeObserver(self)
             a2plib.setConstraintViewMode(False)
 
     def setSelection(self, doc):
