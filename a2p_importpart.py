@@ -386,22 +386,24 @@ def updateImportedParts(doc):
                     obj.Shape = newObject.Shape.copy()
                     obj.Placement = savedPlacement # restore the old placement
 
-                    if not a2plib.getPerFaceTransparency():
-                        #obj.ViewObject.DiffuseColor = copy.copy(newObject.ViewObject.DiffuseColor)
-                        obj.ViewObject.Transparency = newObject.ViewObject.Transparency
-                        obj.ViewObject.ShapeColor = copy.copy(newObject.ViewObject.ShapeColor)
-                        
-
+                    #touch transparency one to trigger update of 3D View
                     if obj.ViewObject.Transparency > 0:
                         transparency = obj.ViewObject.Transparency
                         obj.ViewObject.Transparency = 0
                         obj.ViewObject.Transparency = transparency
-                        #FreeCADGui.Selection.addSelection(obj)
-                        #FreeCADGui.Selection.removeSelection(obj)
+                    else:
+                        obj.ViewObject.Transparency = 1
+                        obj.ViewObject.Transparency = 0
 
-                    if a2plib.getPerFaceTransparency():
-                        obj.ViewObject.DiffuseColor = copy.copy(newObject.ViewObject.DiffuseColor)    # diffuse must be set last
-                        
+                    # diffuse must be set last
+                    if obj.updateColors == True:
+                        # import colors newly from import file
+                        obj.ViewObject.DiffuseColor = copy.copy(newObject.ViewObject.DiffuseColor)
+                    else:
+                        #keep color set by user
+                        obj.ViewObject.DiffuseColor = [obj.ViewObject.ShapeColor] 
+
+                    # select/unselect object once to trigger update of 3D View
                     FreeCADGui.Selection.addSelection(obj)
                     FreeCADGui.Selection.removeSelection(obj)
 
