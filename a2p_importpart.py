@@ -386,6 +386,19 @@ def updateImportedParts(doc):
                     obj.Shape = newObject.Shape.copy()
                     obj.Placement = savedPlacement # restore the old placement
 
+
+                    # this section seems not to be necessary
+                    # as DiffuseColor overrides ShapeColor and Transparency completely on FC0.18
+                    # Keep this section for FC0.16 ?
+                    if obj.updateColors == True:
+                        # import colors newly from import file
+                        obj.ViewObject.ShapeColor = newObject.ViewObject.ShapeColor
+                        obj.ViewObject.Transparency = newObject.ViewObject.Transparency
+                    else:
+                        #keep color set by user
+                        pass
+
+
                     #touch transparency one to trigger update of 3D View
                     if obj.ViewObject.Transparency > 0:
                         transparency = obj.ViewObject.Transparency
@@ -396,12 +409,15 @@ def updateImportedParts(doc):
                         obj.ViewObject.Transparency = 0
 
                     # diffuse must be set last
-                    if obj.updateColors == True:
-                        # import colors newly from import file
-                        obj.ViewObject.DiffuseColor = copy.copy(newObject.ViewObject.DiffuseColor)
-                    else:
-                        #keep color set by user
-                        obj.ViewObject.DiffuseColor = [obj.ViewObject.ShapeColor] 
+                    try:
+                        if obj.updateColors == True:
+                            # import colors newly from import file
+                            obj.ViewObject.DiffuseColor = copy.copy(newObject.ViewObject.DiffuseColor)
+                        else:
+                            #keep color set by user
+                            obj.ViewObject.DiffuseColor = [obj.ViewObject.ShapeColor]
+                    except:
+                        pass # for objects of old FC Versions without DiffuseColor... 
 
                     # select/unselect object once to trigger update of 3D View
                     FreeCADGui.Selection.addSelection(obj)
