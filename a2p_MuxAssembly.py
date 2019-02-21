@@ -125,8 +125,8 @@ def muxAssemblyWithTopoNames(doc, withColor=False):
 
         # now start the loop with use of the stored values..(much faster)
         topoNaming = a2plib.getUseTopoNaming()
-        for i, face in enumerate(tempShape.Faces):
-            faces.append(face)
+        diffuseElement = makeDiffuseElement(shapeCol,transparency)
+        for i in range(0,len(tempShape.Faces)):
             if topoNaming:
                 if extendNames:
                     newName = "".join((faceNames[i],obj.Name,';'))
@@ -134,15 +134,13 @@ def muxAssemblyWithTopoNames(doc, withColor=False):
                 else:
                     newName = "".join(('F;',str(i+1),';',obj.Name,';'))
                     muxInfo.append(newName)
+            if colorFlag:
+                faceColors.append(diffuseElement)
+                    
+        if not colorFlag:
+            faceColors.extend(diffuseCol)
 
-            if withColor:
-                if colorFlag:
-                    if not a2plib.getPerFaceTransparency():
-                        faceColors.append(shapeCol)
-                    else:
-                        faceColors.append(makeDiffuseElement(shapeCol,transparency))
-                else:
-                    faceColors.append(diffuseCol[i])
+        faces.extend(tempShape.Faces)
 
     shell = Part.makeShell(faces)
     try:
@@ -160,69 +158,7 @@ def muxAssemblyWithTopoNames(doc, withColor=False):
     except:
         # keeping a shell if solid is failing
         solid = shell
-    if withColor:
-        return muxInfo, solid, faceColors, transparency
-    else:
-        return muxInfo, solid
-
-def muxObjectsWithKeys(objsIn, withColor=False):
-    '''
-    combines all the objects in objsIn into one shape,
-    is able to import colors
-    '''
-    faces = []
-    faceColors = []
-    muxInfo = [] # List of keys, not used at moment...
-    shape_list = []
-    
-    for obj in objsIn:
-        # Save Computing time, store this before the for..enumerate loop later...
-        colorFlag = ( len(obj.ViewObject.DiffuseColor) < len(obj.Shape.Faces) )
-        shapeCol = obj.ViewObject.ShapeColor
-        diffuseCol = obj.ViewObject.DiffuseColor
-        tempShape = makePlacedShape(obj)
-        transparency = obj.ViewObject.Transparency
-        shape_list.append(obj.Shape)
-
-        # now start the loop with use of the stored values..(much faster)
-        for i, face in enumerate(tempShape.Faces):
-            faces.append(face)
-            DebugMsg(A2P_DEBUG_3,"a2p MUX: i(Faces)={}\n{}\n".format(i,face))
-
-            if withColor:
-                if colorFlag:
-                    if not a2plib.getPerFaceTransparency():
-                        faceColors.append(shapeCol)
-                    else:
-                        faceColors.append(makeDiffuseElement(shapeCol,transparency))
-                else:
-                    faceColors.append(diffuseCol[i])
-
-    shell = Part.makeShell(faces)
-    try:
-        solid = Part.Solid(shell)
-    except:
-        # keeping a shell if solid is failing
-        solid = shell
-    if withColor:
-        return muxInfo, solid, faceColors, transparency
-    else:
-        return muxInfo, solid
-
-#NOTE: muxObjects is never called in A2plus
-def muxObjects(doc, mode=0):
-    'combines all the imported shape object in doc into one shape'
-    faces = []
-    if mode == 1:
-        objects = doc.getSelection()
-    else:
-        objects = doc.Objects
-
-    for obj in objects:
-        if 'importPart' in obj.Content:
-            faces = faces + obj.Shape.Faces
-    shell = Part.makeShell(faces)
-    return shell
+    return muxInfo, solid, faceColors, transparency
 
 class SimpleAssemblyShape:
     def __init__(self, obj):

@@ -27,7 +27,6 @@ from PySide import QtGui, QtCore
 import os, copy, time, sys, platform
 import a2plib
 from a2p_MuxAssembly import (
-    muxObjectsWithKeys,
     Proxy_muxAssemblyObj,
     makePlacedShape,
     muxAssemblyWithTopoNames
