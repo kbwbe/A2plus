@@ -460,7 +460,7 @@ class TopoMapper(object):
                 self.isPartDesignDocument = True
                 break
 
-    def createTopoNames(self,withColor=False):
+    def createTopoNames(self):
         '''
         creates a combined shell of all toplevel objects and
         assigns toponames to its geometry if toponaming is
@@ -485,26 +485,23 @@ class TopoMapper(object):
         faceColors = []
         transparency = 0
         shape_list = []
+        
         for objName in self.topLevelShapes:
             ob = self.doc.getObject(objName)
-            colorFlag = ( len(ob.ViewObject.DiffuseColor) < len(ob.Shape.Faces) )
+            needDiffuseExtension = ( len(ob.ViewObject.DiffuseColor) < len(ob.Shape.Faces) )
             shapeCol = ob.ViewObject.ShapeColor
             diffuseCol = ob.ViewObject.DiffuseColor
             tempShape = self.makePlacedShape(ob)
             transparency = ob.ViewObject.Transparency
             shape_list.append(ob.Shape)
-            # now start the loop with use of the stored values..(much faster)
-            for i, face in enumerate(tempShape.Faces):
-                faces.append(face)
-
-                if withColor:
-                    if colorFlag:
-                        if not a2plib.getPerFaceTransparency():
-                            faceColors.append(shapeCol)
-                        else:
-                            faceColors.append(a2plib.makeDiffuseElement(shapeCol,transparency))
-                    else:
-                        faceColors.append(diffuseCol[i])
+            
+            if needDiffuseExtension:
+                diffuseElement = a2plib.makeDiffuseElement(shapeCol,transparency)
+                for i in range(0,len(tempShape.Faces)):
+                    faceColors.append(diffuseElement)
+            else:
+                faceColors.extend(diffuseCol) #let python libs extend faceColors, much faster
+            faces.extend(tempShape.Faces) #let python libs extend faces, much faster
 
         shell = Part.makeShell(faces)
         try:
@@ -554,7 +551,4 @@ class TopoMapper(object):
                 name = self.shapeDict.get(keys[0],"None")
                 muxInfo.append(name)
 
-        if withColor:
-            return muxInfo, solid, faceColors, transparency
-        else:
-            return muxInfo, solid
+        return muxInfo, solid, faceColors, transparency

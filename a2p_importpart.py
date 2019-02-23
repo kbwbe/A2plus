@@ -27,7 +27,6 @@ from PySide import QtGui, QtCore
 import os, copy, time, sys, platform
 import a2plib
 from a2p_MuxAssembly import (
-    muxObjectsWithKeys,
     Proxy_muxAssemblyObj,
     makePlacedShape,
     muxAssemblyWithTopoNames
@@ -214,31 +213,36 @@ def importPartFromFile(_doc, filename, importToCache=False):
     if subAssemblyImport:
     #if False:
         #newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor = muxObjectsWithKeys(importableObjects, withColor=True)
-        newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = muxAssemblyWithTopoNames(
-            importDoc, 
-            withColor=True
-            )
+        newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = \
+            muxAssemblyWithTopoNames(importDoc)
     else:
         # TopoMapper manages import of non A2p-Files. It generates the shapes and appropriate topo names...
-        newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = topoMapper.createTopoNames(withColor=True)
+        newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = \
+            topoMapper.createTopoNames()
         
 
     doc.recompute()
 
-    if importToCache:
+    if importToCache: # this import is used to update already imported parts
         objectCache.add(filename, newObj)
+    else: # this is a first time import of a part
+        if not a2plib.getPerFaceTransparency():
+            # turn of perFaceTransparency by accessing ViewObject.Transparency and set to zero (non transparent)
+            newObj.ViewObject.Transparency = 1
+            newObj.ViewObject.Transparency = 0 # import assembly first time as non transparent.
 
     if not importDocIsOpen:
         FreeCAD.closeDocument(importDoc.Name)
 
     return newObj
 
+
+
 toolTip = \
 '''
 Add a part from an external file
 to the assembly
 '''
-
 
 class a2p_ImportPartCommand():
 
@@ -385,25 +389,7 @@ def updateImportedParts(doc):
                     savedPlacement  = obj.Placement
                     obj.Shape = newObject.Shape.copy()
                     obj.Placement = savedPlacement # restore the old placement
-
-                    if not a2plib.getPerFaceTransparency():
-                        #obj.ViewObject.DiffuseColor = copy.copy(newObject.ViewObject.DiffuseColor)
-                        obj.ViewObject.Transparency = newObject.ViewObject.Transparency
-                        obj.ViewObject.ShapeColor = copy.copy(newObject.ViewObject.ShapeColor)
-                        
-
-                    if obj.ViewObject.Transparency > 0:
-                        transparency = obj.ViewObject.Transparency
-                        obj.ViewObject.Transparency = 0
-                        obj.ViewObject.Transparency = transparency
-                        #FreeCADGui.Selection.addSelection(obj)
-                        #FreeCADGui.Selection.removeSelection(obj)
-
-                    if a2plib.getPerFaceTransparency():
-                        obj.ViewObject.DiffuseColor = copy.copy(newObject.ViewObject.DiffuseColor)    # diffuse must be set last
-                        
-                    FreeCADGui.Selection.addSelection(obj)
-                    FreeCADGui.Selection.removeSelection(obj)
+                    a2plib.copyObjectColors(obj,newObject)
 
 
     mw = FreeCADGui.getMainWindow()

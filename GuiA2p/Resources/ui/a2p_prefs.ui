@@ -17,9 +17,9 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>390</y>
+     <y>480</y>
      <width>621</width>
-     <height>51</height>
+     <height>61</height>
     </rect>
    </property>
    <property name="title">
@@ -29,8 +29,8 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>20</y>
-      <width>221</width>
+      <y>30</y>
+      <width>311</width>
       <height>17</height>
      </rect>
     </property>
@@ -54,10 +54,10 @@
   <widget class="QGroupBox" name="groupBox_3">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>180</y>
+     <x>0</x>
+     <y>240</y>
      <width>621</width>
-     <height>191</height>
+     <height>231</height>
     </rect>
    </property>
    <property name="toolTip">
@@ -188,7 +188,7 @@ subassemblies. Otherwise you can break the assembly.</string>
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>440</y>
+     <y>580</y>
      <width>441</width>
      <height>161</height>
     </rect>
@@ -295,10 +295,10 @@ subassemblies. Otherwise you can break the assembly.</string>
   <widget class="QGroupBox" name="groupBox_2">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>120</y>
+     <x>0</x>
+     <y>160</y>
      <width>621</width>
-     <height>51</height>
+     <height>61</height>
     </rect>
    </property>
    <property name="title">
@@ -308,7 +308,7 @@ subassemblies. Otherwise you can break the assembly.</string>
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>20</y>
+      <y>30</y>
       <width>283</width>
       <height>17</height>
      </rect>
@@ -333,7 +333,7 @@ subassemblies. Otherwise you can break the assembly.</string>
      <x>10</x>
      <y>10</y>
      <width>621</width>
-     <height>101</height>
+     <height>131</height>
     </rect>
    </property>
    <property name="title">
