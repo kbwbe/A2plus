@@ -268,6 +268,7 @@ class a2p_ImportPartCommand():
                "Unnamed document",
                '''Before inserting first part,\nplease save the empty assembly\nto give it a name'''
                )
+            FreeCADGui.SendMsgToActiveView("Save")
             return
         
         doc = FreeCAD.activeDocument()
