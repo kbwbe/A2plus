@@ -213,31 +213,36 @@ def importPartFromFile(_doc, filename, importToCache=False):
     if subAssemblyImport:
     #if False:
         #newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor = muxObjectsWithKeys(importableObjects, withColor=True)
-        newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = muxAssemblyWithTopoNames(
-            importDoc, 
-            withColor=True
-            )
+        newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = \
+            muxAssemblyWithTopoNames(importDoc)
     else:
         # TopoMapper manages import of non A2p-Files. It generates the shapes and appropriate topo names...
-        newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = topoMapper.createTopoNames(withColor=True)
+        newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = \
+            topoMapper.createTopoNames()
         
 
     doc.recompute()
 
-    if importToCache:
+    if importToCache: # this import is used to update already imported parts
         objectCache.add(filename, newObj)
+    else: # this is a first time import of a part
+        if not a2plib.getPerFaceTransparency():
+            # turn of perFaceTransparency by accessing ViewObject.Transparency and set to zero (non transparent)
+            newObj.ViewObject.Transparency = 1
+            newObj.ViewObject.Transparency = 0 # import assembly first time as non transparent.
 
     if not importDocIsOpen:
         FreeCAD.closeDocument(importDoc.Name)
 
     return newObj
 
+
+
 toolTip = \
 '''
 Add a part from an external file
 to the assembly
 '''
-
 
 class a2p_ImportPartCommand():
 
@@ -384,43 +389,7 @@ def updateImportedParts(doc):
                     savedPlacement  = obj.Placement
                     obj.Shape = newObject.Shape.copy()
                     obj.Placement = savedPlacement # restore the old placement
-
-
-                    # this section seems not to be necessary
-                    # as DiffuseColor overrides ShapeColor and Transparency completely on FC0.18
-                    # Keep this section for FC0.16 ?
-                    if obj.updateColors == True:
-                        # import colors newly from import file
-                        obj.ViewObject.ShapeColor = newObject.ViewObject.ShapeColor
-                        obj.ViewObject.Transparency = newObject.ViewObject.Transparency
-                    else:
-                        #keep color set by user
-                        pass
-
-
-                    #touch transparency one to trigger update of 3D View
-                    if obj.ViewObject.Transparency > 0:
-                        transparency = obj.ViewObject.Transparency
-                        obj.ViewObject.Transparency = 0
-                        obj.ViewObject.Transparency = transparency
-                    else:
-                        obj.ViewObject.Transparency = 1
-                        obj.ViewObject.Transparency = 0
-
-                    # diffuse must be set last
-                    try:
-                        if obj.updateColors == True:
-                            # import colors newly from import file
-                            obj.ViewObject.DiffuseColor = copy.copy(newObject.ViewObject.DiffuseColor)
-                        else:
-                            #keep color set by user
-                            obj.ViewObject.DiffuseColor = [obj.ViewObject.ShapeColor]
-                    except:
-                        pass # for objects of old FC Versions without DiffuseColor... 
-
-                    # select/unselect object once to trigger update of 3D View
-                    FreeCADGui.Selection.addSelection(obj)
-                    FreeCADGui.Selection.removeSelection(obj)
+                    a2plib.copyObjectColors(obj,newObject)
 
 
     mw = FreeCADGui.getMainWindow()

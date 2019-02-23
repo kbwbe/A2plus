@@ -64,7 +64,7 @@ def makePlacedShape(obj):
     tempShape.Placement = plmGlobal
     return tempShape
 
-def muxAssemblyWithTopoNames(doc, withColor=False):
+def muxAssemblyWithTopoNames(doc):
     '''
     Mux an a2p assenbly
     
@@ -116,7 +116,7 @@ def muxAssemblyWithTopoNames(doc, withColor=False):
                     muxInfo.append(newName)
         
         # Save Computing time, store this before the for..enumerate loop later...
-        colorFlag = ( len(obj.ViewObject.DiffuseColor) < len(obj.Shape.Faces) )
+        needDiffuseColorExtension = ( len(obj.ViewObject.DiffuseColor) < len(obj.Shape.Faces) )
         shapeCol = obj.ViewObject.ShapeColor
         diffuseCol = obj.ViewObject.DiffuseColor
         tempShape = makePlacedShape(obj)
@@ -134,10 +134,10 @@ def muxAssemblyWithTopoNames(doc, withColor=False):
                 else:
                     newName = "".join(('F;',str(i+1),';',obj.Name,';'))
                     muxInfo.append(newName)
-            if colorFlag:
+            if needDiffuseColorExtension:
                 faceColors.append(diffuseElement)
                     
-        if not colorFlag:
+        if not needDiffuseColorExtension:
             faceColors.extend(diffuseCol)
 
         faces.extend(tempShape.Faces)
@@ -158,6 +158,12 @@ def muxAssemblyWithTopoNames(doc, withColor=False):
     except:
         # keeping a shell if solid is failing
         solid = shell
+    
+    # transparency coud change to different values depending
+    # of order of imported objects
+    # now set it to a default value
+    # faceColors still contains the per face transparency values
+    transparency = 0
     return muxInfo, solid, faceColors, transparency
 
 class SimpleAssemblyShape:

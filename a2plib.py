@@ -30,6 +30,7 @@ from PySide import QtGui
 from PySide import QtCore
 import os
 import sys
+import copy
 import platform
 from a2p_viewProviderProxies import *
 
@@ -312,12 +313,11 @@ def getProjectFolder():
 def pathToOS(path):
     if path == None: return None
     p = to_str(path)
-    print(u"p = {}".format(p))
     if OPERATING_SYSTEM == 'WINDOWS':
         p = p.replace(u'/',u'\\')
     else:
         p = p.replace(u'\\',u'/')
-    return p # binary string
+    return p # unicode string
 
 #------------------------------------------------------------------------------
 def findFile(_name, _path):
@@ -747,6 +747,36 @@ def isA2pObject(obj):
 def makeDiffuseElement(color,trans):
     elem = (color[0],color[1],color[2],trans/100.0)
     return elem
+#------------------------------------------------------------------------------
+def copyObjectColors(ob1,ob2):
+    '''
+    copies colors from ob2 to ob1
+    Transparency of updated object is not touched until
+    user activates perFaceTransparency within preferences.
+    '''
+    if ob1.updateColors != True:
+        ob1.ViewObject.DiffuseColor = [ob1.ViewObject.ShapeColor] # set syncron
+        return
+    
+    # obj1.updateColors == True from now
+    newDiffuseColor = copy.copy(ob2.ViewObject.DiffuseColor)
+    ob1.ViewObject.ShapeColor = ob2.ViewObject.ShapeColor
+    ob1.ViewObject.DiffuseColor = newDiffuseColor # set diffuse last
+
+    if not getPerFaceTransparency():
+        # touch transparency one to trigger update of 3D View
+        # per face transparency probably gets lost
+        if ob1.ViewObject.Transparency > 0:
+            t = ob1.ViewObject.Transparency
+            ob1.ViewObject.Transparency = 0
+            ob1.ViewObject.Transparency = t
+        else:
+            ob1.ViewObject.Transparency = 1
+            ob1.ViewObject.Transparency = 0
+
+    # select/unselect object once to trigger update of 3D View
+    FreeCADGui.Selection.addSelection(ob1)
+    FreeCADGui.Selection.removeSelection(ob1)
 #------------------------------------------------------------------------------
 def isConstrainedPart(doc,obj):
     if not isA2pPart(obj): return False
