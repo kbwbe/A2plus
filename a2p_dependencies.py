@@ -660,9 +660,13 @@ class DependencyAngledPlanes(Dependency):
             axis = rigAxis.cross(foreignAxis)
             axis.normalize()
             axis.multiply(-deltaAngle)
-        except: #axis = Vector(0,0,0) and cannot be normalized...
-            #print ("Exception in angledPlanes.getRotation\n")
-            pass
+        except:
+            # axis = Vector(0,0,0) and cannot be normalized...
+            # return a random axis with very small angle...
+            x = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
+            y = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
+            z = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
+            axis = Base.Vector(x,y,z)
         return axis
     
     def calcDOF(self, _dofPos, _dofRot, _pointconstraints=[]):
