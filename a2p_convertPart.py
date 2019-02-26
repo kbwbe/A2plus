@@ -73,8 +73,14 @@ def convertToImportedPart(doc, obj):
     for p in obj.ViewObject.PropertiesList: 
         if hasattr(obj.ViewObject, p) and p not in ['DiffuseColor','Proxy','MappedColors']:
             setattr(newObj.ViewObject, p, getattr( obj.ViewObject, p))
-#    newObj.ViewObject.Transparency = obj.ViewObject.Transparency               # should have been done within the above loop
-    newObj.ViewObject.DiffuseColor = copy.copy( obj.ViewObject.DiffuseColor )   # diffuse needs to happen last
+    newObj.ViewObject.ShapeColor = obj.ViewObject.ShapeColor
+    newObj.ViewObject.DiffuseColor = copy.copy( obj.ViewObject.DiffuseColor ) # diffuse needs to happen last
+    
+    if not a2plib.getPerFaceTransparency():
+        # switch of perFaceTransparency
+        newObj.ViewObject.Transparency = 1
+        newObj.ViewObject.Transparency = 0 # default = nontransparent
+        
 
     newObj.Placement.Base = obj.Placement.Base
     newObj.Placement.Rotation = obj.Placement.Rotation
@@ -134,17 +140,6 @@ You must select a part to convert first.
                 msg
                 )
             return
-        elif len(selection) > 1:
-            msg = \
-'''
-One part at a time please.
-'''
-            QtGui.QMessageBox.information(
-                QtGui.QApplication.activeWindow(),
-                "Selection Error",
-                msg
-                )
-            return
         elif not selection[0].isDerivedFrom("Part::Feature"):    # change here if allowing groups
             msg = \
 '''
@@ -157,9 +152,27 @@ Please select a Part.
                 )
             return
 
-        doc.openTransaction("part converted to A2plus")
-        convertToImportedPart(doc, selection[0])
-        doc.commitTransaction()
+        elif len(selection) > 1:
+            for s in selection:
+                if not s.isDerivedFrom("Part::Feature"):    # change here if allowing groups
+                    msg = \
+'''
+Please select a Part.
+'''
+                    QtGui.QMessageBox.information(
+                        QtGui.QApplication.activeWindow(),
+                        "Selection Error",
+                        msg
+                        )
+                    return
+                else:
+                    doc.openTransaction("part converted to A2plus")
+                    convertToImportedPart(doc, s)
+                    doc.commitTransaction()
+        else:
+            doc.openTransaction("part converted to A2plus")
+            convertToImportedPart(doc, selection[0])
+            doc.commitTransaction()
 
     def IsActive(self):
         """Here you can define if the command must be active or not (greyed) if certain conditions

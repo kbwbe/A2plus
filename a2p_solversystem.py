@@ -294,17 +294,31 @@ class SolverSystem():
 
         f.write("graph TD\n")
         for rig in self.rigids:
+            rigLabel = a2plib.to_str(rig.label).replace(u' ',u'_')
             # No children, add current rogod as a leaf entry
             if len(rig.childRigids) == 0:
-                f.write("{}\n".format(rig.label))
+                message = u"{}\n".format(rigLabel)
+                if a2plib.PYVERSION < 3:
+                    f.write(a2plib.to_bytes(message))
+                else:
+                    f.write(message)
             else:
                 # Rigid have children, add them based on the dependency list
                 for d in rig.dependencies:
                     if d.dependedRigid in rig.childRigids:
+                        dependedRigLabel = a2plib.to_str(d.dependedRigid.label).replace(u' ',u'_')
                         if rig.fixed:
-                            f.write("{}({}<br>*FIXED*) -- {} --> {}\n".format(rig.label, rig.label, d.Type, d.dependedRigid.label))
+                            message = u"{}({}<br>*FIXED*) -- {} --> {}\n".format(rigLabel, rigLabel, d.Type, dependedRigLabel)
+                            if a2plib.PYVERSION < 3:
+                                f.write(a2plib.to_bytes(message))
+                            else:
+                                f.write(message)
                         else:
-                            f.write("{} -- {} --> {}\n".format(rig.label, d.Type, d.dependedRigid.label))
+                            message = u"{} -- {} --> {}\n".format(rigLabel, d.Type, dependedRigLabel)
+                            if a2plib.PYVERSION < 3:
+                                f.write(a2plib.to_bytes(message))
+                            else:
+                                f.write(message)
 
         f.write("</div>\n")
         f.write('    <script src="https://unpkg.com/mermaid@7.1.2/dist/mermaid.js"></script>\n')
