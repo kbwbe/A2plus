@@ -54,6 +54,8 @@ from a2p_topomapper import (
     TopoMapper
     )
 
+import a2p_lcs_support
+
 PYVERSION =  sys.version_info[0]
 
 class ObjectCache:
@@ -233,6 +235,27 @@ def importPartFromFile(_doc, filename, importToCache=False):
 
     if not importDocIsOpen:
         FreeCAD.closeDocument(importDoc.Name)
+
+
+    #=========================================
+    # create a group containing imported LCS's
+    lcsGroupObjectName = 'LCS_' + partName
+    lcsGroupLabel = 'LCS_' + newObj.Label
+    
+    if PYVERSION < 3:
+        lcsGroup = doc.addObject( "Part::FeaturePython", lcsGroupObjectName.encode('utf-8') )
+    else:
+        lcsGroup = doc.addObject( "Part::FeaturePython", str(lcsGroupObjectName.encode('utf-8')) )    # works on Python 3.6.5
+    lcsGroup.Label = lcsGroupLabel
+
+    proxy = a2p_lcs_support.LCS_Group(lcsGroup)
+    vp_proxy = a2p_lcs_support.VP_LCS_Group(lcsGroup.ViewObject)
+    
+    newObj.addProperty("App::PropertyLinkList","lcsLink","importPart").lcsLink = lcsGroup
+    newObj.Label = newObj.Label # this is needed to trigger an update
+    lcsGroup.Label = lcsGroup.Label
+
+    #=========================================
 
     return newObj
 

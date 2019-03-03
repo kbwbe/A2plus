@@ -34,8 +34,13 @@ from PySide import QtGui
 
 
 class Proxy_muxAssemblyObj:
-    def execute(self, shape):
-        pass
+    def execute(self, obj):
+        if hasattr(obj,"lcsLink"):
+            if len(obj.lcsLink) > 0:
+                lcsGroup = obj.lcsLink[0]
+                lcsGroup.Placement = obj.Placement
+                lcsGroup.purgeTouched()
+                
 
 def createTopoInfo(obj): # used during converting an object to a2p object
     muxInfo = []
