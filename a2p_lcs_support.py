@@ -42,3 +42,16 @@ class VP_LCS_Group(object):
         return None
 
 
+def getListOfLCS(targetDoc,sourceDoc):
+    lcsOut = []
+    for sourceOb in sourceDoc.Objects:
+        if (
+                sourceOb.Name.startswith("Local_CS") or
+                sourceOb.Name.startswith("App__Placement") or
+                sourceOb.Name.startswith("PartDesign__CoordinateSystem")
+                ):
+            newLCS = targetDoc.addObject("PartDesign::CoordinateSystem","LCS")
+            pl = sourceOb.getGlobalPlacement()
+            newLCS.Placement = pl
+            lcsOut.append(newLCS)
+    return lcsOut

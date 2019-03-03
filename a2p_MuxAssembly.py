@@ -35,11 +35,13 @@ from PySide import QtGui
 
 class Proxy_muxAssemblyObj:
     def execute(self, obj):
+        # if a group containing LCS's exists, then move it
+        # according to the imported part
         if hasattr(obj,"lcsLink"):
             if len(obj.lcsLink) > 0:
                 lcsGroup = obj.lcsLink[0]
                 lcsGroup.Placement = obj.Placement
-                lcsGroup.purgeTouched()
+                lcsGroup.purgeTouched() #untouch the lcsGroup, otherwise it stays touched.
                 
 
 def createTopoInfo(obj): # used during converting an object to a2p object

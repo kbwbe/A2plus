@@ -233,14 +233,21 @@ def importPartFromFile(_doc, filename, importToCache=False):
             newObj.ViewObject.Transparency = 1
             newObj.ViewObject.Transparency = 0 # import assembly first time as non transparent.
 
+
+    lcsList = a2p_lcs_support.getListOfLCS(doc,importDoc)
+    
+
     if not importDocIsOpen:
         FreeCAD.closeDocument(importDoc.Name)
 
 
     #=========================================
     # create a group containing imported LCS's
-    lcsGroupObjectName = 'LCS_' + partName
-    lcsGroupLabel = 'LCS_' + newObj.Label
+    #lcsGroupObjectName = 'LCS_' + partName
+    #lcsGroupLabel = 'LCS_' + newObj.Label
+    
+    lcsGroupObjectName = 'LCS_Collection'
+    lcsGroupLabel = 'LCS_Collection'
     
     if PYVERSION < 3:
         lcsGroup = doc.addObject( "Part::FeaturePython", lcsGroupObjectName.encode('utf-8') )
@@ -250,6 +257,9 @@ def importPartFromFile(_doc, filename, importToCache=False):
 
     proxy = a2p_lcs_support.LCS_Group(lcsGroup)
     vp_proxy = a2p_lcs_support.VP_LCS_Group(lcsGroup.ViewObject)
+    
+    for lcs in lcsList:
+        lcsGroup.addObject(lcs)
     
     newObj.addProperty("App::PropertyLinkList","lcsLink","importPart").lcsLink = lcsGroup
     newObj.Label = newObj.Label # this is needed to trigger an update
