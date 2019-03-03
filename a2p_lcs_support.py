@@ -48,9 +48,10 @@ def getListOfLCS(targetDoc,sourceDoc):
         if (
                 sourceOb.Name.startswith("Local_CS") or
                 sourceOb.Name.startswith("App__Placement") or
+                sourceOb.Name.startswith("a2pLCS") or
                 sourceOb.Name.startswith("PartDesign__CoordinateSystem")
                 ):
-            newLCS = targetDoc.addObject("PartDesign::CoordinateSystem","LCS")
+            newLCS = targetDoc.addObject("PartDesign::CoordinateSystem","a2pLCS")
             pl = sourceOb.getGlobalPlacement()
             newLCS.Placement = pl
             lcsOut.append(newLCS)
