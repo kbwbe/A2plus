@@ -243,9 +243,6 @@ def importPartFromFile(_doc, filename, importToCache=False):
 
     #=========================================
     # create a group containing imported LCS's
-    #lcsGroupObjectName = 'LCS_' + partName
-    #lcsGroupLabel = 'LCS_' + newObj.Label
-    
     lcsGroupObjectName = 'LCS_Collection'
     lcsGroupLabel = 'LCS_Collection'
     
@@ -260,6 +257,8 @@ def importPartFromFile(_doc, filename, importToCache=False):
     
     for lcs in lcsList:
         lcsGroup.addObject(lcs)
+    
+    lcsGroup.Owner = newObj.Name
     
     newObj.addProperty("App::PropertyLinkList","lcsLink","importPart").lcsLink = lcsGroup
     newObj.Label = newObj.Label # this is needed to trigger an update

@@ -20,13 +20,32 @@
 #*                                                                         *
 #***************************************************************************
 
+import FreeCAD
+import FreeCADGui
 
 
+#==============================================================================
+def LCS_Group_deleteContent(_self,doc):
+    '''
+    LCS_Group featurepython extending function deleteContent
+    '''
+    if len(_self.Group) > 0:
+        deleteList = []
+        deleteList.extend(_self.Group)
+        _self.Group = []
+        for ob in deleteList:
+            doc.removeObject(ob.Name) # delete the imported LCS'
+
+#==============================================================================
 class LCS_Group(object):
-    def __init__(self, selfobj):
-        selfobj.addExtension('App::GeoFeatureGroupExtensionPython', self)
-        selfobj.setEditorMode('Placement', 1)  #read-only
+    def __init__(self, obInstance):
+        obInstance.addExtension('App::GeoFeatureGroupExtensionPython', self)
+        obInstance.addProperty("App::PropertyString","Owner").Owner = ''
+        obInstance.setEditorMode('Owner', 1)
+        obInstance.setEditorMode('Placement', 1)  #read-only # KBWBE: does not work...
+        obInstance.deleteContent = LCS_Group_deleteContent # add a function to this featurepython class
         
+#==============================================================================
 class VP_LCS_Group(object):
     def __init__(self,vobj):
         vobj.addExtension('Gui::ViewProviderGeoFeatureGroupExtensionPython', self)
@@ -36,13 +55,27 @@ class VP_LCS_Group(object):
         self.ViewObject = vobj
         self.Object = vobj.Object
 
+    def onDelete(self, viewObject, subelements): # subelements is a tuple of strings
+        if FreeCAD.activeDocument() != viewObject.Object.Document:
+            return False # only delete objects in the active Document anytime !!
+        obj = viewObject.Object
+        doc = obj.Document
+        try:
+            if obj.Owner != '':
+                owner = doc.getObject(obj.Owner)
+                owner.lcsLink = [] # delete link entry within owning A2p part.
+        except:
+            pass
+        obj.deleteContent(doc) # Clean up this group complete with all content
+        return True
+
     def __getstate__(self):
         return None
 
     def __setstate__(self,state):
         return None
 
-
+#==============================================================================
 def getListOfLCS(targetDoc,sourceDoc):
     lcsOut = []
     for sourceOb in sourceDoc.Objects:
@@ -55,6 +88,6 @@ def getListOfLCS(targetDoc,sourceDoc):
             newLCS = targetDoc.addObject("PartDesign::CoordinateSystem","a2pLCS")
             pl = sourceOb.getGlobalPlacement()
             newLCS.Placement = pl
-            newLCS.setEditorMode('Placement', 1)  #read-only
+            newLCS.setEditorMode('Placement', 1)  #read-only # KBWBE: does not work...
             lcsOut.append(newLCS)
     return lcsOut
