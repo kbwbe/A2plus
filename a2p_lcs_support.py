@@ -24,7 +24,8 @@
 
 class LCS_Group(object):
     def __init__(self, selfobj):
-        selfobj.addExtension('App::GeoFeatureGroupExtensionPython', self)     
+        selfobj.addExtension('App::GeoFeatureGroupExtensionPython', self)
+        selfobj.setEditorMode('Placement', 1)  #read-only
         
 class VP_LCS_Group(object):
     def __init__(self,vobj):
@@ -54,5 +55,6 @@ def getListOfLCS(targetDoc,sourceDoc):
             newLCS = targetDoc.addObject("PartDesign::CoordinateSystem","a2pLCS")
             pl = sourceOb.getGlobalPlacement()
             newLCS.Placement = pl
+            newLCS.setEditorMode('Placement', 1)  #read-only
             lcsOut.append(newLCS)
     return lcsOut
