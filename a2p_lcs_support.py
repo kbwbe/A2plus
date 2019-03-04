@@ -47,7 +47,10 @@ class LCS_Group(object):
         
     def execute(self, obj):
         pass
-        
+    
+    def onChanged(self, obj, prop):
+        pass
+            
 #==============================================================================
 class VP_LCS_Group(object):
     def __init__(self,vobj):
@@ -57,6 +60,10 @@ class VP_LCS_Group(object):
     def attach(self, vobj):
         self.ViewObject = vobj
         self.Object = vobj.Object
+        
+        # restore lost functions to featurePython object during reload
+        if not hasattr(self.Object,'deleteContent'):
+            self.Object.deleteContent = LCS_Group_deleteContent
 
     def onDelete(self, viewObject, subelements): # subelements is a tuple of strings
         if FreeCAD.activeDocument() != viewObject.Object.Document:
