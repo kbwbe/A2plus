@@ -1283,6 +1283,30 @@ FreeCADGui.addCommand('a2p_absPath_to_relPath_Command', a2p_absPath_to_relPath_C
 
 
 
+class a2p_SaveAndExit_Command:
+    def Activated(self):
+        doc = FreeCAD.activeDocument()
+        doc.save()
+        FreeCAD.closeDocument(doc.Name)
+        #
+        mw = FreeCADGui.getMainWindow()
+        mdi = mw.findChild(QtGui.QMdiArea)
+        sub = mdi.activeSubWindow()
+        if sub != None:
+            sub.showMaximized()
+            
+    def IsActive(self):
+        return FreeCAD.activeDocument() != None
+            
+    def GetResources(self):
+        return {
+            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_Save_and_exit.svg',
+            'MenuText':     'Save and exit the active document',
+            'ToolTip':      'Save and exit the active document'
+            }
+FreeCADGui.addCommand('a2p_SaveAndExit_Command', a2p_SaveAndExit_Command())
+
+
 
 
 

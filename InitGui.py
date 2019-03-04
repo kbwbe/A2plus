@@ -137,6 +137,7 @@ to use {}.{}.{} or above.\n\n'''.format(
                 'a2p_duplicatePart',
                 'a2p_ConvertPart',
                 'a2p_editImportedPart',
+                'a2p_SaveAndExit_Command'
                 ]
         else:
             partCommands = [
