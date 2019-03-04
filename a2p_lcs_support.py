@@ -45,6 +45,9 @@ class LCS_Group(object):
         obInstance.setEditorMode('Placement', 1)  #read-only # KBWBE: does not work...
         obInstance.deleteContent = LCS_Group_deleteContent # add a function to this featurepython class
         
+    def execute(self, obj):
+        pass
+        
 #==============================================================================
 class VP_LCS_Group(object):
     def __init__(self,vobj):
@@ -68,6 +71,9 @@ class VP_LCS_Group(object):
             pass
         obj.deleteContent(doc) # Clean up this group complete with all content
         return True
+
+    def getIcon(self):
+        return ":/icons/a2p_LCS_group.svg"
 
     def __getstate__(self):
         return None
