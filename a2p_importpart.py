@@ -240,31 +240,31 @@ def importPartFromFile(_doc, filename, importToCache=False):
     if not importDocIsOpen:
         FreeCAD.closeDocument(importDoc.Name)
 
-
-    #=========================================
-    # create a group containing imported LCS's
-    lcsGroupObjectName = 'LCS_Collection'
-    lcsGroupLabel = 'LCS_Collection'
+    if len(lcsList) > 0:
+        #=========================================
+        # create a group containing imported LCS's
+        lcsGroupObjectName = 'LCS_Collection'
+        lcsGroupLabel = 'LCS_Collection'
+        
+        if PYVERSION < 3:
+            lcsGroup = doc.addObject( "Part::FeaturePython", lcsGroupObjectName.encode('utf-8') )
+        else:
+            lcsGroup = doc.addObject( "Part::FeaturePython", str(lcsGroupObjectName.encode('utf-8')) )    # works on Python 3.6.5
+        lcsGroup.Label = lcsGroupLabel
     
-    if PYVERSION < 3:
-        lcsGroup = doc.addObject( "Part::FeaturePython", lcsGroupObjectName.encode('utf-8') )
-    else:
-        lcsGroup = doc.addObject( "Part::FeaturePython", str(lcsGroupObjectName.encode('utf-8')) )    # works on Python 3.6.5
-    lcsGroup.Label = lcsGroupLabel
-
-    proxy = a2p_lcs_support.LCS_Group(lcsGroup)
-    vp_proxy = a2p_lcs_support.VP_LCS_Group(lcsGroup.ViewObject)
+        proxy = a2p_lcs_support.LCS_Group(lcsGroup)
+        vp_proxy = a2p_lcs_support.VP_LCS_Group(lcsGroup.ViewObject)
+        
+        for lcs in lcsList:
+            lcsGroup.addObject(lcs)
+        
+        lcsGroup.Owner = newObj.Name
+        
+        newObj.addProperty("App::PropertyLinkList","lcsLink","importPart").lcsLink = lcsGroup
+        newObj.Label = newObj.Label # this is needed to trigger an update
+        lcsGroup.Label = lcsGroup.Label
     
-    for lcs in lcsList:
-        lcsGroup.addObject(lcs)
-    
-    lcsGroup.Owner = newObj.Name
-    
-    newObj.addProperty("App::PropertyLinkList","lcsLink","importPart").lcsLink = lcsGroup
-    newObj.Label = newObj.Label # this is needed to trigger an update
-    lcsGroup.Label = lcsGroup.Label
-
-    #=========================================
+        #=========================================
 
     return newObj
 
