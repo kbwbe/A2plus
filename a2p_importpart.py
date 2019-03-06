@@ -1247,6 +1247,38 @@ FreeCADGui.addCommand('a2p_Show_DOF_info_Command', a2p_Show_DOF_info_Command())
 
 
 
+tt = \
+'''
+Remove the DOF information labels
+from the 3D view, which were created
+by the detailed DOF info command.
+'''
+
+class a2p_Remove_DOF_Labels_Command:
+
+    def Activated(self):
+        doc = FreeCAD.activeDocument()
+        dofGroup = doc.getObject("dofLabels")
+        if dofGroup != None:
+            for lbl in dofGroup.Group:
+                doc.removeObject(lbl.Name)
+            doc.removeObject("dofLabels")
+
+    def IsActive(self):
+        doc = FreeCAD.activeDocument()
+        dofGroup = doc.getObject("dofLabels")
+        return dofGroup != None
+
+    def GetResources(self):
+        return {
+            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_Unlabel_DOFs.svg',
+            'MenuText':     'Remove DOF-labels from 3D view',
+            'ToolTip':      tt
+            }
+FreeCADGui.addCommand('a2p_Remove_DOF_Labels_Command', a2p_Remove_DOF_Labels_Command())
+
+
+
 class a2p_absPath_to_relPath_Command:
     def Activated(self):
         doc = FreeCAD.activeDocument()
