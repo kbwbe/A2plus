@@ -39,6 +39,9 @@ class ImportedPartViewProviderProxy:
                 for obj in self.Object.InList:
                     if a2plib.isA2pObject(obj):
                         children.append(obj)
+                if hasattr(self.Object,'lcsLink'):
+                    for obj in self.Object.lcsLink:
+                        children.append(obj)
                 return children
             except:
                 #FreeCAD has already deleted self.Object !!
@@ -60,6 +63,13 @@ class ImportedPartViewProviderProxy:
         if len(deleteList) > 0:
             for c in deleteList:
                 a2plib.removeConstraint(c) #also deletes the mirrors...
+                
+        if hasattr(obj,"lcsLink"):
+            if len(obj.lcsLink)>0:
+                lscGroup = doc.getObject(obj.lcsLink[0].Name)
+                lscGroup.deleteContent(doc)
+                doc.removeObject(lscGroup.Name)
+                
         return True # If False is returned the object won't be deleted
 
     def getIcon(self):

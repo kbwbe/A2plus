@@ -137,6 +137,7 @@ to use {}.{}.{} or above.\n\n'''.format(
                 'a2p_duplicatePart',
                 'a2p_ConvertPart',
                 'a2p_editImportedPart',
+                'a2p_SaveAndExit_Command'
                 ]
         else:
             partCommands = [
@@ -180,6 +181,7 @@ to use {}.{}.{} or above.\n\n'''.format(
             'a2p_ToggleAutoSolveCommand',
             'a2p_FlipConstraintDirectionCommand',
             'a2p_Show_DOF_info_Command',
+            'a2p_Remove_DOF_Labels_Command',
             'a2p_Show_Hierarchy_Command'
             #'a2p_TogglePartialProcessingCommand',
             ]

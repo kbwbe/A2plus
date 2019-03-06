@@ -197,11 +197,66 @@ class SolverSystem():
         self.status = "loaded"
         
     def DOF_info_to_console(self):
-        self.loadSystem( FreeCAD.activeDocument() )
+        doc = FreeCAD.activeDocument()
+
+        dofGroup = doc.getObject("dofLabels")
+        if dofGroup == None:
+            dofGroup=doc.addObject("App::DocumentObjectGroup", "dofLabels")
+        else:
+            for lbl in dofGroup.Group:
+                doc.removeObject(lbl.Name)
+            doc.removeObject("dofLabels")
+            dofGroup=doc.addObject("App::DocumentObjectGroup", "dofLabels")
+        
+        self.loadSystem( doc )
+        
+        #look for unconstrained objects and label them
+        solverObjectNames = []
+        for rig in self.rigids:
+            solverObjectNames.append(rig.objectName)
+        shapeObs = a2plib.filterShapeObs(doc.Objects)
+        for so in shapeObs:
+            if so.Name not in solverObjectNames:
+                ob = doc.getObject(so.Name)
+                bbCenter = ob.Shape.BoundBox.Center
+                dofLabel = doc.addObject("App::AnnotationLabel","dofLabel")
+                dofLabel.LabelText = "FREE"
+                dofLabel.BasePosition.x = bbCenter.x
+                dofLabel.BasePosition.y = bbCenter.y
+                dofLabel.BasePosition.z = bbCenter.z
+                #
+                dofLabel.ViewObject.BackgroundColor = a2plib.BLUE
+                dofLabel.ViewObject.TextColor = a2plib.WHITE
+                dofGroup.addObject(dofLabel)
+        
+        
         numdep = 0
         self.retrieveDOFInfo() #function only once used here at this place in whole program
         for rig in self.rigids:
-            rig.currentDOF()
+            dofCount = rig.currentDOF()
+            ob = doc.getObject(rig.objectName)
+            bbCenter = ob.Shape.BoundBox.Center
+            dofLabel = doc.addObject("App::AnnotationLabel","dofLabel")
+            if rig.fixed:
+                dofLabel.LabelText = "Fixed"
+            else:
+                dofLabel.LabelText = "DOFs: {}".format(dofCount)
+            dofLabel.BasePosition.x = bbCenter.x
+            dofLabel.BasePosition.y = bbCenter.y
+            dofLabel.BasePosition.z = bbCenter.z
+            
+            if rig.fixed:
+                dofLabel.ViewObject.BackgroundColor = a2plib.RED
+                dofLabel.ViewObject.TextColor = a2plib.BLACK
+            elif dofCount == 0:
+                dofLabel.ViewObject.BackgroundColor = a2plib.RED
+                dofLabel.ViewObject.TextColor = a2plib.BLACK
+            elif dofCount < 6:
+                dofLabel.ViewObject.BackgroundColor = a2plib.YELLOW
+                dofLabel.ViewObject.TextColor = a2plib.BLACK
+            dofGroup.addObject(dofLabel)
+            
+            
             rig.beautyDOFPrint()
             numdep+=rig.countDependencies()
         Msg( 'there are {} dependencies\n'.format(numdep/2))  
