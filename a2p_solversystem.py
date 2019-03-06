@@ -210,6 +210,24 @@ class SolverSystem():
         
         self.loadSystem( doc )
         
+        #look for unconstrained objects and label them
+        solverObjectNames = []
+        for rig in self.rigids:
+            solverObjectNames.append(rig.objectName)
+        shapeObs = a2plib.filterShapeObs(doc.Objects)
+        for so in shapeObs:
+            if so.Name not in solverObjectNames:
+                ob = doc.getObject(so.Name)
+                bbCenter = ob.Shape.BoundBox.Center
+                dofLabel = doc.addObject("App::AnnotationLabel","dofLabel")
+                dofLabel.LabelText = "FREE"
+                dofLabel.BasePosition.x = bbCenter.x
+                dofLabel.BasePosition.y = bbCenter.y
+                dofLabel.BasePosition.z = bbCenter.z
+                #
+                dofLabel.ViewObject.BackgroundColor = a2plib.BLUE
+                dofLabel.ViewObject.TextColor = a2plib.WHITE
+                dofGroup.addObject(dofLabel)
         
         
         numdep = 0
