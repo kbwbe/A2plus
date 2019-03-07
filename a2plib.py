@@ -63,6 +63,9 @@ wb_globals = {}
 RED = (1.0,0.0,0.0)
 GREEN = (0.0,1.0,0.0)
 BLUE = (0.0,0.0,1.0)
+YELLOW = (1.0,1.0,0.0)
+WHITE = (1.0,1.0,1.0)
+BLACK = (0.0,0.0,0.0)
 
 # DEFINE DEBUG LEVELS FOR CONSOLE OUTPUT
 A2P_DEBUG_NONE      = 0

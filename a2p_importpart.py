@@ -54,6 +54,8 @@ from a2p_topomapper import (
     TopoMapper
     )
 
+import a2p_lcs_support
+
 PYVERSION =  sys.version_info[0]
 
 class ObjectCache:
@@ -231,8 +233,38 @@ def importPartFromFile(_doc, filename, importToCache=False):
             newObj.ViewObject.Transparency = 1
             newObj.ViewObject.Transparency = 0 # import assembly first time as non transparent.
 
+
+    lcsList = a2p_lcs_support.getListOfLCS(doc,importDoc)
+    
+
     if not importDocIsOpen:
         FreeCAD.closeDocument(importDoc.Name)
+
+    if len(lcsList) > 0:
+        #=========================================
+        # create a group containing imported LCS's
+        lcsGroupObjectName = 'LCS_Collection'
+        lcsGroupLabel = 'LCS_Collection'
+        
+        if PYVERSION < 3:
+            lcsGroup = doc.addObject( "Part::FeaturePython", lcsGroupObjectName.encode('utf-8') )
+        else:
+            lcsGroup = doc.addObject( "Part::FeaturePython", str(lcsGroupObjectName.encode('utf-8')) )    # works on Python 3.6.5
+        lcsGroup.Label = lcsGroupLabel
+    
+        proxy = a2p_lcs_support.LCS_Group(lcsGroup)
+        vp_proxy = a2p_lcs_support.VP_LCS_Group(lcsGroup.ViewObject)
+        
+        for lcs in lcsList:
+            lcsGroup.addObject(lcs)
+        
+        lcsGroup.Owner = newObj.Name
+        
+        newObj.addProperty("App::PropertyLinkList","lcsLink","importPart").lcsLink = lcsGroup
+        newObj.Label = newObj.Label # this is needed to trigger an update
+        lcsGroup.Label = lcsGroup.Label
+    
+        #=========================================
 
     return newObj
 
@@ -1215,6 +1247,38 @@ FreeCADGui.addCommand('a2p_Show_DOF_info_Command', a2p_Show_DOF_info_Command())
 
 
 
+tt = \
+'''
+Remove the DOF information labels
+from the 3D view, which were created
+by the detailed DOF info command.
+'''
+
+class a2p_Remove_DOF_Labels_Command:
+
+    def Activated(self):
+        doc = FreeCAD.activeDocument()
+        dofGroup = doc.getObject("dofLabels")
+        if dofGroup != None:
+            for lbl in dofGroup.Group:
+                doc.removeObject(lbl.Name)
+            doc.removeObject("dofLabels")
+
+    def IsActive(self):
+        doc = FreeCAD.activeDocument()
+        dofGroup = doc.getObject("dofLabels")
+        return dofGroup != None
+
+    def GetResources(self):
+        return {
+            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_Unlabel_DOFs.svg',
+            'MenuText':     'Remove DOF-labels from 3D view',
+            'ToolTip':      tt
+            }
+FreeCADGui.addCommand('a2p_Remove_DOF_Labels_Command', a2p_Remove_DOF_Labels_Command())
+
+
+
 class a2p_absPath_to_relPath_Command:
     def Activated(self):
         doc = FreeCAD.activeDocument()
@@ -1249,6 +1313,30 @@ class a2p_absPath_to_relPath_Command:
 FreeCADGui.addCommand('a2p_absPath_to_relPath_Command', a2p_absPath_to_relPath_Command())
 
 
+
+
+class a2p_SaveAndExit_Command:
+    def Activated(self):
+        doc = FreeCAD.activeDocument()
+        doc.save()
+        FreeCAD.closeDocument(doc.Name)
+        #
+        mw = FreeCADGui.getMainWindow()
+        mdi = mw.findChild(QtGui.QMdiArea)
+        sub = mdi.activeSubWindow()
+        if sub != None:
+            sub.showMaximized()
+            
+    def IsActive(self):
+        return FreeCAD.activeDocument() != None
+            
+    def GetResources(self):
+        return {
+            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_Save_and_exit.svg',
+            'MenuText':     'Save and exit the active document',
+            'ToolTip':      'Save and exit the active document'
+            }
+FreeCADGui.addCommand('a2p_SaveAndExit_Command', a2p_SaveAndExit_Command())
 
 
 
