@@ -1318,7 +1318,10 @@ FreeCADGui.addCommand('a2p_absPath_to_relPath_Command', a2p_absPath_to_relPath_C
 class a2p_SaveAndExit_Command:
     def Activated(self):
         doc = FreeCAD.activeDocument()
-        doc.save()
+        try:
+            doc.save()
+        except:
+            FreeCADGui.SendMsgToActiveView("Save")            
         FreeCAD.closeDocument(doc.Name)
         #
         mw = FreeCADGui.getMainWindow()
