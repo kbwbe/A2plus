@@ -99,6 +99,7 @@ class SolverSystem():
         self.maxPosError = 0.0
         self.maxAxisError = 0.0
         self.maxSingleAxisError = 0.0
+        self.unmovedParts = []
 
     def clear(self):
         for r in self.rigids:
@@ -393,6 +394,16 @@ class SolverSystem():
             rig.prepareRestart()
         self.partialSolverCurrentStage = PARTIAL_SOLVE_STAGE1
 
+    def detectUnmovedParts(self):
+        doc = FreeCAD.activeDocument()
+        self.unmovedParts = []
+        for rig in self.rigids:
+            if rig.fixed: continue
+            if not rig.moved:
+                self.unmovedParts.append(
+                    doc.getObject(rig.objectName)
+                    )
+    
     def solveAccuracySteps(self,doc):
         self.level_of_accuracy=1
         self.mySOLVER_POS_ACCURACY = SOLVER_CONTROLDATA[self.level_of_accuracy][0]
@@ -404,6 +415,9 @@ class SolverSystem():
         self.assignParentship(doc)
         while True:
             systemSolved = self.calculateChain(doc)
+            if self.level_of_accuracy == 1:
+                self.detectUnmovedParts()   # do only once here. It can fail at higher accuracy levels
+                                            # where not a final solution is required.
             if systemSolved:
                 self.level_of_accuracy+=1
                 if self.level_of_accuracy > len(SOLVER_CONTROLDATA):
@@ -465,18 +479,9 @@ class SolverSystem():
         ignore them and they are not moved.
         This function detects this and signals it to the user.
         '''
-        doc = FreeCAD.activeDocument()
-        
-        unmovedParts = []
-        for rig in self.rigids:
-            if rig.fixed: continue
-            if not rig.moved:
-                unmovedParts.append(
-                    doc.getObject(rig.objectName)
-                    )
-        if len(unmovedParts) != 0:
+        if len(self.unmovedParts) != 0:
             FreeCADGui.Selection.clearSelection()
-            for obj in unmovedParts:
+            for obj in self.unmovedParts:
                 FreeCADGui.Selection.addSelection(obj)
             msg = '''    
 The highlighted parts where not moved. They are
@@ -554,6 +559,7 @@ to a fixed part!
             self.convergencyCounter += 1
             # First calculate all the movement vectors
             for w in workList:
+                w.moved = True
                 w.calcMoveData(doc, self)
                 if w.maxPosError > maxPosError:
                     maxPosError = w.maxPosError

@@ -395,7 +395,6 @@ class Rigid():
     def move(self,doc):
         if self.tempfixed or self.fixed: return
         #
-        self.moved = True
         #Linear moving of a rigid
         moveDist = Base.Vector(0,0,0)
         if self.moveVectorSum != None:
