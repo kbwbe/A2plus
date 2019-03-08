@@ -129,9 +129,9 @@ def doNotImportInvisibleShapes():
     preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
     return preferences.GetBool('doNotImportInvisibleShapes',True)
 #------------------------------------------------------------------------------
-def getPerFaceTransparency():
+def getPerPartTransparency():
     preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
-    return preferences.GetBool('usePerFaceTransparency',False)
+    return preferences.GetBool('usePerPartTransparency',False)
 #------------------------------------------------------------------------------
 def getRecalculateImportedParts():
     preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
@@ -747,39 +747,39 @@ def isA2pObject(obj):
         result = True
     return result
 #------------------------------------------------------------------------------
-def makeDiffuseElement(color,trans):
-    elem = (color[0],color[1],color[2],trans/100.0)
+def makeDiffuseElement(color,transparency):
+    elem = (color[0],color[1],color[2],transparency/100.0)
     return elem
 #------------------------------------------------------------------------------
 def copyObjectColors(ob1,ob2):
     '''
-    copies colors from ob2 to ob1
+    copies colors from ob1 to ob2 (source,target)
     Transparency of updated object is not touched until
-    user activates perFaceTransparency within preferences.
+    user activates perPartTransparency within preferences.
     '''
     if ob1.updateColors != True:
         ob1.ViewObject.DiffuseColor = [ob1.ViewObject.ShapeColor] # set syncron
         return
     
     # obj1.updateColors == True from now
-    newDiffuseColor = copy.copy(ob2.ViewObject.DiffuseColor)
-    ob1.ViewObject.ShapeColor = ob2.ViewObject.ShapeColor
-    ob1.ViewObject.DiffuseColor = newDiffuseColor # set diffuse last
+    newDiffuseColor = copy.copy(ob1.ViewObject.DiffuseColor)
+    ob2.ViewObject.ShapeColor = ob1.ViewObject.ShapeColor
+    ob2.ViewObject.DiffuseColor = newDiffuseColor # set diffuse last
 
-    if not getPerFaceTransparency():
+    if not getPerPartTransparency():
         # touch transparency one to trigger update of 3D View
         # per face transparency probably gets lost
         if ob1.ViewObject.Transparency > 0:
             t = ob1.ViewObject.Transparency
-            ob1.ViewObject.Transparency = 0
-            ob1.ViewObject.Transparency = t
+            ob2.ViewObject.Transparency = 0
+            ob2.ViewObject.Transparency = t
         else:
-            ob1.ViewObject.Transparency = 1
-            ob1.ViewObject.Transparency = 0
+            ob2.ViewObject.Transparency = 1
+            ob2.ViewObject.Transparency = 0
 
     # select/unselect object once to trigger update of 3D View
-    FreeCADGui.Selection.addSelection(ob1)
-    FreeCADGui.Selection.removeSelection(ob1)
+    FreeCADGui.Selection.addSelection(ob2)
+    FreeCADGui.Selection.removeSelection(ob2)
 #------------------------------------------------------------------------------
 def isConstrainedPart(doc,obj):
     if not isA2pPart(obj): return False

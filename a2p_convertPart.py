@@ -76,7 +76,7 @@ def convertToImportedPart(doc, obj):
     newObj.ViewObject.ShapeColor = obj.ViewObject.ShapeColor
     newObj.ViewObject.DiffuseColor = copy.copy( obj.ViewObject.DiffuseColor ) # diffuse needs to happen last
     
-    if not a2plib.getPerFaceTransparency():
+    if not a2plib.getPerPartTransparency():
         # switch of perFaceTransparency
         newObj.ViewObject.Transparency = 1
         newObj.ViewObject.Transparency = 0 # default = nontransparent

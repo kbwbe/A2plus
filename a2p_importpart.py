@@ -228,8 +228,9 @@ def importPartFromFile(_doc, filename, importToCache=False):
     if importToCache: # this import is used to update already imported parts
         objectCache.add(filename, newObj)
     else: # this is a first time import of a part
-        if not a2plib.getPerFaceTransparency():
-            # turn of perFaceTransparency by accessing ViewObject.Transparency and set to zero (non transparent)
+        if not a2plib.getPerPartTransparency():
+            # turn of perPartTransparency by accessing ViewObject.Transparency and set to zero (non transparent)
+#              Mmmmh? "turn of"?! turn on, off, around, refresh or override would be more meaningful - MK.
             newObj.ViewObject.Transparency = 1
             newObj.ViewObject.Transparency = 0 # import assembly first time as non transparent.
 
@@ -422,7 +423,7 @@ def updateImportedParts(doc):
                     savedPlacement  = obj.Placement
                     obj.Shape = newObject.Shape.copy()
                     obj.Placement = savedPlacement # restore the old placement
-                    a2plib.copyObjectColors(obj,newObject)
+                    a2plib.copyObjectColors(newObject,obj)    # order is: source,target !!! MK.
 
 
     mw = FreeCADGui.getMainWindow()

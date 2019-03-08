@@ -136,10 +136,10 @@ will be updated according to the &quot;mux Info&quot; topology.</string>
 from imported parts</string>
        </property>
        <property name="text">
-        <string>Inherit per face transparency from parts and subassemblies (experimental)</string>
+        <string>Inherit transparency from parts/subassemblies (override with updateColors=false)</string>
        </property>
        <property name="prefEntry" stdset="0">
-        <cstring>usePerFaceTransparency</cstring>
+        <cstring>usePerPartTransparency</cstring>
        </property>
        <property name="prefPath" stdset="0">
         <cstring>Mod/A2plus</cstring>
