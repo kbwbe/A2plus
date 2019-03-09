@@ -42,7 +42,7 @@ class Proxy_muxAssemblyObj:
                 lcsGroup = obj.lcsLink[0]
                 lcsGroup.Placement = obj.Placement
                 lcsGroup.purgeTouched() #untouch the lcsGroup, otherwise it stays touched.
-                
+
 
 def createTopoInfo(obj): # used during converting an object to a2p object
     muxInfo = []
@@ -74,7 +74,7 @@ def makePlacedShape(obj):
 def muxAssemblyWithTopoNames(doc):
     '''
     Mux an a2p assenbly
-    
+
     combines all the a2p objects in the doc into one shape
     and populates muxinfo with a description of an edge or face.
     these descriptions are used later to retrieve the edges or faces...
@@ -88,12 +88,12 @@ def muxAssemblyWithTopoNames(doc):
                        and hasattr(obj,'Shape') and len(obj.Shape.Faces) > 0
                        and hasattr(obj,'muxInfo')
                        ]
-    
+
     transparency = 0
     shape_list = []
     for obj in visibleObjects:
         #
-        extendNames = False 
+        extendNames = False
         if a2plib.getUseTopoNaming() and len(obj.muxInfo) > 0: # Subelement-Strings existieren schon...
             extendNames = True
             #
@@ -121,7 +121,7 @@ def muxAssemblyWithTopoNames(doc):
                 else:
                     newName = "".join(('E;',str(i+1),';',obj.Name,';'))
                     muxInfo.append(newName)
-        
+
         # Save Computing time, store this before the for..enumerate loop later...
         needDiffuseColorExtension = ( len(obj.ViewObject.DiffuseColor) < len(obj.Shape.Faces) )
         shapeCol = obj.ViewObject.ShapeColor
@@ -143,7 +143,7 @@ def muxAssemblyWithTopoNames(doc):
                     muxInfo.append(newName)
             if needDiffuseColorExtension:
                 faceColors.append(diffuseElement)
-                    
+
         if not needDiffuseColorExtension:
             faceColors.extend(diffuseCol)
 
@@ -165,9 +165,9 @@ def muxAssemblyWithTopoNames(doc):
     except:
         # keeping a shell if solid is failing
         solid = shell
-    
-    # transparency coud change to different values depending
-    # of order of imported objects
+
+    # transparency could change to different values depending
+    # on the order of imported objects
     # now set it to a default value
     # faceColors still contains the per face transparency values
     transparency = 0

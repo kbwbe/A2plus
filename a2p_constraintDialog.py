@@ -42,12 +42,12 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
     Deleted = QtCore.Signal()
     Accepted = QtCore.Signal()
 
-    
+
     def __init__(self,parent,constraintObject, mode):
         super(a2p_ConstraintValueWidget,self).__init__(parent=parent)
         self.mode = mode # either "editConstraint" or "createConstraint"
         self.constraintObject = constraintObject # The documentObject of a constraint!
-        
+
         self.savedOffset = None
         self.savedDirectionConstraint = None
         self.savedAngle = None
@@ -60,7 +60,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             self.savedAngle = self.constraintObject.angle
         if hasattr(self.constraintObject,'lockRotation'):
             self.savedLockRotation = self.constraintObject.lockRotation
-        
+
         self.winModified = False
         self.lineNo = 0
         self.neededHight = 0
@@ -72,24 +72,24 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         self.setMinimumHeight(100)
         self.setWindowTitle('Constraint properties')
         self.mainLayout = QtGui.QGridLayout() # a VBoxLayout for the whole form
-        
+
         #==============================
         lbl1 = QtGui.QLabel(self)
         lbl1.setText(self.constraintObject.Label)
         lbl1.setFrameStyle(
-            QtGui.QFrame.Panel | 
+            QtGui.QFrame.Panel |
             QtGui.QFrame.Sunken
             )
         self.mainLayout.addWidget(lbl1,self.lineNo,0,1,4)
         self.lineNo += 1
-        
+
         #==============================
-        if hasattr(self.constraintObject,"directionConstraint"):   
+        if hasattr(self.constraintObject,"directionConstraint"):
             lbl3 = QtGui.QLabel(self)
             lbl3.setText("Direction")
             lbl3.setFixedHeight(32)
             self.mainLayout.addWidget(lbl3,self.lineNo,0)
-            
+
             self.directionCombo = QtGui.QComboBox(self)
             self.directionCombo.insertItem(0,"aligned")
             self.directionCombo.insertItem(1,"opposed")
@@ -107,26 +107,26 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
                 self.directionCombo.setCurrentIndex(2)
             #
             self.directionCombo.setFixedHeight(32)
-            self.directionCombo.currentIndexChanged[int].connect(self.flipDirection2)            
+            self.directionCombo.currentIndexChanged[int].connect(self.flipDirection2)
             self.mainLayout.addWidget(self.directionCombo,self.lineNo,1)
-            
+
             self.flipDirectionButton = QtGui.QPushButton(self)
             self.flipDirectionButton.setIcon(QtGui.QIcon(':/icons/a2p_FlipConstraint.svg'))
             self.flipDirectionButton.setText("Flip direction")
             self.flipDirectionButton.setFixedHeight(32)
             QtCore.QObject.connect(self.flipDirectionButton, QtCore.SIGNAL("clicked()"), self.flipDirection)
             self.mainLayout.addWidget(self.flipDirectionButton,self.lineNo,2)
-            
+
             self.lineNo += 1
-        
+
         #==============================
-        if hasattr(self.constraintObject,"offset"):   
-            offs = self.constraintObject.offset    
+        if hasattr(self.constraintObject,"offset"):
+            offs = self.constraintObject.offset
             lbl4 = QtGui.QLabel(self)
             lbl4.setText("Offset")
             lbl4.setFixedHeight(32)
             self.mainLayout.addWidget(lbl4,self.lineNo,0)
-            
+
             self.offsetEdit = QtGui.QLineEdit(self)
             self.offsetEdit.setText(FreeCAD.Units.Quantity(offs.Value, FreeCAD.Units.Length).UserString)
             self.offsetEdit.setFixedHeight(32)
@@ -137,36 +137,36 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             self.offsetSetZeroButton.setFixedHeight(32)
             QtCore.QObject.connect(self.offsetSetZeroButton, QtCore.SIGNAL("clicked()"), self.setOffsetZero)
             self.mainLayout.addWidget(self.offsetSetZeroButton,self.lineNo,2)
-            
+
             self.flipOffsetSignButton = QtGui.QPushButton(self)
             self.flipOffsetSignButton.setText("Flip sign")
             self.flipOffsetSignButton.setFixedHeight(32)
             QtCore.QObject.connect(self.flipOffsetSignButton, QtCore.SIGNAL("clicked()"), self.flipOffsetSign)
             self.mainLayout.addWidget(self.flipOffsetSignButton,self.lineNo,3)
-            
+
             self.lineNo += 1
-            
+
         #==============================
-        if hasattr(self.constraintObject,"angle"):   
-            angle = self.constraintObject.angle    
+        if hasattr(self.constraintObject,"angle"):
+            angle = self.constraintObject.angle
             lbl5 = QtGui.QLabel(self)
             lbl5.setText("Angle")
             lbl5.setFixedHeight(32)
             self.mainLayout.addWidget(lbl5,self.lineNo,0)
-            
+
             self.angleEdit = QtGui.QLineEdit(self)
             self.angleEdit.setText("%0.6f" % angle.Value)
             self.angleEdit.setFixedHeight(32)
             self.mainLayout.addWidget(self.angleEdit,self.lineNo,1)
             self.lineNo += 1
-            
+
         #==============================
-        if hasattr(self.constraintObject,"lockRotation"):   
+        if hasattr(self.constraintObject,"lockRotation"):
             lbl6 = QtGui.QLabel(self)
             lbl6.setText("Lock Rotation")
             lbl6.setFixedHeight(32)
             self.mainLayout.addWidget(lbl6,self.lineNo,0)
-            
+
             self.lockRotationCombo = QtGui.QComboBox(self)
             self.lockRotationCombo.insertItem(0,"False")
             self.lockRotationCombo.insertItem(1,"True")
@@ -176,57 +176,57 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
                 self.lockRotationCombo.setCurrentIndex(0)
             self.lockRotationCombo.setFixedHeight(32)
             self.mainLayout.addWidget(self.lockRotationCombo,self.lineNo,1)
-            
+
             self.flipLockRotationButton = QtGui.QPushButton(self)
             self.flipLockRotationButton.setIcon(QtGui.QIcon(':/icons/a2p_LockRotation.svg'))
             self.flipLockRotationButton.setText("Toggle")
             self.flipLockRotationButton.setFixedHeight(32)
             QtCore.QObject.connect(self.flipLockRotationButton, QtCore.SIGNAL("clicked()"), self.flipLockRotation)
             self.mainLayout.addWidget(self.flipLockRotationButton,self.lineNo,2)
-            
+
             self.lineNo += 1
-        
+
         #==============================
-        
+
         self.buttonPanel = QtGui.QWidget(self)
         self.buttonPanelLayout = QtGui.QHBoxLayout()
-        
+
         self.deleteButton = QtGui.QPushButton(self.buttonPanel)
         self.deleteButton.setFixedHeight(32)
         self.deleteButton.setIcon(QtGui.QIcon(':/icons/a2p_DeleteConnections.svg')) #need new Icon
         self.deleteButton.setToolTip("Delete this constraint")
         self.deleteButton.setText("Delete this constraint")
-        
+
         self.solveButton = QtGui.QPushButton(self.buttonPanel)
         self.solveButton.setFixedHeight(32)
         self.solveButton.setIcon(QtGui.QIcon(':/icons/a2p_Solver.svg'))
         self.solveButton.setToolTip("Solve constraints")
         self.solveButton.setText("Solve")
-        
+
         self.acceptButton = QtGui.QPushButton(self.buttonPanel)
         self.acceptButton.setFixedHeight(32)
         self.acceptButton.setIcon(QtGui.QIcon(':/icons/a2p_CheckAssembly.svg')) #need new Icon
         self.acceptButton.setToolTip("Solve constraints")
         self.acceptButton.setText("Accept")
         #self.acceptButton.setDefault(True)
-        
+
         self.buttonPanelLayout.addWidget(self.deleteButton)
         self.buttonPanelLayout.addWidget(self.solveButton)
         self.buttonPanelLayout.addWidget(self.acceptButton)
         self.buttonPanel.setLayout(self.buttonPanelLayout)
-        
+
         self.mainLayout.addWidget(self.buttonPanel,self.lineNo,0,1,4)
         self.lineNo += 1
 
         #==============================
         self.setLayout(self.mainLayout)
-        self.neededHight = (self.lineNo+1)*36 
+        self.neededHight = (self.lineNo+1)*36
         self.setFixedHeight(self.neededHight)
         QtCore.QObject.connect(self.deleteButton, QtCore.SIGNAL("clicked()"), self.delete)
         QtCore.QObject.connect(self.solveButton, QtCore.SIGNAL("clicked()"), self.solve)
         QtCore.QObject.connect(self.acceptButton, QtCore.SIGNAL("clicked()"), self.accept)
         #==============================
-        
+
     def setConstraintEditorData(self):
         if hasattr(self.constraintObject,"directionConstraint"):
             if self.directionCombo.currentIndex() == 0:
@@ -244,7 +244,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
                 self.constraintObject.lockRotation = False
             else:
                 self.constraintObject.lockRotation = True
-            
+
     def solve(self):
         doc = FreeCAD.activeDocument()
         if self.constraintObject not in doc.Objects:
@@ -256,27 +256,27 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             a2plib.setConstraintEditorRef(None)
             self.Deleted.emit()
             return
-        
+
         self.winModified = True
         self.setConstraintEditorData()
         doc = FreeCAD.activeDocument()
         if doc != None:
             solveConstraints(doc)
             doc.recompute()
-            
+
     def flipLockRotation(self):
         self.winModified = True
         if self.lockRotationCombo.currentIndex() == 0:
             self.lockRotationCombo.setCurrentIndex(1)
         else:
             self.lockRotationCombo.setCurrentIndex(0)
-    
+
     def setOffsetZero(self):
         self.winModified = True
         q = FreeCAD.Units.Quantity(self.offsetEdit.text())
         q.Value = 0.0
         self.offsetEdit.setText(q.UserString)
-    
+
     def flipOffsetSign(self):
         self.winModified = True
         q = FreeCAD.Units.Quantity(self.offsetEdit.text())
@@ -288,12 +288,12 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         else:
             q.Value = 0.0
             self.offsetEdit.setText(q.UserString)
-        
+
     def flipDirection2(self,idx):
         self.winModified = True
         if a2plib.getAutoSolveState():
             self.solve()
-            
+
     def flipDirection(self):
         self.winModified = True
         if self.directionCombo.currentIndex() == 0:
@@ -302,7 +302,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             self.directionCombo.setCurrentIndex(0)
         if a2plib.getAutoSolveState():
             self.solve()
-            
+
     def restoreConstraintValues(self):
         if self.savedOffset != None:
             self.constraintObject.offset = self.savedOffset
@@ -312,7 +312,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             self.constraintObject.angle = self.savedAngle
         if self.savedLockRotation != None:
             self.constraintObject.lockRotation = self.savedLockRotation
-            
+
     def delete(self):
         doc = FreeCAD.activeDocument()
         if self.constraintObject not in doc.Objects:
@@ -324,7 +324,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             a2plib.setConstraintEditorRef(None)
             self.Deleted.emit()
             return
-        
+
         flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
         response = QtGui.QMessageBox.information(
             QtGui.QApplication.activeWindow(),
@@ -339,13 +339,13 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
                 pass # perhaps constraint already deleted by user
             a2plib.setConstraintEditorRef(None)
             self.Deleted.emit()
-        
+
     def keyPressEvent(self,e):
         if e.key() == QtCore.Qt.Key_Enter:
             self.accept()
         if e.key() == QtCore.Qt.Key_Return:
             self.accept()
-        
+
     def accept(self):
         doc = FreeCAD.activeDocument()
         if self.constraintObject not in doc.Objects:
@@ -357,10 +357,10 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             a2plib.setConstraintEditorRef(None)
             self.Deleted.emit()
             return
-        
+
         self.setConstraintEditorData()
         self.Accepted.emit()
-        
+
     def cancelOperation(self):
         doc = FreeCAD.activeDocument()
         if self.constraintObject not in doc.Objects:
@@ -406,7 +406,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             else:
                 a2plib.setConstraintEditorRef(None)
                 self.Accepted.emit()
-        
+
 #==============================================================================
 toolTipText = \
 '''
@@ -427,13 +427,13 @@ class a2p_ConstraintCollection(QtGui.QWidget):
         self.activeConstraint = None
         self.position = None # Window position
         self.initUI()
-        
+
     def initUI(self):
         self.setWindowTitle('Constraint Tools')
         #self.setMinimumHeight(self.baseHeight)
         self.mainLayout = QtGui.QVBoxLayout() # a VBoxLayout for the whole form
-        
-        
+
+
         #-------------------------------------
         self.panel1 = QtGui.QWidget(self)
         self.panel1.setMinimumHeight(32)
@@ -478,7 +478,7 @@ class a2p_ConstraintCollection(QtGui.QWidget):
         panel1_Layout.addStretch(1)
         self.panel1.setLayout(panel1_Layout)
         #-------------------------------------
-        
+
 
         #-------------------------------------
         self.panel2 = QtGui.QWidget(self)
@@ -582,7 +582,7 @@ class a2p_ConstraintCollection(QtGui.QWidget):
         self.mainLayout.addWidget(self.panel3)
         self.mainLayout.addWidget(self.helpButton)
         self.mainLayout.addStretch(1)
-        self.setLayout(self.mainLayout)       
+        self.setLayout(self.mainLayout)
         #-------------------------------------
         for btn in self.constraintButtons:
             btn.setEnabled(False)
@@ -590,7 +590,7 @@ class a2p_ConstraintCollection(QtGui.QWidget):
         self.timer = QtCore.QTimer()
         QtCore.QObject.connect(self.timer, QtCore.SIGNAL("timeout()"), self.onTimer)
         self.timer.start(100)
-        
+
     def showConstraintCollectionHelp(self):
         msg = \
 '''
@@ -608,14 +608,14 @@ button.
             "Constraint tools help",
             msg
             )
-        
+
     def parseSelections(self):
         #constraint editor comannd is active, do not allow defining constraints
         if a2plib.getConstraintEditorRef():
             for btn in self.constraintButtons:
                 btn.setEnabled(False)
             return
-        
+
         selection = FreeCADGui.Selection.getSelectionEx()
         if len(selection) != 2:
             for btn in self.constraintButtons:
@@ -678,15 +678,15 @@ button.
         QtCore.QObject.connect(self.constraintValueBox, QtCore.SIGNAL("Deleted()"), self.onDeleteConstraint)
         QtCore.QObject.connect(self.constraintValueBox, QtCore.SIGNAL("Accepted()"), self.onAcceptConstraint)
         a2plib.setConstraintEditorRef(self)
-        
-    @QtCore.Slot()    
+
+    @QtCore.Slot()
     def onAcceptConstraint(self):
         #self.constraintValueBox.deleteLater()
         a2plib.setConstraintEditorRef(None)
         self.activeConstraint = None
         FreeCADGui.Selection.clearSelection()
 
-    @QtCore.Slot()    
+    @QtCore.Slot()
     def onDeleteConstraint(self):
         #self.constraintValueBox.deleteLater()
         a2plib.setConstraintEditorRef(None)
@@ -697,7 +697,7 @@ button.
         selection = FreeCADGui.Selection.getSelectionEx()
         self.activeConstraint = a2p_constraints.PointIdentityConstraint(selection)
         self.manageConstraint()
-        
+
     def onPointOnLineButton(self):
         selection = FreeCADGui.Selection.getSelectionEx()
         self.activeConstraint = a2p_constraints.PointOnLineConstraint(selection)
@@ -707,7 +707,7 @@ button.
         selection = FreeCADGui.Selection.getSelectionEx()
         self.activeConstraint = a2p_constraints.PointOnPlaneConstraint(selection)
         self.manageConstraint()
-        
+
     def onCircularEdgeButton(self):
         selection = FreeCADGui.Selection.getSelectionEx()
         self.activeConstraint = a2p_constraints.CircularEdgeConstraint(selection)
@@ -752,35 +752,35 @@ button.
         selection = FreeCADGui.Selection.getSelectionEx()
         self.activeConstraint = a2p_constraints.SphericalConstraint(selection)
         self.manageConstraint()
-        
+
 #==============================================================================
 def getMoveDistToStoredPosition(widg):
-    if CONSTRAINT_DIALOG_STORED_POSITION == QtCore.QPoint(-1,-1): 
+    if CONSTRAINT_DIALOG_STORED_POSITION == QtCore.QPoint(-1,-1):
         mw = FreeCADGui.getMainWindow()
         fcFrame = QtGui.QDesktopWidget.geometry(mw)
         x = fcFrame.x()
         y = fcFrame.y()
         width = fcFrame.width()
         height = fcFrame.height()
-        
+
         centerX = x + width/2
         centerY = y + height/2
         fcCenter = QtCore.QPoint(centerX,centerY)
-    
+
         return fcCenter- widg.rect().center()
     else:
         widgetFrame = widg.frameGeometry()
         x = widgetFrame.x()
         y = widgetFrame.y()
         widgetCorner = QtCore.QPoint(x,y)
-        
+
         return CONSTRAINT_DIALOG_STORED_POSITION - widgetCorner
 #==============================================================================
 class a2p_ConstraintValuePanel(QtGui.QDockWidget):
-    
+
     Deleted = QtCore.Signal()
     Accepted = QtCore.Signal()
-    
+
     def __init__(self,constraintObject, mode):
         super(a2p_ConstraintValuePanel,self).__init__()
         self.constraintObject = constraintObject
@@ -795,15 +795,15 @@ class a2p_ConstraintValuePanel(QtGui.QDockWidget):
         self.setWindowTitle("Constraint Properties")
         QtCore.QObject.connect(self.cvw, QtCore.SIGNAL("Accepted()"), self.onAcceptConstraint)
         QtCore.QObject.connect(self.cvw, QtCore.SIGNAL("Deleted()"), self.onDeleteConstraint)
-        
-        mw = FreeCADGui.getMainWindow() 
+
+        mw = FreeCADGui.getMainWindow()
         mw.addDockWidget(QtCore.Qt.RightDockWidgetArea,self)
 
         self.setFloating(True)
         self.activateWindow()
         self.setAllowedAreas(QtCore.Qt.NoDockWidgetArea)
         self.move(getMoveDistToStoredPosition(self))
-              
+
         a2plib.setConstraintEditorRef(self)
         if mode == 'createConstraint':
             if a2plib.getAutoSolveState():
@@ -811,7 +811,7 @@ class a2p_ConstraintValuePanel(QtGui.QDockWidget):
                 if doc != None:
                     solveConstraints(doc)
         self.cvw.activateWindow()
-        
+
     def storeWindowPosition(self):
         # ConstraintDialog has Priority on storing its position
         if a2plib.getConstraintDialogRef() != None:
@@ -819,16 +819,16 @@ class a2p_ConstraintValuePanel(QtGui.QDockWidget):
         frame = QtGui.QDockWidget.frameGeometry(self)
         x = frame.x()
         y = frame.y()
-        
+
         global CONSTRAINT_DIALOG_STORED_POSITION
         CONSTRAINT_DIALOG_STORED_POSITION = QtCore.QPoint(x,y)
-        
+
     def onAcceptConstraint(self):
         self.storeWindowPosition()
         self.Accepted.emit()
         a2plib.setConstraintEditorRef(None)
         self.deleteLater()
-        
+
     def onDeleteConstraint(self):
         self.storeWindowPosition()
         self.Deleted.emit()
@@ -848,7 +848,7 @@ class a2p_ConstraintPanel(QtGui.QDockWidget):
         self.setWidget(cc)
         self.setWindowTitle("Constraint Tools")
         #
-        mw = FreeCADGui.getMainWindow() 
+        mw = FreeCADGui.getMainWindow()
         mw.addDockWidget(QtCore.Qt.RightDockWidgetArea,self)
         #
         self.setFloating(True)
@@ -861,7 +861,7 @@ class a2p_ConstraintPanel(QtGui.QDockWidget):
         self.timer = QtCore.QTimer()
         QtCore.QObject.connect(self.timer, QtCore.SIGNAL("timeout()"), self.onTimer)
         self.timer.start(100)
-        
+
     def onTimer(self):
         if a2plib.getConstraintEditorRef(): # != None
             # the editor box is active, do not show self
@@ -875,17 +875,17 @@ class a2p_ConstraintPanel(QtGui.QDockWidget):
             frame = QtGui.QDockWidget.frameGeometry(self)
             x = frame.x()
             y = frame.y()
-            
+
             global CONSTRAINT_DIALOG_STORED_POSITION
             CONSTRAINT_DIALOG_STORED_POSITION = QtCore.QPoint(x,y)
-            
+
         self.timer.start(100)
-        
+
     def closeEvent(self,event):
         a2plib.setConstraintDialogRef(None)
         self.deleteLater()
         event.accept()
-        
+
 #==============================================================================
 toolTipText = \
 '''
@@ -894,11 +894,11 @@ define constraints
 '''
 
 class a2p_ConstraintDialogCommand:
-    
+
     def Activated(self):
-        if a2plib.getConstraintDialogRef(): return #Dialog alread active...
+        if a2plib.getConstraintDialogRef(): return #Dialog already active...
         p = a2p_ConstraintPanel()
-        
+
     def IsActive(self):
         if a2plib.getConstraintEditorRef(): return False
         if a2plib.getConstraintDialogRef(): return False
@@ -922,7 +922,7 @@ treeview and hit this button
 '''
 
 class a2p_EditConstraintCommand:
-    
+
     def Activated(self):
         self.selectedConstraint = a2plib.getSelectedConstraint()
         if self.selectedConstraint is None:
@@ -932,7 +932,7 @@ class a2p_EditConstraintCommand:
                 "Please select exact one constraint first."
                 )
             return
-        
+
         self.constraintValueBox = a2p_ConstraintValuePanel(
             self.selectedConstraint,
             'editConstraint'
@@ -940,11 +940,11 @@ class a2p_EditConstraintCommand:
         QtCore.QObject.connect(self.constraintValueBox, QtCore.SIGNAL("Deleted()"), self.onDeleteConstraint)
         QtCore.QObject.connect(self.constraintValueBox, QtCore.SIGNAL("Accepted()"), self.onAcceptConstraint)
         a2plib.setConstraintEditorRef(self.constraintValueBox)
-        
+
     def IsActive(self):
         if a2plib.getConstraintEditorRef(): return False
         return True
-        
+
     def onAcceptConstraint(self):
         self.constraintValueBox.deleteLater()
         a2plib.setConstraintEditorRef(None)
