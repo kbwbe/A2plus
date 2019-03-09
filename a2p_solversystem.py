@@ -219,16 +219,17 @@ class SolverSystem():
         for so in shapeObs:
             if so.Name not in solverObjectNames:
                 ob = doc.getObject(so.Name)
-                bbCenter = ob.Shape.BoundBox.Center
-                dofLabel = doc.addObject("App::AnnotationLabel","dofLabel")
-                dofLabel.LabelText = "FREE"
-                dofLabel.BasePosition.x = bbCenter.x
-                dofLabel.BasePosition.y = bbCenter.y
-                dofLabel.BasePosition.z = bbCenter.z
-                #
-                dofLabel.ViewObject.BackgroundColor = a2plib.BLUE
-                dofLabel.ViewObject.TextColor = a2plib.WHITE
-                dofGroup.addObject(dofLabel)
+                if ob.ViewObject.Visibility == True:
+                    bbCenter = ob.Shape.BoundBox.Center
+                    dofLabel = doc.addObject("App::AnnotationLabel","dofLabel")
+                    dofLabel.LabelText = "FREE"
+                    dofLabel.BasePosition.x = bbCenter.x
+                    dofLabel.BasePosition.y = bbCenter.y
+                    dofLabel.BasePosition.z = bbCenter.z
+                    #
+                    dofLabel.ViewObject.BackgroundColor = a2plib.BLUE
+                    dofLabel.ViewObject.TextColor = a2plib.WHITE
+                    dofGroup.addObject(dofLabel)
         
         
         numdep = 0
@@ -236,26 +237,27 @@ class SolverSystem():
         for rig in self.rigids:
             dofCount = rig.currentDOF()
             ob = doc.getObject(rig.objectName)
-            bbCenter = ob.Shape.BoundBox.Center
-            dofLabel = doc.addObject("App::AnnotationLabel","dofLabel")
-            if rig.fixed:
-                dofLabel.LabelText = "Fixed"
-            else:
-                dofLabel.LabelText = "DOFs: {}".format(dofCount)
-            dofLabel.BasePosition.x = bbCenter.x
-            dofLabel.BasePosition.y = bbCenter.y
-            dofLabel.BasePosition.z = bbCenter.z
-            
-            if rig.fixed:
-                dofLabel.ViewObject.BackgroundColor = a2plib.RED
-                dofLabel.ViewObject.TextColor = a2plib.BLACK
-            elif dofCount == 0:
-                dofLabel.ViewObject.BackgroundColor = a2plib.RED
-                dofLabel.ViewObject.TextColor = a2plib.BLACK
-            elif dofCount < 6:
-                dofLabel.ViewObject.BackgroundColor = a2plib.YELLOW
-                dofLabel.ViewObject.TextColor = a2plib.BLACK
-            dofGroup.addObject(dofLabel)
+            if ob.ViewObject.Visibility == True:
+                bbCenter = ob.Shape.BoundBox.Center
+                dofLabel = doc.addObject("App::AnnotationLabel","dofLabel")
+                if rig.fixed:
+                    dofLabel.LabelText = "Fixed"
+                else:
+                    dofLabel.LabelText = "DOFs: {}".format(dofCount)
+                dofLabel.BasePosition.x = bbCenter.x
+                dofLabel.BasePosition.y = bbCenter.y
+                dofLabel.BasePosition.z = bbCenter.z
+                
+                if rig.fixed:
+                    dofLabel.ViewObject.BackgroundColor = a2plib.RED
+                    dofLabel.ViewObject.TextColor = a2plib.BLACK
+                elif dofCount == 0:
+                    dofLabel.ViewObject.BackgroundColor = a2plib.RED
+                    dofLabel.ViewObject.TextColor = a2plib.BLACK
+                elif dofCount < 6:
+                    dofLabel.ViewObject.BackgroundColor = a2plib.YELLOW
+                    dofLabel.ViewObject.TextColor = a2plib.BLACK
+                dofGroup.addObject(dofLabel)
             
             
             rig.beautyDOFPrint()
