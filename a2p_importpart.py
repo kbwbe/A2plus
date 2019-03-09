@@ -588,7 +588,7 @@ Edit an imported part.
 Select an imported part
 and hit this button.
 
-The appropiate FCStd file,
+The appropriate FCStd file,
 linked to this part will
 be opened and you can modify
 this part at this place.
