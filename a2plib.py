@@ -748,7 +748,7 @@ def copyObjectColors(ob1,ob2):
     ob2.ViewObject.ShapeColor = ob1.ViewObject.ShapeColor
     ob2.ViewObject.DiffuseColor = newDiffuseColor # set diffuse last
 
-    if not getPerPartTransparency():
+    if not getPerFaceTransparency():
         # touch transparency one to trigger update of 3D View
         # per face transparency probably gets lost
         if ob1.ViewObject.Transparency > 0:
