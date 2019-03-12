@@ -422,7 +422,7 @@ def updateImportedParts(doc):
                     savedPlacement  = obj.Placement
                     obj.Shape = newObject.Shape.copy()
                     obj.Placement = savedPlacement # restore the old placement
-                    a2plib.copyObjectColors(obj,newObject)
+                    a2plib.copyObjectColors(newObject,obj)    # order is: source,target  *MK.
 
 
     mw = FreeCADGui.getMainWindow()
