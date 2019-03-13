@@ -33,7 +33,7 @@ class BasicConstraint():
     Base class of all Constraints, only use inherited classes...
     '''
     def __init__(self,selection):
-        self.typeInfo = None # give the appropiate type string for A2plus solver
+        self.typeInfo = None # give the appropriate type string for A2plus solver
         self.constraintBaseName = None # <== give a base name here
         self.iconPath = None
         #

@@ -410,6 +410,27 @@ class TopoMapper(object):
             inList,dummy = self.treeNodes[objName]
             if len(inList) == 0:
                 self.topLevelShapes.append(objName)
+            else:
+                #-------------------------------------------
+                # search for missing non top-level clone-basefeatures
+                # Maybe a clone as basefeature of a body..
+                #-------------------------------------------
+                numBodies = 0
+                numClones = 0
+                invalidObjects = False
+                if len(inList) % 2 == 0: # pairs of Clone/Bodies
+                    for o in inList:
+                        if o.Name.startswith('Clone'):
+                            numClones += 1
+                        elif o.Name.startswith('Body'):
+                            numBodies += 1
+                        else:
+                            invalidObjects = True
+                            break
+                    if not invalidObjects:
+                        if numBodies == numClones:
+                            self.topLevelShapes.append(objName)
+        
         #-------------------------------------------
         # search for missing clone-basefeatures
         #-------------------------------------------
