@@ -26,7 +26,7 @@
 __title__ = 'A2plus assembly Workbench - InitGui file'
 __author__ = 'kbwbe'
 
-A2P_VERSION = 'V0.4.4'
+A2P_VERSION = 'V0.4.5'
 
 
 
@@ -137,7 +137,7 @@ to use {}.{}.{} or above.\n\n'''.format(
                 'a2p_duplicatePart',
                 'a2p_ConvertPart',
                 'a2p_editImportedPart',
-                'a2p_SaveAndExit_Command'
+                'a2p_SaveAndExit_Command',
                 ]
         else:
             partCommands = [
@@ -147,6 +147,7 @@ to use {}.{}.{} or above.\n\n'''.format(
                 'a2p_duplicatePart',
                 'a2p_ConvertPart',
                 'a2p_editImportedPart',
+                'a2p_SaveAndExit_Command',
                 ]
         
         if a2plib.SHOW_CONSTRAINTS_ON_TOOLBAR:
