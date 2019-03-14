@@ -1320,9 +1320,11 @@ class a2p_SaveAndExit_Command:
         doc = FreeCAD.activeDocument()
         try:
             doc.save()
+            FreeCAD.closeDocument(doc.Name)
         except:
-            FreeCADGui.SendMsgToActiveView("Save")            
-        FreeCAD.closeDocument(doc.Name)
+            FreeCADGui.SendMsgToActiveView("Save")
+            if not FreeCADGui.activeDocument().Modified: # user really saved the file           
+                FreeCAD.closeDocument(doc.Name)
         #
         mw = FreeCADGui.getMainWindow()
         mdi = mw.findChild(QtGui.QMdiArea)
