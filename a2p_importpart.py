@@ -385,7 +385,7 @@ def updateImportedParts(doc):
     doc.openTransaction("updateImportParts")    
     objectCache.cleanUp(doc)
     for obj in doc.Objects:
-        if hasattr(obj, 'sourceFile'):
+        if hasattr(obj, 'sourceFile') and a2plib.to_str(obj.sourceFile) != a2plib.to_str('converted'):
             if not hasattr( obj, 'a2p_Version'):
                 obj.addProperty("App::PropertyString", "a2p_Version","importPart").a2p_Version = 'V0.0'
                 obj.setEditorMode("a2p_Version",1)
