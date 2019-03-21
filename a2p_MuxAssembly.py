@@ -92,7 +92,6 @@ def muxAssemblyWithTopoNames(doc):
     transparency = 0
     shape_list = []
     for obj in visibleObjects:
-        #
         extendNames = False
         if a2plib.getUseTopoNaming() and len(obj.muxInfo) > 0: # Subelement-Strings existieren schon...
             extendNames = True
@@ -161,7 +160,12 @@ def muxAssemblyWithTopoNames(doc):
             else:   #one drill ONLY
                 solid = shape_list[0]
         else:
-            solid = Part.Solid(shell)
+            numShellFaces = len(shell.Faces)
+            solid = Part.Solid(shell) # This does not work if shell includes spherical faces. FC-Bug ??
+            numSolidFaces = len(solid.Faces)
+            # Check, whether all faces where processed...
+            if numShellFaces != numSolidFaces:
+                solid = shell # Some faces are missing, take shell as result as workaround..
     except:
         # keeping a shell if solid is failing
         solid = shell
@@ -275,9 +279,19 @@ def createOrUpdateSimpleAssemblyShape(doc):
                 shapes=shape_list[1:]
                 solid = shape_base.fuse(shapes)
             else:   #one shape only
-                solid = shape_list[0]
+                numShellFaces = len(shell.Faces)
+                solid = Part.Solid(shell) # This does not work if shell includes spherical faces. FC-Bug ??
+                numSolidFaces = len(solid.Faces)
+                # Check, whether all faces where processed...
+                if numShellFaces != numSolidFaces:
+                    solid = shell # Some faces are missing, take shell as result as workaround..
         else:
-            solid = Part.Solid(shell)
+            numShellFaces = len(shell.Faces)
+            solid = Part.Solid(shell) # This does not work if shell includes spherical faces. FC-Bug ??
+            numSolidFaces = len(solid.Faces)
+            # Check, whether all faces where processed...
+            if numShellFaces != numSolidFaces:
+                solid = shell # Some faces are missing, take shell as result as workaround..
     except:
         # keeping a shell if solid is failing
         solid = shell
