@@ -195,7 +195,9 @@ to use {}.{}.{} or above.\n\n'''.format(
             'a2p_SimpleAssemblyShapeCommand',
             'a2p_repairTreeViewCommand',
             'a2p_CreatePartInformationSheet_Command',
-            'a2p_CreatePartlist'
+            'a2p_CreatePartlist',
+            'a2p_Show_PartLabels_Command',
+            'a2p_RemovePartLabels_Command'
             ]
 
         self.appendToolbar(

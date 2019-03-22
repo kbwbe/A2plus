@@ -1225,6 +1225,89 @@ FreeCADGui.addCommand('a2p_Show_Hierarchy_Command', a2p_Show_Hierarchy_Command()
 
 
 
+class a2p_Show_PartLabels_Command:
+
+    def Activated(self):
+        doc = FreeCAD.activeDocument()
+        if doc == None:
+            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
+                                        "No active document found!",
+                                        "You have to open an assembly file first."
+                                    )
+            return
+        
+        a2pObjects = []
+        for ob in doc.Objects:
+            if a2plib.isA2pPart(ob):
+                a2pObjects.append(ob)
+                
+        if len(a2pObjects) == 0:
+            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
+                                        "Nothing found to be labeled!",
+                                        "This document does not contain A2p-objects"
+                                    )
+            return
+        
+        labelGroup = doc.getObject("partLabels")
+        if labelGroup == None:
+            labelGroup=doc.addObject("App::DocumentObjectGroup", "partLabels")
+        else:
+            for lbl in labelGroup.Group:
+                doc.removeObject(lbl.Name)
+            doc.removeObject("partLabels")
+            labelGroup=doc.addObject("App::DocumentObjectGroup", "partLabels")
+        
+        for ob in a2pObjects:
+            if ob.ViewObject.Visibility == True:
+                bbCenter = ob.Shape.BoundBox.Center
+                partLabel = doc.addObject("App::AnnotationLabel","partLabel")
+                partLabel.LabelText = a2plib.to_str(ob.Label)
+                partLabel.BasePosition.x = bbCenter.x
+                partLabel.BasePosition.y = bbCenter.y
+                partLabel.BasePosition.z = bbCenter.z
+                #
+                partLabel.ViewObject.BackgroundColor = a2plib.YELLOW
+                partLabel.ViewObject.TextColor = a2plib.BLACK
+                labelGroup.addObject(partLabel)
+        
+
+    def GetResources(self):
+        return {
+            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_PartLabel.svg',
+            'MenuText':     "Print part-labels to 3D view",
+            'ToolTip':      "Print part-labels to 3D view"
+            }
+FreeCADGui.addCommand('a2p_Show_PartLabels_Command', a2p_Show_PartLabels_Command())
+
+
+
+
+class a2p_RemovePartLabels_Command:
+
+    def Activated(self):
+        doc = FreeCAD.activeDocument()
+        dofGroup = doc.getObject("partLabels")
+        if dofGroup != None:
+            for lbl in dofGroup.Group:
+                doc.removeObject(lbl.Name)
+            doc.removeObject("partLabels")
+
+    def IsActive(self):
+        doc = FreeCAD.activeDocument()
+        dofGroup = doc.getObject("partLabels")
+        return dofGroup != None
+
+    def GetResources(self):
+        return {
+            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_PartLabelRemove.svg',
+            'MenuText':     'Remove part-labels from 3D view',
+            'ToolTip':      'Remove part-labels from 3D view'
+            }
+FreeCADGui.addCommand('a2p_RemovePartLabels_Command', a2p_RemovePartLabels_Command())
+
+
+
+
 class a2p_Show_DOF_info_Command:
 
     def Activated(self):
