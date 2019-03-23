@@ -235,7 +235,7 @@ class PointOnPlaneConstraint(BasicConstraint):
         return \
 '''
 Add a pointOnPlane constraint between two objects
-1.) select a vertex or a center of a circle
+1.) select a vertex or a center of a circle or sphere
 2.) select a plane on other part
 
 Button gets active after
@@ -249,7 +249,10 @@ correct selection.
             s1, s2 = selection
             if s1.ObjectName != s2.ObjectName:
                 if ( 
-                     (vertexSelected(s1) or CircularEdgeSelected(s1)) and 
+                     (vertexSelected(s1) or 
+                      CircularEdgeSelected(s1) or 
+                      sphericalSurfaceSelected(s1)
+                      ) and 
                      planeSelected(s2)
                     ):
                     validSelection = True
