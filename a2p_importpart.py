@@ -351,7 +351,7 @@ Check your settings of A2plus preferences.
 # WF: how will this work for multiple imported objects?
 #     only A2p AI's will have property "fixedPosition"
         if importedObject and not importedObject.fixedPosition:
-            PartMover( view, importedObject )
+            PartMover( view, importedObject, deleteOnEscape = True )
         else:
             self.timer = QtCore.QTimer()
             QtCore.QObject.connect(self.timer, QtCore.SIGNAL("timeout()"), self.GuiViewFit)
@@ -359,8 +359,8 @@ Check your settings of A2plus preferences.
         return
 
     def IsActive(self):
-        """Here you can define if the command must be active or not (greyed) if certain conditions
-        are met or not. This function is optional."""
+        doc = FreeCAD.activeDocument()
+        if doc == None: return False
         return True
 
     def GuiViewFit(self):
@@ -516,59 +516,44 @@ def duplicateImportedPart( part ):
     newObj.Placement.Rotation = part.Placement.Rotation
     return newObj
 
+
+
 toolTip = \
 '''
 Make a duplicate of a
 part, which is already
 imported to the assembly.
 
-Select a part and hit
+Select a imported part and hit
 this button. A duplicate
 will be created and can be 
 placed somewhere by mouse.
+
+Hold "Shift" for doing this
+multiple times.
 '''
 
 class a2p_DuplicatePartCommand:
     def Activated(self):
-        #====================================================
-        # Is there an open Doc ?
-        #====================================================
-        if FreeCAD.activeDocument() == None:
-            QtGui.QMessageBox.information(
-                QtGui.QApplication.activeWindow(),
-               u"No active Document error",
-               u"First please open an assembly file!"
-               )
-            return
+        doc = FreeCAD.activeDocument()
+        selection = [s for s in FreeCADGui.Selection.getSelectionEx() if s.Document == doc ]
+        PartMover(
+            FreeCADGui.activeDocument().activeView(),
+            duplicateImportedPart(selection[0].Object),
+            deleteOnEscape = True
+            )
         
-        #====================================================
-        # Is something been selected ?
-        #====================================================
-        selection = [s for s in FreeCADGui.Selection.getSelectionEx() if s.Document == FreeCAD.ActiveDocument ]
-        if len(selection) != 1:
-            QtGui.QMessageBox.information(
-                QtGui.QApplication.activeWindow(),
-               u"Selection error",
-               u"Before duplicating, first please select a part!"
-               )
-            return
-            
-        #====================================================
-        # Is the selection an a2p part ?
-        #====================================================
+    def IsActive(self):
+        doc = FreeCAD.activeDocument()
+        if doc == None: return False
+        #
+        selection = [s for s in FreeCADGui.Selection.getSelectionEx() if s.Document == doc ]
+        if len(selection) != 1: return False
+        #
         obj = selection[0].Object
-        if not a2plib.isA2pPart(obj):
-            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
-                                        u"Duplicate: Selection invalid!",
-                                        u"This object is no imported part!"
-                                    )
-            return
-        
-        #====================================================
-        # Duplicate the part
-        #====================================================
-        PartMover(  FreeCADGui.activeDocument().activeView(), duplicateImportedPart( selection[0].Object ) )
-        
+        if not a2plib.isA2pPart(obj): return False
+        #
+        return True
 
     def GetResources(self):
         return {
@@ -708,48 +693,43 @@ FreeCADGui.addCommand('a2p_editImportedPart', a2p_EditPartCommand())
 
 
 
-
-
-
 class PartMover:
-    def __init__(self, view, obj):
+    def __init__(self, view, obj, deleteOnEscape):
         self.obj = obj
-        self.initialPostion = self.obj.Placement.Base
-        self.copiedObject = False
+        self.initialPosition = self.obj.Placement.Base
         self.view = view
+        self.deleteOnEscape = deleteOnEscape
         self.callbackMove = self.view.addEventCallback("SoLocation2Event",self.moveMouse)
         self.callbackClick = self.view.addEventCallback("SoMouseButtonEvent",self.clickMouse)
         self.callbackKey = self.view.addEventCallback("SoKeyboardEvent",self.KeyboardEvent)
+        
     def moveMouse(self, info):
         newPos = self.view.getPoint( *info['Position'] )
         self.obj.Placement.Base = newPos
+        
     def removeCallbacks(self):
         self.view.removeEventCallback("SoLocation2Event",self.callbackMove)
         self.view.removeEventCallback("SoMouseButtonEvent",self.callbackClick)
         self.view.removeEventCallback("SoKeyboardEvent",self.callbackKey)
+        
     def clickMouse(self, info):
         if info['Button'] == 'BUTTON1' and info['State'] == 'DOWN':
             #if not info['ShiftDown'] and not info['CtrlDown']: #struggles within Inventor Navigation
             if not info['ShiftDown']:
                 self.removeCallbacks()
                 FreeCAD.activeDocument().recompute()
+            elif info['ShiftDown']:
+                self.obj = duplicateImportedPart(self.obj)
+                self.deleteOnEscape = True
+                
     def KeyboardEvent(self, info):
         if info['State'] == 'UP' and info['Key'] == 'ESCAPE':
-            if not self.copiedObject:
-                self.obj.Placement.Base = self.initialPostion
+            if not self.deleteOnEscape:
+                self.obj.Placement.Base = self.initialPosition
             else:
                 FreeCAD.ActiveDocument.removeObject(self.obj.Name)
             self.removeCallbacks()
 
-class PartMoverSelectionObserver:
-    def __init__(self):
-        FreeCADGui.Selection.addObserver(self)
-        FreeCADGui.Selection.removeSelectionGate()
-    def addSelection( self, docName, objName, sub, pnt ):
-        FreeCADGui.Selection.removeObserver(self)
-        obj = FreeCAD.ActiveDocument.getObject(objName)
-        view = FreeCADGui.activeDocument().activeView()
-        PartMover( view, obj )
 
 toolTip = \
 '''
@@ -766,41 +746,29 @@ of the assembly.
 
 class a2p_MovePartCommand:
     def Activated(self):
-        #====================================================
-        # Is there an open Doc ?
-        #====================================================
-        if FreeCAD.activeDocument() == None:
-            QtGui.QMessageBox.critical(
-                QtGui.QApplication.activeWindow(),
-               u"No active Document error",
-               u"First please open an assembly file!"
-               )
-            return
-        
-        #====================================================
-        # Is something been selected ?
-        #====================================================
-        selection = [s for s in FreeCADGui.Selection.getSelectionEx() if s.Document == FreeCAD.ActiveDocument ]
-        if len(selection) != 1:
-            QtGui.QMessageBox.information(
-                QtGui.QApplication.activeWindow(),
-               u"Selection error",
-               u"Before moving, first please select exact 1 part!"
-               )
-            return
-            
-        #====================================================
-        # Move object, if possible
-        #====================================================
+        doc = FreeCAD.activeDocument()
+        selection = [s for s in FreeCADGui.Selection.getSelectionEx() if s.Document == doc ]
         try:
-            PartMover(  FreeCADGui.activeDocument().activeView(), selection[0].Object )
+            PartMover(
+                FreeCADGui.activeDocument().activeView(),
+                selection[0].Object,
+                deleteOnEscape = False
+                )
         except:
             QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
                u"Wrong selection",
                u"Cannot move selected object!"
                )
-            
+
+    def IsActive(self):
+        doc = FreeCAD.activeDocument()
+        if doc == None: return False
+        #
+        selection = [s for s in FreeCADGui.Selection.getSelectionEx() if s.Document == doc ]
+        if len(selection) != 1: return False
+        #
+        return True
 
     def GetResources(self):
         return {

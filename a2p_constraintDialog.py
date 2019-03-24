@@ -624,47 +624,31 @@ button.
             for btn in self.constraintButtons:
                 btn.setEnabled(False)
         else:
-            s1, s2 = selection
-            if s1.ObjectName != s2.ObjectName:
-                #=============================
-                if vertexSelected(s1):
-                    if vertexSelected(s2):
-                        self.pointIdentityButton.setEnabled(True)
-                        self.sphericalConstraintButton.setEnabled(True)
-                    elif LinearEdgeSelected(s2):
-                        self.pointOnLineButton.setEnabled(True)
-                    elif planeSelected(s2):
-                        self.pointOnPlaneButton.setEnabled(True)
-                    elif sphericalSurfaceSelected(s2):
-                        self.sphericalConstraintButton.setEnabled(True)
-                #=============================
-                elif LinearEdgeSelected(s1) or cylindricalPlaneSelected(s1):
-                    if LinearEdgeSelected(s2) or cylindricalPlaneSelected(s2):
-                        self.axisParallelButton.setEnabled(True)
-                        self.axialButton.setEnabled(True) #
-                    elif planeSelected(s2):
-                        self.axisPlaneParallelButton.setEnabled(True)
-                #=============================
-                elif CircularEdgeSelected(s1):
-                    if planeSelected(s2):
-                        self.pointOnPlaneButton.setEnabled(True)
-                    elif CircularEdgeSelected(s2):
-                        self.circularEdgeButton.setEnabled(True)
-                #=============================
-                elif planeSelected(s1):
-                    if planeSelected(s2):
-                        self.planesParallelButton.setEnabled(True)
-                        self.planeCoincidentButton.setEnabled(True)
-                        self.angledPlanesButton.setEnabled(True)
-                if ((planeSelected(s1) or ClosedEdgeSelected(s1)) and (planeSelected(s2) or ClosedEdgeSelected(s2))):
-                    self.centerOfMassButton.setEnabled(True)
-                #=============================
-                if sphericalSurfaceSelected(s1):
-                    if vertexSelected(s2):
-                        self.sphericalConstraintButton.setEnabled(True)
-                    elif sphericalSurfaceSelected(s2):
-                        self.sphericalConstraintButton.setEnabled(True)
-
+            if a2p_constraints.PointIdentityConstraint.isValidSelection(selection):
+                self.pointIdentityButton.setEnabled(True)
+            if a2p_constraints.SphericalConstraint.isValidSelection(selection):
+                self.sphericalConstraintButton.setEnabled(True)
+            if a2p_constraints.PointOnLineConstraint.isValidSelection(selection):
+                self.pointOnLineButton.setEnabled(True)
+            if a2p_constraints.PointOnPlaneConstraint.isValidSelection(selection):
+                self.pointOnPlaneButton.setEnabled(True)
+            if a2p_constraints.AxisParallelConstraint.isValidSelection(selection):
+                self.axisParallelButton.setEnabled(True)
+            if a2p_constraints.AxialConstraint.isValidSelection(selection):
+                self.axialButton.setEnabled(True)
+            if a2p_constraints.AxisPlaneParallelConstraint.isValidSelection(selection):
+                self.axisPlaneParallelButton.setEnabled(True)
+            if a2p_constraints.CircularEdgeConstraint.isValidSelection(selection):
+                self.circularEdgeButton.setEnabled(True)
+            if a2p_constraints.PlanesParallelConstraint.isValidSelection(selection):
+                self.planesParallelButton.setEnabled(True)
+            if a2p_constraints.AngledPlanesConstraint.isValidSelection(selection):
+                self.angledPlanesButton.setEnabled(True)
+            if a2p_constraints.PlaneConstraint.isValidSelection(selection):
+                self.planeCoincidentButton.setEnabled(True)
+            if a2p_constraints.CenterOfMassConstraint.isValidSelection(selection):
+                self.centerOfMassButton.setEnabled(True)
+            
     def onTimer(self):
         self.parseSelections()
         self.timer.start(100)
