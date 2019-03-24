@@ -171,8 +171,9 @@ class Dependency():
             ob1 = doc.getObject(c.Object1)
             ob2 = doc.getObject(c.Object2)
 
-            vert1 = getObjectVertexFromName(ob1, c.SubElement1)
-            dep1.refPoint = vert1.Point
+            #vert1 = getObjectVertexFromName(ob1, c.SubElement1)
+            #dep1.refPoint = vert1.Point
+            dep1.refPoint = getPos(ob1, c.SubElement1)
             dep2.refPoint = getPos(ob2, c.SubElement2)
 
             axis2 = getAxis(ob2, c.SubElement2)

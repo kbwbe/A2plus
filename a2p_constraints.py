@@ -190,8 +190,8 @@ class PointOnLineConstraint(BasicConstraint):
         return \
 '''
 Add a pointOnLine constraint between two objects
-1.) select a vertex from a part
-2.) select a line (linear edge) on another part
+1.) select a vertex or a sphere from a part
+2.) select a linear edge or a cylindrical face on another part
 
 Button gets active after
 correct selection.
@@ -203,7 +203,10 @@ correct selection.
         if len(selection) == 2:
             s1, s2 = selection
             if s1.ObjectName != s2.ObjectName:
-                if vertexSelected(s1) and LinearEdgeSelected(s2):
+                if (
+                    (vertexSelected(s1) or sphericalSurfaceSelected(s1)) and 
+                    (LinearEdgeSelected(s2) or cylindricalFaceSelected(s2))
+                    ):
                     validSelection = True
         return validSelection
     
@@ -345,7 +348,7 @@ correct selection.
     def isValidSelection(selection):
         
         def ValidSelection(selectionExObj):
-            return cylindricalPlaneSelected(selectionExObj) \
+            return cylindricalFaceSelected(selectionExObj) \
                 or LinearEdgeSelected(selectionExObj) 
         
         validSelection = False
@@ -399,8 +402,8 @@ correct selection.
             s1, s2 = selection
             if s1.ObjectName != s2.ObjectName:
                 if (
-                    (LinearEdgeSelected(s1) or cylindricalPlaneSelected(s1)) and
-                    (LinearEdgeSelected(s2) or cylindricalPlaneSelected(s2))
+                    (LinearEdgeSelected(s1) or cylindricalFaceSelected(s1)) and
+                    (LinearEdgeSelected(s2) or cylindricalFaceSelected(s2))
                     ): 
                     validSelection = True
         return validSelection
@@ -441,7 +444,7 @@ correct selection.
             s1, s2 = selection
             if s1.ObjectName != s2.ObjectName:
                 if (
-                    (LinearEdgeSelected(s1) or cylindricalPlaneSelected(s1)) and
+                    (LinearEdgeSelected(s1) or cylindricalFaceSelected(s1)) and
                     planeSelected(s2)
                     ):
                     validSelection = True

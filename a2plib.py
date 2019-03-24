@@ -608,7 +608,7 @@ def vertexSelected( selection ):
         return selection.SubElementNames[0].startswith('Vertex')
     return False
 #------------------------------------------------------------------------------
-def cylindricalPlaneSelected( selection ):
+def cylindricalFaceSelected( selection ):
     if len( selection.SubElementNames ) == 1:
         subElement = selection.SubElementNames[0]
         if subElement.startswith('Face'):
