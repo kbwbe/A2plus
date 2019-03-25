@@ -1242,8 +1242,8 @@ class a2p_Show_PartLabels_Command:
     def GetResources(self):
         return {
             'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_PartLabel.svg',
-            'MenuText':     "Print part-labels to 3D view",
-            'ToolTip':      "Print part-labels to 3D view"
+            'MenuText':     "Show part labels in 3D view",
+            'ToolTip':      "Show part labels in 3D view"
             }
 FreeCADGui.addCommand('a2p_Show_PartLabels_Command', a2p_Show_PartLabels_Command())
 
@@ -1268,8 +1268,8 @@ class a2p_RemovePartLabels_Command:
     def GetResources(self):
         return {
             'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_PartLabelRemove.svg',
-            'MenuText':     'Remove part-labels from 3D view',
-            'ToolTip':      'Remove part-labels from 3D view'
+            'MenuText':     'Remove part labels from 3D view',
+            'ToolTip':      'Remove part labels from 3D view'
             }
 FreeCADGui.addCommand('a2p_RemovePartLabels_Command', a2p_RemovePartLabels_Command())
 
