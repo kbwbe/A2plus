@@ -59,7 +59,11 @@ class a2pWorkbench (Workbench):
         FC_COMMIT_RECOMMENDED = 15997
         
         ver = FreeCAD.Version()
-        gitver = ver[2].split()[0]
+        try:
+            gitver = ver[2].split()[0]
+        except IndexError:
+            gitver = 'Unknown'
+            
         if gitver != 'Unknown':
             gitver = int(gitver)
         else:
