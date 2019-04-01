@@ -26,7 +26,7 @@
 __title__ = 'A2plus assembly Workbench - InitGui file'
 __author__ = 'kbwbe'
 
-A2P_VERSION = 'V0.4.10'
+A2P_VERSION = 'V0.4.11'
 
 
 
@@ -59,7 +59,11 @@ class a2pWorkbench (Workbench):
         FC_COMMIT_RECOMMENDED = 15997
         
         ver = FreeCAD.Version()
-        gitver = ver[2].split()[0]
+        try:
+            gitver = ver[2].split()[0]
+        except IndexError:
+            gitver = 'Unknown'
+            
         if gitver != 'Unknown':
             gitver = int(gitver)
         else:
