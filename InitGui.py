@@ -26,7 +26,7 @@
 __title__ = 'A2plus assembly Workbench - InitGui file'
 __author__ = 'kbwbe'
 
-A2P_VERSION = 'V0.4.11'
+A2P_VERSION = 'V0.4.12'
 
 
 
@@ -60,39 +60,36 @@ class a2pWorkbench (Workbench):
         
         ver = FreeCAD.Version()
         try:
-            gitver = ver[2].split()[0]
-        except IndexError:
+            gitver = int(ver[2].split()[0])
+        except:
             gitver = 'Unknown'
-            
-        if gitver != 'Unknown':
-            gitver = int(gitver)
-        else:
-            gitver = FC_COMMIT_REQUIRED
-            
+
         if (
-                (int(ver[0]) == 0 and int(ver[1]) < FC_MINOR_VER_REQUIRED) or
-                (int(ver[0]) == 0 and gitver < FC_COMMIT_REQUIRED)
+            int(ver[0]) == 0 and
+            int(ver[1]) == FC_MINOR_VER_RECOMMENDED and
+            gitver == 'Unknown'
             ):
-            fc_msg = '''
-FreeCAD version ({}.{}.{}) must be at
-least {}.{}.{} to be used with the
-A2P workbench\n\n'''.format(
-                        int(ver[0]),
-                        int(ver[1]),
-                        gitver,
-                        0,
-                        FC_MINOR_VER_REQUIRED,
-                        FC_COMMIT_REQUIRED
-                        )
-            print(fc_msg)
-            diag = QtGui.QMessageBox(QtGui.QMessageBox.Critical,u"Error Message",fc_msg )
-            diag.exec_()
-            
-        elif (
-            int(ver[0]) == 0 and 
-            (int(ver[1]) < FC_MINOR_VER_RECOMMENDED or 
-                (int(ver[1]) == FC_MINOR_VER_RECOMMENDED and gitver < FC_COMMIT_RECOMMENDED)
-                )
+            return # do nothing, version is 0.18 stable and ok.
+
+        if (
+            int(ver[0]) == 0 and
+            int(ver[1]) > FC_MINOR_VER_RECOMMENDED
+            ):
+            return # do nothing, version is > 0.18 stable and ok.
+        
+        if (
+            int(ver[0]) == 0 and
+            int(ver[1]) == FC_MINOR_VER_RECOMMENDED and
+            gitver != 'Unknown' and
+            gitver >= FC_COMMIT_RECOMMENDED
+            ):
+            return # do nothing, version is good 0.18pre and ok.
+        
+        if (
+            int(ver[0]) == 0 and
+            int(ver[1]) >= FC_MINOR_VER_REQUIRED and
+            gitver != 'Unknown' and
+            gitver >= FC_COMMIT_REQUIRED
             ):
             fc_msg = '''
 While FreeCAD version ({}.{}.{}) will
@@ -106,12 +103,20 @@ to use {}.{}.{} or above.\n\n'''.format(
                                     FC_COMMIT_RECOMMENDED
                                     )
             print(fc_msg)
-            # do not display an additional dialog in this case.
-            # Console output is enough
-            
-        else:
-            # FC version is ok. No Message needed.
-            pass
+            return # version is 0.17stable and ok
+        
+        
+        fc_msg = '''
+Your FreeCAD version is not recommended
+for work with the A2P workbench.
+Please use {}.{}.{} or above.\n\n'''.format(
+                                    0,
+                                    FC_MINOR_VER_REQUIRED,
+                                    FC_COMMIT_REQUIRED
+                                    )
+        print(fc_msg)
+
+
 
     def Initialize(self):
         self.checkFC_Version()
