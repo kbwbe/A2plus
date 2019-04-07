@@ -26,7 +26,7 @@
 __title__ = 'A2plus assembly Workbench - InitGui file'
 __author__ = 'kbwbe'
 
-A2P_VERSION = 'V0.4.12'
+A2P_VERSION = 'V0.4.13'
 
 
 
@@ -119,7 +119,7 @@ Please use {}.{}.{} or above.\n\n'''.format(
 
 
     def Initialize(self):
-        self.checkFC_Version()
+        #self.checkFC_Version()
         import sys
         PyVersion = sys.version_info[0]
         if PyVersion == 2:
