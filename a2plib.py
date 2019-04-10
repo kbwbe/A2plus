@@ -268,7 +268,7 @@ def getSelectedConstraint():
 #------------------------------------------------------------------------------
 def appVersionStr():
     version = int(FreeCAD.Version()[0])
-    subVersion = int(FreeCAD.Version()[1])
+    subVersion = int(float(FreeCAD.Version()[1]))
     return "%03d.%03d" %(version,subVersion)
 #------------------------------------------------------------------------------
 def isLine(param):
