@@ -217,17 +217,20 @@ class FCdocumentReader(object):
             fileName = a2plib.to_str(fileName)
         
         self.clear()
+        
+        # got a fileName != None ?
+        if fileName == None:
+            print (u"fcDocumentReader: failed to open file with None name!")
+            return
 
         # check whether file exists or not...
         if not os.path.exists( fileName ):
             print (u"fcDocumentReader: file {} does not exist!".format(fileName))
-            successfulOpened = False
             return
         
         # check for fcstd file
         if not fileName.lower().endswith(a2plib.to_str('.fcstd')):
             print (u"fcDocumentReader: file {} is no FCStd file!".format(fileName))
-            successfulOpened = False
             return
         
         # decompress the file
