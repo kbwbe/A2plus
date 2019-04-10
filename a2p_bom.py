@@ -79,11 +79,14 @@ def createPartList(
         # Process information of this a2p object
         if not ob.isSubassembly() or not recursive:
             # Try to get spreadsheetdata _PARTINFO_ from linked source
-            linkedSource = ob.getA2pSource()
+            linkedSource1 = ob.getA2pSource()
             linkedSource = a2plib.findSourceFileInProject( #this returns unicode on py2 systems!
-                            linkedSource,
+                            linkedSource1,
                             workingDir
-                            ) 
+                            )
+            if linkedSource == None:
+                print(u"BOM ERROR: Could not open sourcefile {}".format(linkedSource1))
+                continue
             # Is it already processed minimum one time ?
             entry = partListEntries.get(linkedSource,None)
             if entry != None:

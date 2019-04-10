@@ -362,7 +362,10 @@ def findSourceFileInProject(_pathImportPart, _assemblyPath):
     fileName = os.path.basename(pathImportPart)
     retval = findFile(fileName,projectFolder)
     retval = pathToOS(retval)
-    return to_str(retval)
+    if retval:
+        return to_str(retval)
+    else:
+        return None
 #------------------------------------------------------------------------------
 def checkFileIsInProjectFolder(path):
     preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
