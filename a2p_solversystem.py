@@ -167,6 +167,7 @@ class SolverSystem():
                 self.status = "loadingDependencyError"
                 deleteList.append(c)
                 
+                
         for rig in self.rigids:
             rig.hierarchyLinkedRigids.extend(rig.linkedRigids)
                
