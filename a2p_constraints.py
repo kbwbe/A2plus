@@ -223,7 +223,7 @@ class PointOnPlaneConstraint(BasicConstraint):
         c = self.constraintObject
         point = getPos(self.ob1, c.SubElement1)
         plane = getObjectFaceFromName(self.ob2, c.SubElement2)
-        planeNormal = plane.Surface.Axis
+        planeNormal = a2plib.getPlaneNormal(plane.Surface)
         planePos = getPos(self.ob2, c.SubElement2)
         #
         # calculate recent offset...
@@ -463,8 +463,10 @@ class PlanesParallelConstraint(BasicConstraint):
         c = self.constraintObject
         plane1 = getObjectFaceFromName(self.ob1, c.SubElement1)
         plane2 = getObjectFaceFromName(self.ob2, c.SubElement2)
-        normal1 = plane1.Surface.Axis
-        normal2 = plane2.Surface.Axis
+        
+        normal1 = a2plib.getPlaneNormal(plane1.Surface)
+        normal2 = a2plib.getPlaneNormal(plane2.Surface)
+        
         angle = math.degrees(normal1.getAngle(normal2))
         if angle <= 90.0:
             self.direction = "aligned"
@@ -513,8 +515,10 @@ class PlaneConstraint(BasicConstraint):
         c = self.constraintObject
         plane1 = getObjectFaceFromName(self.ob1, c.SubElement1)
         plane2 = getObjectFaceFromName(self.ob2, c.SubElement2)
-        normal1 = plane1.Surface.Axis
-        normal2 = plane2.Surface.Axis
+        
+        normal1 = a2plib.getPlaneNormal(plane1.Surface)
+        normal2 = a2plib.getPlaneNormal(plane2.Surface)
+        
         angle = math.degrees(normal1.getAngle(normal2))
         if angle <= 90.0:
             self.direction = "aligned"
@@ -561,8 +565,8 @@ class AngledPlanesConstraint(BasicConstraint):
     def calcInitialValues(self):
         plane1 = getObjectFaceFromName(self.ob1, self.sub1)
         plane2 = getObjectFaceFromName(self.ob2, self.sub2)
-        normal1 = plane1.Surface.Axis
-        normal2 = plane2.Surface.Axis
+        normal1 = a2plib.getPlaneNormal(plane1.Surface)
+        normal2 = a2plib.getPlaneNormal(plane2.Surface)
         self.angle = math.degrees(normal2.getAngle(normal1))
 
     @staticmethod
@@ -661,8 +665,8 @@ class CenterOfMassConstraint(BasicConstraint):
         #plane2 = getObjectFaceFromName(self.ob2, self.sub2)
         CoM1 = plane1.CenterOfMass
         CoM2 = plane2.CenterOfMass
-        axis1 = plane1.Surface.Axis
-        axis2 = plane2.Surface.Axis
+        axis1 = a2plib.getPlaneNormal(plane1.Surface)
+        axis2 = a2plib.getPlaneNormal(plane2.Surface)
         angle = math.degrees(axis1.getAngle(axis2))
         if angle <= 90.0:
             self.direction = "aligned"
