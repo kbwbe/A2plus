@@ -32,6 +32,8 @@ import os
 import sys
 import copy
 import platform
+import numpy
+
 from a2p_viewProviderProxies import *
 
 PYVERSION =  sys.version_info[0]
@@ -270,6 +272,19 @@ def appVersionStr():
     version = int(FreeCAD.Version()[0])
     subVersion = int(float(FreeCAD.Version()[1]))
     return "%03d.%03d" %(version,subVersion)
+#------------------------------------------------------------------------------
+def numpyVecToFC(nv):
+    assert len(nv) == 3
+    return Base.Vector(nv[0],nv[1],nv[2])
+#------------------------------------------------------------------------------
+def fit_plane_to_surface1( surface, n_u=3, n_v=3 ):
+    uv = sum( [ [ (u,v) for u in numpy.linspace(0,1,n_u)] for v in numpy.linspace(0,1,n_v) ], [] )
+    P = [ surface.value(u,v) for u,v in uv ] #positions at u,v points
+    N = [ numpy.cross( *surface.tangent(u,v) ) for u,v in uv ] 
+    plane_norm = sum(N) / len(N) #plane's normal, averaging done to reduce error
+    plane_pos = P[0]
+    error = sum([ abs( numpy.dot(p - plane_pos, plane_norm) ) for p in P ])
+    return numpyVecToFC(plane_norm), numpyVecToFC(plane_pos), error
 #------------------------------------------------------------------------------
 def isLine(param):
     if hasattr(Part,"LineSegment"):
@@ -604,6 +619,10 @@ def planeSelected( selection ):
             face = getObjectFaceFromName( selection.Object, subElement)
             if str(face.Surface) == '<Plane object>':
                 return True
+            elif str(face.Surface) == '<BSplineSurface object>':
+                normal,pos,error = fit_plane_to_surface1(face.Surface)
+                if abs(error) < 1e-9:
+                    return True
     return False
 #------------------------------------------------------------------------------
 def vertexSelected( selection ):
@@ -668,6 +687,8 @@ def getPos(obj, subElementName):
             pos = surface.Center
         elif str(surface).startswith('<SurfaceOfRevolution'):
             pos = getObjectFaceFromName(obj, subElementName).Edges[0].Curve.Center
+        elif str(surface).startswith('<BSplineSurface'):
+            axis,pos,error = fit_plane_to_surface1(surface)
     elif subElementName.startswith('Edge'):
         edge = getObjectEdgeFromName(obj, subElementName)
         if isLine(edge.Curve):
@@ -681,6 +702,14 @@ def getPos(obj, subElementName):
         return  getObjectVertexFromName(obj, subElementName).Point
     return pos # maybe none !!
 #------------------------------------------------------------------------------
+def getPlaneNormal(surface):
+    axis = None
+    if hasattr(surface,'Axis'):
+        axis = surface.Axis
+    elif str(surface).startswith('<BSplineSurface'):
+        axis,pos,error = fit_plane_to_surface1(surface)
+    return axis # may be none!
+#------------------------------------------------------------------------------
 def getAxis(obj, subElementName):
     axis = None
     if subElementName.startswith('Face'):
@@ -690,6 +719,9 @@ def getAxis(obj, subElementName):
             axis = surface.Axis
         elif str(surface).startswith('<SurfaceOfRevolution'):
             axis = face.Edges[0].Curve.Axis
+        elif str(surface).startswith('<BSplineSurface'):
+            axis,pos,error = fit_plane_to_surface1(surface)
+            
     elif subElementName.startswith('Edge'):
         edge = getObjectEdgeFromName(obj, subElementName)
         if isLine(edge.Curve):

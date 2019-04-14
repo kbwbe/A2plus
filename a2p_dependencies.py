@@ -192,7 +192,7 @@ class Dependency():
             plane2 = getObjectFaceFromName(ob2, c.SubElement2)
             dep2.refPoint = plane2.Faces[0].BoundBox.Center
 
-            normal2 = plane2.Surface.Axis
+            normal2 = a2plib.getPlaneNormal(plane2.Surface)
             #shift refPoint of plane by offset
             try:
                 offs = c.offset
@@ -239,8 +239,9 @@ class Dependency():
             dep1.refPoint = plane1.Faces[0].BoundBox.Center
             dep2.refPoint = plane2.Faces[0].BoundBox.Center
 
-            normal1 = plane1.Surface.Axis
-            normal2 = plane2.Surface.Axis
+            normal1 = a2plib.getPlaneNormal(plane1.Surface)
+            normal2 = a2plib.getPlaneNormal(plane2.Surface)
+
             if dep2.direction == "opposed":
                 normal2.multiply(-1.0)
             dep1.refAxisEnd = dep1.refPoint.add(normal1)
@@ -257,8 +258,8 @@ class Dependency():
             dep1.refPoint = plane1.Faces[0].BoundBox.Center
             dep2.refPoint = plane2.Faces[0].BoundBox.Center
 
-            normal1 = plane1.Surface.Axis
-            normal2 = plane2.Surface.Axis
+            normal1 = a2plib.getPlaneNormal(plane1.Surface)
+            normal2 = a2plib.getPlaneNormal(plane2.Surface)
             dep1.refAxisEnd = dep1.refPoint.add(normal1)
             dep2.refAxisEnd = dep2.refPoint.add(normal2)
 
@@ -273,8 +274,8 @@ class Dependency():
             dep1.refPoint = plane1.Faces[0].BoundBox.Center
             dep2.refPoint = plane2.Faces[0].BoundBox.Center
 
-            normal1 = plane1.Surface.Axis
-            normal2 = plane2.Surface.Axis
+            normal1 = a2plib.getPlaneNormal(plane1.Surface)
+            normal2 = a2plib.getPlaneNormal(plane2.Surface)
             if dep2.direction == "opposed":
                 normal2.multiply(-1.0)
             dep1.refAxisEnd = dep1.refPoint.add(normal1)
@@ -336,7 +337,7 @@ class Dependency():
             axis1Normalized.normalize()
             dep1.refAxisEnd = dep1.refPoint.add(axis1Normalized)
 
-            normal2 = plane2.Surface.Axis
+            normal2 = a2plib.getPlaneNormal(plane2.Surface)
             dep2.refAxisEnd = dep2.refPoint.add(normal2)
 
         elif c.Type == "CenterOfMass":
@@ -362,8 +363,12 @@ class Dependency():
             #plane2 = getObjectFaceFromName(ob2, c.SubElement2)
             # dep1.refPoint = plane1.Faces[0].CenterOfMass
             # dep2.refPoint = plane2.Faces[0].CenterOfMass
-            normal1 = plane1.Surface.Axis
-            normal2 = plane2.Surface.Axis
+            
+            #normal1 = plane1.Surface.Axis
+            #normal2 = plane2.Surface.Axis
+            normal1 = a2plib.getPlaneNormal(plane1.Surface)
+            normal2 = a2plib.getPlaneNormal(plane2.Surface)
+
             if dep2.direction == "opposed":
                 normal2.multiply(-1.0)
             dep1.refAxisEnd = dep1.refPoint.add(normal1)
