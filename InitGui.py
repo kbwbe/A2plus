@@ -26,7 +26,7 @@
 __title__ = 'A2plus assembly Workbench - InitGui file'
 __author__ = 'kbwbe'
 
-A2P_VERSION = 'V0.4.16'
+A2P_VERSION = 'V0.4.17'
 
 
 
@@ -191,7 +191,6 @@ Please use {}.{}.{} or above.\n\n'''.format(
             'a2p_ToggleAutoSolveCommand',
             'a2p_FlipConstraintDirectionCommand',
             'a2p_Show_DOF_info_Command',
-            'a2p_Remove_DOF_Labels_Command',
             'a2p_Show_Hierarchy_Command'
             #'a2p_TogglePartialProcessingCommand',
             ]
@@ -206,7 +205,6 @@ Please use {}.{}.{} or above.\n\n'''.format(
             'a2p_CreatePartInformationSheet_Command',
             'a2p_CreatePartlist',
             'a2p_Show_PartLabels_Command',
-            'a2p_RemovePartLabels_Command'
             ]
 
         self.appendToolbar(

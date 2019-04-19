@@ -1195,138 +1195,103 @@ FreeCADGui.addCommand('a2p_Show_Hierarchy_Command', a2p_Show_Hierarchy_Command()
 
 class a2p_Show_PartLabels_Command:
 
-    def Activated(self):
+    def Activated(self, index):
         doc = FreeCAD.activeDocument()
-        if doc == None:
-            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
-                                        "No active document found!",
-                                        "You have to open an assembly file first."
-                                    )
-            return
-        
-        a2pObjects = []
-        for ob in doc.Objects:
-            if a2plib.isA2pPart(ob):
-                a2pObjects.append(ob)
-                
-        if len(a2pObjects) == 0:
-            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
-                                        "Nothing found to be labeled!",
-                                        "This document does not contain A2p-objects"
-                                    )
-            return
-        
-        labelGroup = doc.getObject("partLabels")
-        if labelGroup == None:
-            labelGroup=doc.addObject("App::DocumentObjectGroup", "partLabels")
+        if index == 0:
+            '''remove labels from 3D view'''
+            dofGroup = doc.getObject("partLabels")
+            if dofGroup != None:
+                for lbl in dofGroup.Group:
+                    doc.removeObject(lbl.Name)
+                doc.removeObject("partLabels")
         else:
-            for lbl in labelGroup.Group:
-                doc.removeObject(lbl.Name)
-            doc.removeObject("partLabels")
-            labelGroup=doc.addObject("App::DocumentObjectGroup", "partLabels")
-        
-        for ob in a2pObjects:
-            if ob.ViewObject.Visibility == True:
-                bbCenter = ob.Shape.BoundBox.Center
-                partLabel = doc.addObject("App::AnnotationLabel","partLabel")
-                partLabel.LabelText = a2plib.to_str(ob.Label)
-                partLabel.BasePosition.x = bbCenter.x
-                partLabel.BasePosition.y = bbCenter.y
-                partLabel.BasePosition.z = bbCenter.z
-                #
-                partLabel.ViewObject.BackgroundColor = a2plib.YELLOW
-                partLabel.ViewObject.TextColor = a2plib.BLACK
-                labelGroup.addObject(partLabel)
-        
+            '''create or update labels within 3D view'''
+            a2pObjects = []
+            for ob in doc.Objects:
+                if a2plib.isA2pPart(ob):
+                    a2pObjects.append(ob)
+            if len(a2pObjects) == 0:
+                QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
+                                            "Nothing found to be labeled!",
+                                            "This document does not contain A2p-objects"
+                                        )
+                return
+            
+            labelGroup = doc.getObject("partLabels")
+            if labelGroup == None:
+                labelGroup=doc.addObject("App::DocumentObjectGroup", "partLabels")
+            else:
+                for lbl in labelGroup.Group:
+                    doc.removeObject(lbl.Name)
+                doc.removeObject("partLabels")
+                labelGroup=doc.addObject("App::DocumentObjectGroup", "partLabels")
+            
+            for ob in a2pObjects:
+                if ob.ViewObject.Visibility == True:
+                    bbCenter = ob.Shape.BoundBox.Center
+                    partLabel = doc.addObject("App::AnnotationLabel","partLabel")
+                    partLabel.LabelText = a2plib.to_str(ob.Label)
+                    partLabel.BasePosition.x = bbCenter.x
+                    partLabel.BasePosition.y = bbCenter.y
+                    partLabel.BasePosition.z = bbCenter.z
+                    #
+                    partLabel.ViewObject.BackgroundColor = a2plib.YELLOW
+                    partLabel.ViewObject.TextColor = a2plib.BLACK
+                    labelGroup.addObject(partLabel)
+
+    def IsChecked(self):
+        doc = FreeCAD.activeDocument()
+        if not doc: return False
+        labelGroup = doc.getObject("partLabels")
+        return labelGroup != None
+
+    def IsActive(self):
+        doc = FreeCAD.activeDocument()
+        return doc != None
 
     def GetResources(self):
         return {
             'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_PartLabel.svg',
             'MenuText':     "Show part labels in 3D view",
-            'ToolTip':      "Show part labels in 3D view"
+            'ToolTip':      "Show part labels in 3D view",
+            'Checkable':    False
             }
 FreeCADGui.addCommand('a2p_Show_PartLabels_Command', a2p_Show_PartLabels_Command())
 
 
-
-
-class a2p_RemovePartLabels_Command:
-
-    def Activated(self):
-        doc = FreeCAD.activeDocument()
-        dofGroup = doc.getObject("partLabels")
-        if dofGroup != None:
-            for lbl in dofGroup.Group:
-                doc.removeObject(lbl.Name)
-            doc.removeObject("partLabels")
-
-    def IsActive(self):
-        doc = FreeCAD.activeDocument()
-        dofGroup = doc.getObject("partLabels")
-        return dofGroup != None
-
-    def GetResources(self):
-        return {
-            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_PartLabelRemove.svg',
-            'MenuText':     'Remove part labels from 3D view',
-            'ToolTip':      'Remove part labels from 3D view'
-            }
-FreeCADGui.addCommand('a2p_RemovePartLabels_Command', a2p_RemovePartLabels_Command())
-
-
-
-
 class a2p_Show_DOF_info_Command:
 
-    def Activated(self):
-        if FreeCAD.activeDocument() == None:
-            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
-                                        "No active document found!",
-                                        "You have to open an assembly file first."
-                                    )
-            return
-        ss = a2p_solversystem.SolverSystem()
-        ss.DOF_info_to_console()
+    def Activated(self, index):
+        if index == 0:
+            ''' Remove the existing labels from screen'''
+            doc = FreeCAD.activeDocument()
+            dofGroup = doc.getObject("dofLabels")
+            if dofGroup != None:
+                for lbl in dofGroup.Group:
+                    doc.removeObject(lbl.Name)
+                doc.removeObject("dofLabels")
+        else:
+            ss = a2p_solversystem.SolverSystem()
+            ss.DOF_info_to_console()
+        
+    def IsActive(self):
+        doc = FreeCAD.activeDocument()
+        return doc != None
+
+    def IsChecked(self):
+        doc = FreeCAD.activeDocument()
+        if not doc: return False
+        dofGroup = doc.getObject("dofLabels")
+        return dofGroup != None
 
     def GetResources(self):
         return {
             'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_DOFs.svg',
             'MenuText':     'Print detailed DOF information to console',
-            'ToolTip':      'Prints detailed DOF information to console'
+            'ToolTip':      'Print detailed DOF information to console',
+            'Checkable':    False
             }
 FreeCADGui.addCommand('a2p_Show_DOF_info_Command', a2p_Show_DOF_info_Command())
-
-
-
-tt = \
-'''
-Remove the DOF information labels
-from the 3D view, which were created
-by the detailed DOF info command.
-'''
-
-class a2p_Remove_DOF_Labels_Command:
-
-    def Activated(self):
-        doc = FreeCAD.activeDocument()
-        dofGroup = doc.getObject("dofLabels")
-        if dofGroup != None:
-            for lbl in dofGroup.Group:
-                doc.removeObject(lbl.Name)
-            doc.removeObject("dofLabels")
-
-    def IsActive(self):
-        doc = FreeCAD.activeDocument()
-        dofGroup = doc.getObject("dofLabels")
-        return dofGroup != None
-
-    def GetResources(self):
-        return {
-            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_Unlabel_DOFs.svg',
-            'MenuText':     'Remove DOF-labels from 3D view',
-            'ToolTip':      tt
-            }
-FreeCADGui.addCommand('a2p_Remove_DOF_Labels_Command', a2p_Remove_DOF_Labels_Command())
 
 
 
