@@ -1253,7 +1253,7 @@ class a2p_Show_PartLabels_Command:
         return {
             'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_PartLabel.svg',
             'MenuText':     "Show part labels in 3D view",
-            'ToolTip':      "Show part labels in 3D view",
+            'ToolTip':      "Toggle showing part labels in 3D view",
             'Checkable':    False
             }
 FreeCADGui.addCommand('a2p_Show_PartLabels_Command', a2p_Show_PartLabels_Command())
@@ -1287,8 +1287,8 @@ class a2p_Show_DOF_info_Command:
     def GetResources(self):
         return {
             'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_DOFs.svg',
-            'MenuText':     'Print detailed DOF information to console',
-            'ToolTip':      'Print detailed DOF information to console',
+            'MenuText':     'Print detailed DOF information',
+            'ToolTip':      'Toggle printing detailed DOF information',
             'Checkable':    False
             }
 FreeCADGui.addCommand('a2p_Show_DOF_info_Command', a2p_Show_DOF_info_Command())
