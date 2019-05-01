@@ -517,10 +517,19 @@ class a2p_ConstraintCollection(QtGui.QWidget):
         QtCore.QObject.connect(self.axisPlaneParallelButton, QtCore.SIGNAL("clicked()"), self.onAxisPlaneParallelButton)
         self.constraintButtons.append(self.axisPlaneParallelButton)
         #-------------------------------------
+        self.axisPlaneVerticalButton = QtGui.QPushButton(self.panel2)
+        self.axisPlaneVerticalButton.setFixedSize(32,32)
+        self.axisPlaneVerticalButton.setIcon(QtGui.QIcon(':/icons/a2p_AxisPlaneVerticalConstraint.svg'))
+        self.axisPlaneVerticalButton.setToolTip(a2p_constraints.AxisPlaneVerticalConstraint.getToolTip())
+        self.axisPlaneVerticalButton.setText("")
+        QtCore.QObject.connect(self.axisPlaneVerticalButton, QtCore.SIGNAL("clicked()"), self.onAxisPlaneVerticalButton)
+        self.constraintButtons.append(self.axisPlaneVerticalButton)
+        #-------------------------------------
         panel2_Layout.addWidget(self.circularEdgeButton)
         panel2_Layout.addWidget(self.axialButton)
         panel2_Layout.addWidget(self.axisParallelButton)
         panel2_Layout.addWidget(self.axisPlaneParallelButton)
+        panel2_Layout.addWidget(self.axisPlaneVerticalButton)
         panel2_Layout.addStretch(1)
         self.panel2.setLayout(panel2_Layout)
         #-------------------------------------
@@ -710,6 +719,11 @@ button.
     def onAxisPlaneParallelButton(self):
         selection = FreeCADGui.Selection.getSelectionEx()
         self.activeConstraint = a2p_constraints.AxisPlaneParallelConstraint(selection)
+        self.manageConstraint()
+
+    def onAxisPlaneVerticalButton(self):
+        selection = FreeCADGui.Selection.getSelectionEx()
+        self.activeConstraint = a2p_constraints.AxisPlaneVerticalConstraint(selection)
         self.manageConstraint()
 
     def onPlanesParallelButton(self):

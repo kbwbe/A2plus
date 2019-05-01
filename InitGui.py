@@ -26,7 +26,7 @@
 __title__ = 'A2plus assembly Workbench - InitGui file'
 __author__ = 'kbwbe'
 
-A2P_VERSION = 'V0.4.18'
+A2P_VERSION = 'V0.4.19'
 
 
 
@@ -171,6 +171,7 @@ Please use {}.{}.{} or above.\n\n'''.format(
                 'a2p_AxialConstraintCommand',
                 'a2p_AxisParallelConstraintCommand',
                 'a2p_AxisPlaneParallelCommand',
+                'a2p_AxisPlaneVerticalCommand',
                 'a2p_PlanesParallelConstraintCommand',
                 'a2p_PlaneCoincidentConstraintCommand',
                 'a2p_AngledPlanesConstraintCommand',

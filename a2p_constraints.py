@@ -451,6 +451,48 @@ correct selection.
         return validSelection
 
 #==============================================================================
+class AxisPlaneVerticalConstraint(BasicConstraint):
+    def __init__(self,selection):
+        BasicConstraint.__init__(self, selection)
+        self.typeInfo = 'axisPlaneVertical'
+        self.constraintBaseName = 'axisPlaneVertical'
+        self.iconPath = ':/icons/a2p_AxisPlaneVerticalConstraint.svg'
+        self.create(selection)
+        
+    def calcInitialValues(self):
+        pass
+
+    @staticmethod
+    def getToolTip():
+        return \
+'''
+Creates an axisPlaneVertical constraint.
+
+1) select a linear edge or cylinder axis
+2) select a plane face on another part
+
+This constraint adjusts an axis vertical
+to a selected plane. The parts are not
+moved to be coincident.
+
+Button gets active after
+correct selection.
+'''
+
+    @staticmethod
+    def isValidSelection(selection):
+        validSelection = False
+        if len(selection) == 2:
+            s1, s2 = selection
+            if s1.ObjectName != s2.ObjectName:
+                if (
+                    (LinearEdgeSelected(s1) or cylindricalFaceSelected(s1)) and
+                    planeSelected(s2)
+                    ):
+                    validSelection = True
+        return validSelection
+
+#==============================================================================
 class PlanesParallelConstraint(BasicConstraint):
     def __init__(self,selection):
         BasicConstraint.__init__(self, selection)
