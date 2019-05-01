@@ -647,6 +647,8 @@ button.
                 self.axialButton.setEnabled(True)
             if a2p_constraints.AxisPlaneParallelConstraint.isValidSelection(selection):
                 self.axisPlaneParallelButton.setEnabled(True)
+            if a2p_constraints.AxisPlaneVerticalConstraint.isValidSelection(selection):
+                self.axisPlaneVerticalButton.setEnabled(True)
             if a2p_constraints.CircularEdgeConstraint.isValidSelection(selection):
                 self.circularEdgeButton.setEnabled(True)
             if a2p_constraints.PlanesParallelConstraint.isValidSelection(selection):

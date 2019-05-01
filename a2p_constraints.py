@@ -460,7 +460,16 @@ class AxisPlaneVerticalConstraint(BasicConstraint):
         self.create(selection)
         
     def calcInitialValues(self):
-        pass
+        c = self.constraintObject
+        axis1 = getAxis(self.ob1, c.SubElement1)
+        plane2 = getObjectFaceFromName(self.ob2, c.SubElement2)
+        axis2 = a2plib.getPlaneNormal(plane2.Surface)
+
+        angle = math.degrees(axis1.getAngle(axis2))
+        if angle <= 90.0:
+            self.direction = "aligned"
+        else:
+            self.direction = "opposed"
 
     @staticmethod
     def getToolTip():
