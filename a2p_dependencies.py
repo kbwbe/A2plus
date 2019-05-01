@@ -340,6 +340,26 @@ class Dependency():
             normal2 = a2plib.getPlaneNormal(plane2.Surface)
             dep2.refAxisEnd = dep2.refPoint.add(normal2)
 
+        elif c.Type == "axisPlaneVertical":
+            dep1 = DependencyAxisPlaneVertical(c, "pointAxis")
+            dep2 = DependencyAxisPlaneVertical(c, "pointNormal")
+
+            ob1 = doc.getObject(c.Object1)
+            ob2 = doc.getObject(c.Object2)
+            axis1 = getAxis(ob1, c.SubElement1)
+            plane2 = getObjectFaceFromName(ob2, c.SubElement2)
+            dep1.refPoint = getPos(ob1,c.SubElement1)
+            dep2.refPoint = plane2.Faces[0].BoundBox.Center
+
+            axis1Normalized = Base.Vector(axis1)
+            axis1Normalized.normalize()
+            dep1.refAxisEnd = dep1.refPoint.add(axis1Normalized)
+
+            normal2 = a2plib.getPlaneNormal(plane2.Surface)
+            if dep2.direction == "opposed":
+                normal2.multiply(-1.0)
+            dep2.refAxisEnd = dep2.refPoint.add(normal2)
+
         elif c.Type == "CenterOfMass":
             dep1 = DependencyCenterOfMass(c, "point")
             dep2 = DependencyCenterOfMass(c, "point")
@@ -832,6 +852,23 @@ class DependencyAxisPlaneParallel(Dependency):
             axis = Base.Vector(x,y,z)
         return axis
     
+    def calcDOF(self, _dofPos, _dofRot, _pointconstraints=[]):
+        #AngleBetweenPlanesConstraint
+        #    AngleAlignment()   needs to know the axis normal to plane constrained (stored in dep as refpoint and refAxisEnd) and the dofrot array
+        tmpaxis = cleanAxis(create_Axis2Points(self.refPoint,self.refAxisEnd))
+        tmpaxis.Direction.Length = 2.0
+        return _dofPos, AngleAlignment(tmpaxis,_dofRot)
+
+class DependencyAxisPlaneVertical(Dependency):
+    def __init__(self, constraint, refType):
+        Dependency.__init__(self, constraint, refType, True)
+        self.isPointConstraint = False
+        self.useRefPointSpin = False
+        
+    def getMovement(self):
+        if not self.Enabled: return None, None
+        return self.refPoint, Base.Vector(0,0,0)
+
     def calcDOF(self, _dofPos, _dofRot, _pointconstraints=[]):
         #AngleBetweenPlanesConstraint
         #    AngleAlignment()   needs to know the axis normal to plane constrained (stored in dep as refpoint and refAxisEnd) and the dofrot array

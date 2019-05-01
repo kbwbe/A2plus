@@ -235,6 +235,31 @@ class a2p_AxisPlaneParallelCommand:
 
 FreeCADGui.addCommand('a2p_AxisPlaneParallelCommand', a2p_AxisPlaneParallelCommand())
 #==============================================================================
+class a2p_AxisPlaneVerticalCommand:
+    def Activated(self):
+        selection = FreeCADGui.Selection.getSelectionEx()
+        
+        c = a2p_constraints.AxisPlaneVerticalConstraint(selection)
+        cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
+            c.constraintObject,
+            'createConstraint'
+            )
+        FreeCADGui.Selection.clearSelection()
+
+    def IsActive(self):
+        return a2p_constraints.AxisPlaneVerticalConstraint.isValidSelection(
+            FreeCADGui.Selection.getSelectionEx()
+            )
+
+    def GetResources(self):
+        return {
+             'Pixmap' : ':/icons/a2p_AxisPlaneVerticalConstraint.svg',
+             'MenuText': 'Add axisPlaneVertical constraint',
+             'ToolTip': a2p_constraints.AxisPlaneVerticalConstraint.getToolTip()
+             }
+
+FreeCADGui.addCommand('a2p_AxisPlaneVerticalCommand', a2p_AxisPlaneVerticalCommand())
+#==============================================================================
 class a2p_PlanesParallelConstraintCommand:
     def Activated(self):
         selection = FreeCADGui.Selection.getSelectionEx()

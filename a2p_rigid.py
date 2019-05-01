@@ -205,9 +205,13 @@ class Rigid():
         axis2 = self.savedPlacement.Rotation.Axis
         angle = math.degrees(axis2.getAngle(axis1))
 
+        '''
         if absPosMove >= solver.mySOLVER_POS_ACCURACY*1e-2 or angle >= solver.mySOLVER_SPIN_ACCURACY*1e-2:
             ob1 = doc.getObject(self.objectName)
             ob1.Placement = self.placement
+        '''
+        ob1 = doc.getObject(self.objectName)
+        ob1.Placement = self.placement
 
     def getRigidCenter(self):
         _currentRigid = FreeCAD.ActiveDocument.getObject(self.objectName)
