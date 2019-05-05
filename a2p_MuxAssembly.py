@@ -32,16 +32,7 @@ import time
 import a2plib
 from PySide import QtGui
 
-
-class Proxy_muxAssemblyObj:
-    def execute(self, obj):
-        # if a group containing LCS's exists, then move it
-        # according to the imported part
-        if hasattr(obj,"lcsLink"):
-            if len(obj.lcsLink) > 0:
-                lcsGroup = obj.lcsLink[0]
-                lcsGroup.Placement = obj.Placement
-                lcsGroup.purgeTouched() #untouch the lcsGroup, otherwise it stays touched.
+from a2p_importedPart_class import Proxy_muxAssemblyObj # for compat
 
 
 def createTopoInfo(obj): # used during converting an object to a2p object
@@ -71,7 +62,7 @@ def makePlacedShape(obj):
     tempShape.Placement = plmGlobal
     return tempShape
 
-def muxAssemblyWithTopoNames(doc):
+def muxAssemblyWithTopoNames(doc, desiredShapeLabel=None):
     '''
     Mux an a2p assenbly
 
@@ -88,6 +79,14 @@ def muxAssemblyWithTopoNames(doc):
                        and hasattr(obj,'Shape') and len(obj.Shape.Faces) > 0
                        and hasattr(obj,'muxInfo')
                        ]
+    
+    if desiredShapeLabel: # is not None..
+        tmp = []
+        for ob in visibleObjects:
+            if ob.Label == desiredShapeLabel:
+                tmp.append(ob)
+                break
+        visibleObjects = tmp
 
     transparency = 0
     shape_list = []

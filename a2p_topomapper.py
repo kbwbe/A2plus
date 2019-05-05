@@ -481,7 +481,7 @@ class TopoMapper(object):
                 self.isPartDesignDocument = True
                 break
 
-    def createTopoNames(self):
+    def createTopoNames(self, desiredShapeLabel = None):
         '''
         creates a combined shell of all toplevel objects and
         assigns toponames to its geometry if toponaming is
@@ -489,6 +489,17 @@ class TopoMapper(object):
         '''
         self.detectPartDesignDocument()
         self.getTopLevelObjects()
+        
+        # filter topLevelShapes if there is a desiredShapeLabel 
+        # means: extract only one desired shape out of whole file...
+        if desiredShapeLabel: #is not None
+            tmp = []
+            for objName in self.topLevelShapes:
+                o = self.doc.getObject(objName)
+                if o.Label == desiredShapeLabel:
+                    tmp.append(o.Name)
+            self.topLevelShapes = tmp
+        
         #-------------------------------------------
         # analyse the toplevel shapes
         #-------------------------------------------
@@ -572,4 +583,6 @@ class TopoMapper(object):
                 name = self.shapeDict.get(keys[0],"None")
                 muxInfo.append(name)
 
+
         return muxInfo, solid, faceColors, transparency
+    
