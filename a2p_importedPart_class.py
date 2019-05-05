@@ -1,6 +1,6 @@
 #***************************************************************************
 #*                                                                         *
-#*   Copyright (c) 2018 kbwbe                                              *
+#*   Copyright (c) 2019 kbwbe                                              *
 #*                                                                         *
 #*   Portions of code based on hamish's assembly 2                         *
 #*                                                                         *

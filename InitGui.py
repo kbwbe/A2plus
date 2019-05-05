@@ -26,7 +26,7 @@
 __title__ = 'A2plus assembly Workbench - InitGui file'
 __author__ = 'kbwbe'
 
-A2P_VERSION = 'V0.4.19'
+A2P_VERSION = 'V0.4.20'
 
 
 
@@ -140,6 +140,7 @@ Please use {}.{}.{} or above.\n\n'''.format(
         if a2plib.getRecursiveUpdateEnabled():
             partCommands = [
                 'a2p_ImportPart',
+                'a2p_ImportReferencedShapeCommand',
                 'a2p_updateImportedParts',
                 'a2p_recursiveUpdateImportedPartsCommand',
                 'a2p_movePart',

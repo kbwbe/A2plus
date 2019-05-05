@@ -59,6 +59,11 @@ from a2p_importedPart_class import Proxy_importPart
 
 PYVERSION =  sys.version_info[0]
 
+#==============================================================================
+class DataContainer():
+    def __init__(self):
+        self.tx = None
+#==============================================================================
 class ObjectCache:
     '''
     An assembly could use multiple instances of then same importPart.
@@ -96,7 +101,58 @@ class ObjectCache:
 
 objectCache = ObjectCache()
 
-def importPartFromFile(_doc, filename, importToCache=False):
+#==============================================================================
+class a2p_shapeExtractDialog(QtGui.QDialog):
+    '''
+    select a label from shape which has to be imported from a file
+    '''
+    Deleted = QtCore.Signal()
+    Accepted = QtCore.Signal()
+
+
+    def __init__(self,parent,labelList = [], data = None):
+        super(a2p_shapeExtractDialog,self).__init__(parent=parent)
+        #super(a2p_shapeExtractDialog,self).__init__()
+        self.labelList = labelList
+        self.data = data
+        self.initUI()
+        
+    def initUI(self):
+        self.resize(400,100)
+        self.setWindowTitle('select a shape to be imported')
+        self.mainLayout = QtGui.QGridLayout() # a VBoxLayout for the whole form
+
+        self.shapeCombo = QtGui.QComboBox(self)
+        
+        l = sorted(self.labelList)
+        self.shapeCombo.addItems(l)
+
+        self.buttons = QtGui.QDialogButtonBox(self)
+        self.buttons.setOrientation(QtCore.Qt.Horizontal)
+        self.buttons.addButton("Cancel", QtGui.QDialogButtonBox.RejectRole)
+        self.buttons.addButton("Choose", QtGui.QDialogButtonBox.AcceptRole)
+        self.connect(self.buttons, QtCore.SIGNAL("accepted()"), self, QtCore.SLOT("accept()"))
+        self.connect(self.buttons, QtCore.SIGNAL("rejected()"), self, QtCore.SLOT("reject()"))
+
+        self.mainLayout.addWidget(self.shapeCombo,0,0,1,1)
+        self.mainLayout.addWidget(self.buttons,1,0,1,1)
+        self.setLayout(self.mainLayout)
+        
+    def accept(self):
+        if self.data != None:
+            self.data.tx = self.shapeCombo.currentText()
+        self.deleteLater()
+    
+    def reject(self):
+        self.deleteLater()
+
+#==============================================================================
+def importPartFromFile(
+        _doc,
+        filename,
+        extractSingleShape = False, # load only a single user defined shape from file
+        importToCache=False
+        ):
     doc = _doc
     #-------------------------------------------
     # Get the importDocument
@@ -136,9 +192,7 @@ def importPartFromFile(_doc, filename, importToCache=False):
     #-------------------------------------------
     if a2plib.getRecalculateImportedParts():
         for ob in importDoc.Objects:
-            #ob.touch()
             ob.recompute()
-        #importDoc.recompute()
         importDoc.save() # useless without saving...
     
     #-------------------------------------------
@@ -160,6 +214,30 @@ def importPartFromFile(_doc, filename, importToCache=False):
             )
         return
     
+    #-------------------------------------------
+    # if only one single shape of the importdoc is wanted..
+    #-------------------------------------------
+    labelList = []
+    
+    if extractSingleShape:
+        for io in importableObjects:
+            labelList.append(io.Label)
+        dc = DataContainer()
+        dialog = a2p_shapeExtractDialog(
+            QtGui.QApplication.activeWindow(),
+            labelList,
+            dc)
+        dialog.exec_()
+        if dc.tx == None:
+            msg = "Import of a shape reference aborted by user"
+            QtGui.QMessageBox.information(
+                QtGui.QApplication.activeWindow(),
+                "Import Error",
+                msg
+                )
+            return
+            
+            
     #-------------------------------------------
     # Discover whether we are importing a subassembly or a single part
     #-------------------------------------------
@@ -264,7 +342,109 @@ def importPartFromFile(_doc, filename, importToCache=False):
     return newObj
 
 
+#==============================================================================
+toolTip = \
+'''
+Add a single shape out of an external file
+to the assembly
+'''
 
+class a2p_ImportReferencedShapeCommand():
+
+    def GetResources(self):
+        return {'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_ImportPart.svg',
+                #'Accel' : "Shift+A", # a default shortcut (optional)
+                'MenuText': "Add a single shape out of an external file",
+                'ToolTip' : toolTip
+                }
+
+    def Activated(self):
+        if FreeCAD.ActiveDocument == None:
+            QtGui.QMessageBox.information(
+                QtGui.QApplication.activeWindow(),
+               "No active Document found",
+               '''First create an empty file and\nsave it under desired name'''
+               )
+            return
+        #
+        if FreeCAD.ActiveDocument.FileName == '':
+            QtGui.QMessageBox.information(
+                QtGui.QApplication.activeWindow(),
+               "Unnamed document",
+               '''Before inserting first part,\nplease save the empty assembly\nto give it a name'''
+               )
+            FreeCADGui.SendMsgToActiveView("Save")
+            return
+        
+        doc = FreeCAD.activeDocument()
+        guidoc = FreeCADGui.activeDocument()
+        view = guidoc.activeView()
+
+        dialog = QtGui.QFileDialog(
+            QtGui.QApplication.activeWindow(),
+            "Select FreeCAD document to import part from"
+            )
+        # set option "DontUseNativeDialog"=True, as native Filedialog shows
+        # misbehavior on Unbuntu 18.04 LTS. It works case sensitively, what is not wanted...
+        dialog.setOption(QtGui.QFileDialog.DontUseNativeDialog, True)        
+        dialog.setNameFilter("Supported Formats (*.FCStd *.stp *.step);;All files (*.*)")
+        if dialog.exec_():
+            if PYVERSION < 3:
+                filename = unicode(dialog.selectedFiles()[0])
+            else:
+                filename = str(dialog.selectedFiles()[0])
+        else:
+            return
+
+        if not a2plib.checkFileIsInProjectFolder(filename):
+            msg = \
+'''
+The part you try to import is
+outside of your project-folder !
+Check your settings of A2plus preferences.
+'''
+            QtGui.QMessageBox.information(
+                QtGui.QApplication.activeWindow(),
+                "Import Error",
+                msg
+                )
+            return
+
+        #TODO: change for multi separate part import
+        importedObject = importPartFromFile(doc, filename, extractSingleShape=True)
+
+        if not importedObject:
+            a2plib.Msg("imported Object is empty/none\n")
+            return
+
+        mw = FreeCADGui.getMainWindow()
+        mdi = mw.findChild(QtGui.QMdiArea)
+        sub = mdi.activeSubWindow()
+        if sub != None:
+            sub.showMaximized()
+
+# WF: how will this work for multiple imported objects?
+#     only A2p AI's will have property "fixedPosition"
+        if importedObject and not importedObject.fixedPosition:
+            PartMover( view, importedObject, deleteOnEscape = True )
+        else:
+            self.timer = QtCore.QTimer()
+            QtCore.QObject.connect(self.timer, QtCore.SIGNAL("timeout()"), self.GuiViewFit)
+            self.timer.start( 200 ) #0.2 seconds
+        return
+
+    def IsActive(self):
+        doc = FreeCAD.activeDocument()
+        if doc == None: return False
+        return True
+
+    def GuiViewFit(self):
+        FreeCADGui.SendMsgToActiveView("ViewFit")
+        self.timer.stop()
+
+
+FreeCADGui.addCommand('a2p_ImportReferencedShapeCommand',a2p_ImportReferencedShapeCommand())
+#==============================================================================
 toolTip = \
 '''
 Add a part from an external file
@@ -366,6 +546,7 @@ Check your settings of A2plus preferences.
 
 
 FreeCADGui.addCommand('a2p_ImportPart',a2p_ImportPartCommand())
+#==============================================================================
 
 
 
