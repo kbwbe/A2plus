@@ -55,6 +55,7 @@ from a2p_topomapper import (
     )
 
 import a2p_lcs_support
+from a2p_importedPart_class import Proxy_importPart
 
 PYVERSION =  sys.version_info[0]
 
@@ -182,7 +183,7 @@ def importPartFromFile(_doc, filename, importToCache=False):
             newObj = doc.addObject( "Part::FeaturePython", str(partName.encode('utf-8')) )    # works on Python 3.6.5
         newObj.Label = partLabel
 
-    Proxy_muxAssemblyObj(newObj)
+    Proxy_importPart(newObj)
     if FreeCAD.GuiUp:
         ImportedPartViewProviderProxy(newObj.ViewObject)
 
@@ -464,13 +465,6 @@ class a2p_UpdateImportedPartsCommand:
 FreeCADGui.addCommand('a2p_updateImportedParts', a2p_UpdateImportedPartsCommand())
 
 
-
-
-
-
-class Proxy_importPart:
-    def execute(self, shape):
-        pass
 
 def duplicateImportedPart( part ):
     doc = FreeCAD.ActiveDocument

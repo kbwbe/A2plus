@@ -34,10 +34,9 @@ from a2plib import (
     appVersionStr,
     AUTOSOLVE_ENABLED
     )
+from a2p_importedPart_class import Proxy_importPart
+from a2p_importedPart_class import Proxy_convertPart # for compat.
 
-class Proxy_convertPart:
-    def execute(self, shape):
-        pass
 
 def convertToImportedPart(doc, obj):
     '''
@@ -52,20 +51,18 @@ def convertToImportedPart(doc, obj):
     newObj = doc.addObject("Part::FeaturePython",partName)
     newObj.Label = partLabel
 
-    newObj.Proxy = Proxy_convertPart()
-    newObj.ViewObject.Proxy = ImportedPartViewProviderProxy()
+    Proxy_importPart(newObj)
+    ImportedPartViewProviderProxy(newObj.ViewObject)
 
-    newObj.addProperty("App::PropertyString", "a2p_Version","importPart").a2p_Version = A2P_VERSION
-    newObj.addProperty("App::PropertyFile",    "sourceFile",    "importPart").sourceFile = filename
-    newObj.addProperty("App::PropertyStringList","muxInfo","importPart")
-    newObj.addProperty("App::PropertyFloat", "timeLastImport","importPart")
+    newObj.a2p_Version = A2P_VERSION
+    newObj.sourceFile = filename
+    #newObj.sourcePart = ""
     newObj.setEditorMode("timeLastImport",1)
     newObj.timeLastImport = time.time()
-    newObj.addProperty("App::PropertyBool","fixedPosition","importPart")
     newObj.fixedPosition = False
-    newObj.addProperty("App::PropertyBool","subassemblyImport","importPart").subassemblyImport = False
+    newObj.subassemblyImport = False
     newObj.setEditorMode("subassemblyImport",1)
-    newObj.addProperty("App::PropertyBool","updateColors","importPart").updateColors = True
+    newObj.updateColors = True
 
     newObj.Shape = obj.Shape.copy()
     newObj.muxInfo = createTopoInfo(obj)
@@ -120,13 +117,6 @@ class a2p_ConvertPartCommand():
                 }
 
     def Activated(self):
-        if FreeCAD.activeDocument() == None:
-            QtGui.QMessageBox.information(
-                QtGui.QApplication.activeWindow(),
-               "No active document error",
-               "Please open an assembly file first!"
-               )
-            return
         doc = FreeCAD.activeDocument()
         selection = FreeCADGui.Selection.getSelection()
         if not selection:
@@ -177,6 +167,8 @@ Please select a Part.
     def IsActive(self):
         """Here you can define if the command must be active or not (greyed) if certain conditions
         are met or not. This function is optional."""
+        if FreeCAD.activeDocument() is None:
+            return False
         
         return True
 

@@ -32,56 +32,7 @@ import time
 import a2plib
 from PySide import QtGui
 
-
-class Proxy_muxAssemblyObj:
-    '''
-    The a2p importPart object
-    '''
-    def __init__(self,obj):
-        obj.Proxy = self
-        Proxy_muxAssemblyObj.setProperties(self,obj)
-        self.type = "a2p_importPart"
-        
-    def setProperties(self,obj):
-        propList = obj.PropertiesList
-        if not "a2p_Version" in propList:
-            obj.addProperty("App::PropertyString", "a2p_Version", "importPart")
-        if not "sourceFile" in propList:
-            obj.addProperty("App::PropertyFile", "sourceFile", "importPart")
-        if not "sourcePart" in propList:
-            obj.addProperty("App::PropertyString", "sourcePart", "importPart")
-        if not "muxInfo" in propList:
-            obj.addProperty("App::PropertyStringList","muxInfo","importPart")
-        if not "timeLastImport" in propList:
-            obj.addProperty("App::PropertyFloat", "timeLastImport","importPart")
-        if not "fixedPosition" in propList:
-            obj.addProperty("App::PropertyBool","fixedPosition","importPart")
-        if not "subassemblyImport" in propList:
-            obj.addProperty("App::PropertyBool","subassemblyImport","importPart")
-        if not "updateColors" in propList:
-            obj.addProperty("App::PropertyBool","updateColors","importPart")
-
-        self.type = "a2p_importPart"
-
-    def onDocumentRestored(self,obj):
-        Proxy_muxAssemblyObj.setProperties(self,obj)
-
-    def __getstate__(self):
-        return None
-
-    def __setstate__(self,state):
-        return None
-
-        
-    
-    def execute(self, obj):
-        # if a group containing LCS's exists, then move it
-        # according to the imported part
-        if hasattr(obj,"lcsLink"):
-            if len(obj.lcsLink) > 0:
-                lcsGroup = obj.lcsLink[0]
-                lcsGroup.Placement = obj.Placement
-                lcsGroup.purgeTouched() #untouch the lcsGroup, otherwise it stays touched.
+from a2p_importedPart_class import Proxy_muxAssemblyObj # for compat
 
 
 def createTopoInfo(obj): # used during converting an object to a2p object
