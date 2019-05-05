@@ -151,7 +151,9 @@ def importPartFromFile(
         _doc,
         filename,
         extractSingleShape = False, # load only a single user defined shape from file
-        importToCache=False
+        desiredShapeLabel=None,
+        importToCache=False,
+        cacheKey = ""
         ):
     doc = _doc
     #-------------------------------------------
@@ -220,23 +222,25 @@ def importPartFromFile(
     labelList = []
     
     if extractSingleShape:
-        for io in importableObjects:
-            labelList.append(io.Label)
         dc = DataContainer()
-        dialog = a2p_shapeExtractDialog(
-            QtGui.QApplication.activeWindow(),
-            labelList,
-            dc)
-        dialog.exec_()
-        if dc.tx == None:
-            msg = "Import of a shape reference aborted by user"
-            QtGui.QMessageBox.information(
+        if desiredShapeLabel is None: # ask for a shape label
+            for io in importableObjects:
+                labelList.append(io.Label)
+            dialog = a2p_shapeExtractDialog(
                 QtGui.QApplication.activeWindow(),
-                "Import Error",
-                msg
-                )
-            return
-            
+                labelList,
+                dc)
+            dialog.exec_()
+            if dc.tx == None:
+                msg = "Import of a shape reference aborted by user"
+                QtGui.QMessageBox.information(
+                    QtGui.QApplication.activeWindow(),
+                    "Import Error",
+                    msg
+                    )
+                return
+        else: # use existant shape label
+            dc.tx = desiredShapeLabel
             
     #-------------------------------------------
     # Discover whether we are importing a subassembly or a single part
@@ -277,6 +281,9 @@ def importPartFromFile(
         newObj.sourceFile = relativePath
     else:
         newObj.sourceFile = absPath
+        
+    if dc.tx is not None:
+        newObj.sourcePart = dc.tx
     
     newObj.setEditorMode("timeLastImport",1)
     newObj.timeLastImport = os.path.getmtime( filename )
@@ -307,7 +314,7 @@ def importPartFromFile(
     doc.recompute()
 
     if importToCache: # this import is used to update already imported parts
-        objectCache.add(filename, newObj)
+        objectCache.add(cacheKey, newObj)
     else: # this is a first time import of a part
         if not a2plib.getPerFaceTransparency():
             # turn of perFaceTransparency by accessing ViewObject.Transparency and set to zero (non transparent)
@@ -572,11 +579,6 @@ def updateImportedParts(doc):
     objectCache.cleanUp(doc)
     for obj in doc.Objects:
         if hasattr(obj, 'sourceFile') and a2plib.to_str(obj.sourceFile) != a2plib.to_str('converted'):
-            if not hasattr( obj, 'a2p_Version'):
-                obj.addProperty("App::PropertyString", "a2p_Version","importPart").a2p_Version = 'V0.0'
-                obj.setEditorMode("a2p_Version",1)
-            if not hasattr( obj, 'muxInfo'):
-                obj.addProperty("App::PropertyStringList","muxInfo","importPart").muxInfo = []
 
             assemblyPath = os.path.normpath(os.path.split(doc.FileName)[0])
             absPath = a2plib.findSourceFileInProject(obj.sourceFile, assemblyPath)
@@ -595,15 +597,33 @@ def updateImportedParts(doc):
                     obj.a2p_Version != A2P_VERSION or
                     a2plib.getRecalculateImportedParts() # open always all parts as they could depend on spreadsheets
                     ):
-                    
-                    if not objectCache.isCached(absPath): # Load every changed object one time to cache
-                        importPartFromFile(
-                            doc,
-                            absPath,
-                            importToCache=True
-                            ) # the version is now in the cache
+                    cacheKeyExtension = obj.sourcePart
+                    if cacheKeyExtension is None:
+                        cacheKeyExtension = "AllShapes"
+                    elif cacheKeyExtension == "":
+                        cacheKeyExtension = "AllShapes"
+                    cacheKeyExtension = '-' + cacheKeyExtension
+                    cacheKey = absPath+cacheKeyExtension
                         
-                    newObject = objectCache.get(absPath)
+                    if not objectCache.isCached(cacheKey): # Load every changed object one time to cache
+                        if obj.sourcePart is not None and obj.sourcePart != '':
+                            importPartFromFile(
+                                doc,
+                                absPath,
+                                importToCache=True,
+                                cacheKey = cacheKey,
+                                extractSingleShape = True,
+                                desiredShapeLabel = obj.sourcePart
+                                ) # the version is now in the cache
+                        else:
+                            importPartFromFile(
+                                doc,
+                                absPath,
+                                importToCache=True,
+                                cacheKey = cacheKey
+                                ) # the version is now in the cache
+                        
+                    newObject = objectCache.get(cacheKey)
                     obj.timeLastImport = newPartCreationTime
                     if hasattr(newObject, 'a2p_Version'):
                         obj.a2p_Version = A2P_VERSION
