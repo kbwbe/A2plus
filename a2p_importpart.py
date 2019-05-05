@@ -288,12 +288,20 @@ def importPartFromFile(
     newObj.setEditorMode("subassemblyImport",1)
 
     if subAssemblyImport:
-        newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = \
-            muxAssemblyWithTopoNames(importDoc)
+        if extractSingleShape:
+            newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = \
+                muxAssemblyWithTopoNames(importDoc,desiredShapeLabel = dc.tx)
+        else:
+            newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = \
+                muxAssemblyWithTopoNames(importDoc)
     else:
         # TopoMapper manages import of non A2p-Files. It generates the shapes and appropriate topo names...
-        newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = \
-            topoMapper.createTopoNames()
+        if extractSingleShape:
+            newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = \
+                topoMapper.createTopoNames(desiredShapeLabel = dc.tx)
+        else:
+            newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = \
+                topoMapper.createTopoNames()
         
 
     doc.recompute()
@@ -587,8 +595,14 @@ def updateImportedParts(doc):
                     obj.a2p_Version != A2P_VERSION or
                     a2plib.getRecalculateImportedParts() # open always all parts as they could depend on spreadsheets
                     ):
+                    
                     if not objectCache.isCached(absPath): # Load every changed object one time to cache
-                        importPartFromFile(doc, absPath, importToCache=True) # the version is now in the cache
+                        importPartFromFile(
+                            doc,
+                            absPath,
+                            importToCache=True
+                            ) # the version is now in the cache
+                        
                     newObject = objectCache.get(absPath)
                     obj.timeLastImport = newPartCreationTime
                     if hasattr(newObject, 'a2p_Version'):

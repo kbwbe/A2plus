@@ -62,7 +62,7 @@ def makePlacedShape(obj):
     tempShape.Placement = plmGlobal
     return tempShape
 
-def muxAssemblyWithTopoNames(doc):
+def muxAssemblyWithTopoNames(doc, desiredShapeLabel=None):
     '''
     Mux an a2p assenbly
 
@@ -79,6 +79,14 @@ def muxAssemblyWithTopoNames(doc):
                        and hasattr(obj,'Shape') and len(obj.Shape.Faces) > 0
                        and hasattr(obj,'muxInfo')
                        ]
+    
+    if desiredShapeLabel: # is not None..
+        tmp = []
+        for ob in visibleObjects:
+            if ob.Label == desiredShapeLabel:
+                tmp.append(ob)
+                break
+        visibleObjects = tmp
 
     transparency = 0
     shape_list = []
