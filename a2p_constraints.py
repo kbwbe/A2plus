@@ -424,7 +424,7 @@ class AxisPlaneParallelConstraint(BasicConstraint):
     def getToolTip():
         return \
 '''
-Creates an axisPlaneParallel constraint.
+Add an axisPlaneParallel constraint
 
 1) select a linear edge or cylinder axis
 2) select a plane face on another part
@@ -475,7 +475,7 @@ class AxisPlaneVerticalConstraint(BasicConstraint):
     def getToolTip():
         return \
 '''
-Creates an axisPlaneVertical constraint.
+Add an axisPlaneVertical constraint
 
 1) select a linear edge or cylinder axis
 2) select a plane face on another part
@@ -624,7 +624,7 @@ class AngledPlanesConstraint(BasicConstraint):
     def getToolTip():
         return \
 '''
-Creates an angledPlanes constraint.
+Add an angledPlanes constraint
 
 1) select first plane object
 2) select second plane object on another part
@@ -730,7 +730,7 @@ class CenterOfMassConstraint(BasicConstraint):
     def getToolTip():
         return \
 '''
-Creates a centerOfMass constraint.
+Add a centerOfMass constraint
 
 (Join centerOfMass of \'face1\' or \'closed edge1\' to 
 centerOfMass of \'face2\' or \'closed edge2\') 
