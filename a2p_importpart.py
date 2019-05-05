@@ -182,11 +182,11 @@ def importPartFromFile(_doc, filename, importToCache=False):
             newObj = doc.addObject( "Part::FeaturePython", str(partName.encode('utf-8')) )    # works on Python 3.6.5
         newObj.Label = partLabel
 
-    newObj.Proxy = Proxy_muxAssemblyObj()
-    newObj.ViewObject.Proxy = ImportedPartViewProviderProxy()
+    Proxy_muxAssemblyObj(newObj)
+    if FreeCAD.GuiUp:
+        ImportedPartViewProviderProxy(newObj.ViewObject)
 
-    newObj.addProperty("App::PropertyString", "a2p_Version","importPart").a2p_Version = A2P_VERSION
-    
+    newObj.a2p_Version = A2P_VERSION
     assemblyPath = os.path.normpath(os.path.split(doc.FileName)[0])
     absPath = os.path.normpath(filename)
     if getRelativePathesEnabled():
@@ -195,26 +195,20 @@ def importPartFromFile(_doc, filename, importToCache=False):
         else:
             prefix = './'
         relativePath = prefix+os.path.relpath(absPath, assemblyPath)
-        newObj.addProperty("App::PropertyFile",    "sourceFile",    "importPart").sourceFile = relativePath
+        newObj.sourceFile = relativePath
     else:
-        newObj.addProperty("App::PropertyFile",    "sourceFile",    "importPart").sourceFile = absPath
+        newObj.sourceFile = absPath
     
-    newObj.addProperty("App::PropertyStringList","muxInfo","importPart")
-    newObj.addProperty("App::PropertyFloat", "timeLastImport","importPart")
     newObj.setEditorMode("timeLastImport",1)
     newObj.timeLastImport = os.path.getmtime( filename )
-    newObj.addProperty("App::PropertyBool","fixedPosition","importPart")
     if a2plib.getForceFixedPosition():
         newObj.fixedPosition = True
     else:
         newObj.fixedPosition = not any([i.fixedPosition for i in doc.Objects if hasattr(i, 'fixedPosition') ])
-    newObj.addProperty("App::PropertyBool","subassemblyImport","importPart").subassemblyImport = subAssemblyImport
+    newObj.subassemblyImport = subAssemblyImport
     newObj.setEditorMode("subassemblyImport",1)
-    newObj.addProperty("App::PropertyBool","updateColors","importPart").updateColors = True
 
     if subAssemblyImport:
-    #if False:
-        #newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor = muxObjectsWithKeys(importableObjects, withColor=True)
         newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = \
             muxAssemblyWithTopoNames(importDoc)
     else:
@@ -491,21 +485,19 @@ def duplicateImportedPart( part ):
     
     newObj.Label = partLabel
 
-    newObj.Proxy = Proxy_importPart()
-    newObj.ViewObject.Proxy = ImportedPartViewProviderProxy()
+    Proxy_importPart(newObj)
+    ImportedPartViewProviderProxy(newObj.ViewObject)
 
 
-    if hasattr(part,'a2p_Version'):
-        newObj.addProperty("App::PropertyString", "a2p_Version","importPart").a2p_Version = part.a2p_Version
-    newObj.addProperty("App::PropertyFile",    "sourceFile",    "importPart").sourceFile = part.sourceFile
-    newObj.addProperty("App::PropertyFloat", "timeLastImport","importPart").timeLastImport =  part.timeLastImport
+    newObj.a2p_Version = part.a2p_Version
+    newObj.sourceFile = part.sourceFile
+    newObj.sourcePart = part.sourcePart
+    newObj.timeLastImport =  part.timeLastImport
     newObj.setEditorMode("timeLastImport",1)
-    newObj.addProperty("App::PropertyBool","fixedPosition","importPart").fixedPosition = False# part.fixedPosition
-    newObj.addProperty("App::PropertyBool","updateColors","importPart").updateColors = getattr(part,'updateColors',True)
-    if hasattr(part, "muxInfo"):
-        newObj.addProperty("App::PropertyStringList","muxInfo","importPart").muxInfo = part.muxInfo
-    if hasattr(part, 'subassemblyImport'):
-        newObj.addProperty("App::PropertyBool","subassemblyImport","importPart").subassemblyImport = part.subassemblyImport
+    newObj.fixedPosition = False
+    newObj.updateColors = getattr(part,'updateColors',True)
+    newObj.muxInfo = part.muxInfo
+    newObj.subassemblyImport = part.subassemblyImport
     newObj.Shape = part.Shape.copy()
 
     for p in part.ViewObject.PropertiesList: #assuming that the user may change the appearance of parts differently depending on their role in the assembly.

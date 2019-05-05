@@ -31,6 +31,11 @@ import a2plib
 
 #---------------------------------------------------------------------------
 class ImportedPartViewProviderProxy:
+    '''
+    A ViewProvider for the a2p importPart object
+    '''
+    def __init__(self,vobj):
+        vobj.Proxy = self
 
     def claimChildren(self):
         if hasattr(self,'Object'):
