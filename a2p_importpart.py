@@ -364,10 +364,10 @@ Add a single shape out of an external file
 to the assembly
 '''
 
-class a2p_ImportReferencedShapeCommand():
+class a2p_ImportShapeReferenceCommand():
 
     def GetResources(self):
-        return {'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_ImportPart.svg',
+        return {'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_ShapeReference.svg',
                 #'Accel' : "Shift+A", # a default shortcut (optional)
                 'MenuText': "Add a single shape out of an external file",
                 'ToolTip' : toolTip
@@ -458,7 +458,7 @@ Check your settings of A2plus preferences.
         self.timer.stop()
 
 
-FreeCADGui.addCommand('a2p_ImportReferencedShapeCommand',a2p_ImportReferencedShapeCommand())
+FreeCADGui.addCommand('a2p_ImportShapeReferenceCommand',a2p_ImportShapeReferenceCommand())
 #==============================================================================
 toolTip = \
 '''

@@ -140,7 +140,7 @@ Please use {}.{}.{} or above.\n\n'''.format(
         if a2plib.getRecursiveUpdateEnabled():
             partCommands = [
                 'a2p_ImportPart',
-                'a2p_ImportReferencedShapeCommand',
+                'a2p_ImportShapeReferenceCommand',
                 'a2p_updateImportedParts',
                 'a2p_recursiveUpdateImportedPartsCommand',
                 'a2p_movePart',
