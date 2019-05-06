@@ -132,7 +132,7 @@ class ImportedPartViewProviderProxy:
 
     def getIcon(self):
         if hasattr(self,"Object"):
-            if hasattr(self.Object,"sourceFile"):
+            if hasattr(self.Object,"sourceFile") and hasattr(self.Object,"sourcePart"):
                 if self.Object.sourcePart is not None and self.Object.sourcePart !='':
                     return ":/icons/a2p_ShapeReference.svg"
             if hasattr(self.Object,"subassemblyImport"):
