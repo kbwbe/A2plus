@@ -220,9 +220,9 @@ def importPartFromFile(
     # if only one single shape of the importdoc is wanted..
     #-------------------------------------------
     labelList = []
+    dc = DataContainer()
     
     if extractSingleShape:
-        dc = DataContainer()
         if desiredShapeLabel is None: # ask for a shape label
             for io in importableObjects:
                 labelList.append(io.Label)
