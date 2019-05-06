@@ -152,6 +152,7 @@ Please use {}.{}.{} or above.\n\n'''.format(
         else:
             partCommands = [
                 'a2p_ImportPart',
+                'a2p_ImportShapeReferenceCommand',
                 'a2p_updateImportedParts',
                 'a2p_movePart',
                 'a2p_duplicatePart',
