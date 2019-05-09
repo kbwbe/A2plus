@@ -550,6 +550,14 @@ class TopoMapper(object):
         except:
             # keeping a shell if solid is failing
             solid = shell
+        
+        # sometimes converting to solid deletes faces, especially spheres.
+        # check for this problem and apply a shell if problems are detected
+        numShellFaces = len(shell.Faces)
+        numSolidFaces = len(solid.Faces)  
+        if numShellFaces != numSolidFaces:  
+            solid = shell # fall back to shell on missing faces
+        
         #-------------------------------------------
         # if toponaming is used, assign toponames to
         # shells geometry
