@@ -159,13 +159,13 @@ class ImportedPartViewProviderProxy:
 #==============================================================================
 class Proxy_muxAssemblyObj(Proxy_importPart):
     '''
-    A wrapper for compatibilty reasons...
+    A wrapper for compatibility reasons...
     '''
     pass
 #==============================================================================
 class Proxy_convertPart(Proxy_importPart):
     '''
-    A wrapper for compatibilty reasons...
+    A wrapper for compatibility reasons...
     '''
     pass
 #==============================================================================

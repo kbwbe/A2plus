@@ -239,7 +239,7 @@ def importPartFromFile(
                     msg
                     )
                 return
-        else: # use existant shape label
+        else: # use existent shape label
             dc.tx = desiredShapeLabel
             
     #-------------------------------------------
