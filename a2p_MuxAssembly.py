@@ -155,9 +155,11 @@ def muxAssemblyWithTopoNames(doc, desiredShapeLabel=None):
             if len(shape_list) > 1:
                 shape_base=shape_list[0]
                 shapes=shape_list[1:]
+                FreeCAD.Console.PrintError("pre-unioning")
                 solid = shape_base.fuse(shapes)
+                FreeCAD.Console.PrintError("unioning")
             else:   #one drill ONLY
-                solid = shape_list[0]
+                solid = Part.Solid(shape_list[0])
         else:
             numShellFaces = len(shell.Faces)
             solid = Part.Solid(shell) # This does not work if shell includes spherical faces. FC-Bug ??

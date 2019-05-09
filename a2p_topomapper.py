@@ -544,7 +544,7 @@ class TopoMapper(object):
                     solid = shape_base.fuse(shapes)
                     #solid = ob.Shape
                 else:   #one shape only
-                    solid = shape_list[0]
+                    solid = Part.Solid(shape_list[0])
             else:
                 solid = Part.Solid(shell)
         except:
