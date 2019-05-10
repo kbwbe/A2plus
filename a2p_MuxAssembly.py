@@ -147,7 +147,10 @@ def muxAssemblyWithTopoNames(doc, desiredShapeLabel=None):
 
         faces.extend(tempShape.Faces)
 
-    shell = Part.makeShell(faces)
+    if len(faces) == 1:
+        shell = Part.makeShell([faces])
+    else:
+        shell = Part.makeShell(faces)
     try:
         # solid = Part.Solid(shell)
         # solid = Part.makeCompound (shape_list)
@@ -155,18 +158,16 @@ def muxAssemblyWithTopoNames(doc, desiredShapeLabel=None):
             if len(shape_list) > 1:
                 shape_base=shape_list[0]
                 shapes=shape_list[1:]
-                FreeCAD.Console.PrintError("pre-unioning")
                 solid = shape_base.fuse(shapes)
-                FreeCAD.Console.PrintError("unioning")
             else:   #one drill ONLY
                 solid = Part.Solid(shape_list[0])
         else:
             numShellFaces = len(shell.Faces)
             solid = Part.Solid(shell) # This does not work if shell includes spherical faces. FC-Bug ??
-            numSolidFaces = len(solid.Faces)
-            # Check, whether all faces where processed...
-            if numShellFaces != numSolidFaces:
-                solid = shell # Some faces are missing, take shell as result as workaround..
+            # numSolidFaces = len(solid.Faces)
+            # # Check, whether all faces where processed...
+            # if numShellFaces != numSolidFaces:
+            #     solid = shell # Some faces are missing, take shell as result as workaround..
     except:
         # keeping a shell if solid is failing
         solid = shell
@@ -270,7 +271,10 @@ def createOrUpdateSimpleAssemblyShape(doc):
     for obj in visibleImportObjects:
         faces = faces + obj.Shape.Faces
         shape_list.append(obj.Shape)
-    shell = Part.makeShell(faces)
+    if len(faces) == 1:
+        shell = Part.makeShell([faces])
+    else:
+        shell = Part.makeShell(faces)
     try:
         # solid = Part.Solid(shell)
         # solid = Part.makeCompound (shape_list)
