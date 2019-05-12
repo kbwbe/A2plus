@@ -535,28 +535,25 @@ class TopoMapper(object):
                 faceColors.extend(diffuseCol) #let python libs extend faceColors, much faster
             faces.extend(tempShape.Faces) #let python libs extend faces, much faster
 
-        shell = Part.makeShell(faces)
+        if len(faces) == 1:
+            shell = Part.makeShell([faces])
+        else:
+            shell = Part.makeShell(faces)    
         try:
             if a2plib.getUseSolidUnion():
                 if len(shape_list) > 1:
                     shape_base=shape_list[0]
                     shapes=shape_list[1:]
                     solid = shape_base.fuse(shapes)
-                    #solid = ob.Shape
                 else:   #one shape only
-                    solid = shape_list[0]
+                    solid = Part.Solid(shape_list[0])
             else:
-                solid = Part.Solid(shell)
+                solid = Part.Solid(shell) # fails with missing faces if shell contains spheres
+                if len(shell.Faces) != len(solid.Faces):
+                    solid = shell # fall back to shell if faces are missing
         except:
             # keeping a shell if solid is failing
             solid = shell
-        
-        # sometimes converting to solid deletes faces, especially spheres.
-        # check for this problem and apply a shell if problems are detected
-        numShellFaces = len(shell.Faces)
-        numSolidFaces = len(solid.Faces)  
-        if numShellFaces != numSolidFaces:  
-            solid = shell # fall back to shell on missing faces
         
         #-------------------------------------------
         # if toponaming is used, assign toponames to
