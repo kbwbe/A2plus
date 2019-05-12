@@ -152,22 +152,18 @@ def muxAssemblyWithTopoNames(doc, desiredShapeLabel=None):
     else:
         shell = Part.makeShell(faces)
     try:
-        # solid = Part.Solid(shell)
-        # solid = Part.makeCompound (shape_list)
         if a2plib.getUseSolidUnion():
             if len(shape_list) > 1:
                 shape_base=shape_list[0]
                 shapes=shape_list[1:]
                 solid = shape_base.fuse(shapes)
-            else:   #one drill ONLY
+            else:
                 solid = Part.Solid(shape_list[0])
         else:
-            numShellFaces = len(shell.Faces)
             solid = Part.Solid(shell) # This does not work if shell includes spherical faces. FC-Bug ??
-            # numSolidFaces = len(solid.Faces)
-            # # Check, whether all faces where processed...
-            # if numShellFaces != numSolidFaces:
-            #     solid = shell # Some faces are missing, take shell as result as workaround..
+            # Fall back to shell if some faces are missing..
+            if len(shell.Faces) != len(solid.Faces):
+                solid = shell
     except:
         # keeping a shell if solid is failing
         solid = shell
@@ -276,27 +272,18 @@ def createOrUpdateSimpleAssemblyShape(doc):
     else:
         shell = Part.makeShell(faces)
     try:
-        # solid = Part.Solid(shell)
-        # solid = Part.makeCompound (shape_list)
         if a2plib.getUseSolidUnion():
             if len(shape_list) > 1:
                 shape_base=shape_list[0]
                 shapes=shape_list[1:]
                 solid = shape_base.fuse(shapes)
-            else:   #one shape only
-                numShellFaces = len(shell.Faces)
-                solid = Part.Solid(shell) # This does not work if shell includes spherical faces. FC-Bug ??
-                numSolidFaces = len(solid.Faces)
-                # Check, whether all faces where processed...
-                if numShellFaces != numSolidFaces:
-                    solid = shell # Some faces are missing, take shell as result as workaround..
+            else:
+                solid = Part.Solid(shape_list[0])
         else:
-            numShellFaces = len(shell.Faces)
             solid = Part.Solid(shell) # This does not work if shell includes spherical faces. FC-Bug ??
-            numSolidFaces = len(solid.Faces)
-            # Check, whether all faces where processed...
-            if numShellFaces != numSolidFaces:
-                solid = shell # Some faces are missing, take shell as result as workaround..
+            # Fall back to shell if faces are misiing
+            if len(shell.Faces) != len(solid.Faces):
+                solid = shell
     except:
         # keeping a shell if solid is failing
         solid = shell

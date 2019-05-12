@@ -580,6 +580,9 @@ def updateImportedParts(doc):
     for obj in doc.Objects:
         if hasattr(obj, 'sourceFile') and a2plib.to_str(obj.sourceFile) != a2plib.to_str('converted'):
 
+            if not "sourcePart" in obj.PropertiesList:
+                obj.addProperty("App::PropertyString", "sourcePart", "importPart")
+
             assemblyPath = os.path.normpath(os.path.split(doc.FileName)[0])
             absPath = a2plib.findSourceFileInProject(obj.sourceFile, assemblyPath)
 

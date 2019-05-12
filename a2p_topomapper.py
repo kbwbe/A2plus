@@ -545,21 +545,15 @@ class TopoMapper(object):
                     shape_base=shape_list[0]
                     shapes=shape_list[1:]
                     solid = shape_base.fuse(shapes)
-                    #solid = ob.Shape
                 else:   #one shape only
                     solid = Part.Solid(shape_list[0])
             else:
-                solid = Part.Solid(shell)
+                solid = Part.Solid(shell) # fails with missing faces if shell contains spheres
+                if len(shell.Faces) != len(solid.Faces):
+                    solid = shell # fall back to shell if faces are missing
         except:
             # keeping a shell if solid is failing
             solid = shell
-        
-        # sometimes converting to solid deletes faces, especially spheres.
-        # check for this problem and apply a shell if problems are detected
-        # numShellFaces = len(shell.Faces)
-        # numSolidFaces = len(solid.Faces)  
-        # if numShellFaces != numSolidFaces:  
-        #     solid = shell # fall back to shell on missing faces
         
         #-------------------------------------------
         # if toponaming is used, assign toponames to

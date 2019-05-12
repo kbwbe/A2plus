@@ -60,6 +60,7 @@ class Proxy_importPart:
             obj.addProperty("App::PropertyBool","subassemblyImport","importPart")
         if not "updateColors" in propList:
             obj.addProperty("App::PropertyBool","updateColors","importPart")
+            obj.updateColors = True
 
         self.type = "a2p_importPart"
 
