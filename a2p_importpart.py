@@ -55,7 +55,7 @@ from a2p_topomapper import (
     )
 
 import a2p_lcs_support
-from a2p_importedPart_class import Proxy_importPart
+from a2p_importedPart_class import Proxy_importPart, ImportedPartViewProviderProxy
 
 PYVERSION =  sys.version_info[0]
 
@@ -580,9 +580,14 @@ def updateImportedParts(doc):
     for obj in doc.Objects:
         if hasattr(obj, 'sourceFile') and a2plib.to_str(obj.sourceFile) != a2plib.to_str('converted'):
 
-            if not "sourcePart" in obj.PropertiesList:
-                obj.addProperty("App::PropertyString", "sourcePart", "importPart")
-
+            
+            #repair data structures (perhaps an old Assembly2 import was found)
+            if hasattr(obj,"Content") and 'importPart' in obj.Content: # be sure to have an assembly object
+                if obj.Proxy is None:
+                    #print (u"Repair Proxy of: {}, Proxy: {}".format(obj.Label, obj.Proxy))
+                    Proxy_importPart(obj)
+                    ImportedPartViewProviderProxy(obj.ViewObject)
+                    
             assemblyPath = os.path.normpath(os.path.split(doc.FileName)[0])
             absPath = a2plib.findSourceFileInProject(obj.sourceFile, assemblyPath)
 

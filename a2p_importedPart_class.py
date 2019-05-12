@@ -31,7 +31,7 @@ import numpy
 from FreeCAD import  Base
 from PySide import QtGui
 import a2plib
-
+from a2p_versionmanagement import A2P_VERSION
 #==============================================================================
 class Proxy_importPart:
     '''
@@ -46,6 +46,7 @@ class Proxy_importPart:
         propList = obj.PropertiesList
         if not "a2p_Version" in propList:
             obj.addProperty("App::PropertyString", "a2p_Version", "importPart")
+            obj.a2p_Version = A2P_VERSION
         if not "sourceFile" in propList:
             obj.addProperty("App::PropertyFile", "sourceFile", "importPart")
         if not "sourcePart" in propList:
@@ -58,6 +59,7 @@ class Proxy_importPart:
             obj.addProperty("App::PropertyBool","fixedPosition","importPart")
         if not "subassemblyImport" in propList:
             obj.addProperty("App::PropertyBool","subassemblyImport","importPart")
+            obj.subassemblyImport = False
         if not "updateColors" in propList:
             obj.addProperty("App::PropertyBool","updateColors","importPart")
             obj.updateColors = True
