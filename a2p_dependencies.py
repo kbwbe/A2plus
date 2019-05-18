@@ -340,9 +340,9 @@ class Dependency():
             normal2 = a2plib.getPlaneNormal(plane2.Surface)
             dep2.refAxisEnd = dep2.refPoint.add(normal2)
 
-        elif c.Type == "axisPlaneVertical":
-            dep1 = DependencyAxisPlaneVertical(c, "pointAxis")
-            dep2 = DependencyAxisPlaneVertical(c, "pointNormal")
+        elif c.Type == "axisPlaneVertical" or c.Type == "axisPlaneNormal": # axisPlaneVertical for compat.
+            dep1 = DependencyAxisPlaneNormal(c, "pointAxis")
+            dep2 = DependencyAxisPlaneNormal(c, "pointNormal")
 
             ob1 = doc.getObject(c.Object1)
             ob2 = doc.getObject(c.Object2)
@@ -379,13 +379,7 @@ class Dependency():
             elif c.SubElement2.startswith('Edge'):
                 plane2 = Part.Face(Part.Wire(getObjectEdgeFromName(ob2, c.SubElement2)))
                 dep2.refPoint = plane2.CenterOfMass
-            #plane1 = getObjectFaceFromName(ob1, c.SubElement1)
-            #plane2 = getObjectFaceFromName(ob2, c.SubElement2)
-            # dep1.refPoint = plane1.Faces[0].CenterOfMass
-            # dep2.refPoint = plane2.Faces[0].CenterOfMass
             
-            #normal1 = plane1.Surface.Axis
-            #normal2 = plane2.Surface.Axis
             normal1 = a2plib.getPlaneNormal(plane1.Surface)
             normal2 = a2plib.getPlaneNormal(plane2.Surface)
 
@@ -859,7 +853,7 @@ class DependencyAxisPlaneParallel(Dependency):
         tmpaxis.Direction.Length = 2.0
         return _dofPos, AngleAlignment(tmpaxis,_dofRot)
 
-class DependencyAxisPlaneVertical(Dependency):
+class DependencyAxisPlaneNormal(Dependency):
     def __init__(self, constraint, refType):
         Dependency.__init__(self, constraint, refType, True)
         self.isPointConstraint = False

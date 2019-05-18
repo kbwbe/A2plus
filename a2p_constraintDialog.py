@@ -517,19 +517,19 @@ class a2p_ConstraintCollection(QtGui.QWidget):
         QtCore.QObject.connect(self.axisPlaneParallelButton, QtCore.SIGNAL("clicked()"), self.onAxisPlaneParallelButton)
         self.constraintButtons.append(self.axisPlaneParallelButton)
         #-------------------------------------
-        self.axisPlaneVerticalButton = QtGui.QPushButton(self.panel2)
-        self.axisPlaneVerticalButton.setFixedSize(32,32)
-        self.axisPlaneVerticalButton.setIcon(QtGui.QIcon(':/icons/a2p_AxisPlaneVerticalConstraint.svg'))
-        self.axisPlaneVerticalButton.setToolTip(a2p_constraints.AxisPlaneVerticalConstraint.getToolTip())
-        self.axisPlaneVerticalButton.setText("")
-        QtCore.QObject.connect(self.axisPlaneVerticalButton, QtCore.SIGNAL("clicked()"), self.onAxisPlaneVerticalButton)
-        self.constraintButtons.append(self.axisPlaneVerticalButton)
+        self.axisPlaneNormalButton = QtGui.QPushButton(self.panel2)
+        self.axisPlaneNormalButton.setFixedSize(32,32)
+        self.axisPlaneNormalButton.setIcon(QtGui.QIcon(':/icons/a2p_AxisPlaneNormalConstraint.svg'))
+        self.axisPlaneNormalButton.setToolTip(a2p_constraints.AxisPlaneNormalConstraint.getToolTip())
+        self.axisPlaneNormalButton.setText("")
+        QtCore.QObject.connect(self.axisPlaneNormalButton, QtCore.SIGNAL("clicked()"), self.onAxisPlaneNormalButton)
+        self.constraintButtons.append(self.axisPlaneNormalButton)
         #-------------------------------------
         panel2_Layout.addWidget(self.circularEdgeButton)
         panel2_Layout.addWidget(self.axialButton)
         panel2_Layout.addWidget(self.axisParallelButton)
         panel2_Layout.addWidget(self.axisPlaneParallelButton)
-        panel2_Layout.addWidget(self.axisPlaneVerticalButton)
+        panel2_Layout.addWidget(self.axisPlaneNormalButton)
         panel2_Layout.addStretch(1)
         self.panel2.setLayout(panel2_Layout)
         #-------------------------------------
@@ -647,8 +647,8 @@ button.
                 self.axialButton.setEnabled(True)
             if a2p_constraints.AxisPlaneParallelConstraint.isValidSelection(selection):
                 self.axisPlaneParallelButton.setEnabled(True)
-            if a2p_constraints.AxisPlaneVerticalConstraint.isValidSelection(selection):
-                self.axisPlaneVerticalButton.setEnabled(True)
+            if a2p_constraints.AxisPlaneNormalConstraint.isValidSelection(selection):
+                self.axisPlaneNormalButton.setEnabled(True)
             if a2p_constraints.CircularEdgeConstraint.isValidSelection(selection):
                 self.circularEdgeButton.setEnabled(True)
             if a2p_constraints.PlanesParallelConstraint.isValidSelection(selection):
@@ -723,9 +723,9 @@ button.
         self.activeConstraint = a2p_constraints.AxisPlaneParallelConstraint(selection)
         self.manageConstraint()
 
-    def onAxisPlaneVerticalButton(self):
+    def onAxisPlaneNormalButton(self):
         selection = FreeCADGui.Selection.getSelectionEx()
-        self.activeConstraint = a2p_constraints.AxisPlaneVerticalConstraint(selection)
+        self.activeConstraint = a2p_constraints.AxisPlaneNormalConstraint(selection)
         self.manageConstraint()
 
     def onPlanesParallelButton(self):
