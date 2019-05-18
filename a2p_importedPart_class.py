@@ -137,7 +137,7 @@ class ImportedPartViewProviderProxy:
         if hasattr(self,"Object"):
             if hasattr(self.Object,"sourceFile") and hasattr(self.Object,"sourcePart"):
                 if self.Object.sourcePart is not None and self.Object.sourcePart !='':
-                    return ":/icons/a2p_ShapeReference.svg"
+                    return a2plib.pathOfModule()+'/icons/a2p_ObjReference.svg'
             if hasattr(self.Object,"subassemblyImport"):
                 if self.Object.subassemblyImport:
                     return ":/icons/a2p_Asm.svg"

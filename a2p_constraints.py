@@ -451,12 +451,12 @@ correct selection.
         return validSelection
 
 #==============================================================================
-class AxisPlaneVerticalConstraint(BasicConstraint):
+class AxisPlaneNormalConstraint(BasicConstraint):
     def __init__(self,selection):
         BasicConstraint.__init__(self, selection)
-        self.typeInfo = 'axisPlaneVertical'
-        self.constraintBaseName = 'axisPlaneVertical'
-        self.iconPath = ':/icons/a2p_AxisPlaneVerticalConstraint.svg'
+        self.typeInfo = 'axisPlaneNormal'
+        self.constraintBaseName = 'axisPlaneNormal'
+        self.iconPath = ':/icons/a2p_AxisPlaneNormalConstraint.svg'
         self.create(selection)
         
     def calcInitialValues(self):
@@ -475,7 +475,7 @@ class AxisPlaneVerticalConstraint(BasicConstraint):
     def getToolTip():
         return \
 '''
-Add an axisPlaneVertical constraint
+Add an axisPlaneNormal constraint
 
 1) select a linear edge or cylinder axis
 2) select a plane face on another part

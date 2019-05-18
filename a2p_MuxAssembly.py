@@ -166,6 +166,7 @@ def muxAssemblyWithTopoNames(doc, desiredShapeLabel=None):
                 solid = shell
     except:
         # keeping a shell if solid is failing
+        FreeCAD.Console.PrintWarning('Union of Shapes FAILED\n')
         solid = shell
 
     # transparency could change to different values depending
@@ -286,6 +287,7 @@ def createOrUpdateSimpleAssemblyShape(doc):
                 solid = shell
     except:
         # keeping a shell if solid is failing
+        FreeCAD.Console.PrintWarning('Union of Shapes FAILED\n')
         solid = shell
     sas.Shape = solid #shell
     sas.ViewObject.Visibility = False
