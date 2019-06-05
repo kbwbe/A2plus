@@ -463,7 +463,8 @@ FreeCADGui.addCommand('a2p_ImportShapeReferenceCommand',a2p_ImportShapeReference
 #==============================================================================
 toolTip = \
 '''
-Restore Transparency to Active Document Objects
+Restore transparency to
+active document objects
 '''
 
 class a2p_Restore_Transparency_Command():
@@ -471,14 +472,14 @@ class a2p_Restore_Transparency_Command():
     def GetResources(self):
         return {'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_Restore_Transparency.svg',
                 'Accel' : "Shift+T", # a default shortcut (optional)
-                'MenuText': "Restore Transparency to Active Document Objects",
+                'MenuText': "Restore transparency to active document objects",
                 'ToolTip' : toolTip
                 }
 
     def Activated(self):        
         doc = FreeCAD.ActiveDocument
         if doc is None:
-            FreeCAD.Console.Print("No Active Document found")
+            FreeCAD.Console.Print("No active document found")
             return
         else:
             for obj in doc.Objects:
