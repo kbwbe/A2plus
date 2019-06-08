@@ -28,7 +28,7 @@ import os, copy, time
 import a2plib
 from a2p_MuxAssembly import createTopoInfo
 from a2p_viewProviderProxies import *
-from a2p_versionmanagement import SubAssemblyWalk, A2P_VERSION
+from a2p_versionmanagement import A2P_VERSION
 import a2p_solversystem
 from a2plib import (
     appVersionStr,
