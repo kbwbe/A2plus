@@ -147,10 +147,13 @@ def muxAssemblyWithTopoNames(doc, desiredShapeLabel=None):
 
         faces.extend(tempShape.Faces)
 
-    if len(faces) == 1:
-        shell = Part.makeShell([faces])
-    else:
-        shell = Part.makeShell(faces)
+    #if len(faces) == 1:
+    #    shell = Part.makeShell([faces])
+    #else:
+    #    shell = Part.makeShell(faces)
+        
+    shell = Part.makeShell(faces)
+        
     try:
         if a2plib.getUseSolidUnion():
             if len(shape_list) > 1:
