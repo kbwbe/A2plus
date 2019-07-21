@@ -388,6 +388,14 @@ class TopoMapper(object):
                     if o1.Name.startswith('Job'):
                         return True
         return False
+    
+    def isTopLevelInList(self,lst):
+        if len(lst) == 0: return True
+        for ob in lst:
+            if ob.Name.startswith("Clone"): continue
+            if ob.Name.startswith("Part__Mirroring"): continue
+            else: return False
+        return True
 
     def getTopLevelObjects(self):
         #-------------------------------------------
@@ -408,11 +416,7 @@ class TopoMapper(object):
         self.topLevelShapes = []
         for objName in self.treeNodes.keys():
             inList,dummy = self.treeNodes[objName]
-            if len(inList) == 0:
-                self.topLevelShapes.append(objName)
-            elif len(inList) == 1 and inList[0].Name.startswith("Clone"):
-                self.topLevelShapes.append(objName)
-            elif len(inList) == 1 and inList[0].Name.startswith("Part__Mirroring"):
+            if self.isTopLevelInList(inList):
                 self.topLevelShapes.append(objName)
             else:
                 #-------------------------------------------
@@ -434,23 +438,6 @@ class TopoMapper(object):
                     if not invalidObjects:
                         if numBodies == numClones:
                             self.topLevelShapes.append(objName)
-        
-        #-------------------------------------------
-        # search for missing clone-basefeatures
-        # (now obsolete as this is done above, KB 2019-07-21)
-        #-------------------------------------------
-        #addList = []
-        #for n in self.topLevelShapes:
-        #    if (
-        #        n.startswith('Clone') or
-        #        n.startswith('Part__Mirroring')
-        #        ):
-        #        dummy,outList = self.treeNodes[n]
-        #        if len(outList) == 1:
-        #            addList.append(outList[0].Name)
-        #if len(addList) > 0:
-        #    self.topLevelShapes.extend(addList)
-        
         #-------------------------------------------
         # Got some shapes created by PathWB? filter out...
         # also filter out invisible shapes...
