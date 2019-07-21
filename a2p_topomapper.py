@@ -410,6 +410,10 @@ class TopoMapper(object):
             inList,dummy = self.treeNodes[objName]
             if len(inList) == 0:
                 self.topLevelShapes.append(objName)
+            elif len(inList) == 1 and inList[0].Name.startswith("Clone"):
+                self.topLevelShapes.append(objName)
+            elif len(inList) == 1 and inList[0].Name.startswith("Part__Mirroring"):
+                self.topLevelShapes.append(objName)
             else:
                 #-------------------------------------------
                 # search for missing non top-level clone-basefeatures
@@ -433,18 +437,20 @@ class TopoMapper(object):
         
         #-------------------------------------------
         # search for missing clone-basefeatures
+        # (now obsolete as this is done above, KB 2019-07-21)
         #-------------------------------------------
-        addList = []
-        for n in self.topLevelShapes:
-            if (
-                n.startswith('Clone') or
-                n.startswith('Part__Mirroring')
-                ):
-                dummy,outList = self.treeNodes[n]
-                if len(outList) == 1:
-                    addList.append(outList[0].Name)
-        if len(addList) > 0:
-            self.topLevelShapes.extend(addList)
+        #addList = []
+        #for n in self.topLevelShapes:
+        #    if (
+        #        n.startswith('Clone') or
+        #        n.startswith('Part__Mirroring')
+        #        ):
+        #        dummy,outList = self.treeNodes[n]
+        #        if len(outList) == 1:
+        #            addList.append(outList[0].Name)
+        #if len(addList) > 0:
+        #    self.topLevelShapes.extend(addList)
+        
         #-------------------------------------------
         # Got some shapes created by PathWB? filter out...
         # also filter out invisible shapes...
@@ -535,11 +541,6 @@ class TopoMapper(object):
                 faceColors.extend(diffuseCol) #let python libs extend faceColors, much faster
             faces.extend(tempShape.Faces) #let python libs extend faces, much faster
 
-
-        #if len(faces) == 1:
-        #    shell = Part.makeShell([faces])
-        #else:
-        #    shell = Part.makeShell(faces)
         shell = Part.makeShell(faces)
                 
         try:
