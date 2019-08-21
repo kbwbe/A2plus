@@ -26,7 +26,7 @@
 __title__ = 'A2plus assembly Workbench - InitGui file'
 __author__ = 'kbwbe'
 
-A2P_VERSION = 'V0.4.26a'
+A2P_VERSION = 'V0.4.26b'
 
 
 
@@ -38,7 +38,7 @@ else:
     import a2p_Resources3
 
 
-class a2pWorkbench (Workbench):
+class A2plusWorkbench (Workbench):
 
     def __init__(self):
         global A2P_VERSION
@@ -287,4 +287,4 @@ Please use {}.{}.{} or above.\n\n'''.format(
                       ]
                     )
 
-Gui.addWorkbench(a2pWorkbench())
+Gui.addWorkbench(A2plusWorkbench())
