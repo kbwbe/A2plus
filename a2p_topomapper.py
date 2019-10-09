@@ -403,6 +403,7 @@ class TopoMapper(object):
         #-------------------------------------------
         self.treeNodes = {}
         shapeObs = a2plib.filterShapeObs(self.doc.Objects)
+        
         S = set(shapeObs)
         for ob in S:
             self.treeNodes[ob.Name] = (
