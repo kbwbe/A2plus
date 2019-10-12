@@ -68,7 +68,7 @@ def convertToImportedPart(doc, obj):
     newObj.muxInfo = createTopoInfo(obj)
 
     for p in obj.ViewObject.PropertiesList: 
-        if hasattr(obj.ViewObject, p) and p not in ['DiffuseColor','Proxy','MappedColors']:
+        if hasattr(obj.ViewObject, p) and p not in ['DiffuseColor','Proxy','MappedColors','DisplayModeBody']:
             setattr(newObj.ViewObject, p, getattr( obj.ViewObject, p))
     newObj.ViewObject.ShapeColor = obj.ViewObject.ShapeColor
     newObj.ViewObject.DiffuseColor = copy.copy( obj.ViewObject.DiffuseColor ) # diffuse needs to happen last
