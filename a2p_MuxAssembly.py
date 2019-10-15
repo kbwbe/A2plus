@@ -64,7 +64,7 @@ def makePlacedShape(obj):
 
 def muxAssemblyWithTopoNames(doc, desiredShapeLabel=None):
     '''
-    Mux an a2p assenbly
+    Mux an a2p assembly
 
     combines all the a2p objects in the doc into one shape
     and populates muxinfo with a description of an edge or face.

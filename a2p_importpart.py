@@ -1185,7 +1185,7 @@ toolTip = \
 Show only selected elements,
 or all if none is selected.
 
-Select one ore more parts,
+Select one or more parts,
 which are the only ones you
 want to see in a big assembly.
 
@@ -1724,5 +1724,3 @@ def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
                 c = doc.getObject(cName)
                 a2plib.removeConstraint(c)
                 
-
-

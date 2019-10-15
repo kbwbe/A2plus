@@ -794,7 +794,7 @@ def copyObjectColors(ob1,ob2):
             ob1.ViewObject.Transparency = 1
             ob1.ViewObject.Transparency = 0
 
-    # select/unselect object once to trigger update of 3D View
+    # select/deselect object once to trigger update of 3D View
     FreeCADGui.Selection.addSelection(ob1)
     FreeCADGui.Selection.removeSelection(ob1)
 #------------------------------------------------------------------------------
