@@ -1010,21 +1010,30 @@ of the assembly.
 '''
 
 class a2p_MovePartCommand:
+
+    def __init__(self):
+        self.partMover = None
+    
     def Activated(self):
         doc = FreeCAD.activeDocument()
         selection = [s for s in FreeCADGui.Selection.getSelectionEx() if s.Document == doc ]
-        try:
-            PartMover(
-                FreeCADGui.activeDocument().activeView(),
-                selection[0].Object,
-                deleteOnEscape = False
-                )
-        except:
-            QtGui.QMessageBox.information(
-                QtGui.QApplication.activeWindow(),
-               u"Wrong selection",
-               u"Cannot move selected object!"
-               )
+        self.partMover = PartMover(
+            FreeCADGui.activeDocument().activeView(),
+            selection[0].Object,
+            deleteOnEscape = False
+            )
+        self.timer = QtCore.QTimer()
+        QtCore.QObject.connect(self.timer, QtCore.SIGNAL("timeout()"), self.onTimer)
+        self.timer.start( 100 )
+
+    def onTimer(self):
+        # if someone holds shift during moving, the partMover goes to copying mode. Catch this here...
+        # Especially handle the ESC key in partmover, which delivers an object which is to delete.
+        if self.partMover != None:
+            if self.partMover.objectToDelete != None:
+                FreeCAD.activeDocument().removeObject(self.partMover.objectToDelete.Name)
+                self.partMover.objectToDelete = None
+        self.timer.start(100)
 
     def IsActive(self):
         doc = FreeCAD.activeDocument()
@@ -1032,6 +1041,9 @@ class a2p_MovePartCommand:
         #
         selection = [s for s in FreeCADGui.Selection.getSelectionEx() if s.Document == doc ]
         if len(selection) != 1: return False
+        #
+        obj = selection[0].Object
+        if not a2plib.isA2pPart(obj): return False
         #
         return True
 
