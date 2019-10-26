@@ -781,14 +781,28 @@ multiple times.
 '''
 
 class a2p_DuplicatePartCommand:
+    
+    def __init__(self):
+        self.partMover = None
+    
     def Activated(self):
         doc = FreeCAD.activeDocument()
         selection = [s for s in FreeCADGui.Selection.getSelectionEx() if s.Document == doc ]
-        PartMover(
+        self.partMover = PartMover(
             FreeCADGui.activeDocument().activeView(),
             duplicateImportedPart(selection[0].Object),
             deleteOnEscape = True
             )
+        self.timer = QtCore.QTimer()
+        QtCore.QObject.connect(self.timer, QtCore.SIGNAL("timeout()"), self.onTimer)
+        self.timer.start( 100 )
+
+    def onTimer(self):
+        if self.partMover != None:
+            if self.partMover.objectToDelete != None:
+                FreeCAD.activeDocument().removeObject(self.partMover.objectToDelete.Name)
+                self.partMover.objectToDelete = None
+        self.timer.start(100)
         
     def IsActive(self):
         doc = FreeCAD.activeDocument()
@@ -949,6 +963,7 @@ class PartMover:
         self.callbackMove = self.view.addEventCallback("SoLocation2Event",self.moveMouse)
         self.callbackClick = self.view.addEventCallback("SoMouseButtonEvent",self.clickMouse)
         self.callbackKey = self.view.addEventCallback("SoKeyboardEvent",self.KeyboardEvent)
+        self.objectToDelete = None # object reference when pressing the escape key
         
     def moveMouse(self, info):
         newPos = self.view.getPoint( *info['Position'] )
@@ -971,11 +986,14 @@ class PartMover:
                 
     def KeyboardEvent(self, info):
         if info['State'] == 'UP' and info['Key'] == 'ESCAPE':
+            self.removeCallbacks()
             if not self.deleteOnEscape:
                 self.obj.Placement.Base = self.initialPosition
             else:
-                FreeCAD.ActiveDocument.removeObject(self.obj.Name)
-            self.removeCallbacks()
+                self.objectToDelete = self.obj #This can be asked by a timer in a calling func...
+                #This causes a crash in FC0.19/Qt5/Py3             
+                #FreeCAD.activeDocument().removeObject(self.obj.Name)
+                
 
 
 toolTip = \
