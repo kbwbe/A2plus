@@ -102,7 +102,7 @@ def createPartList(
             for i in range(0,len(PARTLIST_COLUMN_NAMES)):
                 partInformation.append("*")
                 
-            # if there is a proper spreadsheat, then read it...
+            # if there is a proper spreadsheet, then read it...
             for ob in docReader2.getSpreadsheetObjects():
                 
                 sheetName = PARTINFORMATION_SHEET_NAME

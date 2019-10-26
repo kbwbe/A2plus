@@ -165,8 +165,8 @@ Please select a Part.
             doc.commitTransaction()
 
     def IsActive(self):
-        """Here you can define if the command must be active or not (greyed) if certain conditions
-        are met or not. This function is optional."""
+        """Here you can define if the command must be active or not (grayed out)
+        if certain conditions are met or not. This function is optional."""
         if FreeCAD.activeDocument() is None:
             return False
         
@@ -174,6 +174,3 @@ Please select a Part.
 
 
 FreeCADGui.addCommand('a2p_ConvertPart',a2p_ConvertPartCommand())
-
-
-
