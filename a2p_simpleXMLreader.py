@@ -127,7 +127,7 @@ class simpleXMLObject(object):
                 self.propertyDict[b'timeLastImport'] = floatVal
                 timeLastImportFound = True
                 
-            elif not spreadSheetCellsFound and line == b'<Property name="cells" type="Spreadsheet::PropertySheet">':
+            elif not spreadSheetCellsFound and line.startswith(b'<Property name="cells" type="Spreadsheet::PropertySheet"'):
                 spreadSheetCellsFound = True
                 idx += 2
                 cellDict = {}
