@@ -560,7 +560,8 @@ class TopoMapper(object):
             muxInfo.append("[VERTEXES]")
             for i,v in enumerate(solid.Vertexes):
                 k = self.calcVertexKey(v)
-                name = self.shapeDict.get(k,"None")
+                defaultVal = "V;NONAME;{};".format(i)
+                name = self.shapeDict.get(k,defaultVal)
                 muxInfo.append(name)
             #-------------------------------------------
             # map edgenames to the MUX
@@ -569,7 +570,8 @@ class TopoMapper(object):
             pl = FreeCAD.Placement()
             for i,edge in enumerate(solid.Edges):
                 keys = self.calcEdgeKeys(edge, pl)
-                name = self.shapeDict.get(keys[0],"None")
+                defaultVal = "E;NONAME;{};".format(i)
+                name = self.shapeDict.get(k,defaultVal)
                 muxInfo.append(name)
             #-------------------------------------------
             # map facenames to the MUX
@@ -578,7 +580,8 @@ class TopoMapper(object):
             pl = FreeCAD.Placement()
             for i,face in enumerate(solid.Faces):
                 keys = self.calcFaceKeys(face, pl)
-                name = self.shapeDict.get(keys[0],"None")
+                defaultVal = "F;NONAME;{};".format(i)
+                name = self.shapeDict.get(k,defaultVal)
                 muxInfo.append(name)
 
 
