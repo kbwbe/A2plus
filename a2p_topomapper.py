@@ -571,7 +571,7 @@ class TopoMapper(object):
             for i,edge in enumerate(solid.Edges):
                 keys = self.calcEdgeKeys(edge, pl)
                 defaultVal = "E;NONAME;{};".format(i)
-                name = self.shapeDict.get(k,defaultVal)
+                name = self.shapeDict.get(keys[0],defaultVal)
                 muxInfo.append(name)
             #-------------------------------------------
             # map facenames to the MUX
@@ -581,7 +581,7 @@ class TopoMapper(object):
             for i,face in enumerate(solid.Faces):
                 keys = self.calcFaceKeys(face, pl)
                 defaultVal = "F;NONAME;{};".format(i)
-                name = self.shapeDict.get(k,defaultVal)
+                name = self.shapeDict.get(keys[0],defaultVal)
                 muxInfo.append(name)
 
 
