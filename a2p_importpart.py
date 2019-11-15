@@ -243,6 +243,7 @@ def importPartFromFile(
     # Discover whether we are importing a subassembly or a single part
     #-------------------------------------------
     subAssemblyImport = False
+    
     if all([ 'importPart' in obj.Content for obj in importableObjects]) == 1:
         subAssemblyImport = True
         

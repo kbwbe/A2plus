@@ -68,7 +68,8 @@ def createPartList(
         # skip converted parts...
         if a2plib.to_str(ob.getA2pSource()) == a2plib.to_str('converted'): continue
         
-        if ob.isSubassembly() and recursive:
+        #if ob.isSubassembly() and recursive:
+        if recursive:
             partListEntries = createPartList(
                                         ob.getA2pSource(),
                                         workingDir,
