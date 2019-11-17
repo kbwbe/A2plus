@@ -172,6 +172,9 @@ def muxAssemblyWithTopoNames(doc, desiredShapeLabel=None):
         FreeCAD.Console.PrintWarning('Union of Shapes FAILED\n')
         solid = shell
 
+    if a2plib.getUseTopoNaming():
+        a2plib.createA2pFile(doc, solid, muxInfo, faceColors)
+
     # transparency could change to different values depending
     # on the order of imported objects
     # now set it to a default value
