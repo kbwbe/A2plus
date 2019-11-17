@@ -33,6 +33,7 @@ import sys
 import copy
 import platform
 import numpy
+import zipfile
 
 from a2p_viewProviderProxies import *
 
@@ -98,7 +99,35 @@ elif "LINUX" in tmp:
 else:
     OPERATING_SYSTEM = "OTHER"
 
+#------------------------------------------------------------------------------
+def createA2pFile(doc,shape,toponames, facecolors):
+    docPath, docFileName = os.path.split(doc.FileName)
+                    
+    zipFileName = os.path.join(docPath,docFileName+'.a2p')
+    zip = zipfile.ZipFile(zipFileName,'w',zipfile.ZIP_DEFLATED)
 
+    brepFileName = os.path.join(docPath,docFileName+'.brep')
+    shape.exportBrep(brepFileName)
+    zip.write(brepFileName,'shape.brep')
+    os.remove(brepFileName)
+    
+    topoFileName = os.path.join(docPath,docFileName+'.toponames')
+    with open(topoFileName,'w') as f:
+        for tn in toponames:
+            f.write(tn+'\r\n')
+    f.close()
+    zip.write(topoFileName,'toponames')
+    os.remove(topoFileName)
+    
+    diffuseFileName = os.path.join(docPath,docFileName+'.diffuse')
+    with open(diffuseFileName,'w') as f:
+        for color in facecolors:
+            f.write(a2plib.diffuseElementToTextline(color))
+    f.close()
+    zip.write(diffuseFileName,'diffusecolor')
+    os.remove(diffuseFileName)
+    
+    zip.close()
 
 #------------------------------------------------------------------------------
 def to_bytes(tx):
@@ -765,8 +794,18 @@ def isA2pObject(obj):
     return result
 #------------------------------------------------------------------------------
 def makeDiffuseElement(color,trans):
-    elem = (color[0],color[1],color[2],trans/100.0)
-    return elem
+    return (color[0],color[1],color[2],trans/100.0)
+#------------------------------------------------------------------------------
+def diffuseElementToTextline(elem):
+    if len(elem) == 3:
+        return '%0.5f %0.5f %0.5f\r\n' % (elem[0],elem[1],elem[2])
+    else:
+        return '%0.5f %0.5f %0.5f %0.5f\r\n' % (elem[0],elem[1],elem[2],elem[3])
+#------------------------------------------------------------------------------
+def getDiffuseElementFromText(tx):
+    tex = tx.strip('\r').strip('\n')
+    #to continue
+    
 #------------------------------------------------------------------------------
 def copyObjectColors(ob1,ob2):
     '''

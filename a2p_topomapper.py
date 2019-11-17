@@ -96,6 +96,8 @@ import FreeCAD, FreeCADGui, Part
 from FreeCAD import Base
 import a2plib
 import os
+import zipfile
+import os
 
 class TopoMapper(object):
     def __init__(self,doc):
@@ -584,6 +586,7 @@ class TopoMapper(object):
                 name = self.shapeDict.get(keys[0],defaultVal)
                 muxInfo.append(name)
 
-
+            a2plib.createA2pFile(self.doc, solid, muxInfo, faceColors)
+            
         return muxInfo, solid, faceColors, transparency
     
