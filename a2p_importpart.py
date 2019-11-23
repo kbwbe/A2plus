@@ -182,19 +182,31 @@ def getOrCreateA2pFile(
         ):
     
     if filename != None and os.path.exists( filename ):
-        importDocCreationTime = os.path.getmtime( filename )
-        a2pFileName = filename+'.a2p'
-        if os.path.exists( a2pFileName ):
-            a2pFileCreationTime = os.path.getmtime( a2pFileName )
-            if a2pFileCreationTime >= importDocCreationTime:
-                print ("Found existing a2p file")
-                return a2pFileName # nothing to do...
+        if not a2plib.getRecalculateImportedParts(): 
+            importDocCreationTime = os.path.getmtime( filename )
+            a2pFileName = filename+'.a2p'
+            if os.path.exists( a2pFileName ):
+                a2pFileCreationTime = os.path.getmtime( a2pFileName )
+                if a2pFileCreationTime >= importDocCreationTime:
+                    print ("Found existing a2p file")
+                    return a2pFileName # nothing to do...
     else:
         return #sourceFile does not exist
     
     print ("Create a new a2p file")
     importDoc,importDocIsOpen = openImportDocFromFile(filename)
     if importDoc is None: return #nothing found
+    
+    #-------------------------------------------
+    # recalculate imported part if requested by preferences
+    # This can be useful if the imported part depends on an
+    # external master-spreadsheet
+    #-------------------------------------------
+    if a2plib.getRecalculateImportedParts():
+        for ob in importDoc.Objects:
+            ob.recompute()
+        importDoc.save() # useless without saving...
+
     
     #-------------------------------------------
     # Initialize the TopoMapper
@@ -239,14 +251,118 @@ def getOrCreateA2pFile(
 def importPartFromFile(
         _doc,
         filename,
-        extractSingleShape = False, # load only a single user defined shape from file
-        desiredShapeLabel=None,
         importToCache=False,
         cacheKey = ""
         ):
     doc = _doc
     
     a2pZipFilename = getOrCreateA2pFile(filename)
+    
+    importDoc,importDocIsOpen = openImportDocFromFile(filename)
+    if importDoc is None: return #nothing found
+
+    #-------------------------------------------
+    # Initialize the new TopoMapper
+    #-------------------------------------------
+    topoMapper = TopoMapper(importDoc)
+
+    #-------------------------------------------
+    # Get a list of the importable Objects
+    #-------------------------------------------
+    importableObjects = topoMapper.getTopLevelObjects()
+    
+    if len(importableObjects) == 0:
+        msg = "No visible Part to import found. Aborting operation"
+        QtGui.QMessageBox.information(
+            QtGui.QApplication.activeWindow(),
+            "Import Error",
+            msg
+            )
+        return
+    
+    #-------------------------------------------
+    # Discover whether we are importing a subassembly or a single part
+    #-------------------------------------------
+    subAssemblyImport = False
+    
+    if all([ 'importPart' in obj.Content for obj in importableObjects]) == 1:
+        subAssemblyImport = True
+        
+    #-------------------------------------------
+    # create new object
+    #-------------------------------------------
+    if importToCache:
+        partName = 'CachedObject_'+str(objectCache.len())
+        newObj = doc.addObject("Part::FeaturePython",partName)
+        newObj.Label = partName
+    else:
+        partName = a2plib.findUnusedObjectName( importDoc.Label, document=doc )
+        partLabel = a2plib.findUnusedObjectLabel( importDoc.Label, document=doc )
+        if PYVERSION < 3:
+            newObj = doc.addObject( "Part::FeaturePython", partName.encode('utf-8') )
+        else:
+            newObj = doc.addObject( "Part::FeaturePython", str(partName.encode('utf-8')) )    # works on Python 3.6.5
+        newObj.Label = partLabel
+
+    Proxy_importPart(newObj)
+    if FreeCAD.GuiUp:
+        ImportedPartViewProviderProxy(newObj.ViewObject)
+
+    newObj.a2p_Version = A2P_VERSION
+    assemblyPath = os.path.normpath(os.path.split(doc.FileName)[0])
+    absPath = os.path.normpath(filename)
+    if getRelativePathesEnabled():
+        if platform.system() == "Windows":
+            prefix = '.\\'
+        else:
+            prefix = './'
+        relativePath = prefix+os.path.relpath(absPath, assemblyPath)
+        newObj.sourceFile = relativePath
+    else:
+        newObj.sourceFile = absPath
+        
+    newObj.setEditorMode("timeLastImport",1)
+    newObj.timeLastImport = os.path.getmtime( filename )
+    if a2plib.getForceFixedPosition():
+        newObj.fixedPosition = True
+    else:
+        newObj.fixedPosition = not any([i.fixedPosition for i in doc.Objects if hasattr(i, 'fixedPosition') ])
+    newObj.subassemblyImport = subAssemblyImport
+    newObj.setEditorMode("subassemblyImport",1)
+
+    if subAssemblyImport:
+        newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = \
+            muxAssemblyWithTopoNames(importDoc)
+    else:
+        # TopoMapper manages import of non A2p-Files. It generates the shapes and appropriate topo names...
+        newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = \
+            topoMapper.createTopoNames()
+
+    doc.recompute()
+
+    if importToCache: # this import is used to update already imported parts
+        objectCache.add(cacheKey, newObj)
+    else: # this is a first time import of a part
+        if not a2plib.getPerFaceTransparency():
+            # turn of perFaceTransparency by accessing ViewObject.Transparency and set to zero (non transparent)
+            newObj.ViewObject.Transparency = 1
+            newObj.ViewObject.Transparency = 0 # import assembly first time as non transparent.
+
+
+    if not importDocIsOpen:
+        FreeCAD.closeDocument(importDoc.Name)
+
+    return newObj
+#====================================================================================================
+def importSingleShapeFromFile(
+        _doc,
+        filename,
+        extractSingleShape = False, # load only a single user defined shape from file
+        desiredShapeLabel=None,
+        importToCache=False,
+        cacheKey = ""
+        ):
+    doc = _doc
     
     importDoc,importDocIsOpen = openImportDocFromFile(filename)
     if importDoc is None: return #nothing found
@@ -387,41 +503,10 @@ def importPartFromFile(
             newObj.ViewObject.Transparency = 0 # import assembly first time as non transparent.
 
 
-    lcsList = a2p_lcs_support.getListOfLCS(doc,importDoc)
-    
-
     if not importDocIsOpen:
         FreeCAD.closeDocument(importDoc.Name)
 
-    if len(lcsList) > 0:
-        #=========================================
-        # create a group containing imported LCS's
-        lcsGroupObjectName = 'LCS_Collection'
-        lcsGroupLabel = 'LCS_Collection'
-        
-        if PYVERSION < 3:
-            lcsGroup = doc.addObject( "Part::FeaturePython", lcsGroupObjectName.encode('utf-8') )
-        else:
-            lcsGroup = doc.addObject( "Part::FeaturePython", str(lcsGroupObjectName.encode('utf-8')) )    # works on Python 3.6.5
-        lcsGroup.Label = lcsGroupLabel
-    
-        proxy = a2p_lcs_support.LCS_Group(lcsGroup)
-        vp_proxy = a2p_lcs_support.VP_LCS_Group(lcsGroup.ViewObject)
-        
-        for lcs in lcsList:
-            lcsGroup.addObject(lcs)
-        
-        lcsGroup.Owner = newObj.Name
-        
-        newObj.addProperty("App::PropertyLinkList","lcsLink","importPart").lcsLink = lcsGroup
-        newObj.Label = newObj.Label # this is needed to trigger an update
-        lcsGroup.Label = lcsGroup.Label
-    
-        #=========================================
-
     return newObj
-
-
 #==============================================================================
 toolTip = \
 '''
@@ -491,7 +576,7 @@ Check your settings of A2plus preferences.
             return
 
         #TODO: change for multi separate part import
-        importedObject = importPartFromFile(doc, filename, extractSingleShape=True)
+        importedObject = importSingleShapeFromFile(doc, filename, extractSingleShape=True)
 
         if not importedObject:
             a2plib.Msg("imported Object is empty/none\n")
@@ -719,7 +804,7 @@ def updateImportedParts(doc):
                         
                     if not objectCache.isCached(cacheKey): # Load every changed object one time to cache
                         if obj.sourcePart is not None and obj.sourcePart != '':
-                            importPartFromFile(
+                            importSingleShapeFromFile(
                                 doc,
                                 absPath,
                                 importToCache=True,
