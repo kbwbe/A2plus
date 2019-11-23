@@ -144,19 +144,11 @@ class a2p_shapeExtractDialog(QtGui.QDialog):
         self.deleteLater()
 
 #==============================================================================
-def importPartFromFile(
-        _doc,
-        filename,
-        extractSingleShape = False, # load only a single user defined shape from file
-        desiredShapeLabel=None,
-        importToCache=False,
-        cacheKey = ""
-        ):
-    doc = _doc
-    #-------------------------------------------
-    # Get the importDocument
-    #-------------------------------------------
-    
+def openImportDocFromFile(filename):
+    '''
+    Open the importDocument from it's file or get it's fc document if it is
+    already open.
+    '''
     # look only for filenames, not paths, as there are problems on WIN10 (Address-translation??)
     importDoc = None
     importDocIsOpen = False
@@ -182,7 +174,21 @@ def importPartFromFile(
         else:
             msg = "A part can only be imported from a FreeCAD '*.FCStd' file"
             QtGui.QMessageBox.information( QtGui.QApplication.activeWindow(), "Value Error", msg )
-            return
+            
+    return importDoc, importDocIsOpen
+#==============================================================================
+def importPartFromFile(
+        _doc,
+        filename,
+        extractSingleShape = False, # load only a single user defined shape from file
+        desiredShapeLabel=None,
+        importToCache=False,
+        cacheKey = ""
+        ):
+    doc = _doc
+    
+    importDoc,importDocIsOpen = openImportDocFromFile(filename)
+    if importDoc is None: return #nothing found
 
     #-------------------------------------------
     # recalculate imported part if requested by preferences
