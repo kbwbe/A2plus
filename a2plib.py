@@ -100,8 +100,8 @@ else:
     OPERATING_SYSTEM = "OTHER"
 
 #------------------------------------------------------------------------------
-def createA2pFile(doc,shape,toponames, facecolors):
-    docPath, docFileName = os.path.split(doc.FileName)
+def writeA2pFile(fileName,shape,toponames, facecolors):
+    docPath, docFileName = os.path.split(fileName)
                     
     zipFileName = os.path.join(docPath,docFileName+'.a2p')
     zip = zipfile.ZipFile(zipFileName,'w',zipfile.ZIP_DEFLATED)
@@ -128,7 +128,8 @@ def createA2pFile(doc,shape,toponames, facecolors):
     os.remove(diffuseFileName)
     
     zip.close()
-
+    
+    return zipFileName
 #------------------------------------------------------------------------------
 def to_bytes(tx):
     if PYVERSION > 2:

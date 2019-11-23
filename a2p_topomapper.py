@@ -585,7 +585,5 @@ class TopoMapper(object):
                 name = self.shapeDict.get(keys[0],defaultVal)
                 muxInfo.append(name)
 
-            a2plib.createA2pFile(self.doc, solid, muxInfo, faceColors)
-            
         return muxInfo, solid, faceColors, transparency
     
