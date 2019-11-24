@@ -28,8 +28,9 @@
 
 
 
-import FreeCAD, FreeCADGui, os
-import zipfile
+import FreeCAD
+import FreeCADGui
+import os
 
 class SimpleXMLhandler():
     def __init__(self):
@@ -42,8 +43,7 @@ class SimpleXMLhandler():
         self.clear()
         self.XML += '''<?xml version='1.0' encoding='utf-8'?>'''
         self.XML += '''\n<!-- FreeCAD A2plus Document -->'''
-
-        self.XML +=  '''\n<Document SchemaVersion="1" A2PlusVersion=V0.5 FileVersion="1">''' 
+        self.XML +=  '''\n<Document SchemaVersion="1" A2PlusVersion="V0.5" FileVersion="1">''' 
 
     def writeFooter(self):
         self.XML += '''\n</Document>'''
@@ -54,21 +54,15 @@ class SimpleXMLhandler():
         self.XML += '''\n\t</Property>'''
         
     def createInformationXML(self,
+                      importDocLabel,
                       sourcePartCreationTime = 0.0,
                       isSubAssembly = False,
                       transparency = 0,
                       ):
         self.writeHeader()
+        self.writeProperty("importDocLabel", importDocLabel)
         self.writeProperty("sourcePartCreationTime", sourcePartCreationTime)
         self.writeProperty("isSubAssembly", isSubAssembly)
         self.writeProperty("transparency", transparency)
         self.writeFooter()
         return self.XML
-        
-    def retrieveData(self,xmlString):
-        xmlLines = xmlString.split("\n")
-        for line in xmlLines:
-            print(line)
-        
-        
-        

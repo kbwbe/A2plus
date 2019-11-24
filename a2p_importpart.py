@@ -245,7 +245,7 @@ def getOrCreateA2pFile(
     #-------------------------------------------
     xmlHandler = a2p_simpleXMLhandler.SimpleXMLhandler()
     xml = xmlHandler.createInformationXML(
-        #filename,
+        importDoc.Label,
         os.path.getmtime(filename),
         subAssemblyImport,
         transparency
@@ -269,40 +269,14 @@ def importPartFromFile(
     
     iShape, iMuxInfo, iDiffuseColor, iProperties = a2plib.readA2pFile(a2pZipFilename)
     
-    subAssemblyImport = bool(iProperties["isSubAssembly"])
+    if iProperties["isSubAssembly"] == "True":
+        subAssemblyImport = True
+    else:
+        subAssemblyImport = False
     timeLastImport = float(iProperties["sourcePartCreationTime"])
     transparency = int(iProperties["transparency"])
+    importDocLabel = iProperties["importDocLabel"]
     
-    importDoc,importDocIsOpen = openImportDocFromFile(filename)
-    if importDoc is None: return #nothing found
-
-    #-------------------------------------------
-    # Initialize the new TopoMapper
-    #-------------------------------------------
-    topoMapper = TopoMapper(importDoc)
-
-    #-------------------------------------------
-    # Get a list of the importable Objects
-    #-------------------------------------------
-    importableObjects = topoMapper.getTopLevelObjects()
-    
-    if len(importableObjects) == 0:
-        msg = "No visible Part to import found. Aborting operation"
-        QtGui.QMessageBox.information(
-            QtGui.QApplication.activeWindow(),
-            "Import Error",
-            msg
-            )
-        return
-    
-    #-------------------------------------------
-    # Discover whether we are importing a subassembly or a single part
-    #-------------------------------------------
-    subAssemblyImport = False
-    
-    if all([ 'importPart' in obj.Content for obj in importableObjects]) == 1:
-        subAssemblyImport = True
-        
     #-------------------------------------------
     # create new object
     #-------------------------------------------
@@ -311,8 +285,8 @@ def importPartFromFile(
         newObj = doc.addObject("Part::FeaturePython",partName)
         newObj.Label = partName
     else:
-        partName = a2plib.findUnusedObjectName( importDoc.Label, document=doc )
-        partLabel = a2plib.findUnusedObjectLabel( importDoc.Label, document=doc )
+        partName = a2plib.findUnusedObjectName( importDocLabel, document=doc )
+        partLabel = a2plib.findUnusedObjectLabel( importDocLabel, document=doc )
         if PYVERSION < 3:
             newObj = doc.addObject( "Part::FeaturePython", partName.encode('utf-8') )
         else:
@@ -337,7 +311,7 @@ def importPartFromFile(
         newObj.sourceFile = absPath
         
     newObj.setEditorMode("timeLastImport",1)
-    newObj.timeLastImport = os.path.getmtime( filename )
+    newObj.timeLastImport = timeLastImport
     if a2plib.getForceFixedPosition():
         newObj.fixedPosition = True
     else:
@@ -347,8 +321,8 @@ def importPartFromFile(
 
     newObj.muxInfo = iMuxInfo
     newObj.Shape = iShape
+    newObj.ViewObject.Transparency = transparency
     newObj.ViewObject.DiffuseColor = iDiffuseColor
-    newObj.ViewObject.Transparency = 0
     
     doc.recompute()
 
@@ -359,10 +333,6 @@ def importPartFromFile(
             # turn of perFaceTransparency by accessing ViewObject.Transparency and set to zero (non transparent)
             newObj.ViewObject.Transparency = 1
             newObj.ViewObject.Transparency = 0 # import assembly first time as non transparent.
-
-
-    if not importDocIsOpen:
-        FreeCAD.closeDocument(importDoc.Name)
 
     return newObj
 #====================================================================================================
