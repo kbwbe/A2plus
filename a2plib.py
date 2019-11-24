@@ -100,7 +100,7 @@ else:
     OPERATING_SYSTEM = "OTHER"
 
 #------------------------------------------------------------------------------
-def writeA2pFile(fileName,shape,toponames, facecolors):
+def writeA2pFile(fileName,shape,toponames, facecolors, xml):
     docPath, docFileName = os.path.split(fileName)
                     
     zipFileName = os.path.join(docPath,docFileName+'.a2p')
@@ -127,6 +127,13 @@ def writeA2pFile(fileName,shape,toponames, facecolors):
     zip.write(diffuseFileName,'diffusecolor')
     os.remove(diffuseFileName)
     
+    xmlFileName = os.path.join(docPath,docFileName+'.xml')
+    with open(xmlFileName,'w') as f:
+        f.writelines(xml)
+    f.close()
+    zip.write(xmlFileName,'information.xml')
+    os.remove(xmlFileName)
+
     zip.close()
     
     return zipFileName

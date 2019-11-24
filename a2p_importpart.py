@@ -34,6 +34,7 @@ from a2p_MuxAssembly import (
 from a2p_viewProviderProxies import *
 from a2p_versionmanagement import A2P_VERSION
 import a2p_solversystem
+import a2p_simpleXMLhandler
 from a2plib import (
     appVersionStr,
     AUTOSOLVE_ENABLED,
@@ -181,8 +182,8 @@ def getOrCreateA2pFile(
         filename
         ):
     
-    if filename != None and os.path.exists( filename ):
-        if not a2plib.getRecalculateImportedParts(): 
+    if not a2plib.getRecalculateImportedParts(): # always create a new file if recalc is needed...
+        if filename != None and os.path.exists( filename ):
             importDocCreationTime = os.path.getmtime( filename )
             a2pFileName = filename+'.a2p'
             if os.path.exists( a2pFileName ):
@@ -206,7 +207,6 @@ def getOrCreateA2pFile(
         for ob in importDoc.Objects:
             ob.recompute()
         importDoc.save() # useless without saving...
-
     
     #-------------------------------------------
     # Initialize the TopoMapper
@@ -231,20 +231,29 @@ def getOrCreateA2pFile(
     # Discover whether we are importing a subassembly or a single part
     #-------------------------------------------
     subAssemblyImport = False
-    
     if all([ 'importPart' in obj.Content for obj in importableObjects]) == 1:
         subAssemblyImport = True
-    
 
     if subAssemblyImport:
         muxInfo, Shape, DiffuseColor, transparency = muxAssemblyWithTopoNames(importDoc)
     else:
         # TopoMapper manages import of non A2p-Files. It generates the shapes and appropriate topo names...
         muxInfo, Shape, DiffuseColor, transparency = topoMapper.createTopoNames()
+        
+    #-------------------------------------------
+    # setup xml information for a2p file
+    #-------------------------------------------
+    xmlHandler = a2p_simpleXMLhandler.SimpleXMLhandler()
+    xml = xmlHandler.createInformationXML(
+        #filename,
+        os.path.getmtime(filename),
+        subAssemblyImport,
+        transparency
+        )    
 
     if not importDocIsOpen:
         FreeCAD.closeDocument(importDoc.Name)
-    zipFileName = a2plib.writeA2pFile(filename,Shape,muxInfo, DiffuseColor)
+    zipFileName = a2plib.writeA2pFile(filename,Shape,muxInfo, DiffuseColor, xml)
     return zipFileName
 
 #==============================================================================
