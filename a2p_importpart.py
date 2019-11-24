@@ -267,7 +267,11 @@ def importPartFromFile(
     
     a2pZipFilename = getOrCreateA2pFile(filename)
     
-    iShape, iMuxInfo, iDiffuseColor = a2plib.readA2pFile(a2pZipFilename)
+    iShape, iMuxInfo, iDiffuseColor, iProperties = a2plib.readA2pFile(a2pZipFilename)
+    
+    subAssemblyImport = bool(iProperties["isSubAssembly"])
+    timeLastImport = float(iProperties["sourcePartCreationTime"])
+    transparency = int(iProperties["transparency"])
     
     importDoc,importDocIsOpen = openImportDocFromFile(filename)
     if importDoc is None: return #nothing found

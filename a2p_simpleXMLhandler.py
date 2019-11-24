@@ -30,8 +30,6 @@
 
 import FreeCAD, FreeCADGui, os
 import zipfile
-import a2plib
-import a2p_versionmanagement
 
 class SimpleXMLhandler():
     def __init__(self):
@@ -45,9 +43,7 @@ class SimpleXMLhandler():
         self.XML += '''<?xml version='1.0' encoding='utf-8'?>'''
         self.XML += '''\n<!-- FreeCAD A2plus Document -->'''
 
-        self.XML +=  '''\n<Document SchemaVersion="1" A2PlusVersion="%s" FileVersion="1">''' % (
-                a2plib.to_bytes(a2p_versionmanagement.A2P_VERSION)
-                )
+        self.XML +=  '''\n<Document SchemaVersion="1" A2PlusVersion=V0.5 FileVersion="1">''' 
 
     def writeFooter(self):
         self.XML += '''\n</Document>'''

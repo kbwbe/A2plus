@@ -154,8 +154,26 @@ def readA2pFile(fileName):
     for line in lines:
         diffuseColor.append(diffuseElementFromTextline(line))
     
+    xmlContent = zip.open("information.xml").readlines()
+    properties = {}
+    idx = 0
+    while True:
+        l = xmlContent[idx]
+        line = to_str(l).strip("\t").strip(' ').strip('\r\n')
+        if line.startswith("<Property name"):
+            segments = line.split('"')
+            propname = segments[1]
+            idx += 1
+            l = xmlContent[idx]
+            line = to_str(l).strip("\t").strip(' ').strip('\r\n')
+            segments = line.split('"')
+            propvalue = segments[1]
+            properties[propname] = propvalue
+        idx += 1
+        if idx == len(xmlContent): break
+    
     zip.close()
-    return shape, muxInfo, diffuseColor
+    return shape, muxInfo, diffuseColor, properties
 #------------------------------------------------------------------------------
 def to_bytes(tx):
     if PYVERSION > 2:
