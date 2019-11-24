@@ -138,6 +138,20 @@ def writeA2pFile(fileName,shape,toponames, facecolors, xml):
     
     return zipFileName
 #------------------------------------------------------------------------------
+def readA2pFile(fileName):
+    zip = zipfile.ZipFile(fileName,'r')
+    shape = Part.Shape()
+    shape.importBrepFromString(to_str(zip.open("shape.brep").read()))
+    
+    muxInfo = []
+    lines = zip.open("toponames").readlines()
+    for line in lines:
+        tx = to_str(line).strip("\r\n")
+        muxInfo.append(tx)
+    
+    zip.close()
+    return shape, muxInfo
+#------------------------------------------------------------------------------
 def to_bytes(tx):
     if PYVERSION > 2:
         if isinstance(tx, str):

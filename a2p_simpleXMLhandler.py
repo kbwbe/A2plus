@@ -67,10 +67,12 @@ class SimpleXMLhandler():
         self.writeProperty("isSubAssembly", isSubAssembly)
         self.writeProperty("transparency", transparency)
         self.writeFooter()
-        
         return self.XML
         
-        
+    def retrieveData(self,xmlString):
+        xmlLines = xmlString.split("\n")
+        for line in xmlLines:
+            print(line)
         
         
         

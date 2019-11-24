@@ -267,6 +267,8 @@ def importPartFromFile(
     
     a2pZipFilename = getOrCreateA2pFile(filename)
     
+    iShape, iMuxInfo = a2plib.readA2pFile(a2pZipFilename)
+    
     importDoc,importDocIsOpen = openImportDocFromFile(filename)
     if importDoc is None: return #nothing found
 
@@ -339,14 +341,11 @@ def importPartFromFile(
     newObj.subassemblyImport = subAssemblyImport
     newObj.setEditorMode("subassemblyImport",1)
 
-    if subAssemblyImport:
-        newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = \
-            muxAssemblyWithTopoNames(importDoc)
-    else:
-        # TopoMapper manages import of non A2p-Files. It generates the shapes and appropriate topo names...
-        newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = \
-            topoMapper.createTopoNames()
-
+    newObj.muxInfo = iMuxInfo
+    newObj.Shape = iShape
+    #newObj.ViewObject.DiffuseColor = XXX
+    newObj.ViewObject.Transparency = 0
+    
     doc.recompute()
 
     if importToCache: # this import is used to update already imported parts
