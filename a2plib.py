@@ -148,9 +148,14 @@ def readA2pFile(fileName):
     for line in lines:
         tx = to_str(line).strip("\r\n")
         muxInfo.append(tx)
+        
+    diffuseColor = []
+    lines = zip.open("diffusecolor").readlines()
+    for line in lines:
+        diffuseColor.append(diffuseElementFromTextline(line))
     
     zip.close()
-    return shape, muxInfo
+    return shape, muxInfo, diffuseColor
 #------------------------------------------------------------------------------
 def to_bytes(tx):
     if PYVERSION > 2:
@@ -818,16 +823,18 @@ def isA2pObject(obj):
 def makeDiffuseElement(color,trans):
     return (color[0],color[1],color[2],trans/100.0)
 #------------------------------------------------------------------------------
+def diffuseElementFromTextline(line):
+    values = to_str(line).split(' ')
+    diffuseElement = []
+    for val in values:
+        diffuseElement.append(float(val.strip("\r\n")))
+    return tuple(diffuseElement)
+#------------------------------------------------------------------------------
 def diffuseElementToTextline(elem):
     if len(elem) == 3:
         return '%0.5f %0.5f %0.5f\r\n' % (elem[0],elem[1],elem[2])
     else:
         return '%0.5f %0.5f %0.5f %0.5f\r\n' % (elem[0],elem[1],elem[2],elem[3])
-#------------------------------------------------------------------------------
-def getDiffuseElementFromText(tx):
-    tex = tx.strip('\r').strip('\n')
-    #to continue
-    
 #------------------------------------------------------------------------------
 def copyObjectColors(ob1,ob2):
     '''

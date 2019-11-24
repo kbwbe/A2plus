@@ -267,7 +267,7 @@ def importPartFromFile(
     
     a2pZipFilename = getOrCreateA2pFile(filename)
     
-    iShape, iMuxInfo = a2plib.readA2pFile(a2pZipFilename)
+    iShape, iMuxInfo, iDiffuseColor = a2plib.readA2pFile(a2pZipFilename)
     
     importDoc,importDocIsOpen = openImportDocFromFile(filename)
     if importDoc is None: return #nothing found
@@ -343,7 +343,7 @@ def importPartFromFile(
 
     newObj.muxInfo = iMuxInfo
     newObj.Shape = iShape
-    #newObj.ViewObject.DiffuseColor = XXX
+    newObj.ViewObject.DiffuseColor = iDiffuseColor
     newObj.ViewObject.Transparency = 0
     
     doc.recompute()
