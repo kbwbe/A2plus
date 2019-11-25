@@ -128,14 +128,18 @@ def writeA2pFile(fileName,shape,toponames, facecolors, xml):
     os.remove(diffuseFileName)
     
     xmlFileName = os.path.join(docPath,docFileName+'.xml')
-    with open(xmlFileName,'w') as f:
-        f.writelines(xml)
+    if PYVERSION > 2:
+        with open(xmlFileName,'w') as f:
+            f.writelines(xml)
+    else:
+        with open(xmlFileName,'w') as f:
+            for line in xml:
+                f.write(to_bytes(line))
     f.close()
     zip.write(xmlFileName,'information.xml')
     os.remove(xmlFileName)
 
     zip.close()
-    
     return zipFileName
 #------------------------------------------------------------------------------
 def readA2pFile(fileName):

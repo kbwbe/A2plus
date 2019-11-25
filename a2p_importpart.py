@@ -182,17 +182,19 @@ def getOrCreateA2pFile(
         filename
         ):
     
+    if filename is None or not os.path.exists(filename):
+        print(u"Import error: File {} does not exist".format(filename))
+        return
+    
     if not a2plib.getRecalculateImportedParts(): # always create a new file if recalc is needed...
-        if filename != None and os.path.exists( filename ):
-            importDocCreationTime = os.path.getmtime( filename )
+        if filename != None and os.path.exists(filename):
+            importDocCreationTime = os.path.getmtime(filename)
             a2pFileName = filename+'.a2p'
             if os.path.exists( a2pFileName ):
                 a2pFileCreationTime = os.path.getmtime( a2pFileName )
                 if a2pFileCreationTime >= importDocCreationTime:
                     print ("Found existing a2p file")
                     return a2pFileName # nothing to do...
-    else:
-        return #sourceFile does not exist
     
     print ("Create a new a2p file")
     importDoc,importDocIsOpen = openImportDocFromFile(filename)
