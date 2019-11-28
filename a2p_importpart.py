@@ -269,7 +269,11 @@ def importPartFromFile(
     
     a2pZipFilename = getOrCreateA2pFile(filename)
     
-    iShape, iMuxInfo, iDiffuseColor, iProperties = a2plib.readA2pFile(a2pZipFilename)
+    #iShape, iMuxInfo, iDiffuseColor, iProperties = a2plib.readA2pFile(a2pZipFilename)
+    iShape, vertexNames, edgeNames, faceNames, iDiffuseColor, iProperties = \
+        a2plib.readA2pFile(a2pZipFilename)
+        
+    iMuxInfo = vertexNames + edgeNames + faceNames
     
     if iProperties["isSubAssembly"] == "True":
         subAssemblyImport = True

@@ -29,6 +29,7 @@ from PySide import QtCore
 import a2plib
 import a2p_importpart
 import os
+from reportlab.pdfbase.pdfmetrics import _dynFaceNames
 
 class FileCache():
     def __init__(self):
@@ -65,9 +66,14 @@ class FileCache():
             return
         
         #A valid a2p file exists, read it...
-        shape, muxInfo, diffuseColor, properties = a2plib.readA2pFile(zipFile)
+        shape, vertexNames, edgeNames, faceNames, diffuseColor, properties = \
+            a2plib.readA2pFile(zipFile)
         sourcePartCreationTime = float(properties["sourcePartCreationTime"])
-        self.cache[cacheKey] = (sourcePartCreationTime,muxInfo)
+        self.cache[cacheKey] = (sourcePartCreationTime,
+                                vertexNames,
+                                edgeNames,
+                                faceNames
+                                )
         print(u"file loaded to cache")
         
 fileCache = FileCache()

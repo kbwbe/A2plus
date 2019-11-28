@@ -111,14 +111,6 @@ def writeA2pFile(fileName,shape,toponames, facecolors, xml):
     zip.write(brepFileName,'shape.brep')
     os.remove(brepFileName)
     
-    topoFileName = os.path.join(docPath,docFileName+'.toponames')
-    with open(topoFileName,'w') as f:
-        for tn in toponames:
-            f.write(tn+'\r\n')
-    f.close()
-    zip.write(topoFileName,'toponames')
-    os.remove(topoFileName)
-    
     vertexNames = []
     edgeNames = []
     faceNames = []
@@ -179,11 +171,23 @@ def readA2pFile(fileName):
     shape = Part.Shape()
     shape.importBrepFromString(to_str(zip.open("shape.brep").read()))
     
-    muxInfo = []
-    lines = zip.open("toponames").readlines()
+    vertexNames = []
+    lines = zip.open("vertexnames").readlines()
     for line in lines:
         tx = to_str(line).strip("\r\n")
-        muxInfo.append(tx)
+        vertexNames.append(tx)
+        
+    edgeNames = []
+    lines = zip.open("edgenames").readlines()
+    for line in lines:
+        tx = to_str(line).strip("\r\n")
+        edgeNames.append(tx)
+        
+    faceNames = []
+    lines = zip.open("facenames").readlines()
+    for line in lines:
+        tx = to_str(line).strip("\r\n")
+        faceNames.append(tx)
         
     diffuseColor = []
     lines = zip.open("diffusecolor").readlines()
@@ -209,7 +213,8 @@ def readA2pFile(fileName):
         if idx == len(xmlContent): break
     
     zip.close()
-    return shape, muxInfo, diffuseColor, properties
+    
+    return shape, vertexNames, edgeNames, faceNames, diffuseColor, properties
 #------------------------------------------------------------------------------
 def to_bytes(tx):
     if PYVERSION > 2:
