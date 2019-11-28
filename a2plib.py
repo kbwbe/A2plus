@@ -119,6 +119,38 @@ def writeA2pFile(fileName,shape,toponames, facecolors, xml):
     zip.write(topoFileName,'toponames')
     os.remove(topoFileName)
     
+    vertexNames = []
+    edgeNames = []
+    faceNames = []
+    for tn in toponames:
+        if tn.startswith('V'):vertexNames.append(tn)
+        if tn.startswith('E'):edgeNames.append(tn)
+        if tn.startswith('F'):faceNames.append(tn)
+        
+    tempFile = os.path.join(docPath,docFileName+'.temp')
+    with open(tempFile,'w') as f:
+        for tn in vertexNames:
+            f.write(tn+'\r\n')
+    f.close()
+    zip.write(tempFile,'vertexnames')
+    os.remove(tempFile)
+        
+    tempFile = os.path.join(docPath,docFileName+'.temp')
+    with open(tempFile,'w') as f:
+        for tn in edgeNames:
+            f.write(tn+'\r\n')
+    f.close()
+    zip.write(tempFile,'edgenames')
+    os.remove(tempFile)
+
+    tempFile = os.path.join(docPath,docFileName+'.temp')
+    with open(tempFile,'w') as f:
+        for tn in faceNames:
+            f.write(tn+'\r\n')
+    f.close()
+    zip.write(tempFile,'facenames')
+    os.remove(tempFile)
+    
     diffuseFileName = os.path.join(docPath,docFileName+'.diffuse')
     with open(diffuseFileName,'w') as f:
         for color in facecolors:

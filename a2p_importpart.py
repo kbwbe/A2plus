@@ -255,7 +255,7 @@ def getOrCreateA2pFile(
 
     if not importDocIsOpen:
         FreeCAD.closeDocument(importDoc.Name)
-    zipFileName = a2plib.writeA2pFile(filename,Shape,muxInfo, DiffuseColor, xml)
+    zipFileName = a2plib.writeA2pFile(filename,Shape,muxInfo,DiffuseColor,xml)
     return zipFileName
 
 #==============================================================================
