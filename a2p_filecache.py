@@ -29,7 +29,6 @@ from PySide import QtCore
 import a2plib
 import a2p_importpart
 import os
-from reportlab.pdfbase.pdfmetrics import _dynFaceNames
 
 class FileCache():
     def __init__(self):
