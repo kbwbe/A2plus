@@ -263,6 +263,7 @@ Please use {}.{}.{} or above.\n\n'''.format(
 
     def Activated(self):
         import a2p_observers
+        import a2p_filecache
         FreeCAD.addDocumentObserver(a2p_observers.redoUndoObserver)
 
     def Deactivated(self):
