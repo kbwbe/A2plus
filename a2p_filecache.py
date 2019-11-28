@@ -34,17 +34,7 @@ class FileCache():
     def __init__(self):
         self.cache = {}
         
-    def addFile(self,fileName,timeStamp, topoNames):
-        self.cache[fileName] = (timeStamp,topoNames)
-        
     def load(self,fileName, objectTimeStamp):
-        cacheEntry = self.cache.get(fileName,None)
-        if cacheEntry is not None:
-            if cacheEntry[0] > objectTimeStamp:
-                print("cache already loaded")
-                return
-            
-        #Nothing found, file needs to be loaded..
         doc = FreeCAD.activeDocument()
         assemblyPath = os.path.normpath(os.path.split(doc.FileName)[0])
         fileNameWithinProjectFile = a2plib.findSourceFileInProject(fileName, assemblyPath)
@@ -54,8 +44,13 @@ class FileCache():
                 u"File error ! ",
                 u"Cannot find {}".format(fileNameWithinProjectFile)
                 )
-            return None
+            return
         
+        cacheEntry = self.cache.get(fileNameWithinProjectFile,None)
+        if cacheEntry is not None:
+            if cacheEntry[0] >= objectTimeStamp:
+                return
+            
         #A valid sourcefile is found, search for corresponding a2p-file
         zipFile = a2p_importpart.getOrCreateA2pFile(fileNameWithinProjectFile)
         if zipFile is None: 
@@ -64,11 +59,12 @@ class FileCache():
                 u"File error ! ",
                 u"Cannot create a2p file for {}".format(fileNameWithinProjectFile)
                 )
-            return None
+            return
         
-        #A valid a2p file exist, read it...
+        #A valid a2p file exists, read it...
         shape, muxInfo, diffuseColor, properties = a2plib.readA2pFile(zipFile)
-        print ("a2p file has been loaded")
+        sourcePartCreationTime = float(properties["sourcePartCreationTime"])
+        self.cache[fileNameWithinProjectFile] = (sourcePartCreationTime,muxInfo)
         
 fileCache = FileCache()
         
