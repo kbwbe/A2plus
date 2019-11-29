@@ -159,6 +159,38 @@ class FileCache():
                                 )
         print(u"file loaded to cache")
         
+    def getSubelementIndex(self,subName):
+        idxString = ""
+        for c in subName:
+            if c in ["0","1","2","3","4","5","6","7","8","9"]:
+                idxString+=c
+        return int(idxString)-1
+        
+    def getTopoName(self,obj,subName):
+        print("Enter getTopoName()")
+        # No toponaming for import of single shapes for now...
+        if obj.sourcePart is not None and len(obj.sourcePart)>0: 
+            return ""
+        cacheKey = os.path.split(obj.sourceFile)[1]
+        objectTimeStamp = obj.timeLastImport
+        self.load(cacheKey,objectTimeStamp)
+        try:
+            if subName.startswith("Vertex"):
+                names = self.cache[cacheKey][1]
+                idx = self.getSubelementIndex(subName)
+                return names[idx]
+            elif subName.startswith("Edge"):
+                names = self.cache[cacheKey][2]
+                idx = self.getSubelementIndex(subName)
+                return names[idx]
+            elif subName.startswith("Face"):
+                names = self.cache[cacheKey][3]
+                idx = self.getSubelementIndex(subName)
+                return names[idx]
+        except:
+            return ""
+        return "" #default if there are problems
+        
 fileCache = FileCache()
 #==============================================================================
         
