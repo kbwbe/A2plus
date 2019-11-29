@@ -27,11 +27,11 @@ import FreeCADGui
 from PySide import QtGui
 from PySide import QtCore
 import os
+import sys
 import a2plib
 import a2p_topomapper
 import a2p_simpleXMLhandler
 from a2p_MuxAssembly import muxAssemblyWithTopoNames
-
 
 #==============================================================================
 def getOrCreateA2pFile(
@@ -158,6 +158,7 @@ class FileCache():
                                 faceNames
                                 )
         print(u"file loaded to cache")
+        print(u"size of cache is: {}".format(a2plib.getMemSize(self.cache)))
         
     def getSubelementIndex(self,subName):
         idxString = ""
@@ -167,7 +168,6 @@ class FileCache():
         return int(idxString)-1
         
     def getTopoName(self,obj,subName):
-        print("Enter getTopoName()")
         # No toponaming for import of single shapes for now...
         if obj.sourcePart is not None and len(obj.sourcePart)>0: 
             return ""
