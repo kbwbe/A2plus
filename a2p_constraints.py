@@ -76,6 +76,8 @@ class BasicConstraint():
         ob.addProperty("App::PropertyString","SubElement1","ConstraintInfo").SubElement1 = self.sub1
         ob.addProperty("App::PropertyString","Object2","ConstraintInfo").Object2 = self.ob2Name
         ob.addProperty("App::PropertyString","SubElement2","ConstraintInfo").SubElement2 = self.sub2
+        ob.addProperty("App::PropertyString","Toponame1","ConstraintInfo").Toponame1 = ""
+        ob.addProperty("App::PropertyString","Toponame2","ConstraintInfo").Toponame2 = ""
         
         for prop in ["Object1","Object2","SubElement1","SubElement2","Type"]:
             ob.setEditorMode(prop, 1)
