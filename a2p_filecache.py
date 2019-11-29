@@ -26,10 +26,94 @@ import FreeCAD
 import FreeCADGui
 from PySide import QtGui
 from PySide import QtCore
-import a2plib
-import a2p_importpart
 import os
+import a2plib
+import a2p_topomapper
+import a2p_simpleXMLhandler
+from a2p_MuxAssembly import muxAssemblyWithTopoNames
 
+
+#==============================================================================
+def getOrCreateA2pFile(
+        filename
+        ):
+    
+    if filename is None or not os.path.exists(filename):
+        print(u"Import error: File {} does not exist".format(filename))
+        return
+    
+    if not a2plib.getRecalculateImportedParts(): # always create a new file if recalc is needed...
+        if filename != None and os.path.exists(filename):
+            importDocCreationTime = os.path.getmtime(filename)
+            a2pFileName = filename+'.a2p'
+            if os.path.exists( a2pFileName ):
+                a2pFileCreationTime = os.path.getmtime( a2pFileName )
+                if a2pFileCreationTime >= importDocCreationTime:
+                    print ("Found existing a2p file")
+                    return a2pFileName # nothing to do...
+    
+    print ("Create a new a2p file")
+    importDoc,importDocIsOpen = a2plib.openImportDocFromFile(filename)
+    if importDoc is None: return #nothing found
+    
+    #-------------------------------------------
+    # recalculate imported part if requested by preferences
+    # This can be useful if the imported part depends on an
+    # external master-spreadsheet
+    #-------------------------------------------
+    if a2plib.getRecalculateImportedParts():
+        for ob in importDoc.Objects:
+            ob.recompute()
+        importDoc.save() # useless without saving...
+    
+    #-------------------------------------------
+    # Initialize the TopoMapper
+    #-------------------------------------------
+    topoMapper = a2p_topomapper.TopoMapper(importDoc)
+
+    #-------------------------------------------
+    # Get a list of the importable Objects
+    #-------------------------------------------
+    importableObjects = topoMapper.getTopLevelObjects()
+    
+    if len(importableObjects) == 0:
+        msg = "No visible Part to import found. Create no A2p-file.."
+        QtGui.QMessageBox.information(
+            QtGui.QApplication.activeWindow(),
+            "Import Error",
+            msg
+            )
+        return
+    
+    #-------------------------------------------
+    # Discover whether we are importing a subassembly or a single part
+    #-------------------------------------------
+    subAssemblyImport = False
+    if all([ 'importPart' in obj.Content for obj in importableObjects]) == 1:
+        subAssemblyImport = True
+
+    if subAssemblyImport:
+        muxInfo, Shape, DiffuseColor, transparency = muxAssemblyWithTopoNames(importDoc)
+    else:
+        # TopoMapper manages import of non A2p-Files. It generates the shapes and appropriate topo names...
+        muxInfo, Shape, DiffuseColor, transparency = topoMapper.createTopoNames()
+        
+    #-------------------------------------------
+    # setup xml information for a2p file
+    #-------------------------------------------
+    xmlHandler = a2p_simpleXMLhandler.SimpleXMLhandler()
+    xml = xmlHandler.createInformationXML(
+        importDoc.Label,
+        os.path.getmtime(filename),
+        subAssemblyImport,
+        transparency
+        )    
+
+    if not importDocIsOpen:
+        FreeCAD.closeDocument(importDoc.Name)
+    zipFileName = a2plib.writeA2pFile(filename,Shape,muxInfo,DiffuseColor,xml)
+    return zipFileName
+#==============================================================================
 class FileCache():
     def __init__(self):
         self.cache = {}
@@ -55,7 +139,7 @@ class FileCache():
             return
 
         #A valid sourcefile is found, search for corresponding a2p-file
-        zipFile = a2p_importpart.getOrCreateA2pFile(fileNameWithinProjectFile)
+        zipFile = getOrCreateA2pFile(fileNameWithinProjectFile)
         if zipFile is None: 
             QtGui.QMessageBox.critical(
                 QtGui.QApplication.activeWindow(),
@@ -76,4 +160,5 @@ class FileCache():
         print(u"file loaded to cache")
         
 fileCache = FileCache()
+#==============================================================================
         

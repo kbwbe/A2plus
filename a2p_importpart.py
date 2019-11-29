@@ -41,6 +41,7 @@ from a2p_topomapper import TopoMapper
 
 from a2p_importedPart_class import Proxy_importPart
 from a2p_importedPart_class import ImportedPartViewProviderProxy
+from a2p_filecache import getOrCreateA2pFile
 
 PYVERSION =  sys.version_info[0]
 
@@ -130,87 +131,6 @@ class a2p_shapeExtractDialog(QtGui.QDialog):
     
     def reject(self):
         self.deleteLater()
-
-#==============================================================================
-def getOrCreateA2pFile(
-        filename
-        ):
-    
-    if filename is None or not os.path.exists(filename):
-        print(u"Import error: File {} does not exist".format(filename))
-        return
-    
-    if not a2plib.getRecalculateImportedParts(): # always create a new file if recalc is needed...
-        if filename != None and os.path.exists(filename):
-            importDocCreationTime = os.path.getmtime(filename)
-            a2pFileName = filename+'.a2p'
-            if os.path.exists( a2pFileName ):
-                a2pFileCreationTime = os.path.getmtime( a2pFileName )
-                if a2pFileCreationTime >= importDocCreationTime:
-                    print ("Found existing a2p file")
-                    return a2pFileName # nothing to do...
-    
-    print ("Create a new a2p file")
-    importDoc,importDocIsOpen = openImportDocFromFile(filename)
-    if importDoc is None: return #nothing found
-    
-    #-------------------------------------------
-    # recalculate imported part if requested by preferences
-    # This can be useful if the imported part depends on an
-    # external master-spreadsheet
-    #-------------------------------------------
-    if a2plib.getRecalculateImportedParts():
-        for ob in importDoc.Objects:
-            ob.recompute()
-        importDoc.save() # useless without saving...
-    
-    #-------------------------------------------
-    # Initialize the TopoMapper
-    #-------------------------------------------
-    topoMapper = TopoMapper(importDoc)
-
-    #-------------------------------------------
-    # Get a list of the importable Objects
-    #-------------------------------------------
-    importableObjects = topoMapper.getTopLevelObjects()
-    
-    if len(importableObjects) == 0:
-        msg = "No visible Part to import found. Create no A2p-file.."
-        QtGui.QMessageBox.information(
-            QtGui.QApplication.activeWindow(),
-            "Import Error",
-            msg
-            )
-        return
-    
-    #-------------------------------------------
-    # Discover whether we are importing a subassembly or a single part
-    #-------------------------------------------
-    subAssemblyImport = False
-    if all([ 'importPart' in obj.Content for obj in importableObjects]) == 1:
-        subAssemblyImport = True
-
-    if subAssemblyImport:
-        muxInfo, Shape, DiffuseColor, transparency = muxAssemblyWithTopoNames(importDoc)
-    else:
-        # TopoMapper manages import of non A2p-Files. It generates the shapes and appropriate topo names...
-        muxInfo, Shape, DiffuseColor, transparency = topoMapper.createTopoNames()
-        
-    #-------------------------------------------
-    # setup xml information for a2p file
-    #-------------------------------------------
-    xmlHandler = a2p_simpleXMLhandler.SimpleXMLhandler()
-    xml = xmlHandler.createInformationXML(
-        importDoc.Label,
-        os.path.getmtime(filename),
-        subAssemblyImport,
-        transparency
-        )    
-
-    if not importDocIsOpen:
-        FreeCAD.closeDocument(importDoc.Name)
-    zipFileName = a2plib.writeA2pFile(filename,Shape,muxInfo,DiffuseColor,xml)
-    return zipFileName
 
 #==============================================================================
 def importPartFromFile(
