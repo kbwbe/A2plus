@@ -100,6 +100,39 @@ else:
     OPERATING_SYSTEM = "OTHER"
 
 #------------------------------------------------------------------------------
+def openImportDocFromFile(filename):
+    '''
+    Open the importDocument from it's file or get it's fc document if it is
+    already open.
+    '''
+    # look only for filenames, not paths, as there are problems on WIN10 (Address-translation??)
+    importDoc = None
+    importDocIsOpen = False
+    requestedFile = os.path.split(filename)[1]
+    for d in FreeCAD.listDocuments().values():
+        recentFile = os.path.split(d.FileName)[1]
+        if requestedFile == recentFile:
+            importDoc = d # file is already open...
+            importDocIsOpen = True
+            break
+
+    if not importDocIsOpen:
+        if filename.lower().endswith('.fcstd'):
+            importDoc = FreeCAD.openDocument(filename)
+        elif filename.lower().endswith('.stp') or filename.lower().endswith('.step'):
+            import ImportGui
+            fname =  os.path.splitext(os.path.basename(filename))[0]
+            FreeCAD.newDocument(fname)
+            newname = FreeCAD.ActiveDocument.Name
+            FreeCAD.setActiveDocument(newname)
+            ImportGui.insert(filename,newname)
+            importDoc = FreeCAD.ActiveDocument
+        else:
+            msg = "A part can only be imported from a FreeCAD '*.FCStd' file"
+            QtGui.QMessageBox.information( QtGui.QApplication.activeWindow(), "Value Error", msg )
+            
+    return importDoc, importDocIsOpen
+#------------------------------------------------------------------------------
 def writeA2pFile(fileName,shape,toponames, facecolors, xml):
     docPath, docFileName = os.path.split(fileName)
                     

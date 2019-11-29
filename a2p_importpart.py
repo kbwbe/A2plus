@@ -25,35 +25,22 @@
 import FreeCADGui,FreeCAD
 from PySide import QtGui, QtCore
 import os, copy, time, sys, platform
+
 import a2plib
-from a2p_MuxAssembly import (
-    Proxy_muxAssemblyObj,
-    makePlacedShape,
-    muxAssemblyWithTopoNames
-    )
+from a2plib import getRelativePathesEnabled
+from a2plib import openImportDocFromFile
+
+from a2p_MuxAssembly import muxAssemblyWithTopoNames
+
 from a2p_viewProviderProxies import *
 from a2p_versionmanagement import A2P_VERSION
 import a2p_solversystem
 import a2p_simpleXMLhandler
-from a2plib import (
-    appVersionStr,
-    AUTOSOLVE_ENABLED,
-    Msg,
-    DebugMsg,
-    A2P_DEBUG_LEVEL,
-    A2P_DEBUG_NONE,
-    A2P_DEBUG_1,
-    A2P_DEBUG_2,
-    A2P_DEBUG_3,
-    getRelativePathesEnabled
-    )
 
-from a2p_topomapper import (
-    TopoMapper
-    )
+from a2p_topomapper import TopoMapper
 
-import a2p_lcs_support
-from a2p_importedPart_class import Proxy_importPart, ImportedPartViewProviderProxy
+from a2p_importedPart_class import Proxy_importPart
+from a2p_importedPart_class import ImportedPartViewProviderProxy
 
 PYVERSION =  sys.version_info[0]
 
@@ -144,39 +131,6 @@ class a2p_shapeExtractDialog(QtGui.QDialog):
     def reject(self):
         self.deleteLater()
 
-#==============================================================================
-def openImportDocFromFile(filename):
-    '''
-    Open the importDocument from it's file or get it's fc document if it is
-    already open.
-    '''
-    # look only for filenames, not paths, as there are problems on WIN10 (Address-translation??)
-    importDoc = None
-    importDocIsOpen = False
-    requestedFile = os.path.split(filename)[1]
-    for d in FreeCAD.listDocuments().values():
-        recentFile = os.path.split(d.FileName)[1]
-        if requestedFile == recentFile:
-            importDoc = d # file is already open...
-            importDocIsOpen = True
-            break
-
-    if not importDocIsOpen:
-        if filename.lower().endswith('.fcstd'):
-            importDoc = FreeCAD.openDocument(filename)
-        elif filename.lower().endswith('.stp') or filename.lower().endswith('.step'):
-            import ImportGui
-            fname =  os.path.splitext(os.path.basename(filename))[0]
-            FreeCAD.newDocument(fname)
-            newname = FreeCAD.ActiveDocument.Name
-            FreeCAD.setActiveDocument(newname)
-            ImportGui.insert(filename,newname)
-            importDoc = FreeCAD.ActiveDocument
-        else:
-            msg = "A part can only be imported from a FreeCAD '*.FCStd' file"
-            QtGui.QMessageBox.information( QtGui.QApplication.activeWindow(), "Value Error", msg )
-            
-    return importDoc, importDocIsOpen
 #==============================================================================
 def getOrCreateA2pFile(
         filename
