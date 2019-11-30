@@ -30,14 +30,9 @@ import a2plib
 from a2plib import getRelativePathesEnabled
 from a2plib import openImportDocFromFile
 
-from a2p_MuxAssembly import muxAssemblyWithTopoNames
-
 from a2p_viewProviderProxies import *
 from a2p_versionmanagement import A2P_VERSION
 import a2p_solversystem
-import a2p_simpleXMLhandler
-
-from a2p_topomapper import TopoMapper
 
 from a2p_importedPart_class import Proxy_importPart
 from a2p_importedPart_class import ImportedPartViewProviderProxy
@@ -296,19 +291,17 @@ def updateImportedParts(doc):
                     newPartCreationTime > obj.timeLastImport or
                     a2plib.getRecalculateImportedParts() # open always all parts as they could depend on spreadsheets
                     ):
-                    sourcePartCreationTime, importDocFileName, vertexNames, edgeNames, faceNames, shape, diffuseColor = \
-                            a2p_filecache.fileCache.getFullEntry(obj)
-
-                        
+                    sourcePartCreationTime, importDocFileName, vertexNames, \
+                    edgeNames, faceNames, shape, diffuseColor = \
+                                            a2p_filecache.fileCache.getFullEntry(obj)
+                                            
                     obj.timeLastImport = sourcePartCreationTime
                     #importUpdateConstraintSubobjects( doc, obj, newObject ) # do this before changing shape and mux
-                    obj.muxInfo = ""
+                    obj.muxInfo = vertexNames + edgeNames + faceNames
                     # save Placement because following newObject.Shape.copy() isn't resetting it to zeroes...
                     savedPlacement  = obj.Placement
-                    #obj.Shape = shape.copy()
                     obj.Shape = shape
                     obj.Placement = savedPlacement # restore the old placement
-                    #a2plib.copyObjectColors(obj,newObject)
                     obj.ViewObject.DiffuseColor = diffuseColor
 
 
