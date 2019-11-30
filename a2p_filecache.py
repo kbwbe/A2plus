@@ -56,24 +56,16 @@ def getOrCreateA2pFile(
     importDoc,importDocIsOpen = a2plib.openImportDocFromFile(filename)
     if importDoc is None: return #nothing found
     
-    #-------------------------------------------
     # recalculate imported part if requested by preferences
-    # This can be useful if the imported part depends on an
-    # external master-spreadsheet
-    #-------------------------------------------
     if a2plib.getRecalculateImportedParts():
         for ob in importDoc.Objects:
             ob.recompute()
         importDoc.save() # useless without saving...
     
-    #-------------------------------------------
     # Initialize the TopoMapper
-    #-------------------------------------------
     topoMapper = a2p_topomapper.TopoMapper(importDoc)
 
-    #-------------------------------------------
     # Get a list of the importable Objects
-    #-------------------------------------------
     importableObjects = topoMapper.getTopLevelObjects()
     
     if len(importableObjects) == 0:
@@ -121,11 +113,12 @@ class FileCache():
     def load(self,fileName, objectTimeStamp):
         #Search cache for entry
         cacheKey = os.path.split(fileName)[1]
-        cacheEntry = self.cache.get(cacheKey,None)
-        if cacheEntry is not None:
-            if cacheEntry[0] >= objectTimeStamp:
-                print(u"cache hit!")
-                return #entry found, nothing to do
+        if not a2plib.getRecalculateImportedParts(): #always refresh cache if recalculation is needed
+            cacheEntry = self.cache.get(cacheKey,None)
+            if cacheEntry is not None:
+                if cacheEntry[0] >= objectTimeStamp:
+                    print(u"cache hit!")
+                    return #entry found, nothing to do
         
         doc = FreeCAD.activeDocument()
         assemblyPath = os.path.normpath(os.path.split(doc.FileName)[0])
@@ -155,7 +148,9 @@ class FileCache():
         self.cache[cacheKey] = (sourcePartCreationTime,
                                 vertexNames,
                                 edgeNames,
-                                faceNames
+                                faceNames,
+                                shape,
+                                diffuseColor
                                 )
         print(u"file loaded to cache")
         print(u"size of cache is: {}".format(a2plib.getMemSize(self.cache)))
@@ -168,7 +163,8 @@ class FileCache():
         return int(idxString)-1
         
     def getTopoName(self,obj,subName):
-        # No toponaming for import of single shapes for now...
+        # No toponaming for import of single shapes
+        # Single Shape references have been removed for next time
         if obj.sourcePart is not None and len(obj.sourcePart)>0: 
             return ""
         cacheKey = os.path.split(obj.sourceFile)[1]
@@ -190,6 +186,25 @@ class FileCache():
         except:
             return ""
         return "" #default if there are problems
+        
+    def getFullEntry(self,obj):
+        # No toponaming for import of single shapes
+        # Single Shape references have been removed for next time
+        if obj.sourcePart is not None and len(obj.sourcePart)>0: 
+            return ""
+        cacheKey = os.path.split(obj.sourceFile)[1]
+        objectTimeStamp = obj.timeLastImport
+        self.load(cacheKey,objectTimeStamp)
+        entry = self.cache[cacheKey]
+        return (
+            entry[0],
+            entry[1],
+            entry[2],
+            entry[3],
+            entry[4],
+            entry[5]
+            )
+        #end of return!
         
 fileCache = FileCache()
 #==============================================================================
