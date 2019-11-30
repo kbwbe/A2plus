@@ -24,6 +24,7 @@
 
 import FreeCAD
 import FreeCADGui
+import Part
 from PySide import QtGui
 from PySide import QtCore
 import os
@@ -31,8 +32,126 @@ import sys
 import a2plib
 import a2p_topomapper
 import a2p_simpleXMLhandler
-from a2p_MuxAssembly import muxAssemblyWithTopoNames
 
+
+
+#==============================================================================
+def muxAssemblyWithTopoNames(doc, desiredShapeLabel=None):
+    '''
+    Mux an a2p assembly
+
+    combines all the a2p objects in the doc into one shape
+    and populates muxinfo with a description of an edge or face.
+    these descriptions are used later to retrieve the edges or faces...
+    '''
+    faces = []
+    faceColors = []
+    muxInfo = [] # List of keys, not used at moment...
+
+    visibleObjects = [ obj for obj in doc.Objects
+                       if hasattr(obj,'ViewObject') and obj.ViewObject.isVisible()
+                       and hasattr(obj,'Shape') and len(obj.Shape.Faces) > 0
+                       and hasattr(obj,'muxInfo')
+                       ]
+    
+    if desiredShapeLabel: # is not None..
+        tmp = []
+        for ob in visibleObjects:
+            if ob.Label == desiredShapeLabel:
+                tmp.append(ob)
+                break
+        visibleObjects = tmp
+
+    transparency = 0
+    shape_list = []
+    for obj in visibleObjects:
+        extendNames = False
+        if a2plib.getUseTopoNaming() and len(obj.muxInfo) > 0: # Subelement-Strings existieren schon...
+            extendNames = True
+            #
+            vertexNames = []
+            edgeNames = []
+            faceNames = []
+            #
+            for item in obj.muxInfo:
+                if item[0] == 'V': vertexNames.append(item)
+                if item[0] == 'E': edgeNames.append(item)
+                if item[0] == 'F': faceNames.append(item)
+
+        if a2plib.getUseTopoNaming():
+            for i in range(0, len(obj.Shape.Vertexes) ):
+                if extendNames:
+                    newName = "".join((vertexNames[i],obj.Name,';'))
+                    muxInfo.append(newName)
+                else:
+                    newName = "".join(('V;',str(i+1),';',obj.Name,';'))
+                    muxInfo.append(newName)
+            for i in range(0, len(obj.Shape.Edges) ):
+                if extendNames:
+                    newName = "".join((edgeNames[i],obj.Name,';'))
+                    muxInfo.append(newName)
+                else:
+                    newName = "".join(('E;',str(i+1),';',obj.Name,';'))
+                    muxInfo.append(newName)
+
+        # Save Computing time, store this before the for..enumerate loop later...
+        needDiffuseColorExtension = ( len(obj.ViewObject.DiffuseColor) < len(obj.Shape.Faces) )
+        shapeCol = obj.ViewObject.ShapeColor
+        diffuseCol = obj.ViewObject.DiffuseColor
+        tempShape = a2plib.makePlacedShape(obj)
+        transparency = obj.ViewObject.Transparency
+        shape_list.append(obj.Shape)
+
+        # now start the loop with use of the stored values..(much faster)
+        topoNaming = a2plib.getUseTopoNaming()
+        diffuseElement = a2plib.makeDiffuseElement(shapeCol,transparency)
+        for i in range(0,len(tempShape.Faces)):
+            if topoNaming:
+                if extendNames:
+                    newName = "".join((faceNames[i],obj.Name,';'))
+                    muxInfo.append(newName)
+                else:
+                    newName = "".join(('F;',str(i+1),';',obj.Name,';'))
+                    muxInfo.append(newName)
+            if needDiffuseColorExtension:
+                faceColors.append(diffuseElement)
+
+        if not needDiffuseColorExtension:
+            faceColors.extend(diffuseCol)
+
+        faces.extend(tempShape.Faces)
+
+    #if len(faces) == 1:
+    #    shell = Part.makeShell([faces])
+    #else:
+    #    shell = Part.makeShell(faces)
+        
+    shell = Part.makeShell(faces)
+        
+    try:
+        if a2plib.getUseSolidUnion():
+            if len(shape_list) > 1:
+                shape_base=shape_list[0]
+                shapes=shape_list[1:]
+                solid = shape_base.fuse(shapes)
+            else:
+                solid = Part.Solid(shape_list[0])
+        else:
+            solid = Part.Solid(shell) # This does not work if shell includes spherical faces. FC-Bug ??
+            # Fall back to shell if some faces are missing..
+            if len(shell.Faces) != len(solid.Faces):
+                solid = shell
+    except:
+        # keeping a shell if solid is failing
+        FreeCAD.Console.PrintWarning('Union of Shapes FAILED\n')
+        solid = shell
+
+    # transparency could change to different values depending
+    # on the order of imported objects
+    # now set it to a default value
+    # faceColors still contains the per face transparency values
+    transparency = 0
+    return muxInfo, solid, faceColors, transparency
 #==============================================================================
 def getOrCreateA2pFile(
         filename #the full path of the fcstd file which a2p file has to be created from

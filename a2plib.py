@@ -1026,6 +1026,17 @@ def deleteConstraintsOfDeletedObjects():
             msg 
             )
 #------------------------------------------------------------------------------
+def makePlacedShape(obj):
+    '''return a copy of obj.Shape with proper placement applied'''
+    tempShape = obj.Shape.copy()
+    plmGlobal = obj.Placement
+    try:
+        plmGlobal = obj.getGlobalPlacement();
+    except:
+        pass
+    tempShape.Placement = plmGlobal
+    return tempShape
+#------------------------------------------------------------------------------
 def a2p_repairTreeView():
     doc = FreeCAD.activeDocument()
     if doc == None: return
