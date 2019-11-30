@@ -55,12 +55,14 @@ class SimpleXMLhandler():
         
     def createInformationXML(self,
                       importDocLabel,
+                      importDocFileName,
                       sourcePartCreationTime = 0.0,
                       isSubAssembly = False,
                       transparency = 0,
                       ):
         self.writeHeader()
         self.writeProperty("importDocLabel", importDocLabel)
+        self.writeProperty("importDocFileName", importDocFileName)
         self.writeProperty("sourcePartCreationTime", sourcePartCreationTime)
         self.writeProperty("isSubAssembly", isSubAssembly)
         self.writeProperty("transparency", transparency)

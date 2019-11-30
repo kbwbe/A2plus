@@ -35,14 +35,14 @@ from a2p_MuxAssembly import muxAssemblyWithTopoNames
 
 #==============================================================================
 def getOrCreateA2pFile(
-        filename
+        filename #the full path of the fcstd file which a2p file has to be created from
         ):
     
     if filename is None or not os.path.exists(filename):
         print(u"Import error: File {} does not exist".format(filename))
         return
     
-    if not a2plib.getRecalculateImportedParts(): # always create a new file if recalc is needed...
+    if not a2plib.getRecalculateImportedParts(): # always create a new file if recalculation is needed...
         if filename != None and os.path.exists(filename):
             importDocCreationTime = os.path.getmtime(filename)
             a2pFileName = filename+'.a2p'
@@ -77,9 +77,7 @@ def getOrCreateA2pFile(
             )
         return
     
-    #-------------------------------------------
     # Discover whether we are importing a subassembly or a single part
-    #-------------------------------------------
     subAssemblyImport = False
     if all([ 'importPart' in obj.Content for obj in importableObjects]) == 1:
         subAssemblyImport = True
@@ -90,13 +88,12 @@ def getOrCreateA2pFile(
         # TopoMapper manages import of non A2p-Files. It generates the shapes and appropriate topo names...
         muxInfo, Shape, DiffuseColor, transparency = topoMapper.createTopoNames()
         
-    #-------------------------------------------
     # setup xml information for a2p file
-    #-------------------------------------------
     xmlHandler = a2p_simpleXMLhandler.SimpleXMLhandler()
     xml = xmlHandler.createInformationXML(
         importDoc.Label,
-        os.path.getmtime(filename),
+        importDoc.FileName,
+        os.path.getmtime(importDoc.FileName),
         subAssemblyImport,
         transparency
         )    
@@ -110,15 +107,18 @@ class FileCache():
     def __init__(self):
         self.cache = {}
         
-    def load(self,fileName, objectTimeStamp):
+    def createOrUpdateEntry(self,cacheKey, obj):
         #Search cache for entry
-        cacheKey = os.path.split(fileName)[1]
+        fileName = obj.sourceFile
+        
         if not a2plib.getRecalculateImportedParts(): #always refresh cache if recalculation is needed
             cacheEntry = self.cache.get(cacheKey,None)
             if cacheEntry is not None:
-                if cacheEntry[0] >= objectTimeStamp:
-                    print(u"cache hit!")
-                    return #entry found, nothing to do
+                if os.path.exists(cacheEntry[1]):
+                    sourceFileModificationTime = os.path.getmtime(cacheEntry[1])
+                    if cacheEntry[0] >=  sourceFileModificationTime:
+                        print(u"cache hit!")
+                        return #entry found, nothing to do
         
         doc = FreeCAD.activeDocument()
         assemblyPath = os.path.normpath(os.path.split(doc.FileName)[0])
@@ -132,6 +132,7 @@ class FileCache():
             return
 
         #A valid sourcefile is found, search for corresponding a2p-file
+        print(u"fileNameWithinProjectFile: {}".format(fileNameWithinProjectFile))
         zipFile = getOrCreateA2pFile(fileNameWithinProjectFile)
         if zipFile is None: 
             QtGui.QMessageBox.critical(
@@ -145,7 +146,9 @@ class FileCache():
         shape, vertexNames, edgeNames, faceNames, diffuseColor, properties = \
             a2plib.readA2pFile(zipFile)
         sourcePartCreationTime = float(properties["sourcePartCreationTime"])
+        importDocFileName = properties["importDocFileName"]
         self.cache[cacheKey] = (sourcePartCreationTime,
+                                importDocFileName,
                                 vertexNames,
                                 edgeNames,
                                 faceNames,
@@ -168,19 +171,18 @@ class FileCache():
         if obj.sourcePart is not None and len(obj.sourcePart)>0: 
             return ""
         cacheKey = os.path.split(obj.sourceFile)[1]
-        objectTimeStamp = obj.timeLastImport
-        self.load(cacheKey,objectTimeStamp)
+        self.createOrUpdateEntry(cacheKey, obj)
         try:
             if subName.startswith("Vertex"):
-                names = self.cache[cacheKey][1]
-                idx = self.getSubelementIndex(subName)
-                return names[idx]
-            elif subName.startswith("Edge"):
                 names = self.cache[cacheKey][2]
                 idx = self.getSubelementIndex(subName)
                 return names[idx]
-            elif subName.startswith("Face"):
+            elif subName.startswith("Edge"):
                 names = self.cache[cacheKey][3]
+                idx = self.getSubelementIndex(subName)
+                return names[idx]
+            elif subName.startswith("Face"):
+                names = self.cache[cacheKey][4]
                 idx = self.getSubelementIndex(subName)
                 return names[idx]
         except:
@@ -188,13 +190,14 @@ class FileCache():
         return "" #default if there are problems
         
     def getFullEntry(self,obj):
+        print(u"getFullEntry of {}".format(obj.Label))
         # No toponaming for import of single shapes
         # Single Shape references have been removed for next time
         if obj.sourcePart is not None and len(obj.sourcePart)>0: 
             return ""
         cacheKey = os.path.split(obj.sourceFile)[1]
-        objectTimeStamp = obj.timeLastImport
-        self.load(cacheKey,objectTimeStamp)
+        print(u"cacheKey ={}".format(cacheKey))
+        self.createOrUpdateEntry(cacheKey, obj)
         entry = self.cache[cacheKey]
         return (
             entry[0],
@@ -202,7 +205,8 @@ class FileCache():
             entry[2],
             entry[3],
             entry[4],
-            entry[5]
+            entry[5],
+            entry[6]
             )
         #end of return!
         

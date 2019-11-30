@@ -296,7 +296,7 @@ def updateImportedParts(doc):
                     newPartCreationTime > obj.timeLastImport or
                     a2plib.getRecalculateImportedParts() # open always all parts as they could depend on spreadsheets
                     ):
-                    sourcePartCreationTime, vertexNames, edgeNames, faceNames, shape, diffuseColor = \
+                    sourcePartCreationTime, importDocFileName, vertexNames, edgeNames, faceNames, shape, diffuseColor = \
                             a2p_filecache.fileCache.getFullEntry(obj)
 
                         
