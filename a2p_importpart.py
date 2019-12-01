@@ -300,9 +300,8 @@ def updateImportedParts(doc):
                     ):
                     entry = a2p_filecache.fileCache.getFullEntry(obj)
                     obj.timeLastImport = entry.sourcePartCreationTime
-                    #importUpdateConstraintSubobjects( doc, obj, newObject ) # do this before changing shape and mux
+                    updateConstraintsGeoRefs(doc,obj,entry)
                     obj.muxInfo = entry.vertexNames + entry.edgeNames + entry.faceNames
-                    # save Placement because following newObject.Shape.copy() isn't resetting it to zeroes...
                     savedPlacement  = obj.Placement
                     obj.Shape = entry.shape
                     obj.Placement = savedPlacement # restore the old placement
@@ -1260,110 +1259,85 @@ class a2p_SaveAndExit_Command:
 FreeCADGui.addCommand('a2p_SaveAndExit_Command', a2p_SaveAndExit_Command())
 
 
-
-
-
-def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
+#=====================================================================================
+def updateConstraintsGeoRefs(doc,obj,cacheContent):
     if not a2plib.getUseTopoNaming(): return
     
     # return if there are no constraints linked to the object 
-    if len([c for c in doc.Objects if  'ConstraintInfo' in c.Content and oldObject.Name in [c.Object1, c.Object2] ]) == 0:
+    if len([c for c in doc.Objects if  'ConstraintInfo' in c.Content and obj.Name in [c.Object1, c.Object2] ]) == 0:
         return
 
-
-    # check, whether object is an assembly with muxInformations.
-    # Then find edgenames with mapping in muxinfo...
     deletionList = [] #for broken constraints
-    if hasattr(oldObject, 'muxInfo'):
-        if hasattr(newObject, 'muxInfo'):
-            #
-            oldVertexNames = []
-            oldEdgeNames = []
-            oldFaceNames = []
-            for item in oldObject.muxInfo:
-                if item[:1] == 'V':
-                    oldVertexNames.append(item)
-                if item[:1] == 'E':
-                    oldEdgeNames.append(item)
-                if item[:1] == 'F':
-                    oldFaceNames.append(item)
-            #
-            newVertexNames = []
-            newEdgeNames = []
-            newFaceNames = []
-            for item in newObject.muxInfo:
-                if item[:1] == 'V':
-                    newVertexNames.append(item)
-                if item[:1] == 'E':
-                    newEdgeNames.append(item)
-                if item[:1] == 'F':
-                    newFaceNames.append(item)
-            #
-            partName = oldObject.Name
-            for c in doc.Objects:
-                if 'ConstraintInfo' in c.Content:
-                    if partName == c.Object1:
-                        SubElement = "SubElement1"
-                    elif partName == c.Object2:
-                        SubElement = "SubElement2"
-                    else:
-                        SubElement = None
+
+    partName = obj.Name
+    for c in doc.Objects:
+        if 'ConstraintInfo' in c.Content:
+            if partName == c.Object1:
+                SubElement = "SubElement1"
+                topoName = "Toponame1"
+            elif partName == c.Object2:
+                SubElement = "SubElement2"
+                topoName = "Toponame2"
+            else:
+                SubElement = None
+            
+            topoString = None    
+            try:
+                topoString = getattr(c,topoName)
+            except:
+                pass
+            
+            if topoString is None or topoString == "":
+                print(u"missing toponame for {}, do not update this constraint".format(c.Name))
+                return
+                
+            if SubElement: #same as subElement <> None
+                subElementName = getattr(c, SubElement)
+                if subElementName[:4] == 'Face':
+                    try:
+                        newIndex = cacheContent.faceNames.index(topoString)
+                        newSubElementName = 'Face'+str(newIndex+1)
+                    except:
+                        newIndex = -1
+                        newSubElementName = 'INVALID'
                         
-                    if SubElement: #same as subElement <> None
+                elif subElementName[:4] == 'Edge':
+                    try:
+                        newIndex = cacheContent.edgeNames.index(topoString)
+                        newSubElementName = 'Edge'+str(newIndex+1)
+                    except:
+                        newIndex = -1
+                        newSubElementName = 'INVALID'
                         
-                        subElementName = getattr(c, SubElement)
-                        if subElementName[:4] == 'Face':
-                            try:
-                                oldIndex = int(subElementName[4:])-1
-                                oldConstraintString = oldFaceNames[oldIndex]
-                                newIndex = newFaceNames.index(oldConstraintString)
-                                newSubElementName = 'Face'+str(newIndex+1)
-                            except:
-                                newIndex = -1
-                                newSubElementName = 'INVALID'
-                                
-                        elif subElementName[:4] == 'Edge':
-                            try:
-                                oldIndex = int(subElementName[4:])-1
-                                oldConstraintString = oldEdgeNames[oldIndex]
-                                newIndex = newEdgeNames.index(oldConstraintString)
-                                newSubElementName = 'Edge'+str(newIndex+1)
-                            except:
-                                newIndex = -1
-                                newSubElementName = 'INVALID'
-                                
-                        elif subElementName[:6] == 'Vertex':
-                            try:
-                                oldIndex = int(subElementName[6:])-1
-                                oldConstraintString = oldVertexNames[oldIndex]
-                                newIndex = newVertexNames.index(oldConstraintString)
-                                newSubElementName = 'Vertex'+str(newIndex+1)
-                            except:
-                                newIndex = -1
-                                newSubElementName = 'INVALID'
-                                
-                        else:
-                            newIndex = -1
-                            newSubElementName = 'INVALID'
+                elif subElementName[:6] == 'Vertex':
+                    try:
+                        newIndex = cacheContent.vertexNames.index(topoString)
+                        newSubElementName = 'Vertex'+str(newIndex+1)
+                    except:
+                        newIndex = -1
+                        newSubElementName = 'INVALID'
                         
-                        if newIndex >= 0:
-                            setattr(c, SubElement, newSubElementName )
-                            print (
-                                    "oldConstraintString (KEY) : {}".format(
-                                    oldConstraintString
-                                    )
-                                   )
-                            print ("Updating by SubElement-Map: {} => {} ".format(
-                                       subElementName,newSubElementName
-                                       )
-                                   )
-                            continue
-                        #
-                        # if code coming here, constraint is broken
-                        if c.Name not in deletionList:
-                            deletionList.append(c.Name)
-                            
-    
+                else:
+                    newIndex = -1
+                    newSubElementName = 'INVALID'
+                
+                if newIndex >= 0:
+                    setattr(c, SubElement, newSubElementName )
+                    print (
+                            u"oldConstraintString (KEY) : {}".format(
+                            topoString
+                            )
+                           )
+                    print (u"Updating by SubElement-Map: {} => {} ".format(
+                               subElementName,newSubElementName
+                               )
+                           )
+                    continue
+                #
+                # if code coming here, constraint is broken
+                if c.Name not in deletionList:
+                    deletionList.append(c.Name)
+
     if len(deletionList) > 0: # there are broken constraints..
         for cName in deletionList:
         
@@ -1376,4 +1350,3 @@ def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
                 FreeCAD.Console.PrintError("Removing constraint %s" % cName)
                 c = doc.getObject(cName)
                 a2plib.removeConstraint(c)
-                
