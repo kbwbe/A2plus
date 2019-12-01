@@ -65,6 +65,9 @@ def importPartFromFile(
     transparency = int(iProperties["transparency"])
     importDocLabel = iProperties["importDocLabel"]
     
+    #instantly add a2pfile to a2pfilecache
+    a2p_filecache.fileCache.loadObject(filename)
+    
     #create new object
     partName = a2plib.findUnusedObjectName( importDocLabel, document=doc )
     partLabel = a2plib.findUnusedObjectLabel( importDocLabel, document=doc )
@@ -112,6 +115,9 @@ def importPartFromFile(
         # turn of perFaceTransparency by accessing ViewObject.Transparency and set to zero (non transparent)
         newObj.ViewObject.Transparency = 1
         newObj.ViewObject.Transparency = 0 # import assembly first time as non transparent.
+
+    #instantly add a2pfile to a2pfilecache
+    a2p_filecache.fileCache.loadObject(newObj.sourceFile)
 
     return newObj
 #====================================================================================================
@@ -291,18 +297,15 @@ def updateImportedParts(doc):
                     newPartCreationTime > obj.timeLastImport or
                     a2plib.getRecalculateImportedParts() # open always all parts as they could depend on spreadsheets
                     ):
-                    sourcePartCreationTime, importDocFileName, vertexNames, \
-                    edgeNames, faceNames, shape, diffuseColor = \
-                                            a2p_filecache.fileCache.getFullEntry(obj)
-                                            
-                    obj.timeLastImport = sourcePartCreationTime
+                    entry = a2p_filecache.fileCache.getFullEntry(obj)
+                    obj.timeLastImport = entry.sourcePartCreationTime
                     #importUpdateConstraintSubobjects( doc, obj, newObject ) # do this before changing shape and mux
-                    obj.muxInfo = vertexNames + edgeNames + faceNames
+                    obj.muxInfo = entry.vertexNames + entry.edgeNames + entry.faceNames
                     # save Placement because following newObject.Shape.copy() isn't resetting it to zeroes...
                     savedPlacement  = obj.Placement
-                    obj.Shape = shape
+                    obj.Shape = entry.shape
                     obj.Placement = savedPlacement # restore the old placement
-                    obj.ViewObject.DiffuseColor = diffuseColor
+                    obj.ViewObject.DiffuseColor = entry.diffuseColor
 
 
     mw = FreeCADGui.getMainWindow()

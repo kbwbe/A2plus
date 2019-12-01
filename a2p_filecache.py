@@ -207,12 +207,20 @@ def getOrCreateA2pFile(
         # TopoMapper manages import of non A2p-Files. It generates the shapes and appropriate topo names...
         muxInfo, Shape, DiffuseColor, transparency = topoMapper.createTopoNames()
         
+    #if a step file has been imported, the importDoc is not saved...
+    try:
+        fTime = os.path.getmtime(importDoc.FileName)
+        fName = importDoc.FileName
+    except:
+        fTime = os.path.getmtime(filename)
+        fName = filename
+        
     # setup xml information for a2p file
     xmlHandler = a2p_simpleXMLhandler.SimpleXMLhandler()
     xml = xmlHandler.createInformationXML(
         importDoc.Label,
-        importDoc.FileName,
-        os.path.getmtime(importDoc.FileName),
+        fName,
+        fTime,
         subAssemblyImport,
         transparency
         )    
@@ -222,21 +230,41 @@ def getOrCreateA2pFile(
     zipFileName = a2plib.writeA2pFile(filename,Shape,muxInfo,DiffuseColor,xml)
     return zipFileName
 #==============================================================================
+class FileCacheEntry():
+    def __init__(
+        self,
+        sourcePartCreationTime,
+        importDocFileName,
+        vertexNames,
+        edgeNames,
+        faceNames,
+        shape,
+        diffuseColor
+        ):
+        self.sourcePartCreationTime = sourcePartCreationTime
+        self.importDocFileName = importDocFileName
+        self.vertexNames = vertexNames
+        self.edgeNames = edgeNames
+        self.faceNames = faceNames
+        self.shape = shape
+        self.diffuseColor = diffuseColor
+        
+#==============================================================================
 class FileCache():
     def __init__(self):
         self.cache = {}
         
-    def loadObject(self, obj):
+    def loadObject(self, sourceFile):
         #Search cache for entry, create an entry if there none is found
-        cacheKey = os.path.split(obj.sourceFile)[1]
-        fileName = obj.sourceFile
+        cacheKey = os.path.split(sourceFile)[1]
+        fileName = sourceFile
         
         if not a2plib.getRecalculateImportedParts(): #always refresh cache if recalculation is needed
             cacheEntry = self.cache.get(cacheKey,None)
             if cacheEntry is not None:
-                if os.path.exists(cacheEntry[1]):
-                    sourceFileModificationTime = os.path.getmtime(cacheEntry[1])
-                    if cacheEntry[0] >=  sourceFileModificationTime:
+                if os.path.exists(cacheEntry.importDocFileName):
+                    sourceFileModificationTime = os.path.getmtime(cacheEntry.importDocFileName)
+                    if cacheEntry.sourcePartCreationTime >=  sourceFileModificationTime:
                         print(u"cache hit!")
                         return True #entry found, nothing to do
         
@@ -267,7 +295,8 @@ class FileCache():
             a2plib.readA2pFile(zipFile)
         sourcePartCreationTime = float(properties["sourcePartCreationTime"])
         importDocFileName = properties["importDocFileName"]
-        self.cache[cacheKey] = (sourcePartCreationTime,
+        self.cache[cacheKey] = FileCacheEntry(
+                                sourcePartCreationTime,
                                 importDocFileName,
                                 vertexNames,
                                 edgeNames,
@@ -275,7 +304,8 @@ class FileCache():
                                 shape,
                                 diffuseColor
                                 )
-        print(u"size of a2p cache is: {}".format(a2plib.getMemSize(self.cache)))
+        print(u"A2p added object {} to it's cache".format(cacheKey))
+        print(u"size of a2p cache is: {} byte".format(a2plib.getMemSize(self.cache)))
         return True
         
     def getSubelementIndex(self,subName):
@@ -290,21 +320,16 @@ class FileCache():
         # Single Shape references have been removed for next time
         if obj.sourcePart is not None and len(obj.sourcePart)>0: 
             return ""
-        if not self.loadObject(obj): return ""
+        if not self.loadObject(obj.sourceFile): return ""
         cacheKey = os.path.split(obj.sourceFile)[1]
         try:
+            idx = self.getSubelementIndex(subName)
             if subName.startswith("Vertex"):
-                names = self.cache[cacheKey][2]
-                idx = self.getSubelementIndex(subName)
-                return names[idx]
+                return self.cache[cacheKey].vertexNames[idx]
             elif subName.startswith("Edge"):
-                names = self.cache[cacheKey][3]
-                idx = self.getSubelementIndex(subName)
-                return names[idx]
+                return self.cache[cacheKey].edgeNames[idx]
             elif subName.startswith("Face"):
-                names = self.cache[cacheKey][4]
-                idx = self.getSubelementIndex(subName)
-                return names[idx]
+                return self.cache[cacheKey].faceNames[idx]
         except:
             return ""
         return "" #default if there are problems
@@ -314,20 +339,14 @@ class FileCache():
         # Single Shape references have been removed for next time
         if obj.sourcePart is not None and len(obj.sourcePart)>0: 
             return ""
-        if not self.loadObject(obj): return None
+        if not self.loadObject(obj.sourceFile): return None
         cacheKey = os.path.split(obj.sourceFile)[1]
         entry = self.cache[cacheKey]
-        return (
-            entry[0],
-            entry[1],
-            entry[2],
-            entry[3],
-            entry[4],
-            entry[5],
-            entry[6]
-            )
-        #end of return!
+        return entry
         
+#==============================================================================
+# The global cache of a2p-files
+#==============================================================================
 fileCache = FileCache()
 #==============================================================================
         
