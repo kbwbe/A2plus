@@ -1381,11 +1381,6 @@ def updateConstraintsGeoRefs(doc,obj,cacheContent):
                 
                 if newIndex >= 0:
                     setattr(c, SubElement, newSubElementName )
-                    print (
-                            u"oldConstraintString (KEY) : {}".format(
-                            topoString
-                            )
-                           )
                     print (u"Updating by SubElement-Map: {} => {} ".format(
                                subElementName,newSubElementName
                                )
