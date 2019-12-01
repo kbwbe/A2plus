@@ -105,7 +105,8 @@ def importPartFromFile(
     newObj.subassemblyImport = subAssemblyImport
     newObj.setEditorMode("subassemblyImport",1)
 
-    newObj.muxInfo = iMuxInfo
+    #newObj.muxInfo = iMuxInfo
+    newObj.muxInfo = []
     newObj.Shape = iShape
     newObj.ViewObject.Transparency = transparency
     newObj.ViewObject.DiffuseColor = iDiffuseColor
@@ -301,7 +302,8 @@ def updateImportedParts(doc):
                     entry = a2p_filecache.fileCache.getFullEntry(obj)
                     obj.timeLastImport = entry.sourcePartCreationTime
                     updateConstraintsGeoRefs(doc,obj,entry)
-                    obj.muxInfo = entry.vertexNames + entry.edgeNames + entry.faceNames
+                    #obj.muxInfo = entry.vertexNames + entry.edgeNames + entry.faceNames
+                    obj.muxInfo = []
                     savedPlacement  = obj.Placement
                     obj.Shape = entry.shape
                     obj.Placement = savedPlacement # restore the old placement

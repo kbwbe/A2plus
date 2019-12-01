@@ -33,8 +33,12 @@ import a2plib
 import a2p_topomapper
 import a2p_simpleXMLhandler
 
-
-
+#==============================================================================
+#forward declaration...(necessary?)
+#==============================================================================
+class FileCache():
+    pass
+fileCache = FileCache()
 #==============================================================================
 def muxAssemblyWithTopoNames(doc, desiredShapeLabel=None):
     '''
@@ -64,19 +68,16 @@ def muxAssemblyWithTopoNames(doc, desiredShapeLabel=None):
 
     transparency = 0
     shape_list = []
+    
     for obj in visibleObjects:
         extendNames = False
-        if a2plib.getUseTopoNaming() and len(obj.muxInfo) > 0: # Subelement-Strings existieren schon...
+        entry = None
+        if a2plib.getUseTopoNaming() and fileCache.loadObject(obj.sourceFile):
             extendNames = True
-            #
-            vertexNames = []
-            edgeNames = []
-            faceNames = []
-            #
-            for item in obj.muxInfo:
-                if item[0] == 'V': vertexNames.append(item)
-                if item[0] == 'E': edgeNames.append(item)
-                if item[0] == 'F': faceNames.append(item)
+            entry = fileCache.getFullEntry(obj)
+            vertexNames = entry.vertexNames
+            edgeNames = entry.edgeNames
+            faceNames = entry.faceNames
 
         if a2plib.getUseTopoNaming():
             for i in range(0, len(obj.Shape.Vertexes) ):
@@ -121,11 +122,6 @@ def muxAssemblyWithTopoNames(doc, desiredShapeLabel=None):
 
         faces.extend(tempShape.Faces)
 
-    #if len(faces) == 1:
-    #    shell = Part.makeShell([faces])
-    #else:
-    #    shell = Part.makeShell(faces)
-        
     shell = Part.makeShell(faces)
         
     try:
@@ -341,7 +337,10 @@ class FileCache():
             return ""
         if not self.loadObject(obj.sourceFile): return None
         cacheKey = os.path.split(obj.sourceFile)[1]
-        entry = self.cache[cacheKey]
+        try:
+            entry = self.cache[cacheKey]
+        except:
+            entry = None
         return entry
         
 #==============================================================================
