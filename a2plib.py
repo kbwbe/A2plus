@@ -154,6 +154,23 @@ def openImportDocFromFile(filename):
             
     return importDoc, importDocIsOpen
 #------------------------------------------------------------------------------
+class A2pFileContent():
+    def __init__(
+            self,
+            shape,
+            vertexNames,
+            edgeNames,
+            faceNames,
+            diffuseColor,
+            properties
+            ):
+        self.shape = shape
+        self.vertexNames = vertexNames
+        self.edgeNames = edgeNames
+        self.faceNames = faceNames
+        self.diffuseColor = diffuseColor
+        self.properties = properties
+#------------------------------------------------------------------------------
 def writeA2pFile(fileName,shape,toponames, facecolors, xml):
     docPath, docFileName = os.path.split(fileName)
                     
@@ -268,7 +285,14 @@ def readA2pFile(fileName):
     
     zip.close()
     
-    return shape, vertexNames, edgeNames, faceNames, diffuseColor, properties
+    return A2pFileContent(
+        shape,
+        vertexNames,
+        edgeNames,
+        faceNames,
+        diffuseColor,
+        properties
+        )
 #------------------------------------------------------------------------------
 def to_bytes(tx):
     if PYVERSION > 2:

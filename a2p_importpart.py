@@ -49,11 +49,15 @@ def importPartFromFile(
     doc = _doc
     
     a2pZipFilename = getOrCreateA2pFile(filename)
+    content = a2plib.readA2pFile(a2pZipFilename)
+
+    iShape = content.shape
+    vertexNames = content.vertexNames
+    edgeNames = content.edgeNames
+    faceNames = content.faceNames
+    iDiffuseColor = content.diffuseColor
+    iProperties = content.properties
     
-    #iShape, iMuxInfo, iDiffuseColor, iProperties = a2plib.readA2pFile(a2pZipFilename)
-    iShape, vertexNames, edgeNames, faceNames, iDiffuseColor, iProperties = \
-        a2plib.readA2pFile(a2pZipFilename)
-        
     iMuxInfo = vertexNames + edgeNames + faceNames
     
     if iProperties["isSubAssembly"] == "True":
@@ -64,9 +68,6 @@ def importPartFromFile(
     timeLastImport = float(iProperties["sourcePartCreationTime"])
     transparency = int(iProperties["transparency"])
     importDocLabel = iProperties["importDocLabel"]
-    
-    #instantly add a2pfile to a2pfilecache
-    a2p_filecache.fileCache.loadObject(filename)
     
     #create new object
     partName = a2plib.findUnusedObjectName( importDocLabel, document=doc )

@@ -291,18 +291,18 @@ class FileCache():
             return False
         
         #A valid a2p file exists, read it...
-        shape, vertexNames, edgeNames, faceNames, diffuseColor, properties = \
-            a2plib.readA2pFile(zipFile)
-        sourcePartCreationTime = float(properties["sourcePartCreationTime"])
-        importDocFileName = properties["importDocFileName"]
+        content = a2plib.readA2pFile(zipFile)
+    
+        sourcePartCreationTime = float(content.properties["sourcePartCreationTime"])
+        importDocFileName = content.properties["importDocFileName"]
         self.cache[cacheKey] = FileCacheEntry(
                                 sourcePartCreationTime,
                                 importDocFileName,
-                                vertexNames,
-                                edgeNames,
-                                faceNames,
-                                shape,
-                                diffuseColor
+                                content.vertexNames,
+                                content.edgeNames,
+                                content.faceNames,
+                                content.shape,
+                                content.diffuseColor
                                 )
         print(u"A2p added object {} to it's cache".format(cacheKey))
         print(u"size of a2p cache is: {} byte".format(a2plib.getMemSize(self.cache)))
