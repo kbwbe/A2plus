@@ -37,11 +37,7 @@ import a2p_filecache
 def loadToFileCache(selection):
     for s in selection:
         ob = FreeCAD.activeDocument().getObject(s.ObjectName)
-        a2p_filecache.fileCache.load(
-            ob.sourceFile, 
-            ob.timeLastImport
-            )
-    
+        a2p_filecache.fileCache.loadObject(ob)
 #==============================================================================
 class a2p_PointIdentityConstraintCommand:
     def Activated(self):

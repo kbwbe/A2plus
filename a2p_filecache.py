@@ -226,8 +226,9 @@ class FileCache():
     def __init__(self):
         self.cache = {}
         
-    def createOrUpdateEntry(self,cacheKey, obj):
-        #Search cache for entry
+    def loadObject(self, obj):
+        #Search cache for entry, create an entry if there none is found
+        cacheKey = os.path.split(obj.sourceFile)[1]
         fileName = obj.sourceFile
         
         if not a2plib.getRecalculateImportedParts(): #always refresh cache if recalculation is needed
@@ -237,7 +238,7 @@ class FileCache():
                     sourceFileModificationTime = os.path.getmtime(cacheEntry[1])
                     if cacheEntry[0] >=  sourceFileModificationTime:
                         print(u"cache hit!")
-                        return #entry found, nothing to do
+                        return True #entry found, nothing to do
         
         doc = FreeCAD.activeDocument()
         assemblyPath = os.path.normpath(os.path.split(doc.FileName)[0])
@@ -248,7 +249,7 @@ class FileCache():
                 u"File error ! ",
                 u"Cannot find {}".format(fileNameWithinProjectFile)
                 )
-            return
+            return False
 
         #A valid sourcefile is found, search for corresponding a2p-file
         print(u"fileNameWithinProjectFile: {}".format(fileNameWithinProjectFile))
@@ -259,7 +260,7 @@ class FileCache():
                 u"File error ! ",
                 u"Cannot create a2p file for {}".format(fileNameWithinProjectFile)
                 )
-            return
+            return False
         
         #A valid a2p file exists, read it...
         shape, vertexNames, edgeNames, faceNames, diffuseColor, properties = \
@@ -274,8 +275,8 @@ class FileCache():
                                 shape,
                                 diffuseColor
                                 )
-        print(u"file loaded to cache")
-        print(u"size of cache is: {}".format(a2plib.getMemSize(self.cache)))
+        print(u"size of a2p cache is: {}".format(a2plib.getMemSize(self.cache)))
+        return True
         
     def getSubelementIndex(self,subName):
         idxString = ""
@@ -289,8 +290,8 @@ class FileCache():
         # Single Shape references have been removed for next time
         if obj.sourcePart is not None and len(obj.sourcePart)>0: 
             return ""
+        if not self.loadObject(obj): return ""
         cacheKey = os.path.split(obj.sourceFile)[1]
-        self.createOrUpdateEntry(cacheKey, obj)
         try:
             if subName.startswith("Vertex"):
                 names = self.cache[cacheKey][2]
@@ -309,14 +310,12 @@ class FileCache():
         return "" #default if there are problems
         
     def getFullEntry(self,obj):
-        print(u"getFullEntry of {}".format(obj.Label))
         # No toponaming for import of single shapes
         # Single Shape references have been removed for next time
         if obj.sourcePart is not None and len(obj.sourcePart)>0: 
             return ""
+        if not self.loadObject(obj): return None
         cacheKey = os.path.split(obj.sourceFile)[1]
-        print(u"cacheKey ={}".format(cacheKey))
-        self.createOrUpdateEntry(cacheKey, obj)
         entry = self.cache[cacheKey]
         return (
             entry[0],
