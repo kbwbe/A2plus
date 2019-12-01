@@ -304,13 +304,6 @@ class FileCache():
         print(u"size of a2p cache is: {} byte".format(a2plib.getMemSize(self.cache)))
         return True
         
-    def getSubelementIndex(self,subName):
-        idxString = ""
-        for c in subName:
-            if c in ["0","1","2","3","4","5","6","7","8","9"]:
-                idxString+=c
-        return int(idxString)-1
-        
     def getTopoName(self,obj,subName):
         # No toponaming for import of single shapes
         # Single Shape references have been removed for next time
@@ -319,7 +312,7 @@ class FileCache():
         if not self.loadObject(obj.sourceFile): return ""
         cacheKey = os.path.split(obj.sourceFile)[1]
         try:
-            idx = self.getSubelementIndex(subName)
+            idx = a2plib.getSubelementIndex(subName)
             if subName.startswith("Vertex"):
                 return self.cache[cacheKey].vertexNames[idx]
             elif subName.startswith("Edge"):

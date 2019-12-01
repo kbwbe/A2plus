@@ -263,6 +263,62 @@ Check your settings of A2plus preferences.
 
 FreeCADGui.addCommand('a2p_ImportPart',a2p_ImportPartCommand())
 #==============================================================================
+def migrateImportedParts(doc):
+    if doc == None:
+        QtGui.QMessageBox.information(  
+                        QtGui.QApplication.activeWindow(),
+                        "No active document found!",
+                        "Before migrating parts, you have to open an assembly file."
+                        )
+        return
+        
+    doc.openTransaction("migrateImportParts")    
+    for obj in doc.Objects:
+        if hasattr(obj, 'sourceFile') and a2plib.to_str(obj.sourceFile) != a2plib.to_str('converted'):
+
+            
+            #repair data structures (perhaps an old Assembly2 import was found)
+            if hasattr(obj,"Content") and 'importPart' in obj.Content: # be sure to have an assembly object
+                if obj.Proxy is None:
+                    Proxy_importPart(obj)
+                    ImportedPartViewProviderProxy(obj.ViewObject)
+                    
+            assemblyPath = os.path.normpath(os.path.split(doc.FileName)[0])
+            absPath = a2plib.findSourceFileInProject(obj.sourceFile, assemblyPath)
+
+            if absPath == None:
+                QtGui.QMessageBox.critical(  QtGui.QApplication.activeWindow(),
+                                            u"Source file not found",
+                                            u"Unable to find {}".format(
+                                                obj.sourceFile
+                                                )
+                                        )
+            if absPath != None and os.path.exists( absPath ):
+                newPartCreationTime = os.path.getmtime( absPath )
+                if ( 
+                    newPartCreationTime > obj.timeLastImport or
+                    a2plib.getRecalculateImportedParts() # open always all parts as they could depend on spreadsheets
+                    ):
+                    entry = a2p_filecache.fileCache.getFullEntry(obj)
+                    obj.timeLastImport = entry.sourcePartCreationTime
+                    migrateConstraintsGeoRefs(doc,obj,entry)
+                    #updateConstraintsGeoRefs(doc,obj,entry)
+                    #obj.muxInfo = entry.vertexNames + entry.edgeNames + entry.faceNames
+                    obj.muxInfo = []
+                    savedPlacement  = obj.Placement
+                    obj.Shape = entry.shape
+                    obj.Placement = savedPlacement # restore the old placement
+                    obj.ViewObject.DiffuseColor = entry.diffuseColor
+
+
+    mw = FreeCADGui.getMainWindow()
+    mdi = mw.findChild(QtGui.QMdiArea)
+    sub = mdi.activeSubWindow()
+    if sub != None:
+        sub.showMaximized()
+    doc.recompute()
+    doc.commitTransaction()    
+#==============================================================================
 def updateImportedParts(doc):
     if doc == None:
         QtGui.QMessageBox.information(  
@@ -1352,3 +1408,48 @@ def updateConstraintsGeoRefs(doc,obj,cacheContent):
                 FreeCAD.Console.PrintError("Removing constraint %s" % cName)
                 c = doc.getObject(cName)
                 a2plib.removeConstraint(c)
+#=====================================================================================
+def migrateConstraintsGeoRefs(doc,obj,cacheContent):
+    print(u"migrate constraints of {}".format(obj.Label))
+    if not a2plib.getUseTopoNaming(): return
+    
+    # return if there are no constraints linked to the object 
+    if len([c for c in doc.Objects if  'ConstraintInfo' in c.Content and obj.Name in [c.Object1, c.Object2] ]) == 0:
+        return
+
+    partName = obj.Name
+    for c in doc.Objects:
+        if 'ConstraintInfo' in c.Content:
+            if partName == c.Object1:
+                SubElement = "SubElement1"
+                topoName = "Toponame1"
+            elif partName == c.Object2:
+                SubElement = "SubElement2"
+                topoName = "Toponame2"
+            else:
+                SubElement = None
+            
+            if SubElement: #same as subElement <> None
+                subElementName = getattr(c, SubElement)
+                idx = a2plib.getSubelementIndex(subElementName)
+                if subElementName[:4] == 'Face':
+                    try:
+                        topoString = cacheContent.faceNames[idx]
+                    except:
+                        topoString = ""
+                        
+                elif subElementName[:4] == 'Edge':
+                    try:
+                        topoString = cacheContent.edgeNames[idx]
+                    except:
+                        topoString = ""
+                        
+                elif subElementName[:6] == 'Vertex':
+                    try:
+                        topoString = cacheContent.vertexNames[idx]
+                    except:
+                        topoString = ""
+                
+                setattr(c, topoName, topoString )
+                print(u"set constraint {}.{} to '{}'".format(c.Name,topoName,topoString))
+#=====================================================================================

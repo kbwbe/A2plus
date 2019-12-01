@@ -63,6 +63,7 @@ class A2plusWorkbench (Workbench):
         import a2p_partinformation
         import a2p_constraintDialog
         import a2p_constraintcommands
+        import a2p_migratetoponaming
         import a2p_bom # bom == bill of materials == partslist
 
         if a2plib.getRecursiveUpdateEnabled():
@@ -175,7 +176,8 @@ class A2plusWorkbench (Workbench):
 
         menuEntries = [
             'a2p_repairTreeViewCommand',
-            'a2p_absPath_to_relPath_Command'
+            'a2p_absPath_to_relPath_Command',
+            'a2p_recursiveToponamingMigrationCommand'
             ]
         self.appendMenu(
             'A2plus',
