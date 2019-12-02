@@ -275,14 +275,6 @@ def migrateImportedParts(doc):
     doc.openTransaction("migrateImportParts")    
     for obj in doc.Objects:
         if hasattr(obj, 'sourceFile') and a2plib.to_str(obj.sourceFile) != a2plib.to_str('converted'):
-
-            
-            #repair data structures (perhaps an old Assembly2 import was found)
-            if hasattr(obj,"Content") and 'importPart' in obj.Content: # be sure to have an assembly object
-                if obj.Proxy is None:
-                    Proxy_importPart(obj)
-                    ImportedPartViewProviderProxy(obj.ViewObject)
-                    
             assemblyPath = os.path.normpath(os.path.split(doc.FileName)[0])
             absPath = a2plib.findSourceFileInProject(obj.sourceFile, assemblyPath)
 

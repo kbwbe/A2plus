@@ -40,7 +40,22 @@ class FileCache():
     pass
 fileCache = FileCache()
 #==============================================================================
-def muxAssemblyWithTopoNames(doc, desiredShapeLabel=None):
+def createTopoNamesForConvertedParts(obj): # used during converting an object to a2p object
+    vertexNames = []
+    edgeNames = []
+    faceNames = []
+    for i in range(0, len(obj.Shape.Vertexes) ):
+        newName = "".join(('V;',str(i+1),';',obj.Name,';'))
+        vertexNames.append(newName)
+    for i in range(0, len(obj.Shape.Edges) ):
+        newName = "".join(('E;',str(i+1),';',obj.Name,';'))
+        edgeNames.append(newName)
+    for i in range(0, len(obj.Shape.Faces) ):
+        newName = "".join(('F;',str(i+1),';',obj.Name,';'))
+        faceNames.append(newName)
+    return vertexNames, edgeNames, faceNames
+#==============================================================================
+def muxAssemblyWithTopoNames(doc):
     '''
     Mux an a2p assembly
 
@@ -58,42 +73,36 @@ def muxAssemblyWithTopoNames(doc, desiredShapeLabel=None):
                        and hasattr(obj,'muxInfo')
                        ]
     
-    if desiredShapeLabel: # is not None..
-        tmp = []
-        for ob in visibleObjects:
-            if ob.Label == desiredShapeLabel:
-                tmp.append(ob)
-                break
-        visibleObjects = tmp
-
     transparency = 0
     shape_list = []
     
     for obj in visibleObjects:
         extendNames = False
         entry = None
-        if a2plib.getUseTopoNaming() and fileCache.loadObject(obj.sourceFile):
+        if a2plib.to_bytes(obj.sourceFile) == b"converted":
+            vertexNames,edgeNames,faceNames = createTopoNamesForConvertedParts(obj) 
+            
+        elif a2plib.getUseTopoNaming() and fileCache.loadObject(obj.sourceFile):
             extendNames = True
             entry = fileCache.getFullEntry(obj)
             vertexNames = entry.vertexNames
             edgeNames = entry.edgeNames
             faceNames = entry.faceNames
 
-        if a2plib.getUseTopoNaming():
-            for i in range(0, len(obj.Shape.Vertexes) ):
-                if extendNames:
-                    newName = "".join((vertexNames[i],obj.Name,';'))
-                    muxInfo.append(newName)
-                else:
-                    newName = "".join(('V;',str(i+1),';',obj.Name,';'))
-                    muxInfo.append(newName)
-            for i in range(0, len(obj.Shape.Edges) ):
-                if extendNames:
-                    newName = "".join((edgeNames[i],obj.Name,';'))
-                    muxInfo.append(newName)
-                else:
-                    newName = "".join(('E;',str(i+1),';',obj.Name,';'))
-                    muxInfo.append(newName)
+        for i in range(0, len(obj.Shape.Vertexes) ):
+            if extendNames:
+                newName = "".join((vertexNames[i],obj.Name,';'))
+                muxInfo.append(newName)
+            else:
+                newName = "".join(('V;',str(i+1),';',obj.Name,';'))
+                muxInfo.append(newName)
+        for i in range(0, len(obj.Shape.Edges) ):
+            if extendNames:
+                newName = "".join((edgeNames[i],obj.Name,';'))
+                muxInfo.append(newName)
+            else:
+                newName = "".join(('E;',str(i+1),';',obj.Name,';'))
+                muxInfo.append(newName)
 
         # Save Computing time, store this before the for..enumerate loop later...
         needDiffuseColorExtension = ( len(obj.ViewObject.DiffuseColor) < len(obj.Shape.Faces) )
@@ -104,16 +113,14 @@ def muxAssemblyWithTopoNames(doc, desiredShapeLabel=None):
         shape_list.append(obj.Shape)
 
         # now start the loop with use of the stored values..(much faster)
-        topoNaming = a2plib.getUseTopoNaming()
         diffuseElement = a2plib.makeDiffuseElement(shapeCol,transparency)
         for i in range(0,len(tempShape.Faces)):
-            if topoNaming:
-                if extendNames:
-                    newName = "".join((faceNames[i],obj.Name,';'))
-                    muxInfo.append(newName)
-                else:
-                    newName = "".join(('F;',str(i+1),';',obj.Name,';'))
-                    muxInfo.append(newName)
+            if extendNames:
+                newName = "".join((faceNames[i],obj.Name,';'))
+                muxInfo.append(newName)
+            else:
+                newName = "".join(('F;',str(i+1),';',obj.Name,';'))
+                muxInfo.append(newName)
             if needDiffuseColorExtension:
                 faceColors.append(diffuseElement)
 
