@@ -150,24 +150,26 @@ def muxAssemblyWithTopoNames(doc, desiredShapeLabel=None):
     return muxInfo, solid, faceColors, transparency
 #==============================================================================
 def getOrCreateA2pFile(
-        filename #the full path of the fcstd file which a2p file has to be created from
+        filename, #the full path of the fcstd file which a2p file has to be created from
+        allwaysRecreate = False # used for migration purposes
         ):
     
     if filename is None or not os.path.exists(filename):
         print(u"Import error: File {} does not exist".format(filename))
         return
     
-    if not a2plib.getRecalculateImportedParts(): # always create a new file if recalculation is needed...
-        if filename != None and os.path.exists(filename):
-            importDocCreationTime = os.path.getmtime(filename)
-            a2pFileName = filename+'.a2p'
-            if os.path.exists( a2pFileName ):
-                a2pFileCreationTime = os.path.getmtime( a2pFileName )
-                if a2pFileCreationTime >= importDocCreationTime:
-                    print ("Found existing a2p file")
-                    return a2pFileName # nothing to do...
+    if not allwaysRecreate:
+        if not a2plib.getRecalculateImportedParts(): # always create a new file if recalculation is needed...
+            if filename != None and os.path.exists(filename):
+                importDocCreationTime = os.path.getmtime(filename)
+                a2pFileName = filename+'.a2p'
+                if os.path.exists( a2pFileName ):
+                    a2pFileCreationTime = os.path.getmtime( a2pFileName )
+                    if a2pFileCreationTime >= importDocCreationTime:
+                        #Found existing a2p file
+                        return a2pFileName # nothing to do...
     
-    print ("Create a new a2p file")
+    #Create a new a2p file
     importDoc,importDocIsOpen = a2plib.openImportDocFromFile(filename)
     if importDoc is None: return #nothing found
     
@@ -261,7 +263,7 @@ class FileCache():
                 if os.path.exists(cacheEntry.importDocFileName):
                     sourceFileModificationTime = os.path.getmtime(cacheEntry.importDocFileName)
                     if cacheEntry.sourcePartCreationTime >=  sourceFileModificationTime:
-                        print(u"cache hit!")
+                        #cache hit !
                         return True #entry found, nothing to do
         
         doc = FreeCAD.activeDocument()
@@ -276,7 +278,7 @@ class FileCache():
             return False
 
         #A valid sourcefile is found, search for corresponding a2p-file
-        print(u"fileNameWithinProjectFile: {}".format(fileNameWithinProjectFile))
+        #print(u"fileNameWithinProjectFile: {}".format(fileNameWithinProjectFile))
         zipFile = getOrCreateA2pFile(fileNameWithinProjectFile)
         if zipFile is None: 
             QtGui.QMessageBox.critical(

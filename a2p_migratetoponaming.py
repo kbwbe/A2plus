@@ -26,6 +26,7 @@ import os
 import string
 
 import a2plib
+import a2p_filecache
 from a2p_importpart import migrateImportedParts
 #from a2p_fcdocumentreader import FCdocumentReader
 from a2p_simpleXMLreader import FCdocumentReader
@@ -36,15 +37,11 @@ def createMigrationFileList(
             importPath,
             parentAssemblyDir,
             filesToUpdate,
+            allSourceFiles,
             recursive=False
             ):
     
     # do not update converted parts
-    print(
-        "createUpdateFileList importPath = {}".format(
-            importPath
-            )
-        )
     if a2plib.to_bytes(importPath) == b'converted':
         return False, filesToUpdate
     
@@ -60,27 +57,34 @@ def createMigrationFileList(
     subAsmNeedsUpdate = False
     for ob in docReader1.getA2pObjects():
         if a2plib.to_bytes(ob.getA2pSource()) == b'converted':
-            print(
-                "Did not update converted part '{}'".format(
-                    ob.name
-                    )
-                )
             continue
         
-        if ob.isSubassembly() and recursive:
-            subAsmNeedsUpdate, filesToUpdate = createMigrationFileList(
-                                                ob.getA2pSource(),
-                                                workingDir,
-                                                filesToUpdate,
-                                                recursive
-                                                )
+        #if ob.isSubassembly() and recursive:
+        if recursive:
+            subAsmNeedsUpdate, filesToUpdate, allSourceFiles = createMigrationFileList(
+                                                                ob.getA2pSource(),
+                                                                workingDir,
+                                                                filesToUpdate,
+                                                                allSourceFiles,
+                                                                recursive
+                                                                )
         needToUpdate = True
+        #needToUpdate = subAsmNeedsUpdate
+        
+        sourceInProject = a2plib.findSourceFileInProject(
+            ob.getA2pSource(),
+            parentAssemblyDir
+            )
+        
+        if sourceInProject not in allSourceFiles:
+            allSourceFiles.append(sourceInProject)
+        
             
     if needToUpdate:
         if fileNameInProject not in filesToUpdate:
             filesToUpdate.append(fileNameInProject)
         
-    return needToUpdate, filesToUpdate
+    return needToUpdate, filesToUpdate, allSourceFiles
 #==============================================================================
 toolTip = \
 '''
@@ -97,15 +101,36 @@ class a2p_recursiveToponamingMigrationCommand:
         fileName = doc.FileName
         workingDir,basicFileName = os.path.split(fileName)
         
-
-        filesToUpdate = []
-        subAsmNeedsUpdate, filesToUpdate = createMigrationFileList(
-                                            fileName,
-                                            workingDir,
-                                            filesToUpdate,
-                                            True
-                                            )
+        a2p_filecache.fileCache.cache = {}
         
+        filesToUpdate = []
+        allSourceFiles = []
+        subAsmNeedsUpdate, filesToUpdate, allSourceFiles = createMigrationFileList(
+                                                            fileName,
+                                                            workingDir,
+                                                            filesToUpdate,
+                                                            allSourceFiles,
+                                                            True
+                                                            )
+
+        for f in allSourceFiles:
+            try:
+                os.remove(f+'.a2p')
+                print(u"removed '{}' file".format(f+'.a2p'))
+            except:
+                pass
+        
+        print("=================")
+        for f in allSourceFiles:
+            print(u"create a2p file for '{}'".format(f))
+            a2p_filecache.getOrCreateA2pFile(f, True) #recrecate Mode
+        print("=================")
+        print("Assemblies to be updated..")
+        for f in filesToUpdate:
+            print(f)
+        print("=================")
+        
+
         for f in filesToUpdate:
             #-------------------------------------------
             # update necessary documents
@@ -142,7 +167,7 @@ class a2p_recursiveToponamingMigrationCommand:
             FreeCADGui.updateGui()
             importDoc.save()
             print(
-                u"==== Assembly '{}' has been updated! =====".format(
+                u"==== Assembly '{}' has been migrated! =====".format(
                     importDoc.FileName
                     )
                 )

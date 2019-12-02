@@ -295,20 +295,15 @@ def migrateImportedParts(doc):
                                         )
             if absPath != None and os.path.exists( absPath ):
                 newPartCreationTime = os.path.getmtime( absPath )
-                if ( 
-                    newPartCreationTime > obj.timeLastImport or
-                    a2plib.getRecalculateImportedParts() # open always all parts as they could depend on spreadsheets
-                    ):
-                    entry = a2p_filecache.fileCache.getFullEntry(obj)
-                    obj.timeLastImport = entry.sourcePartCreationTime
-                    migrateConstraintsGeoRefs(doc,obj,entry)
-                    #updateConstraintsGeoRefs(doc,obj,entry)
-                    #obj.muxInfo = entry.vertexNames + entry.edgeNames + entry.faceNames
-                    obj.muxInfo = []
-                    savedPlacement  = obj.Placement
-                    obj.Shape = entry.shape
-                    obj.Placement = savedPlacement # restore the old placement
-                    obj.ViewObject.DiffuseColor = entry.diffuseColor
+                entry = a2p_filecache.fileCache.getFullEntry(obj)
+                obj.timeLastImport = entry.sourcePartCreationTime
+                migrateConstraintsGeoRefs(doc,obj,entry)
+                #obj.muxInfo = entry.vertexNames + entry.edgeNames + entry.faceNames
+                #obj.muxInfo = [] #do not clear at moment...
+                savedPlacement  = obj.Placement
+                obj.Shape = entry.shape
+                obj.Placement = savedPlacement # restore the old placement
+                obj.ViewObject.DiffuseColor = entry.diffuseColor
 
 
     mw = FreeCADGui.getMainWindow()
@@ -1446,5 +1441,5 @@ def migrateConstraintsGeoRefs(doc,obj,cacheContent):
                         topoString = ""
                 
                 setattr(c, topoName, topoString )
-                print(u"set constraint {}.{} to '{}'".format(c.Name,topoName,topoString))
+                #print(u"set constraint {}.{} to '{}'".format(c.Name,topoName,topoString))
 #=====================================================================================
