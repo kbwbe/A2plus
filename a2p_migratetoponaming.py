@@ -123,12 +123,14 @@ class a2p_recursiveToponamingMigrationCommand:
         print("=================")
         for f in allSourceFiles:
             print(u"create a2p file for '{}'".format(f))
-            a2p_filecache.getOrCreateA2pFile(f, True) #recrecate Mode
+            a2p_filecache.fileCache.loadObject(f)
         print("=================")
         print("Assemblies to be updated..")
         for f in filesToUpdate:
             print(f)
         print("=================")
+        
+        return
         
 
         for f in filesToUpdate:

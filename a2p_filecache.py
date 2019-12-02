@@ -80,7 +80,8 @@ def muxAssemblyWithTopoNames(doc):
         extendNames = False
         entry = None
         if a2plib.to_bytes(obj.sourceFile) == b"converted":
-            vertexNames,edgeNames,faceNames = createTopoNamesForConvertedParts(obj) 
+            vertexNames,edgeNames,faceNames = createTopoNamesForConvertedParts(obj)
+            inputShape = obj.Shape 
             
         elif a2plib.getUseTopoNaming() and fileCache.loadObject(obj.sourceFile):
             extendNames = True
@@ -88,15 +89,17 @@ def muxAssemblyWithTopoNames(doc):
             vertexNames = entry.vertexNames
             edgeNames = entry.edgeNames
             faceNames = entry.faceNames
-
-        for i in range(0, len(obj.Shape.Vertexes) ):
+            inputShape = entry.shape
+        
+        print(u"MuxAssembly: create muxInfo for {}".format(obj.Label))
+        for i in range(0, len(inputShape.Vertexes) ):
             if extendNames:
                 newName = "".join((vertexNames[i],obj.Name,';'))
                 muxInfo.append(newName)
             else:
                 newName = "".join(('V;',str(i+1),';',obj.Name,';'))
                 muxInfo.append(newName)
-        for i in range(0, len(obj.Shape.Edges) ):
+        for i in range(0, len(inputShape.Edges) ):
             if extendNames:
                 newName = "".join((edgeNames[i],obj.Name,';'))
                 muxInfo.append(newName)
@@ -109,6 +112,10 @@ def muxAssemblyWithTopoNames(doc):
         shapeCol = obj.ViewObject.ShapeColor
         diffuseCol = obj.ViewObject.DiffuseColor
         tempShape = a2plib.makePlacedShape(obj)
+        pl = tempShape.Placement
+        obj.Shape = inputShape
+        obj.Placement = pl
+        tempShape = obj.Shape
         transparency = obj.ViewObject.Transparency
         shape_list.append(obj.Shape)
 

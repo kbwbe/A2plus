@@ -394,6 +394,7 @@ def filterShapeObs(_list):
     lst = []
     for ob in _list:
         if ob.hasExtension('App::GeoFeatureGroupExtension'):continue #Part Containers within FC0.19.18405 seem to have a shape property..
+        if ob.hasExtension('App::GroupExtension'):continue #Group Containers within FC0.19.18405 seem to have a shape property..
         if hasattr(ob,"Shape"):
             if len(ob.Shape.Faces) > 0 and len(ob.Shape.Vertexes) > 0:
                 lst.append(ob)
