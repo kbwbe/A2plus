@@ -273,7 +273,6 @@ class FCdocumentReader(object):
         for ob in self.objects:
             if ob.propertyDict.get(b'a2p_Version',None) != None:
                 out.append(ob)
-                continue
         return out
         
     def getSpreadsheetObjects(self):
