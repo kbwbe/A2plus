@@ -290,8 +290,7 @@ def migrateImportedParts(doc):
                 entry = a2p_filecache.fileCache.getFullEntry(obj)
                 obj.timeLastImport = entry.sourcePartCreationTime
                 migrateConstraintsGeoRefs(doc,obj,entry)
-                #obj.muxInfo = entry.vertexNames + entry.edgeNames + entry.faceNames
-                #obj.muxInfo = [] #do not clear at moment...
+                obj.muxInfo = []
                 savedPlacement  = obj.Placement
                 obj.Shape = entry.shape
                 obj.Placement = savedPlacement # restore the old placement

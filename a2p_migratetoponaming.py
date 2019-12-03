@@ -120,9 +120,6 @@ class a2p_recursiveToponamingMigrationCommand:
             print(f)
         print("=================")
         
-        return
-        
-
         for f in assembliesToUpdate:
             #-------------------------------------------
             # update necessary documents
@@ -142,14 +139,6 @@ class a2p_recursiveToponamingMigrationCommand:
             if not importDocIsOpen:
                 if f.lower().endswith('.fcstd'):
                     importDoc = FreeCAD.openDocument(f)
-                elif f.lower().endswith('.stp') or f.lower().endswith('.step'):
-                    import ImportGui
-                    fname =  os.path.splitext(os.path.basename(f))[0]
-                    FreeCAD.newDocument(fname)
-                    newname = FreeCAD.ActiveDocument.Name
-                    FreeCAD.setActiveDocument(newname)
-                    ImportGui.insert(fname,newname)
-                    importDoc = FreeCAD.ActiveDocument
                 else:
                     msg = "A part can only be imported from a FreeCAD '*.fcstd' file"
                     QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Value Error", msg )
@@ -158,6 +147,7 @@ class a2p_recursiveToponamingMigrationCommand:
             migrateImportedParts(importDoc)
             FreeCADGui.updateGui()
             importDoc.save()
+            a2p_filecache.fileCache.loadObject(f) #create A2p file and load it to cache
             print(
                 u"==== Assembly '{}' has been migrated! =====".format(
                     importDoc.FileName
