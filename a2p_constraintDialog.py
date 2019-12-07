@@ -127,9 +127,16 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             lbl4.setFixedHeight(32)
             self.mainLayout.addWidget(lbl4,self.lineNo,0)
 
-            self.offsetEdit = QtGui.QLineEdit(self)
-            self.offsetEdit.setText(FreeCAD.Units.Quantity(offs.Value, FreeCAD.Units.Length).UserString)
+            self.offsetEdit = QtGui.QDoubleSpinBox(self)
+            # get the length unit as string
+            self.offsetEdit.setSuffix(str( FreeCAD.Units.Quantity(1, FreeCAD.Units.Length) )[2:])
+            # the maximum is by default 99.99 and we can allow more
+            self.offsetEdit.setMaximum(1e7) # allow up to 1 km
+            # set minimum to negative of maximum
+            self.offsetEdit.setMinimum(-1*self.offsetEdit.maximum())
+            self.offsetEdit.setValue(offs.Value)
             self.offsetEdit.setFixedHeight(32)
+            QtCore.QObject.connect(self.offsetEdit, QtCore.SIGNAL("valueChanged(double)"), self.handleOffsetChanged)
             self.mainLayout.addWidget(self.offsetEdit,self.lineNo,1)
 
             self.offsetSetZeroButton = QtGui.QPushButton(self)
@@ -154,10 +161,32 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             lbl5.setFixedHeight(32)
             self.mainLayout.addWidget(lbl5,self.lineNo,0)
 
-            self.angleEdit = QtGui.QLineEdit(self)
-            self.angleEdit.setText("%0.6f" % angle.Value)
+            self.angleEdit = QtGui.QDoubleSpinBox(self)
+            # get the angle unit as string
+            self.angleEdit.setSuffix(str( FreeCAD.Units.Quantity(1, FreeCAD.Units.Angle) )[2:])
+            self.angleEdit.setMaximum(180)
+            # the solver treats negative values as positive
+            self.angleEdit.setMinimum(0)
+            self.angleEdit.setValue(angle)
             self.angleEdit.setFixedHeight(32)
+            self.angleEdit.setToolTip("Angle in the range 0 - 180 degrees")
+            QtCore.QObject.connect(self.angleEdit, QtCore.SIGNAL("valueChanged(double)"), self.handleAngleChanged)
             self.mainLayout.addWidget(self.angleEdit,self.lineNo,1)
+            
+            self.roundAngleButton = QtGui.QPushButton(self)
+            self.roundAngleButton.setText("Round")
+            self.roundAngleButton.setFixedHeight(32)
+            self.roundAngleButton.setToolTip("Round angle to multiples of 90")
+            QtCore.QObject.connect(self.roundAngleButton, QtCore.SIGNAL("clicked()"), self.roundAngle)
+            self.mainLayout.addWidget(self.roundAngleButton,self.lineNo,2)
+            
+            self.perpendicularAngleButton = QtGui.QPushButton(self)
+            self.perpendicularAngleButton.setText("Perpendicular")
+            self.perpendicularAngleButton.setFixedHeight(32)
+            self.perpendicularAngleButton.setToolTip("Adds/deletes 90 degrees")
+            QtCore.QObject.connect(self.perpendicularAngleButton, QtCore.SIGNAL("clicked()"), self.perpendicularAngle)
+            self.mainLayout.addWidget(self.perpendicularAngleButton,self.lineNo,3)
+            
             self.lineNo += 1
 
         #==============================
@@ -206,7 +235,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         self.acceptButton = QtGui.QPushButton(self.buttonPanel)
         self.acceptButton.setFixedHeight(32)
         self.acceptButton.setIcon(QtGui.QIcon(':/icons/a2p_CheckAssembly.svg')) #need new Icon
-        self.acceptButton.setToolTip("Solve constraints")
+        self.acceptButton.setToolTip("Accept the settings")
         self.acceptButton.setText("Accept")
         #self.acceptButton.setDefault(True)
 
@@ -236,9 +265,9 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             else:
                 self.constraintObject.directionConstraint = "none"
         if hasattr(self.constraintObject,"offset"):
-            self.constraintObject.offset = FreeCAD.Units.Quantity(self.offsetEdit.text()).Value
+            self.constraintObject.offset = self.offsetEdit.value()
         if hasattr(self.constraintObject,"angle"):
-            self.constraintObject.angle = float(self.angleEdit.text())
+            self.constraintObject.angle = self.angleEdit.value()
         if hasattr(self.constraintObject,"lockRotation"):
             if self.lockRotationCombo.currentIndex() == 0:
                 self.constraintObject.lockRotation = False
@@ -270,24 +299,31 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             self.lockRotationCombo.setCurrentIndex(1)
         else:
             self.lockRotationCombo.setCurrentIndex(0)
+    
+    def handleOffsetChanged(self):
+        self.winModified = True
+        # recalculate after every change
+        if a2plib.getAutoSolveState():
+            self.solve()
 
     def setOffsetZero(self):
         self.winModified = True
-        q = FreeCAD.Units.Quantity(self.offsetEdit.text())
-        q.Value = 0.0
-        self.offsetEdit.setText(q.UserString)
+        self.offsetEdit.setValue(0.0)
+        if a2plib.getAutoSolveState():
+            self.solve()
 
     def flipOffsetSign(self):
         self.winModified = True
-        q = FreeCAD.Units.Quantity(self.offsetEdit.text())
-        q.Value = -q.Value
-        if abs(q.Value) > 1e-7:
-            self.offsetEdit.setText(q.UserString)
+        q = self.offsetEdit.value()
+        q = -q
+        if abs(q) > 1e-7:
+            self.offsetEdit.setValue(q)
             if a2plib.getAutoSolveState():
                 self.solve()
         else:
-            q.Value = 0.0
-            self.offsetEdit.setText(q.UserString)
+            self.offsetEdit.setValue(0.0)
+            if a2plib.getAutoSolveState():
+                self.solve()
 
     def flipDirection2(self,idx):
         self.winModified = True
@@ -300,6 +336,37 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             self.directionCombo.setCurrentIndex(1)
         else:
             self.directionCombo.setCurrentIndex(0)
+        if a2plib.getAutoSolveState():
+            self.solve()
+    
+    def handleAngleChanged(self):
+        self.winModified = True
+        # recalculate after every change
+        if a2plib.getAutoSolveState():
+            self.solve()
+    
+    def roundAngle(self):
+        # rounds angle to 90 degrees
+        self.winModified = True
+        q = self.angleEdit.value() / 90
+        q = round(q)
+        q = q * 90
+        self.angleEdit.setValue(q)
+        if a2plib.getAutoSolveState():
+            self.solve()
+    
+    def perpendicularAngle(self):
+        #adds /subtracs 90 degrees
+        # we want to go this way: 0 -> 90 -> 180 -> 90 -> 0
+        # but: 10 -> 100 -> 100
+        self.winModified = True
+        q = self.angleEdit.value() + 90
+        if q == 270:
+            self.angleEdit.setValue(0)
+        elif q > 180:
+            self.angleEdit.setValue(q - 180)
+        elif q <= 180:
+            self.angleEdit.setValue(q)
         if a2plib.getAutoSolveState():
             self.solve()
 
