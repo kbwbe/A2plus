@@ -178,8 +178,9 @@ class TopoMapper(object):
             keys.append(
                 'CIRC;'+
                 self.calcVertexKey(pl.multVec(edge.Curve.Center))+
-                self.calcAxisKey(axis)+
-                self.calcFloatKey(edge.Curve.Radius)
+                #self.calcAxisKey(axis)+
+                #self.calcFloatKey(edge.Curve.Radius)
+                self.calcAxisKey(axis)
                 )
         else:
             endPoint1 = pl.multVec(edge.Vertexes[0].Point)
