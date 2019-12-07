@@ -388,6 +388,14 @@ class TopoMapper(object):
                     if o1.Name.startswith('Job'):
                         return True
         return False
+    
+    def isTopLevelInList(self,lst):
+        if len(lst) == 0: return True
+        for ob in lst:
+            if ob.Name.startswith("Clone"): continue
+            if ob.Name.startswith("Part__Mirroring"): continue
+            else: return False
+        return True
 
     def getTopLevelObjects(self):
         #-------------------------------------------
@@ -395,6 +403,7 @@ class TopoMapper(object):
         #-------------------------------------------
         self.treeNodes = {}
         shapeObs = a2plib.filterShapeObs(self.doc.Objects)
+        
         S = set(shapeObs)
         for ob in S:
             self.treeNodes[ob.Name] = (
@@ -408,7 +417,7 @@ class TopoMapper(object):
         self.topLevelShapes = []
         for objName in self.treeNodes.keys():
             inList,dummy = self.treeNodes[objName]
-            if len(inList) == 0:
+            if self.isTopLevelInList(inList):
                 self.topLevelShapes.append(objName)
             else:
                 #-------------------------------------------
@@ -430,21 +439,6 @@ class TopoMapper(object):
                     if not invalidObjects:
                         if numBodies == numClones:
                             self.topLevelShapes.append(objName)
-        
-        #-------------------------------------------
-        # search for missing clone-basefeatures
-        #-------------------------------------------
-        addList = []
-        for n in self.topLevelShapes:
-            if (
-                n.startswith('Clone') or
-                n.startswith('Part__Mirroring')
-                ):
-                dummy,outList = self.treeNodes[n]
-                if len(outList) == 1:
-                    addList.append(outList[0].Name)
-        if len(addList) > 0:
-            self.topLevelShapes.extend(addList)
         #-------------------------------------------
         # Got some shapes created by PathWB? filter out...
         # also filter out invisible shapes...
@@ -481,7 +475,7 @@ class TopoMapper(object):
                 self.isPartDesignDocument = True
                 break
 
-    def createTopoNames(self):
+    def createTopoNames(self, desiredShapeLabel = None):
         '''
         creates a combined shell of all toplevel objects and
         assigns toponames to its geometry if toponaming is
@@ -489,6 +483,17 @@ class TopoMapper(object):
         '''
         self.detectPartDesignDocument()
         self.getTopLevelObjects()
+        
+        # filter topLevelShapes if there is a desiredShapeLabel 
+        # means: extract only one desired shape out of whole file...
+        if desiredShapeLabel: #is not None
+            tmp = []
+            for objName in self.topLevelShapes:
+                o = self.doc.getObject(objName)
+                if o.Label == desiredShapeLabel:
+                    tmp.append(o.Name)
+            self.topLevelShapes = tmp
+        
         #-------------------------------------------
         # analyse the toplevel shapes
         #-------------------------------------------
@@ -525,20 +530,24 @@ class TopoMapper(object):
             faces.extend(tempShape.Faces) #let python libs extend faces, much faster
 
         shell = Part.makeShell(faces)
+                
         try:
             if a2plib.getUseSolidUnion():
                 if len(shape_list) > 1:
                     shape_base=shape_list[0]
                     shapes=shape_list[1:]
                     solid = shape_base.fuse(shapes)
-                    #solid = ob.Shape
                 else:   #one shape only
-                    solid = shape_list[0]
+                    solid = Part.Solid(shape_list[0])
             else:
-                solid = Part.Solid(shell)
+                solid = Part.Solid(shell) # fails with missing faces if shell contains spheres
+                if len(shell.Faces) != len(solid.Faces):
+                    solid = shell # fall back to shell if faces are missing
         except:
             # keeping a shell if solid is failing
+            FreeCAD.Console.PrintWarning('Union of Shapes FAILED\n')
             solid = shell
+        
         #-------------------------------------------
         # if toponaming is used, assign toponames to
         # shells geometry
@@ -551,7 +560,8 @@ class TopoMapper(object):
             muxInfo.append("[VERTEXES]")
             for i,v in enumerate(solid.Vertexes):
                 k = self.calcVertexKey(v)
-                name = self.shapeDict.get(k,"None")
+                defaultVal = "V;NONAME;{};".format(i)
+                name = self.shapeDict.get(k,defaultVal)
                 muxInfo.append(name)
             #-------------------------------------------
             # map edgenames to the MUX
@@ -560,7 +570,8 @@ class TopoMapper(object):
             pl = FreeCAD.Placement()
             for i,edge in enumerate(solid.Edges):
                 keys = self.calcEdgeKeys(edge, pl)
-                name = self.shapeDict.get(keys[0],"None")
+                defaultVal = "E;NONAME;{};".format(i)
+                name = self.shapeDict.get(keys[0],defaultVal)
                 muxInfo.append(name)
             #-------------------------------------------
             # map facenames to the MUX
@@ -569,7 +580,10 @@ class TopoMapper(object):
             pl = FreeCAD.Placement()
             for i,face in enumerate(solid.Faces):
                 keys = self.calcFaceKeys(face, pl)
-                name = self.shapeDict.get(keys[0],"None")
+                defaultVal = "F;NONAME;{};".format(i)
+                name = self.shapeDict.get(keys[0],defaultVal)
                 muxInfo.append(name)
 
+
         return muxInfo, solid, faceColors, transparency
+    

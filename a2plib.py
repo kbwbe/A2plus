@@ -200,6 +200,7 @@ def isPartialProcessing():
 def filterShapeObs(_list):
     lst = []
     for ob in _list:
+        if ob.hasExtension('App::GeoFeatureGroupExtension'):continue #Part Containers within FC0.19.18405 seem to have a shape property..
         if hasattr(ob,"Shape"):
             if len(ob.Shape.Faces) > 0 and len(ob.Shape.Vertexes) > 0:
                 lst.append(ob)
@@ -793,7 +794,7 @@ def copyObjectColors(ob1,ob2):
             ob1.ViewObject.Transparency = 1
             ob1.ViewObject.Transparency = 0
 
-    # select/unselect object once to trigger update of 3D View
+    # select/deselect object once to trigger update of 3D View
     FreeCADGui.Selection.addSelection(ob1)
     FreeCADGui.Selection.removeSelection(ob1)
 #------------------------------------------------------------------------------

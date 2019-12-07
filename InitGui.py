@@ -26,7 +26,7 @@
 __title__ = 'A2plus assembly Workbench - InitGui file'
 __author__ = 'kbwbe'
 
-A2P_VERSION = 'V0.4.17'
+A2P_VERSION = 'V0.4.29a'
 
 
 
@@ -38,7 +38,7 @@ else:
     import a2p_Resources3
 
 
-class a2pWorkbench (Workbench):
+class A2plusWorkbench (Workbench):
 
     def __init__(self):
         global A2P_VERSION
@@ -140,6 +140,7 @@ Please use {}.{}.{} or above.\n\n'''.format(
         if a2plib.getRecursiveUpdateEnabled():
             partCommands = [
                 'a2p_ImportPart',
+                'a2p_ImportShapeReferenceCommand',
                 'a2p_updateImportedParts',
                 'a2p_recursiveUpdateImportedPartsCommand',
                 'a2p_movePart',
@@ -147,16 +148,19 @@ Please use {}.{}.{} or above.\n\n'''.format(
                 'a2p_ConvertPart',
                 'a2p_editImportedPart',
                 'a2p_SaveAndExit_Command',
+                'a2p_Restore_Transparency',
                 ]
         else:
             partCommands = [
                 'a2p_ImportPart',
+                'a2p_ImportShapeReferenceCommand',
                 'a2p_updateImportedParts',
                 'a2p_movePart',
                 'a2p_duplicatePart',
                 'a2p_ConvertPart',
                 'a2p_editImportedPart',
                 'a2p_SaveAndExit_Command',
+                'a2p_Restore_Transparency',
                 ]
         
         if a2plib.SHOW_CONSTRAINTS_ON_TOOLBAR:
@@ -171,6 +175,7 @@ Please use {}.{}.{} or above.\n\n'''.format(
                 'a2p_AxialConstraintCommand',
                 'a2p_AxisParallelConstraintCommand',
                 'a2p_AxisPlaneParallelCommand',
+                'a2p_AxisPlaneNormalCommand',
                 'a2p_PlanesParallelConstraintCommand',
                 'a2p_PlaneCoincidentConstraintCommand',
                 'a2p_AngledPlanesConstraintCommand',
@@ -282,4 +287,4 @@ Please use {}.{}.{} or above.\n\n'''.format(
                       ]
                     )
 
-Gui.addWorkbench(a2pWorkbench())
+Gui.addWorkbench(A2plusWorkbench())

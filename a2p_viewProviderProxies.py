@@ -27,75 +27,10 @@ from PySide import QtGui, QtCore
 from pivy import coin
 import traceback
 import a2plib
+from a2p_importedPart_class import ImportedPartViewProviderProxy # for compat
 
 
-#---------------------------------------------------------------------------
-class ImportedPartViewProviderProxy:
-
-    def claimChildren(self):
-        if hasattr(self,'Object'):
-            try:
-                children = list()
-                for obj in self.Object.InList:
-                    if a2plib.isA2pObject(obj):
-                        children.append(obj)
-                if hasattr(self.Object,'lcsLink'):
-                    for obj in self.Object.lcsLink:
-                        children.append(obj)
-                return children
-            except:
-                #FreeCAD has already deleted self.Object !!
-                return[]
-        else:
-            return []
-
-    def onDelete(self, viewObject, subelements): # subelements is a tuple of strings
-        if FreeCAD.activeDocument() != viewObject.Object.Document:
-            return False # only delete objects in the active Document anytime !!
-        obj = viewObject.Object
-        doc = obj.Document
-
-        deleteList = []
-        for c in doc.Objects:
-            if 'ConstraintInfo' in c.Content: # a related Constraint
-                if obj.Name in [ c.Object1, c.Object2 ]:
-                    deleteList.append(c)
-        if len(deleteList) > 0:
-            for c in deleteList:
-                a2plib.removeConstraint(c) #also deletes the mirrors...
-                
-        if hasattr(obj,"lcsLink"):
-            if len(obj.lcsLink)>0:
-                lscGroup = doc.getObject(obj.lcsLink[0].Name)
-                lscGroup.deleteContent(doc)
-                doc.removeObject(lscGroup.Name)
-                
-        return True # If False is returned the object won't be deleted
-
-    def getIcon(self):
-        if hasattr(self,"Object"):
-            if hasattr(self.Object,"subassemblyImport"):
-                if self.Object.subassemblyImport:
-                    return ":/icons/a2p_Asm.svg"
-            if hasattr(self.Object,"sourceFile"):
-                if self.Object.sourceFile == 'converted':
-                    return ":/icons/a2p_ConvertPart.svg"
-        return ":/icons/a2p_Obj.svg"
-
-    def __getstate__(self):
-        return None
-
-    def __setstate__(self, state):
-        return None
-    
-    def attach(self, vobj):
-        self.object_Name = vobj.Object.Name
-        self.Object = vobj.Object
-
-    def setupContextMenu(self, ViewObject, popup_menu):
-        pass
-
-
+#==============================================================================
 class PopUpMenuItem:
     def __init__( self, proxy, menu, label, Freecad_cmd ):
         self.Object = proxy.Object
@@ -111,6 +46,7 @@ class PopUpMenuItem:
             FreeCAD.Console.PrintError( traceback.format_exc() )
 
 
+#==============================================================================
 class ConstraintViewProviderProxy:
     def __init__(
             self,
@@ -138,7 +74,7 @@ class ConstraintViewProviderProxy:
         return self.iconPath
     
     def doubleClicked(self,vobj):
-        FreeCADGui.activateWorkbench('a2pWorkbench')
+        FreeCADGui.activateWorkbench('A2plusWorkbench')
         FreeCADGui.runCommand("a2p_EditConstraintCommand")
 
 #WF: next 3 methods not required
@@ -172,7 +108,7 @@ class ConstraintViewProviderProxy:
                 pass # if mirror is already deleted...
         return True
 
-
+#==============================================================================
 class ConstraintMirrorViewProviderProxy:
     def __init__( self, constraintObj, iconPath ):
         self.iconPath = iconPath
@@ -180,7 +116,7 @@ class ConstraintMirrorViewProviderProxy:
         self.enableDeleteCounterPart = True #allow to delete the original of the mirror
 
     def doubleClicked(self,vobj):
-        FreeCADGui.activateWorkbench('a2pWorkbench')
+        FreeCADGui.activateWorkbench('A2plusWorkbench')
         FreeCADGui.runCommand("a2p_EditConstraintCommand")
 
     def getIcon(self):
@@ -217,6 +153,7 @@ class ConstraintMirrorViewProviderProxy:
         return True
 
 
+#==============================================================================
 def create_constraint_mirror( constraintObj, iconPath, origLabel= '', mirrorLabel='', extraLabel = '' ):
     #FreeCAD.Console.PrintMessage("creating constraint mirror\n")
     cName = constraintObj.Name + '_mirror'
@@ -262,6 +199,7 @@ def create_constraint_mirror( constraintObj, iconPath, origLabel= '', mirrorLabe
     cMirror.ViewObject.Proxy = ConstraintMirrorViewProviderProxy( constraintObj, iconPath )
     return cMirror.Name
 
+#==============================================================================
 class ConstraintObjectProxy:
     def __init__(self,obj=None):
         self.disable_onChanged = False
@@ -300,6 +238,7 @@ class ConstraintObjectProxy:
             )
 
 
+#==============================================================================
 class ConstraintMirrorObjectProxy:
     def __init__(self, obj, constraintObj ):
         self.constraintObj_name = constraintObj.Name
@@ -326,4 +265,4 @@ class ConstraintMirrorObjectProxy:
                         setattr( constraintObj, prop, getattr( obj, prop) )
                 except:
                     pass #loading issues...
-
+#==============================================================================

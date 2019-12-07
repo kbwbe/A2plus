@@ -424,12 +424,63 @@ class AxisPlaneParallelConstraint(BasicConstraint):
     def getToolTip():
         return \
 '''
-Creates an axisPlaneParallel constraint.
+Add an axisPlaneParallel constraint
 
 1) select a linear edge or cylinder axis
 2) select a plane face on another part
 
 This constraint adjusts an axis parallel
+to a selected plane. The parts are not
+moved to be coincident.
+
+Button gets active after
+correct selection.
+'''
+
+    @staticmethod
+    def isValidSelection(selection):
+        validSelection = False
+        if len(selection) == 2:
+            s1, s2 = selection
+            if s1.ObjectName != s2.ObjectName:
+                if (
+                    (LinearEdgeSelected(s1) or cylindricalFaceSelected(s1)) and
+                    planeSelected(s2)
+                    ):
+                    validSelection = True
+        return validSelection
+
+#==============================================================================
+class AxisPlaneNormalConstraint(BasicConstraint):
+    def __init__(self,selection):
+        BasicConstraint.__init__(self, selection)
+        self.typeInfo = 'axisPlaneNormal'
+        self.constraintBaseName = 'axisPlaneNormal'
+        self.iconPath = ':/icons/a2p_AxisPlaneNormalConstraint.svg'
+        self.create(selection)
+        
+    def calcInitialValues(self):
+        c = self.constraintObject
+        axis1 = getAxis(self.ob1, c.SubElement1)
+        plane2 = getObjectFaceFromName(self.ob2, c.SubElement2)
+        axis2 = a2plib.getPlaneNormal(plane2.Surface)
+
+        angle = math.degrees(axis1.getAngle(axis2))
+        if angle <= 90.0:
+            self.direction = "aligned"
+        else:
+            self.direction = "opposed"
+
+    @staticmethod
+    def getToolTip():
+        return \
+'''
+Add an axisPlaneNormal constraint
+
+1) select a linear edge or cylinder axis
+2) select a plane face on another part
+
+This constraint adjusts an axis vertical
 to a selected plane. The parts are not
 moved to be coincident.
 
@@ -573,7 +624,7 @@ class AngledPlanesConstraint(BasicConstraint):
     def getToolTip():
         return \
 '''
-Creates an angledPlanes constraint.
+Add an angledPlanes constraint
 
 1) select first plane object
 2) select second plane object on another part
@@ -679,7 +730,7 @@ class CenterOfMassConstraint(BasicConstraint):
     def getToolTip():
         return \
 '''
-Creates a centerOfMass constraint.
+Add a centerOfMass constraint
 
 (Join centerOfMass of \'face1\' or \'closed edge1\' to 
 centerOfMass of \'face2\' or \'closed edge2\') 
