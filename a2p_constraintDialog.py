@@ -130,11 +130,14 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
 
             self.offsetEdit = QtGui.QDoubleSpinBox(self)
             # get the length unit as string
-            self.offsetEdit.setSuffix(str( FreeCAD.Units.Quantity(1, FreeCAD.Units.Length) )[2:])
+            self.offsetEdit.setSuffix(" " + str(FreeCAD.Units.Quantity(1, FreeCAD.Units.Length))[2:])
             # the maximum is by default 99.99 and we can allow more
             self.offsetEdit.setMaximum(1e7) # allow up to 1 km
             # set minimum to negative of maximum
             self.offsetEdit.setMinimum(-1*self.offsetEdit.maximum())
+            # use the number of decimals defined by thew user in FC
+            params = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Units")
+            self.offsetEdit.setDecimals(params.GetInt('Decimals'))
             self.offsetEdit.setValue(offs.Value)
             self.offsetEdit.setFixedHeight(32)
             QtCore.QObject.connect(self.offsetEdit, QtCore.SIGNAL("valueChanged(double)"), self.handleOffsetChanged)
@@ -164,10 +167,13 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
 
             self.angleEdit = QtGui.QDoubleSpinBox(self)
             # get the angle unit as string
-            self.angleEdit.setSuffix(str( FreeCAD.Units.Quantity(1, FreeCAD.Units.Angle) )[2:])
+            self.angleEdit.setSuffix(" " + str(FreeCAD.Units.Quantity(1, FreeCAD.Units.Angle))[2:])
             self.angleEdit.setMaximum(180)
             # the solver treats negative values as positive
             self.angleEdit.setMinimum(0)
+            # use the number of decimals defined by thew user in FC
+            params = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Units")
+            self.angleEdit.setDecimals(params.GetInt('Decimals'))
             self.angleEdit.setValue(angle)
             self.angleEdit.setFixedHeight(32)
             self.angleEdit.setToolTip("Angle in the range 0 - 180 degrees")
