@@ -34,150 +34,15 @@ from PySide import QtGui
 
 from a2p_importedPart_class import Proxy_muxAssemblyObj # for compat
 
+#===========================================================================
+# !!!!!!!!!!!!!!!!!!!
+# Relevant muxing of assemblies has been moved to a2p_filecache.py
+# !!!!!!!!!!!!!!!!!!!
+#
+# only SimpleAssemblyShape is still here...
+#===========================================================================
 
-def createTopoInfo(obj): # used during converting an object to a2p object
-    muxInfo = []
-    if not a2plib.getUseTopoNaming(): return muxInfo
-    #
-    # Assembly works with topoNaming!
-    for i in range(0, len(obj.Shape.Vertexes) ):
-        newName = "".join(('V;',str(i+1),';',obj.Name,';'))
-        muxInfo.append(newName)
-    for i in range(0, len(obj.Shape.Edges) ):
-        newName = "".join(('E;',str(i+1),';',obj.Name,';'))
-        muxInfo.append(newName)
-    for i in range(0, len(obj.Shape.Faces) ):
-        newName = "".join(('F;',str(i+1),';',obj.Name,';'))
-        muxInfo.append(newName)
-    return muxInfo
 
-def makePlacedShape(obj):
-    '''return a copy of obj.Shape with proper placement applied'''
-    tempShape = obj.Shape.copy()
-    plmGlobal = obj.Placement
-    try:
-        plmGlobal = obj.getGlobalPlacement();
-    except:
-        pass
-    tempShape.Placement = plmGlobal
-    return tempShape
-
-def muxAssemblyWithTopoNames(doc, desiredShapeLabel=None):
-    '''
-    Mux an a2p assembly
-
-    combines all the a2p objects in the doc into one shape
-    and populates muxinfo with a description of an edge or face.
-    these descriptions are used later to retrieve the edges or faces...
-    '''
-    faces = []
-    faceColors = []
-    muxInfo = [] # List of keys, not used at moment...
-
-    visibleObjects = [ obj for obj in doc.Objects
-                       if hasattr(obj,'ViewObject') and obj.ViewObject.isVisible()
-                       and hasattr(obj,'Shape') and len(obj.Shape.Faces) > 0
-                       and hasattr(obj,'muxInfo')
-                       ]
-    
-    if desiredShapeLabel: # is not None..
-        tmp = []
-        for ob in visibleObjects:
-            if ob.Label == desiredShapeLabel:
-                tmp.append(ob)
-                break
-        visibleObjects = tmp
-
-    transparency = 0
-    shape_list = []
-    for obj in visibleObjects:
-        extendNames = False
-        if a2plib.getUseTopoNaming() and len(obj.muxInfo) > 0: # Subelement-Strings existieren schon...
-            extendNames = True
-            #
-            vertexNames = []
-            edgeNames = []
-            faceNames = []
-            #
-            for item in obj.muxInfo:
-                if item[0] == 'V': vertexNames.append(item)
-                if item[0] == 'E': edgeNames.append(item)
-                if item[0] == 'F': faceNames.append(item)
-
-        if a2plib.getUseTopoNaming():
-            for i in range(0, len(obj.Shape.Vertexes) ):
-                if extendNames:
-                    newName = "".join((vertexNames[i],obj.Name,';'))
-                    muxInfo.append(newName)
-                else:
-                    newName = "".join(('V;',str(i+1),';',obj.Name,';'))
-                    muxInfo.append(newName)
-            for i in range(0, len(obj.Shape.Edges) ):
-                if extendNames:
-                    newName = "".join((edgeNames[i],obj.Name,';'))
-                    muxInfo.append(newName)
-                else:
-                    newName = "".join(('E;',str(i+1),';',obj.Name,';'))
-                    muxInfo.append(newName)
-
-        # Save Computing time, store this before the for..enumerate loop later...
-        needDiffuseColorExtension = ( len(obj.ViewObject.DiffuseColor) < len(obj.Shape.Faces) )
-        shapeCol = obj.ViewObject.ShapeColor
-        diffuseCol = obj.ViewObject.DiffuseColor
-        tempShape = makePlacedShape(obj)
-        transparency = obj.ViewObject.Transparency
-        shape_list.append(obj.Shape)
-
-        # now start the loop with use of the stored values..(much faster)
-        topoNaming = a2plib.getUseTopoNaming()
-        diffuseElement = makeDiffuseElement(shapeCol,transparency)
-        for i in range(0,len(tempShape.Faces)):
-            if topoNaming:
-                if extendNames:
-                    newName = "".join((faceNames[i],obj.Name,';'))
-                    muxInfo.append(newName)
-                else:
-                    newName = "".join(('F;',str(i+1),';',obj.Name,';'))
-                    muxInfo.append(newName)
-            if needDiffuseColorExtension:
-                faceColors.append(diffuseElement)
-
-        if not needDiffuseColorExtension:
-            faceColors.extend(diffuseCol)
-
-        faces.extend(tempShape.Faces)
-
-    #if len(faces) == 1:
-    #    shell = Part.makeShell([faces])
-    #else:
-    #    shell = Part.makeShell(faces)
-        
-    shell = Part.makeShell(faces)
-        
-    try:
-        if a2plib.getUseSolidUnion():
-            if len(shape_list) > 1:
-                shape_base=shape_list[0]
-                shapes=shape_list[1:]
-                solid = shape_base.fuse(shapes)
-            else:
-                solid = Part.Solid(shape_list[0])
-        else:
-            solid = Part.Solid(shell) # This does not work if shell includes spherical faces. FC-Bug ??
-            # Fall back to shell if some faces are missing..
-            if len(shell.Faces) != len(solid.Faces):
-                solid = shell
-    except:
-        # keeping a shell if solid is failing
-        FreeCAD.Console.PrintWarning('Union of Shapes FAILED\n')
-        solid = shell
-
-    # transparency could change to different values depending
-    # on the order of imported objects
-    # now set it to a default value
-    # faceColors still contains the per face transparency values
-    transparency = 0
-    return muxInfo, solid, faceColors, transparency
 
 class SimpleAssemblyShape:
     def __init__(self, obj):

@@ -33,6 +33,7 @@ import sys
 import copy
 import platform
 import numpy
+import zipfile
 
 from a2p_viewProviderProxies import *
 
@@ -98,8 +99,200 @@ elif "LINUX" in tmp:
 else:
     OPERATING_SYSTEM = "OTHER"
 
+#==============================================================================
+def getMemSize(obj, seen=None):
+    """
+    Recursively finds memsize of objects
+    Code by Wissam Jarqui
+    """
+    size = sys.getsizeof(obj)
+    if seen is None:
+        seen = set()
+    obj_id = id(obj)
+    if obj_id in seen:
+        return 0
+    seen.add(obj_id)
+    if isinstance(obj, dict):
+        size += sum([getMemSize(v, seen) for v in obj.values()])
+        size += sum([getMemSize(k, seen) for k in obj.keys()])
+    elif hasattr(obj, '__dict__'):
+        size += getMemSize(obj.__dict__, seen)
+    elif hasattr(obj, '__iter__') and not isinstance(obj, (str, bytes, bytearray)):
+        size += sum([getMemSize(i, seen) for i in obj])
+    return size
+#------------------------------------------------------------------------------
+def openImportDocFromFile(filename):
+    '''
+    Open the importDocument from it's file or get it's fc document if it is
+    already open.
+    '''
+    # look only for filenames, not paths, as there are problems on WIN10 (Address-translation??)
+    importDoc = None
+    importDocIsOpen = False
+    requestedFile = os.path.split(filename)[1]
+    for d in FreeCAD.listDocuments().values():
+        recentFile = os.path.split(d.FileName)[1]
+        if requestedFile == recentFile:
+            importDoc = d # file is already open...
+            importDocIsOpen = True
+            break
 
+    if not importDocIsOpen:
+        if filename.lower().endswith('.fcstd'):
+            importDoc = FreeCAD.openDocument(filename)
+        elif filename.lower().endswith('.stp') or filename.lower().endswith('.step'):
+            import ImportGui
+            fname =  os.path.splitext(os.path.basename(filename))[0]
+            FreeCAD.newDocument(fname)
+            newname = FreeCAD.ActiveDocument.Name
+            FreeCAD.setActiveDocument(newname)
+            ImportGui.insert(filename,newname)
+            importDoc = FreeCAD.ActiveDocument
+        else:
+            msg = "A part can only be imported from a FreeCAD '*.FCStd' file"
+            QtGui.QMessageBox.information( QtGui.QApplication.activeWindow(), "Value Error", msg )
+            
+    return importDoc, importDocIsOpen
+#------------------------------------------------------------------------------
+class A2pFileContent():
+    def __init__(
+            self,
+            shape,
+            vertexNames,
+            edgeNames,
+            faceNames,
+            diffuseColor,
+            properties
+            ):
+        self.shape = shape
+        self.vertexNames = vertexNames
+        self.edgeNames = edgeNames
+        self.faceNames = faceNames
+        self.diffuseColor = diffuseColor
+        self.properties = properties
+#------------------------------------------------------------------------------
+def writeA2pFile(fileName,shape,toponames, facecolors, xml):
+    docPath, docFileName = os.path.split(fileName)
+                    
+    zipFileName = os.path.join(docPath,docFileName+'.a2p')
+    zip = zipfile.ZipFile(zipFileName,'w',zipfile.ZIP_DEFLATED)
 
+    brepFileName = os.path.join(docPath,docFileName+'.brep')
+    shape.exportBrep(brepFileName)
+    zip.write(brepFileName,'shape.brep')
+    os.remove(brepFileName)
+    
+    vertexNames = []
+    edgeNames = []
+    faceNames = []
+    for tn in toponames:
+        if tn.startswith('V'):vertexNames.append(tn)
+        if tn.startswith('E'):edgeNames.append(tn)
+        if tn.startswith('F'):faceNames.append(tn)
+        
+    tempFile = os.path.join(docPath,docFileName+'.temp')
+    with open(tempFile,'w') as f:
+        for tn in vertexNames:
+            f.write(tn+'\r\n')
+    f.close()
+    zip.write(tempFile,'vertexnames')
+    os.remove(tempFile)
+        
+    tempFile = os.path.join(docPath,docFileName+'.temp')
+    with open(tempFile,'w') as f:
+        for tn in edgeNames:
+            f.write(tn+'\r\n')
+    f.close()
+    zip.write(tempFile,'edgenames')
+    os.remove(tempFile)
+
+    tempFile = os.path.join(docPath,docFileName+'.temp')
+    with open(tempFile,'w') as f:
+        for tn in faceNames:
+            f.write(tn+'\r\n')
+    f.close()
+    zip.write(tempFile,'facenames')
+    os.remove(tempFile)
+    
+    diffuseFileName = os.path.join(docPath,docFileName+'.diffuse')
+    with open(diffuseFileName,'w') as f:
+        for color in facecolors:
+            f.write(a2plib.diffuseElementToTextline(color))
+    f.close()
+    zip.write(diffuseFileName,'diffusecolor')
+    os.remove(diffuseFileName)
+    
+    xmlFileName = os.path.join(docPath,docFileName+'.xml')
+    if PYVERSION > 2:
+        with open(xmlFileName,'w') as f:
+            f.writelines(xml)
+    else:
+        with open(xmlFileName,'w') as f:
+            for line in xml:
+                f.write(to_bytes(line))
+    f.close()
+    zip.write(xmlFileName,'information.xml')
+    os.remove(xmlFileName)
+
+    zip.close()
+    return zipFileName
+#------------------------------------------------------------------------------
+def readA2pFile(fileName):
+    zip = zipfile.ZipFile(fileName,'r')
+    shape = Part.Shape()
+    shape.importBrepFromString(to_str(zip.open("shape.brep").read()))
+    
+    vertexNames = []
+    lines = zip.open("vertexnames").readlines()
+    for line in lines:
+        tx = to_str(line).strip("\r\n")
+        vertexNames.append(tx)
+        
+    edgeNames = []
+    lines = zip.open("edgenames").readlines()
+    for line in lines:
+        tx = to_str(line).strip("\r\n")
+        edgeNames.append(tx)
+        
+    faceNames = []
+    lines = zip.open("facenames").readlines()
+    for line in lines:
+        tx = to_str(line).strip("\r\n")
+        faceNames.append(tx)
+        
+    diffuseColor = []
+    lines = zip.open("diffusecolor").readlines()
+    for line in lines:
+        diffuseColor.append(diffuseElementFromTextline(line))
+    
+    xmlContent = zip.open("information.xml").readlines()
+    properties = {}
+    idx = 0
+    while True:
+        l = xmlContent[idx]
+        line = to_str(l).strip("\t").strip(' ').strip('\r\n')
+        if line.startswith("<Property name"):
+            segments = line.split('"')
+            propname = segments[1]
+            idx += 1
+            l = xmlContent[idx]
+            line = to_str(l).strip("\t").strip(' ').strip('\r\n')
+            segments = line.split('"')
+            propvalue = segments[1]
+            properties[propname] = propvalue
+        idx += 1
+        if idx == len(xmlContent): break
+    
+    zip.close()
+    
+    return A2pFileContent(
+        shape,
+        vertexNames,
+        edgeNames,
+        faceNames,
+        diffuseColor,
+        properties
+        )
 #------------------------------------------------------------------------------
 def to_bytes(tx):
     if PYVERSION > 2:
@@ -201,6 +394,7 @@ def filterShapeObs(_list):
     lst = []
     for ob in _list:
         if ob.hasExtension('App::GeoFeatureGroupExtension'):continue #Part Containers within FC0.19.18405 seem to have a shape property..
+        if ob.hasExtension('App::GroupExtension'):continue #Group Containers within FC0.19.18405 seem to have a shape property..
         if hasattr(ob,"Shape"):
             if len(ob.Shape.Faces) > 0 and len(ob.Shape.Vertexes) > 0:
                 lst.append(ob)
@@ -765,8 +959,20 @@ def isA2pObject(obj):
     return result
 #------------------------------------------------------------------------------
 def makeDiffuseElement(color,trans):
-    elem = (color[0],color[1],color[2],trans/100.0)
-    return elem
+    return (color[0],color[1],color[2],trans/100.0)
+#------------------------------------------------------------------------------
+def diffuseElementFromTextline(line):
+    values = to_str(line).split(' ')
+    diffuseElement = []
+    for val in values:
+        diffuseElement.append(float(val.strip("\r\n")))
+    return tuple(diffuseElement)
+#------------------------------------------------------------------------------
+def diffuseElementToTextline(elem):
+    if len(elem) == 3:
+        return '%0.5f %0.5f %0.5f\r\n' % (elem[0],elem[1],elem[2])
+    else:
+        return '%0.5f %0.5f %0.5f %0.5f\r\n' % (elem[0],elem[1],elem[2],elem[3])
 #------------------------------------------------------------------------------
 def copyObjectColors(ob1,ob2):
     '''
@@ -845,6 +1051,17 @@ def deleteConstraintsOfDeletedObjects():
             msg 
             )
 #------------------------------------------------------------------------------
+def makePlacedShape(obj):
+    '''return a copy of obj.Shape with proper placement applied'''
+    tempShape = obj.Shape.copy()
+    plmGlobal = obj.Placement
+    try:
+        plmGlobal = obj.getGlobalPlacement();
+    except:
+        pass
+    tempShape.Placement = plmGlobal
+    return tempShape
+#------------------------------------------------------------------------------
 def a2p_repairTreeView():
     doc = FreeCAD.activeDocument()
     if doc == None: return
@@ -877,3 +1094,12 @@ def a2p_repairTreeView():
         if m.Proxy != None:
             m.Proxy.disable_onChanged = False
 #------------------------------------------------------------------------------
+def getSubelementIndex(subName):
+    idxString = ""
+    for c in subName:
+        if c in ["0","1","2","3","4","5","6","7","8","9"]:
+            idxString+=c
+    return int(idxString)-1
+#------------------------------------------------------------------------------
+        
+

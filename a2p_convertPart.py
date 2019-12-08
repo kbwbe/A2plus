@@ -26,7 +26,6 @@ import FreeCADGui,FreeCAD
 from PySide import QtGui, QtCore
 import os, copy, time
 import a2plib
-from a2p_MuxAssembly import createTopoInfo
 from a2p_viewProviderProxies import *
 from a2p_versionmanagement import A2P_VERSION
 import a2p_solversystem
@@ -38,6 +37,23 @@ from a2p_importedPart_class import Proxy_importPart
 from a2p_importedPart_class import Proxy_convertPart # for compat.
 
 
+#===========================================================================
+def createTopoInfo(obj): # used during converting an object to a2p object
+    muxInfo = []
+    if not a2plib.getUseTopoNaming(): return muxInfo
+    #
+    # Assembly works with topoNaming!
+    for i in range(0, len(obj.Shape.Vertexes) ):
+        newName = "".join(('V;',str(i+1),';',obj.Name,';'))
+        muxInfo.append(newName)
+    for i in range(0, len(obj.Shape.Edges) ):
+        newName = "".join(('E;',str(i+1),';',obj.Name,';'))
+        muxInfo.append(newName)
+    for i in range(0, len(obj.Shape.Faces) ):
+        newName = "".join(('F;',str(i+1),';',obj.Name,';'))
+        muxInfo.append(newName)
+    return muxInfo
+#===========================================================================
 def convertToImportedPart(doc, obj):
     '''
     convertToImportedPart(document, documentObject) - changes a regular FreeCAD object into an A2plus
@@ -174,3 +190,4 @@ Please select a Part.
 
 
 FreeCADGui.addCommand('a2p_ConvertPart',a2p_ConvertPartCommand())
+#===========================================================================

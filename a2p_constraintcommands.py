@@ -31,11 +31,18 @@ from  FreeCAD import Base
 from a2plib import *
 from a2p_solversystem import solveConstraints
 import a2p_constraints, a2p_constraintDialog
+import a2p_filecache
 
+#==============================================================================
+def loadToFileCache(selection):
+    for s in selection:
+        ob = FreeCAD.activeDocument().getObject(s.ObjectName)
+        a2p_filecache.fileCache.loadObject(ob.sourceFile)
 #==============================================================================
 class a2p_PointIdentityConstraintCommand:
     def Activated(self):
         selection = FreeCADGui.Selection.getSelectionEx()
+        loadToFileCache(selection)
         
         c = a2p_constraints.PointIdentityConstraint(selection)
         cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
@@ -62,6 +69,7 @@ FreeCADGui.addCommand('a2p_PointIdentityConstraintCommand', a2p_PointIdentityCon
 class a2p_PointOnLineConstraintCommand:
     def Activated(self):
         selection = FreeCADGui.Selection.getSelectionEx()
+        loadToFileCache(selection)
         
         c = a2p_constraints.PointOnLineConstraint(selection)
         cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
@@ -88,6 +96,7 @@ FreeCADGui.addCommand('a2p_PointOnLineConstraintCommand', a2p_PointOnLineConstra
 class a2p_PointOnPlaneConstraintCommand:
     def Activated(self):
         selection = FreeCADGui.Selection.getSelectionEx()
+        loadToFileCache(selection)
         
         c = a2p_constraints.PointOnPlaneConstraint(selection)
         cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
@@ -113,6 +122,7 @@ FreeCADGui.addCommand('a2p_PointOnPlaneConstraintCommand', a2p_PointOnPlaneConst
 class a2p_SphericalSurfaceConstraintCommand:
     def Activated(self):
         selection = FreeCADGui.Selection.getSelectionEx()
+        loadToFileCache(selection)
         
         c = a2p_constraints.SphericalConstraint(selection)
         cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
@@ -138,6 +148,7 @@ FreeCADGui.addCommand('a2p_SphericalSurfaceConstraintCommand', a2p_SphericalSurf
 class a2p_CircularEdgeConnectionCommand:
     def Activated(self):
         selection = FreeCADGui.Selection.getSelectionEx()
+        loadToFileCache(selection)
         
         c = a2p_constraints.CircularEdgeConstraint(selection)
         cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
@@ -163,6 +174,7 @@ FreeCADGui.addCommand('a2p_CircularEdgeConnection', a2p_CircularEdgeConnectionCo
 class a2p_AxialConstraintCommand:
     def Activated(self):
         selection = FreeCADGui.Selection.getSelectionEx()
+        loadToFileCache(selection)
         
         c = a2p_constraints.AxialConstraint(selection)
         cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
@@ -188,6 +200,7 @@ FreeCADGui.addCommand('a2p_AxialConstraintCommand', a2p_AxialConstraintCommand()
 class a2p_AxisParallelConstraintCommand:
     def Activated(self):
         selection = FreeCADGui.Selection.getSelectionEx()
+        loadToFileCache(selection)
         
         c = a2p_constraints.AxisParallelConstraint(selection)
         cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
@@ -213,6 +226,7 @@ FreeCADGui.addCommand('a2p_AxisParallelConstraintCommand', a2p_AxisParallelConst
 class a2p_AxisPlaneParallelCommand:
     def Activated(self):
         selection = FreeCADGui.Selection.getSelectionEx()
+        loadToFileCache(selection)
         
         c = a2p_constraints.AxisPlaneParallelConstraint(selection)
         cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
@@ -238,6 +252,7 @@ FreeCADGui.addCommand('a2p_AxisPlaneParallelCommand', a2p_AxisPlaneParallelComma
 class a2p_AxisPlaneNormalCommand:
     def Activated(self):
         selection = FreeCADGui.Selection.getSelectionEx()
+        loadToFileCache(selection)
         
         c = a2p_constraints.AxisPlaneNormalConstraint(selection)
         cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
@@ -263,6 +278,7 @@ FreeCADGui.addCommand('a2p_AxisPlaneNormalCommand', a2p_AxisPlaneNormalCommand()
 class a2p_PlanesParallelConstraintCommand:
     def Activated(self):
         selection = FreeCADGui.Selection.getSelectionEx()
+        loadToFileCache(selection)
         
         c = a2p_constraints.PlanesParallelConstraint(selection)
         cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
@@ -288,6 +304,7 @@ FreeCADGui.addCommand('a2p_PlanesParallelConstraintCommand', a2p_PlanesParallelC
 class a2p_PlaneCoincidentConstraintCommand:
     def Activated(self):
         selection = FreeCADGui.Selection.getSelectionEx()
+        loadToFileCache(selection)
         
         c = a2p_constraints.PlaneConstraint(selection)
         cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
@@ -313,6 +330,7 @@ FreeCADGui.addCommand('a2p_PlaneCoincidentConstraintCommand', a2p_PlaneCoinciden
 class a2p_AngledPlanesConstraintCommand:
     def Activated(self):
         selection = FreeCADGui.Selection.getSelectionEx()
+        loadToFileCache(selection)
         
         c = a2p_constraints.AngledPlanesConstraint(selection)
         cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
@@ -340,6 +358,7 @@ FreeCADGui.addCommand('a2p_AngledPlanesConstraintCommand', a2p_AngledPlanesConst
 class a2p_CenterOfMassConstraintCommand:
     def Activated(self):
         selection = FreeCADGui.Selection.getSelectionEx()
+        loadToFileCache(selection)
         
         c = a2p_constraints.CenterOfMassConstraint(selection)
         cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
