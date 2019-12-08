@@ -368,7 +368,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
     def perpendicularAngle(self):
         #adds /subtracs 90 degrees
         # we want to go this way: 0 -> 90 -> 180 -> 90 -> 0
-        # but: 10 -> 100 -> 100
+        # but: 12 -> 102 -> 12
         self.winModified = True
         q = self.angleEdit.value() + 90
         if q == 270:
