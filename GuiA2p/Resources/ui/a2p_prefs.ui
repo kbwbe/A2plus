@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>644</width>
-    <height>767</height>
+    <width>691</width>
+    <height>793</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,8 +30,8 @@
      <rect>
       <x>20</x>
       <y>30</y>
-      <width>311</width>
-      <height>17</height>
+      <width>591</width>
+      <height>21</height>
      </rect>
     </property>
     <property name="toolTip">
@@ -71,7 +71,7 @@
      <rect>
       <x>21</x>
       <y>20</y>
-      <width>611</width>
+      <width>641</width>
       <height>194</height>
      </rect>
     </property>
@@ -188,7 +188,7 @@ subassemblies. Otherwise you can break the assembly.</string>
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>580</y>
+     <y>610</y>
      <width>441</width>
      <height>161</height>
     </rect>
@@ -309,7 +309,7 @@ subassemblies. Otherwise you can break the assembly.</string>
      <rect>
       <x>20</x>
       <y>30</y>
-      <width>283</width>
+      <width>601</width>
       <height>17</height>
      </rect>
     </property>
@@ -407,6 +407,28 @@ where they were created</string>
      </item>
     </layout>
    </widget>
+  </widget>
+  <widget class="Gui::PrefCheckBox" name="checkBox_10">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>550</y>
+     <width>591</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>use native file manager of your OS</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="prefEntry" stdset="0">
+    <cstring>useNativeFileManager</cstring>
+   </property>
+   <property name="prefPath" stdset="0">
+    <cstring>Mod/A2plus</cstring>
+   </property>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>

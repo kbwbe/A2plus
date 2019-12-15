@@ -398,8 +398,11 @@ class a2p_ImportShapeReferenceCommand():
             )
         # set option "DontUseNativeDialog"=True, as native Filedialog shows
         # misbehavior on Unbuntu 18.04 LTS. It works case sensitively, what is not wanted...
-        dialog.setOption(QtGui.QFileDialog.DontUseNativeDialog, True)        
-        dialog.setNameFilter("Supported Formats (*.FCStd *.stp *.step);;All files (*.*)")
+        if a2plib.getNativeFileManagerUsage():
+            dialog.setOption(QtGui.QFileDialog.DontUseNativeDialog, False)
+        else:
+            dialog.setOption(QtGui.QFileDialog.DontUseNativeDialog, True)
+        dialog.setNameFilter("Supported Formats (*.FCStd *.fcstd *.stp *.step);;All files (*.*)")
         if dialog.exec_():
             if PYVERSION < 3:
                 filename = unicode(dialog.selectedFiles()[0])
@@ -539,8 +542,11 @@ class a2p_ImportPartCommand():
             )
         # set option "DontUseNativeDialog"=True, as native Filedialog shows
         # misbehavior on Unbuntu 18.04 LTS. It works case sensitively, what is not wanted...
-        dialog.setOption(QtGui.QFileDialog.DontUseNativeDialog, True)        
-        dialog.setNameFilter("Supported Formats (*.FCStd *.stp *.step);;All files (*.*)")
+        if a2plib.getNativeFileManagerUsage():
+            dialog.setOption(QtGui.QFileDialog.DontUseNativeDialog, False)
+        else:
+            dialog.setOption(QtGui.QFileDialog.DontUseNativeDialog, True)
+        dialog.setNameFilter("Supported Formats (*.FCStd *.fcstd *.stp *.step);;All files (*.*)")
         if dialog.exec_():
             if PYVERSION < 3:
                 filename = unicode(dialog.selectedFiles()[0])
