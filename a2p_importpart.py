@@ -95,10 +95,7 @@ class a2p_shapeExtractDialog(QtGui.QDialog):
 def importSingleShapeFromFile(
         _doc,
         filename,
-        extractSingleShape = False, # load only a single user defined shape from file
-        desiredShapeLabel=None,
-        importToCache=False,
-        cacheKey = ""
+        desiredShapeLabel=None
         ):
     doc = _doc
     #-------------------------------------------
@@ -518,22 +515,35 @@ def updateImportedParts(doc):
                                                 obj.sourceFile
                                                 )
                                         )
+            isSingleShapeRef = False
+            if hasattr(obj,'sourcePart') and obj.sourcePart is not None and len(obj.sourcePart)>0:
+                isSingleShapeRef = True
+                
             if absPath != None and os.path.exists( absPath ):
                 newPartCreationTime = os.path.getmtime( absPath )
-                if ( 
-                    newPartCreationTime > obj.timeLastImport or
-                    a2plib.getRecalculateImportedParts() # open always all parts as they could depend on spreadsheets
-                    ):
-                    entry = a2p_filecache.fileCache.getFullEntry(obj)
-                    obj.timeLastImport = entry.sourcePartCreationTime
-                    updateConstraintsGeoRefs(doc,obj,entry)
-                    #obj.muxInfo = entry.vertexNames + entry.edgeNames + entry.faceNames
-                    obj.muxInfo = []
-                    savedPlacement  = obj.Placement
-                    obj.Shape = entry.shape
-                    obj.Placement = savedPlacement # restore the old placement
-                    obj.ViewObject.DiffuseColor = entry.diffuseColor
-
+                if isSingleShapeRef:
+                    if (newPartCreationTime > obj.timeLastImport):
+                        obj.timeLastImport = newPartCreationTime
+                        obj.muxInfo = []
+                        savedPlacement  = obj.Placement
+                        newObj = importSingleShapeFromFile(doc,absPath,obj.sourcePart)
+                        obj.Shape = copy.copy(newObj.Shape)
+                        obj.Placement = savedPlacement # restore the old placement
+                        obj.ViewObject.DiffuseColor = newObj.ViewObject.DiffuseColor
+                        doc.removeObject(newObj.Name)
+                else:
+                    if ( 
+                        newPartCreationTime > obj.timeLastImport or
+                        a2plib.getRecalculateImportedParts() # open always all parts as they could depend on spreadsheets
+                        ):
+                        entry = a2p_filecache.fileCache.getFullEntry(obj)
+                        obj.timeLastImport = entry.sourcePartCreationTime
+                        updateConstraintsGeoRefs(doc,obj,entry)
+                        obj.muxInfo = []
+                        savedPlacement  = obj.Placement
+                        obj.Shape = entry.shape
+                        obj.Placement = savedPlacement # restore the old placement
+                        obj.ViewObject.DiffuseColor = entry.diffuseColor
 
     mw = FreeCADGui.getMainWindow()
     mdi = mw.findChild(QtGui.QMdiArea)
@@ -1558,7 +1568,7 @@ Check your settings of A2plus preferences.
             return
 
         #TODO: change for multi separate part import
-        importedObject = importSingleShapeFromFile(doc, filename, extractSingleShape=True)
+        importedObject = importSingleShapeFromFile(doc, filename)
 
         if not importedObject:
             a2plib.Msg("imported Object is empty/none\n")
