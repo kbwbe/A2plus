@@ -465,17 +465,23 @@ def migrateImportedParts(doc):
                                                 obj.sourceFile
                                                 )
                                         )
+                
+            isSingleShapeRef = False
+            if hasattr(obj,'sourcePart') and obj.sourcePart is not None and len(obj.sourcePart)>0:
+                isSingleShapeRef = True
+                
             if absPath != None and os.path.exists( absPath ):
-                newPartCreationTime = os.path.getmtime( absPath )
-                entry = a2p_filecache.fileCache.getFullEntry(obj)
-                obj.timeLastImport = entry.sourcePartCreationTime
-                migrateConstraintsGeoRefs(doc,obj,entry)
-                obj.muxInfo = []
-                savedPlacement  = obj.Placement
-                obj.Shape = entry.shape
-                obj.Placement = savedPlacement # restore the old placement
-                obj.ViewObject.DiffuseColor = entry.diffuseColor
-
+                if not isSingleShapeRef:
+                    entry = a2p_filecache.fileCache.getFullEntry(obj)
+                    obj.timeLastImport = entry.sourcePartCreationTime
+                    migrateConstraintsGeoRefs(doc,obj,entry)
+                    obj.muxInfo = []
+                    savedPlacement  = obj.Placement
+                    obj.Shape = entry.shape
+                    obj.Placement = savedPlacement # restore the old placement
+                    obj.ViewObject.DiffuseColor = entry.diffuseColor
+                else:
+                    obj.muxInfo = []
 
     mw = FreeCADGui.getMainWindow()
     mdi = mw.findChild(QtGui.QMdiArea)

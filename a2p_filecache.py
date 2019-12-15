@@ -40,7 +40,7 @@ class FileCache():
     pass
 fileCache = FileCache()
 #==============================================================================
-def createTopoNamesForConvertedParts(obj): # used during converting an object to a2p object
+def createDefaultTopNames(obj): # used during converting an object to a2p object
     vertexNames = []
     edgeNames = []
     faceNames = []
@@ -80,7 +80,12 @@ def muxAssemblyWithTopoNames(doc):
         extendNames = False
         entry = None
         if a2plib.to_bytes(obj.sourceFile) == b"converted":
-            vertexNames,edgeNames,faceNames = createTopoNamesForConvertedParts(obj)
+            vertexNames,edgeNames,faceNames = createDefaultTopNames(obj)
+            inputShape = obj.Shape 
+
+        #SingleShapeRefs            
+        elif hasattr(obj,"sourcePart") and obj.sourcePart is not None and len(obj.sourcePart)>0:
+            vertexNames,edgeNames,faceNames = createDefaultTopNames(obj)
             inputShape = obj.Shape 
             
         elif a2plib.getUseTopoNaming() and fileCache.loadObject(obj.sourceFile):
