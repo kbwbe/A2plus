@@ -96,6 +96,7 @@ import FreeCAD, FreeCADGui, Part
 from FreeCAD import Base
 import a2plib
 import os
+import zipfile
 
 class TopoMapper(object):
     def __init__(self,doc):
@@ -177,8 +178,9 @@ class TopoMapper(object):
             keys.append(
                 'CIRC;'+
                 self.calcVertexKey(pl.multVec(edge.Curve.Center))+
-                self.calcAxisKey(axis)+
-                self.calcFloatKey(edge.Curve.Radius)
+                #self.calcAxisKey(axis)+
+                #self.calcFloatKey(edge.Curve.Radius)
+                self.calcAxisKey(axis)
                 )
         else:
             endPoint1 = pl.multVec(edge.Vertexes[0].Point)
@@ -583,7 +585,6 @@ class TopoMapper(object):
                 defaultVal = "F;NONAME;{};".format(i)
                 name = self.shapeDict.get(keys[0],defaultVal)
                 muxInfo.append(name)
-
 
         return muxInfo, solid, faceColors, transparency
     

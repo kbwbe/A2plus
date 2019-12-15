@@ -26,6 +26,7 @@ from a2plib import *
 from PySide import QtGui, QtCore
 import math
 from a2p_viewProviderProxies import *
+import a2p_filecache
 
 #==============================================================================
 class BasicConstraint():
@@ -76,6 +77,11 @@ class BasicConstraint():
         ob.addProperty("App::PropertyString","SubElement1","ConstraintInfo").SubElement1 = self.sub1
         ob.addProperty("App::PropertyString","Object2","ConstraintInfo").Object2 = self.ob2Name
         ob.addProperty("App::PropertyString","SubElement2","ConstraintInfo").SubElement2 = self.sub2
+        
+        Toponame1 = a2p_filecache.fileCache.getTopoName(self.ob1, self.sub1)
+        ob.addProperty("App::PropertyString","Toponame1","ConstraintInfo").Toponame1 = Toponame1
+        Toponame2 = a2p_filecache.fileCache.getTopoName(self.ob2, self.sub2)
+        ob.addProperty("App::PropertyString","Toponame2","ConstraintInfo").Toponame2 = Toponame2
         
         for prop in ["Object1","Object2","SubElement1","SubElement2","Type"]:
             ob.setEditorMode(prop, 1)

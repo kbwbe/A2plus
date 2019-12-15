@@ -25,243 +25,60 @@
 import FreeCADGui,FreeCAD
 from PySide import QtGui, QtCore
 import os, copy, time, sys, platform
+
 import a2plib
-from a2p_MuxAssembly import (
-    Proxy_muxAssemblyObj,
-    makePlacedShape,
-    muxAssemblyWithTopoNames
-    )
+from a2plib import getRelativePathesEnabled
+from a2plib import openImportDocFromFile
+
 from a2p_viewProviderProxies import *
 from a2p_versionmanagement import A2P_VERSION
 import a2p_solversystem
-from a2plib import (
-    appVersionStr,
-    AUTOSOLVE_ENABLED,
-    Msg,
-    DebugMsg,
-    A2P_DEBUG_LEVEL,
-    A2P_DEBUG_NONE,
-    A2P_DEBUG_1,
-    A2P_DEBUG_2,
-    A2P_DEBUG_3,
-    getRelativePathesEnabled
-    )
 
-from a2p_topomapper import (
-    TopoMapper
-    )
-
-import a2p_lcs_support
-from a2p_importedPart_class import Proxy_importPart, ImportedPartViewProviderProxy
+from a2p_importedPart_class import Proxy_importPart
+from a2p_importedPart_class import ImportedPartViewProviderProxy
+from a2p_filecache import getOrCreateA2pFile
+import a2p_filecache
 
 PYVERSION =  sys.version_info[0]
 
 #==============================================================================
-class DataContainer():
-    def __init__(self):
-        self.tx = None
-#==============================================================================
-class ObjectCache:
-    '''
-    An assembly could use multiple instances of then same importPart.
-    Cache them here so fileImports have to be executed only one time...
-    '''
-    def __init__(self):
-        self.objects = {} # dict, key=fileName, val=object
-
-    def cleanUp(self,doc):
-        for key in self.objects.keys():
-            try:
-                doc.removeObject(self.objects[key].Name) #remove temporaryParts from doc
-            except:
-                pass
-        self.objects = {} # dict, key=fileName
-
-    def add(self,fileName,obj): # pi_obj = PartInformation-Object
-        self.objects[fileName] = obj
-
-    def get(self,fileName):
-        obj = self.objects.get(fileName,None)
-        if obj:
-            return obj
-        else:
-            return None
-
-    def isCached(self,fileName):
-        if fileName in self.objects.keys():
-            return True
-        else:
-            return False
-
-    def len(self):
-        return len(self.objects.keys())
-
-objectCache = ObjectCache()
-
-#==============================================================================
-class a2p_shapeExtractDialog(QtGui.QDialog):
-    '''
-    select a label from shape which has to be imported from a file
-    '''
-    Deleted = QtCore.Signal()
-    Accepted = QtCore.Signal()
-
-
-    def __init__(self,parent,labelList = [], data = None):
-        super(a2p_shapeExtractDialog,self).__init__(parent=parent)
-        #super(a2p_shapeExtractDialog,self).__init__()
-        self.labelList = labelList
-        self.data = data
-        self.initUI()
-        
-    def initUI(self):
-        self.resize(400,100)
-        self.setWindowTitle('select a shape to be imported')
-        self.mainLayout = QtGui.QGridLayout() # a VBoxLayout for the whole form
-
-        self.shapeCombo = QtGui.QComboBox(self)
-        
-        l = sorted(self.labelList)
-        self.shapeCombo.addItems(l)
-
-        self.buttons = QtGui.QDialogButtonBox(self)
-        self.buttons.setOrientation(QtCore.Qt.Horizontal)
-        self.buttons.addButton("Cancel", QtGui.QDialogButtonBox.RejectRole)
-        self.buttons.addButton("Choose", QtGui.QDialogButtonBox.AcceptRole)
-        self.connect(self.buttons, QtCore.SIGNAL("accepted()"), self, QtCore.SLOT("accept()"))
-        self.connect(self.buttons, QtCore.SIGNAL("rejected()"), self, QtCore.SLOT("reject()"))
-
-        self.mainLayout.addWidget(self.shapeCombo,0,0,1,1)
-        self.mainLayout.addWidget(self.buttons,1,0,1,1)
-        self.setLayout(self.mainLayout)
-        
-    def accept(self):
-        if self.data != None:
-            self.data.tx = self.shapeCombo.currentText()
-        self.deleteLater()
-    
-    def reject(self):
-        self.deleteLater()
-
-#==============================================================================
 def importPartFromFile(
         _doc,
-        filename,
-        extractSingleShape = False, # load only a single user defined shape from file
-        desiredShapeLabel=None,
-        importToCache=False,
-        cacheKey = ""
+        filename
         ):
     doc = _doc
-    #-------------------------------------------
-    # Get the importDocument
-    #-------------------------------------------
     
-    # look only for filenames, not paths, as there are problems on WIN10 (Address-translation??)
-    importDoc = None
-    importDocIsOpen = False
-    requestedFile = os.path.split(filename)[1]
-    for d in FreeCAD.listDocuments().values():
-        recentFile = os.path.split(d.FileName)[1]
-        if requestedFile == recentFile:
-            importDoc = d # file is already open...
-            importDocIsOpen = True
-            break
+    a2pZipFilename = getOrCreateA2pFile(filename)
+    content = a2plib.readA2pFile(a2pZipFilename)
 
-    if not importDocIsOpen:
-        if filename.lower().endswith('.fcstd'):
-            importDoc = FreeCAD.openDocument(filename)
-        elif filename.lower().endswith('.stp') or filename.lower().endswith('.step'):
-            import ImportGui
-            fname =  os.path.splitext(os.path.basename(filename))[0]
-            FreeCAD.newDocument(fname)
-            newname = FreeCAD.ActiveDocument.Name
-            FreeCAD.setActiveDocument(newname)
-            ImportGui.insert(filename,newname)
-            importDoc = FreeCAD.ActiveDocument
-        else:
-            msg = "A part can only be imported from a FreeCAD '*.FCStd' file"
-            QtGui.QMessageBox.information( QtGui.QApplication.activeWindow(), "Value Error", msg )
-            return
-
-    #-------------------------------------------
-    # recalculate imported part if requested by preferences
-    # This can be useful if the imported part depends on an
-    # external master-spreadsheet
-    #-------------------------------------------
-    if a2plib.getRecalculateImportedParts():
-        for ob in importDoc.Objects:
-            ob.recompute()
-        importDoc.save() # useless without saving...
+    iShape = content.shape
+    vertexNames = content.vertexNames
+    edgeNames = content.edgeNames
+    faceNames = content.faceNames
+    iDiffuseColor = content.diffuseColor
+    iProperties = content.properties
     
-    #-------------------------------------------
-    # Initialize the new TopoMapper
-    #-------------------------------------------
-    topoMapper = TopoMapper(importDoc)
-
-    #-------------------------------------------
-    # Get a list of the importable Objects
-    #-------------------------------------------
-    importableObjects = topoMapper.getTopLevelObjects()
+    iMuxInfo = vertexNames + edgeNames + faceNames
     
-    if len(importableObjects) == 0:
-        msg = "No visible Part to import found. Aborting operation"
-        QtGui.QMessageBox.information(
-            QtGui.QApplication.activeWindow(),
-            "Import Error",
-            msg
-            )
-        return
-    
-    #-------------------------------------------
-    # if only one single shape of the importdoc is wanted..
-    #-------------------------------------------
-    labelList = []
-    dc = DataContainer()
-    
-    if extractSingleShape:
-        if desiredShapeLabel is None: # ask for a shape label
-            for io in importableObjects:
-                labelList.append(io.Label)
-            dialog = a2p_shapeExtractDialog(
-                QtGui.QApplication.activeWindow(),
-                labelList,
-                dc)
-            dialog.exec_()
-            if dc.tx == None:
-                msg = "Import of a shape reference aborted by user"
-                QtGui.QMessageBox.information(
-                    QtGui.QApplication.activeWindow(),
-                    "Import Error",
-                    msg
-                    )
-                return
-        else: # use existent shape label
-            dc.tx = desiredShapeLabel
-            
-    #-------------------------------------------
-    # Discover whether we are importing a subassembly or a single part
-    #-------------------------------------------
-    subAssemblyImport = False
-    if all([ 'importPart' in obj.Content for obj in importableObjects]) == 1:
+    if iProperties["isSubAssembly"] == "True":
         subAssemblyImport = True
-        
-    #-------------------------------------------
-    # create new object
-    #-------------------------------------------
-    if importToCache:
-        partName = 'CachedObject_'+str(objectCache.len())
-        newObj = doc.addObject("Part::FeaturePython",partName)
-        newObj.Label = partName
     else:
-        partName = a2plib.findUnusedObjectName( importDoc.Label, document=doc )
-        partLabel = a2plib.findUnusedObjectLabel( importDoc.Label, document=doc )
-        if PYVERSION < 3:
-            newObj = doc.addObject( "Part::FeaturePython", partName.encode('utf-8') )
-        else:
-            newObj = doc.addObject( "Part::FeaturePython", str(partName.encode('utf-8')) )    # works on Python 3.6.5
-        newObj.Label = partLabel
+        subAssemblyImport = False
+        
+    timeLastImport = float(iProperties["sourcePartCreationTime"])
+    transparency = int(iProperties["transparency"])
+    importDocLabel = iProperties["importDocLabel"]
+    
+    #create new object
+    partName = a2plib.findUnusedObjectName( importDocLabel, document=doc )
+    partLabel = a2plib.findUnusedObjectLabel( importDocLabel, document=doc )
+    if PYVERSION < 3:
+        newObj = doc.addObject( "Part::FeaturePython", partName.encode('utf-8') )
+    else:
+        newObj = doc.addObject( "Part::FeaturePython", str(partName.encode('utf-8')) )    # works on Python 3.6.5
+    newObj.Label = partLabel
 
+    #setup proxies
     Proxy_importPart(newObj)
     if FreeCAD.GuiUp:
         ImportedPartViewProviderProxy(newObj.ViewObject)
@@ -279,11 +96,8 @@ def importPartFromFile(
     else:
         newObj.sourceFile = absPath
         
-    if dc.tx is not None:
-        newObj.sourcePart = dc.tx
-    
     newObj.setEditorMode("timeLastImport",1)
-    newObj.timeLastImport = os.path.getmtime( filename )
+    newObj.timeLastImport = timeLastImport
     if a2plib.getForceFixedPosition():
         newObj.fixedPosition = True
     else:
@@ -291,175 +105,23 @@ def importPartFromFile(
     newObj.subassemblyImport = subAssemblyImport
     newObj.setEditorMode("subassemblyImport",1)
 
-    if subAssemblyImport:
-        if extractSingleShape:
-            newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = \
-                muxAssemblyWithTopoNames(importDoc,desiredShapeLabel = dc.tx)
-        else:
-            newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = \
-                muxAssemblyWithTopoNames(importDoc)
-    else:
-        # TopoMapper manages import of non A2p-Files. It generates the shapes and appropriate topo names...
-        if extractSingleShape:
-            newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = \
-                topoMapper.createTopoNames(desiredShapeLabel = dc.tx)
-        else:
-            newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = \
-                topoMapper.createTopoNames()
-        
-
+    #newObj.muxInfo = iMuxInfo
+    newObj.muxInfo = []
+    newObj.Shape = iShape
+    newObj.ViewObject.Transparency = transparency
+    newObj.ViewObject.DiffuseColor = iDiffuseColor
+    
     doc.recompute()
 
-    if importToCache: # this import is used to update already imported parts
-        objectCache.add(cacheKey, newObj)
-    else: # this is a first time import of a part
-        if not a2plib.getPerFaceTransparency():
-            # turn of perFaceTransparency by accessing ViewObject.Transparency and set to zero (non transparent)
-            newObj.ViewObject.Transparency = 1
-            newObj.ViewObject.Transparency = 0 # import assembly first time as non transparent.
+    if not a2plib.getPerFaceTransparency():
+        # turn of perFaceTransparency by accessing ViewObject.Transparency and set to zero (non transparent)
+        newObj.ViewObject.Transparency = 1
+        newObj.ViewObject.Transparency = 0 # import assembly first time as non transparent.
 
-
-    lcsList = a2p_lcs_support.getListOfLCS(doc,importDoc)
-    
-
-    if not importDocIsOpen:
-        FreeCAD.closeDocument(importDoc.Name)
-
-    if len(lcsList) > 0:
-        #=========================================
-        # create a group containing imported LCS's
-        lcsGroupObjectName = 'LCS_Collection'
-        lcsGroupLabel = 'LCS_Collection'
-        
-        if PYVERSION < 3:
-            lcsGroup = doc.addObject( "Part::FeaturePython", lcsGroupObjectName.encode('utf-8') )
-        else:
-            lcsGroup = doc.addObject( "Part::FeaturePython", str(lcsGroupObjectName.encode('utf-8')) )    # works on Python 3.6.5
-        lcsGroup.Label = lcsGroupLabel
-    
-        proxy = a2p_lcs_support.LCS_Group(lcsGroup)
-        vp_proxy = a2p_lcs_support.VP_LCS_Group(lcsGroup.ViewObject)
-        
-        for lcs in lcsList:
-            lcsGroup.addObject(lcs)
-        
-        lcsGroup.Owner = newObj.Name
-        
-        newObj.addProperty("App::PropertyLinkList","lcsLink","importPart").lcsLink = lcsGroup
-        newObj.Label = newObj.Label # this is needed to trigger an update
-        lcsGroup.Label = lcsGroup.Label
-    
-        #=========================================
+    #instantly add a2pfile to a2pfilecache
+    a2p_filecache.fileCache.loadObject(newObj.sourceFile)
 
     return newObj
-
-
-#==============================================================================
-toolTip = \
-'''
-Add a single shape out of an external file
-to the assembly
-'''
-
-class a2p_ImportShapeReferenceCommand():
-
-    def GetResources(self):
-        return {'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_ShapeReference.svg',
-                #'Accel' : "Shift+A", # a default shortcut (optional)
-                'MenuText': "Add a single shape out of an external file",
-                'ToolTip' : toolTip
-                }
-
-    def Activated(self):
-        if FreeCAD.ActiveDocument == None:
-            QtGui.QMessageBox.information(
-                QtGui.QApplication.activeWindow(),
-               "No active Document found",
-               '''First create an empty file and\nsave it under desired name'''
-               )
-            return
-        #
-        if FreeCAD.ActiveDocument.FileName == '':
-            QtGui.QMessageBox.information(
-                QtGui.QApplication.activeWindow(),
-               "Unnamed document",
-               '''Before inserting first part,\nplease save the empty assembly\nto give it a name'''
-               )
-            FreeCADGui.SendMsgToActiveView("Save")
-            return
-        
-        doc = FreeCAD.activeDocument()
-        guidoc = FreeCADGui.activeDocument()
-        view = guidoc.activeView()
-
-        dialog = QtGui.QFileDialog(
-            QtGui.QApplication.activeWindow(),
-            "Select FreeCAD document to import part from"
-            )
-        # set option "DontUseNativeDialog"=True, as native Filedialog shows
-        # misbehavior on Unbuntu 18.04 LTS. It works case sensitively, what is not wanted...
-        if a2plib.getNativeFileManagerUsage():
-            dialog.setOption(QtGui.QFileDialog.DontUseNativeDialog, False)
-        else:
-            dialog.setOption(QtGui.QFileDialog.DontUseNativeDialog, True)
-        dialog.setNameFilter("Supported Formats (*.FCStd *.fcstd *.stp *.step);;All files (*.*)")
-        if dialog.exec_():
-            if PYVERSION < 3:
-                filename = unicode(dialog.selectedFiles()[0])
-            else:
-                filename = str(dialog.selectedFiles()[0])
-        else:
-            return
-
-        if not a2plib.checkFileIsInProjectFolder(filename):
-            msg = \
-'''
-The part you try to import is
-outside of your project-folder !
-Check your settings of A2plus preferences.
-'''
-            QtGui.QMessageBox.information(
-                QtGui.QApplication.activeWindow(),
-                "Import Error",
-                msg
-                )
-            return
-
-        #TODO: change for multi separate part import
-        importedObject = importPartFromFile(doc, filename, extractSingleShape=True)
-
-        if not importedObject:
-            a2plib.Msg("imported Object is empty/none\n")
-            return
-
-        mw = FreeCADGui.getMainWindow()
-        mdi = mw.findChild(QtGui.QMdiArea)
-        sub = mdi.activeSubWindow()
-        if sub != None:
-            sub.showMaximized()
-
-# WF: how will this work for multiple imported objects?
-#     only A2p AI's will have property "fixedPosition"
-        if importedObject and not importedObject.fixedPosition:
-            PartMover( view, importedObject, deleteOnEscape = True )
-        else:
-            self.timer = QtCore.QTimer()
-            QtCore.QObject.connect(self.timer, QtCore.SIGNAL("timeout()"), self.GuiViewFit)
-            self.timer.start( 200 ) #0.2 seconds
-        return
-
-    def IsActive(self):
-        doc = FreeCAD.activeDocument()
-        if doc == None: return False
-        return True
-
-    def GuiViewFit(self):
-        FreeCADGui.SendMsgToActiveView("ViewFit")
-        self.timer.stop()
-
-
-FreeCADGui.addCommand('a2p_ImportShapeReferenceCommand',a2p_ImportShapeReferenceCommand())
-
 #==============================================================================
 toolTip = \
 '''
@@ -604,10 +266,48 @@ Check your settings of A2plus preferences.
 
 FreeCADGui.addCommand('a2p_ImportPart',a2p_ImportPartCommand())
 #==============================================================================
+def migrateImportedParts(doc):
+    if doc == None:
+        QtGui.QMessageBox.information(  
+                        QtGui.QApplication.activeWindow(),
+                        "No active document found!",
+                        "Before migrating parts, you have to open an assembly file."
+                        )
+        return
+        
+    doc.openTransaction("migrateImportParts")    
+    for obj in doc.Objects:
+        if hasattr(obj, 'sourceFile') and a2plib.to_str(obj.sourceFile) != a2plib.to_str('converted'):
+            assemblyPath = os.path.normpath(os.path.split(doc.FileName)[0])
+            absPath = a2plib.findSourceFileInProject(obj.sourceFile, assemblyPath)
+
+            if absPath == None:
+                QtGui.QMessageBox.critical(  QtGui.QApplication.activeWindow(),
+                                            u"Source file not found",
+                                            u"Unable to find {}".format(
+                                                obj.sourceFile
+                                                )
+                                        )
+            if absPath != None and os.path.exists( absPath ):
+                newPartCreationTime = os.path.getmtime( absPath )
+                entry = a2p_filecache.fileCache.getFullEntry(obj)
+                obj.timeLastImport = entry.sourcePartCreationTime
+                migrateConstraintsGeoRefs(doc,obj,entry)
+                obj.muxInfo = []
+                savedPlacement  = obj.Placement
+                obj.Shape = entry.shape
+                obj.Placement = savedPlacement # restore the old placement
+                obj.ViewObject.DiffuseColor = entry.diffuseColor
 
 
-
-
+    mw = FreeCADGui.getMainWindow()
+    mdi = mw.findChild(QtGui.QMdiArea)
+    sub = mdi.activeSubWindow()
+    if sub != None:
+        sub.showMaximized()
+    doc.recompute()
+    doc.commitTransaction()    
+#==============================================================================
 def updateImportedParts(doc):
     if doc == None:
         QtGui.QMessageBox.information(  
@@ -618,7 +318,6 @@ def updateImportedParts(doc):
         return
         
     doc.openTransaction("updateImportParts")    
-    objectCache.cleanUp(doc)
     for obj in doc.Objects:
         if hasattr(obj, 'sourceFile') and a2plib.to_str(obj.sourceFile) != a2plib.to_str('converted'):
 
@@ -626,7 +325,6 @@ def updateImportedParts(doc):
             #repair data structures (perhaps an old Assembly2 import was found)
             if hasattr(obj,"Content") and 'importPart' in obj.Content: # be sure to have an assembly object
                 if obj.Proxy is None:
-                    #print (u"Repair Proxy of: {}, Proxy: {}".format(obj.Label, obj.Proxy))
                     Proxy_importPart(obj)
                     ImportedPartViewProviderProxy(obj.ViewObject)
                     
@@ -644,47 +342,17 @@ def updateImportedParts(doc):
                 newPartCreationTime = os.path.getmtime( absPath )
                 if ( 
                     newPartCreationTime > obj.timeLastImport or
-                    obj.a2p_Version != A2P_VERSION or
                     a2plib.getRecalculateImportedParts() # open always all parts as they could depend on spreadsheets
                     ):
-                    cacheKeyExtension = obj.sourcePart
-                    if cacheKeyExtension is None:
-                        cacheKeyExtension = "AllShapes"
-                    elif cacheKeyExtension == "":
-                        cacheKeyExtension = "AllShapes"
-                    cacheKeyExtension = '-' + cacheKeyExtension
-                    cacheKey = absPath+cacheKeyExtension
-                        
-                    if not objectCache.isCached(cacheKey): # Load every changed object one time to cache
-                        if obj.sourcePart is not None and obj.sourcePart != '':
-                            importPartFromFile(
-                                doc,
-                                absPath,
-                                importToCache=True,
-                                cacheKey = cacheKey,
-                                extractSingleShape = True,
-                                desiredShapeLabel = obj.sourcePart
-                                ) # the version is now in the cache
-                        else:
-                            importPartFromFile(
-                                doc,
-                                absPath,
-                                importToCache=True,
-                                cacheKey = cacheKey
-                                ) # the version is now in the cache
-                        
-                    newObject = objectCache.get(cacheKey)
-                    obj.timeLastImport = newPartCreationTime
-                    if hasattr(newObject, 'a2p_Version'):
-                        obj.a2p_Version = A2P_VERSION
-                    importUpdateConstraintSubobjects( doc, obj, newObject ) # do this before changing shape and mux
-                    if hasattr(newObject, 'muxInfo'):
-                        obj.muxInfo = newObject.muxInfo
-                    # save Placement because following newObject.Shape.copy() isn't resetting it to zeroes...
+                    entry = a2p_filecache.fileCache.getFullEntry(obj)
+                    obj.timeLastImport = entry.sourcePartCreationTime
+                    updateConstraintsGeoRefs(doc,obj,entry)
+                    #obj.muxInfo = entry.vertexNames + entry.edgeNames + entry.faceNames
+                    obj.muxInfo = []
                     savedPlacement  = obj.Placement
-                    obj.Shape = newObject.Shape.copy()
+                    obj.Shape = entry.shape
                     obj.Placement = savedPlacement # restore the old placement
-                    a2plib.copyObjectColors(obj,newObject)
+                    obj.ViewObject.DiffuseColor = entry.diffuseColor
 
 
     mw = FreeCADGui.getMainWindow()
@@ -692,7 +360,6 @@ def updateImportedParts(doc):
     sub = mdi.activeSubWindow()
     if sub != None:
         sub.showMaximized()
-    objectCache.cleanUp(doc)
     a2p_solversystem.autoSolveConstraints(
         doc, 
         useTransaction = False, 
@@ -700,9 +367,7 @@ def updateImportedParts(doc):
         ) #transaction is already open...
     doc.recompute()
     doc.commitTransaction()    
-
-
-
+#==============================================================================
 toolTip = \
 '''
 Update parts, which have been
@@ -728,9 +393,7 @@ class a2p_UpdateImportedPartsCommand:
             }
 
 FreeCADGui.addCommand('a2p_updateImportedParts', a2p_UpdateImportedPartsCommand())
-
-
-
+#==============================================================================
 def duplicateImportedPart( part ):
     doc = FreeCAD.ActiveDocument
 
@@ -1643,110 +1306,80 @@ class a2p_SaveAndExit_Command:
 FreeCADGui.addCommand('a2p_SaveAndExit_Command', a2p_SaveAndExit_Command())
 
 
-
-
-
-def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
+#=====================================================================================
+def updateConstraintsGeoRefs(doc,obj,cacheContent):
     if not a2plib.getUseTopoNaming(): return
     
     # return if there are no constraints linked to the object 
-    if len([c for c in doc.Objects if  'ConstraintInfo' in c.Content and oldObject.Name in [c.Object1, c.Object2] ]) == 0:
+    if len([c for c in doc.Objects if  'ConstraintInfo' in c.Content and obj.Name in [c.Object1, c.Object2] ]) == 0:
         return
 
-
-    # check, whether object is an assembly with muxInformations.
-    # Then find edgenames with mapping in muxinfo...
     deletionList = [] #for broken constraints
-    if hasattr(oldObject, 'muxInfo'):
-        if hasattr(newObject, 'muxInfo'):
-            #
-            oldVertexNames = []
-            oldEdgeNames = []
-            oldFaceNames = []
-            for item in oldObject.muxInfo:
-                if item[:1] == 'V':
-                    oldVertexNames.append(item)
-                if item[:1] == 'E':
-                    oldEdgeNames.append(item)
-                if item[:1] == 'F':
-                    oldFaceNames.append(item)
-            #
-            newVertexNames = []
-            newEdgeNames = []
-            newFaceNames = []
-            for item in newObject.muxInfo:
-                if item[:1] == 'V':
-                    newVertexNames.append(item)
-                if item[:1] == 'E':
-                    newEdgeNames.append(item)
-                if item[:1] == 'F':
-                    newFaceNames.append(item)
-            #
-            partName = oldObject.Name
-            for c in doc.Objects:
-                if 'ConstraintInfo' in c.Content:
-                    if partName == c.Object1:
-                        SubElement = "SubElement1"
-                    elif partName == c.Object2:
-                        SubElement = "SubElement2"
-                    else:
-                        SubElement = None
+
+    partName = obj.Name
+    for c in doc.Objects:
+        if 'ConstraintInfo' in c.Content:
+            if partName == c.Object1:
+                SubElement = "SubElement1"
+                topoName = "Toponame1"
+            elif partName == c.Object2:
+                SubElement = "SubElement2"
+                topoName = "Toponame2"
+            else:
+                SubElement = None
+            
+            topoString = None    
+            try:
+                topoString = getattr(c,topoName)
+            except:
+                pass
+            
+            if topoString is None or topoString == "":
+                print(u"missing toponame for {}, do not update this constraint".format(c.Name))
+                return
+                
+            if SubElement: #same as subElement <> None
+                subElementName = getattr(c, SubElement)
+                if subElementName[:4] == 'Face':
+                    try:
+                        newIndex = cacheContent.faceNames.index(topoString)
+                        newSubElementName = 'Face'+str(newIndex+1)
+                    except:
+                        newIndex = -1
+                        newSubElementName = 'INVALID'
                         
-                    if SubElement: #same as subElement <> None
+                elif subElementName[:4] == 'Edge':
+                    try:
+                        newIndex = cacheContent.edgeNames.index(topoString)
+                        newSubElementName = 'Edge'+str(newIndex+1)
+                    except:
+                        newIndex = -1
+                        newSubElementName = 'INVALID'
                         
-                        subElementName = getattr(c, SubElement)
-                        if subElementName[:4] == 'Face':
-                            try:
-                                oldIndex = int(subElementName[4:])-1
-                                oldConstraintString = oldFaceNames[oldIndex]
-                                newIndex = newFaceNames.index(oldConstraintString)
-                                newSubElementName = 'Face'+str(newIndex+1)
-                            except:
-                                newIndex = -1
-                                newSubElementName = 'INVALID'
-                                
-                        elif subElementName[:4] == 'Edge':
-                            try:
-                                oldIndex = int(subElementName[4:])-1
-                                oldConstraintString = oldEdgeNames[oldIndex]
-                                newIndex = newEdgeNames.index(oldConstraintString)
-                                newSubElementName = 'Edge'+str(newIndex+1)
-                            except:
-                                newIndex = -1
-                                newSubElementName = 'INVALID'
-                                
-                        elif subElementName[:6] == 'Vertex':
-                            try:
-                                oldIndex = int(subElementName[6:])-1
-                                oldConstraintString = oldVertexNames[oldIndex]
-                                newIndex = newVertexNames.index(oldConstraintString)
-                                newSubElementName = 'Vertex'+str(newIndex+1)
-                            except:
-                                newIndex = -1
-                                newSubElementName = 'INVALID'
-                                
-                        else:
-                            newIndex = -1
-                            newSubElementName = 'INVALID'
+                elif subElementName[:6] == 'Vertex':
+                    try:
+                        newIndex = cacheContent.vertexNames.index(topoString)
+                        newSubElementName = 'Vertex'+str(newIndex+1)
+                    except:
+                        newIndex = -1
+                        newSubElementName = 'INVALID'
                         
-                        if newIndex >= 0:
-                            setattr(c, SubElement, newSubElementName )
-                            print (
-                                    "oldConstraintString (KEY) : {}".format(
-                                    oldConstraintString
-                                    )
-                                   )
-                            print ("Updating by SubElement-Map: {} => {} ".format(
-                                       subElementName,newSubElementName
-                                       )
-                                   )
-                            continue
-                        #
-                        # if code coming here, constraint is broken
-                        if c.Name not in deletionList:
-                            deletionList.append(c.Name)
-                            
-    
+                else:
+                    newIndex = -1
+                    newSubElementName = 'INVALID'
+                
+                if newIndex >= 0:
+                    setattr(c, SubElement, newSubElementName )
+                    print (u"Updating by SubElement-Map: {} => {} ".format(
+                               subElementName,newSubElementName
+                               )
+                           )
+                    continue
+                #
+                # if code coming here, constraint is broken
+                if c.Name not in deletionList:
+                    deletionList.append(c.Name)
+
     if len(deletionList) > 0: # there are broken constraints..
         for cName in deletionList:
         
@@ -1759,4 +1392,48 @@ def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
                 FreeCAD.Console.PrintError("Removing constraint %s" % cName)
                 c = doc.getObject(cName)
                 a2plib.removeConstraint(c)
+#=====================================================================================
+def migrateConstraintsGeoRefs(doc,obj,cacheContent):
+    print(u"migrate constraints of {}".format(obj.Label))
+    if not a2plib.getUseTopoNaming(): return
+    
+    # return if there are no constraints linked to the object 
+    if len([c for c in doc.Objects if  'ConstraintInfo' in c.Content and obj.Name in [c.Object1, c.Object2] ]) == 0:
+        return
+
+    partName = obj.Name
+    for c in doc.Objects:
+        if 'ConstraintInfo' in c.Content:
+            if partName == c.Object1:
+                SubElement = "SubElement1"
+                topoName = "Toponame1"
+            elif partName == c.Object2:
+                SubElement = "SubElement2"
+                topoName = "Toponame2"
+            else:
+                SubElement = None
+            
+            if SubElement: #same as subElement <> None
+                subElementName = getattr(c, SubElement)
+                idx = a2plib.getSubelementIndex(subElementName)
+                if subElementName[:4] == 'Face':
+                    try:
+                        topoString = cacheContent.faceNames[idx]
+                    except:
+                        topoString = ""
+                        
+                elif subElementName[:4] == 'Edge':
+                    try:
+                        topoString = cacheContent.edgeNames[idx]
+                    except:
+                        topoString = ""
+                        
+                elif subElementName[:6] == 'Vertex':
+                    try:
+                        topoString = cacheContent.vertexNames[idx]
+                    except:
+                        topoString = ""
                 
+                setattr(c, topoName, topoString )
+                #print(u"set constraint {}.{} to '{}'".format(c.Name,topoName,topoString))
+#=====================================================================================

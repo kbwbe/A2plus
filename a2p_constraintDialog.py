@@ -63,8 +63,6 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
 
         self.winModified = False
         self.lineNo = 0
-        self.neededHight = 0
-        self.isTopLevelWin = True  #Window management
         self.position = None # Window position
         self.initUI()
 
@@ -259,8 +257,6 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         #==============================
         self.setLayout(self.mainLayout)
         #self.updateGeometry()
-        #self.neededHight = 50+(self.lineNo+1)*40
-        #self.resize(self.neededHight,350)
         QtCore.QObject.connect(self.deleteButton, QtCore.SIGNAL("clicked()"), self.delete)
         QtCore.QObject.connect(self.solveButton, QtCore.SIGNAL("clicked()"), self.solve)
         QtCore.QObject.connect(self.acceptButton, QtCore.SIGNAL("clicked()"), self.accept)
