@@ -135,6 +135,10 @@ def getPerFaceTransparency():
     preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
     return preferences.GetBool('usePerFaceTransparency',False)
 #------------------------------------------------------------------------------
+def getNativeFileManagerUsage():
+    preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
+    return preferences.GetBool('useNativeFileManager',False)
+#------------------------------------------------------------------------------
 def getRecalculateImportedParts():
     preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
     return preferences.GetBool('recalculateImportedParts',False)
