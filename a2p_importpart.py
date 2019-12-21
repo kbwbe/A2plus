@@ -1062,6 +1062,106 @@ class a2p_MovePartCommand:
             }
 
 FreeCADGui.addCommand('a2p_movePart', a2p_MovePartCommand())
+#===============================================================================
+class ConstrainedPartsMover:
+    def __init__(self, view):
+        self.obj = None
+        self.view = view
+        self.callbackMove = self.view.addEventCallback("SoLocation2Event",self.onMouseMove)
+        self.callbackClick = self.view.addEventCallback("SoMouseButtonEvent",self.onMouseClicked)
+        self.callbackKey = self.view.addEventCallback("SoKeyboardEvent",self.KeyboardEvent)
+        self.motionActivated = False
+        
+    def setPreselection(self,doc,obj,sub):
+        if not self.motionActivated:
+            doc = FreeCAD.activeDocument()
+            self.obj = doc.getObject(obj)
+    
+    def addSelection(self,doc,obj,sub,pnt):
+        pass
+        
+    def removeSelection(self,doc,obj,sub):
+        pass
+    
+    def clearSelection(self,doc):
+        pass
+    
+    def onMouseMove(self, info):
+        if self.obj is None: return
+        if self.motionActivated:
+            newPos = self.view.getPoint( *info['Position'] )
+            self.obj.Placement.Base = newPos
+            a2plib.setSimulationState(True)
+            FreeCADGui.runCommand('a2p_SolverCommand',0) # solve the system
+            a2plib.setSimulationState(False)
+        
+    def removeCallbacks(self):
+        self.view.removeEventCallback("SoLocation2Event",self.callbackMove)
+        self.view.removeEventCallback("SoMouseButtonEvent",self.callbackClick)
+        self.view.removeEventCallback("SoKeyboardEvent",self.callbackKey)
+        FreeCADGui.Selection.removeObserver(self)
+        del self
+        
+    def onMouseClicked(self, info):
+        if self.obj is None: return
+        if info['Button'] == 'BUTTON1' and info['State'] == 'DOWN':
+            if hasattr(self.obj, 'fixedPosition') and self.obj.fixedPosition == True:
+                QtGui.QMessageBox.information(
+                    QtGui.QApplication.activeWindow(),
+                   "Invalid selection",
+                   '''A2plus will not move a part with property fixedPosition == True'''
+                   )
+                self.removeCallbacks()
+            self.motionActivated = not self.motionActivated
+            if self.motionActivated == False:
+                self.removeCallbacks()
+                    
+    def KeyboardEvent(self, info):
+        if info['State'] == 'UP' and info['Key'] == 'ESCAPE':
+            self.removeCallbacks()
+#===============================================================================
+toolTip = \
+'''
+Move the a part under rule of constraints.
+
+1) Hit this button
+2) Click a part and it is glued to the cursor and can be moved
+3) Click again (or press ESC) and the command terminates
+'''
+
+class a2p_MovePartUnderConstraints:
+
+    def __init__(self):
+        self.partMover = None
+    
+    def Activated(self):
+        self.partMover = ConstrainedPartsMover(
+                            FreeCADGui.activeDocument().activeView()
+                            )
+        FreeCADGui.Selection.addObserver(self.partMover)
+
+    def IsActive(self):
+        doc = FreeCAD.activeDocument()
+        if doc == None: return False
+        #
+        #selection = [s for s in FreeCADGui.Selection.getSelectionEx() if s.Document == doc ]
+        #if len(selection) != 1: return False
+        #
+        #obj = selection[0].Object
+        #if not a2plib.isA2pPart(obj): return False
+        #
+        return True
+
+    def GetResources(self):
+        return {
+            #'Pixmap' : ':/assembly2/icons/MovePart.svg',
+            'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_MovePartUnderConstraints.svg',
+            'MenuText': 'Move the selected part under constraints',
+            'ToolTip': toolTip
+            }
+
+FreeCADGui.addCommand('a2p_MovePartUnderConstraints', a2p_MovePartUnderConstraints())
+#===============================================================================
 
 
 

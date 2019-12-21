@@ -26,7 +26,7 @@
 __title__ = 'A2plus assembly Workbench - InitGui file'
 __author__ = 'kbwbe'
 
-A2P_VERSION = 'V0.4.31'
+A2P_VERSION = 'V0.4.32'
 
 
 
@@ -144,6 +144,7 @@ Please use {}.{}.{} or above.\n\n'''.format(
                 'a2p_updateImportedParts',
                 'a2p_recursiveUpdateImportedPartsCommand',
                 'a2p_movePart',
+                'a2p_MovePartUnderConstraints',
                 'a2p_duplicatePart',
                 'a2p_ConvertPart',
                 'a2p_editImportedPart',
@@ -156,6 +157,7 @@ Please use {}.{}.{} or above.\n\n'''.format(
                 'a2p_ImportShapeReferenceCommand',
                 'a2p_updateImportedParts',
                 'a2p_movePart',
+                'a2p_MovePartUnderConstraints',
                 'a2p_duplicatePart',
                 'a2p_ConvertPart',
                 'a2p_editImportedPart',
