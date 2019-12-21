@@ -979,16 +979,11 @@ class ConstrainedPartsMover:
 #===============================================================================
 toolTip = \
 '''
-Move the selected part
-under constraints.
+Move the a part under rule of constraints.
 
-Select a part and hit this
-button. The part can be moved
-around by mouse.
-
-If the part is constrained, it
-will jump back by next solving
-of the assembly.
+1) Hit this button
+2) Click a part and it is glued to the cursor and can be moved
+3) Click again (or press ESC) and the command terminates
 '''
 
 class a2p_MovePartUnderConstraints:
@@ -1017,7 +1012,7 @@ class a2p_MovePartUnderConstraints:
     def GetResources(self):
         return {
             #'Pixmap' : ':/assembly2/icons/MovePart.svg',
-            'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_MovePart.svg',
+            'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_MovePartUnderConstraints.svg',
             'MenuText': 'Move the selected part under constraints',
             'ToolTip': toolTip
             }
