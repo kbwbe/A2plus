@@ -50,6 +50,9 @@ SHOW_CONSTRAINTS_ON_TOOLBAR= preferences.GetBool('showConstraintsOnToolbar',True
 RECURSIVE_UPDATE_ENABLED = preferences.GetBool('enableRecursiveUpdate',False)
 USE_SOLID_UNION = preferences.GetBool('useSolidUnion',True)
 
+# if SIMULATION_STATE == True assemblies are solved with less accuracy
+SIMULATION_STATE = False
+
 SAVED_TRANSPARENCY = []
 
 DEBUGPROGRAM = 1
@@ -319,6 +322,10 @@ def to_str(tx):
         else:
             value = tx.decode("utf-8")
     return value # Instance of unicode string
+#------------------------------------------------------------------------------
+def setSimulationState(boolVal):
+    global SIMULATION_STATE
+    SIMULATION_STATE = boolVal
 #------------------------------------------------------------------------------
 def doNotImportInvisibleShapes():
     preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")

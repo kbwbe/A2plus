@@ -818,7 +818,7 @@ FreeCADGui.addCommand('a2p_editImportedPart', a2p_EditPartCommand())
 
 
 
-
+#===============================================================================
 class PartMover:
     def __init__(self, view, obj, deleteOnEscape):
         self.obj = obj
@@ -858,9 +858,7 @@ class PartMover:
                 self.objectToDelete = self.obj #This can be asked by a timer in a calling func...
                 #This causes a crash in FC0.19/Qt5/Py3             
                 #FreeCAD.activeDocument().removeObject(self.obj.Name)
-                
-
-
+#===============================================================================
 toolTip = \
 '''
 Move the selected part.
@@ -921,6 +919,89 @@ class a2p_MovePartCommand:
             }
 
 FreeCADGui.addCommand('a2p_movePart', a2p_MovePartCommand())
+#===============================================================================
+class ConstrainedPartsMover:
+    def __init__(self, view, obj):
+        self.obj = obj
+        self.initialPosition = self.obj.Placement.Base
+        self.view = view
+        self.callbackMove = self.view.addEventCallback("SoLocation2Event",self.moveMouse)
+        self.callbackClick = self.view.addEventCallback("SoMouseButtonEvent",self.clickMouse)
+        self.callbackKey = self.view.addEventCallback("SoKeyboardEvent",self.KeyboardEvent)
+        self.motionActivated = False
+        
+    def moveMouse(self, info):
+        if self.motionActivated:
+            newPos = self.view.getPoint( *info['Position'] )
+            self.obj.Placement.Base = newPos
+            a2plib.setSimulationState(True)
+            FreeCADGui.runCommand('a2p_SolverCommand',0) # solve the system
+            a2plib.setSimulationState(False)
+        
+    def removeCallbacks(self):
+        self.view.removeEventCallback("SoLocation2Event",self.callbackMove)
+        self.view.removeEventCallback("SoMouseButtonEvent",self.callbackClick)
+        self.view.removeEventCallback("SoKeyboardEvent",self.callbackKey)
+        
+    def clickMouse(self, info):
+        #for item in info.keys():
+        #    print("{}:{}".format(item,info[item]))
+        if info['Button'] == 'BUTTON1' and info['State'] == 'DOWN':
+            self.motionActivated = not self.motionActivated # toggle motion
+                    
+    def KeyboardEvent(self, info):
+        if info['State'] == 'UP' and info['Key'] == 'ESCAPE':
+            self.removeCallbacks()
+#===============================================================================
+toolTip = \
+'''
+Move the selected part
+under constraints.
+
+Select a part and hit this
+button. The part can be moved
+around by mouse.
+
+If the part is constrained, it
+will jump back by next solving
+of the assembly.
+'''
+
+class a2p_MovePartUnderConstraints:
+
+    def __init__(self):
+        self.partMover = None
+    
+    def Activated(self):
+        doc = FreeCAD.activeDocument()
+        selection = [s for s in FreeCADGui.Selection.getSelectionEx() if s.Document == doc ]
+        self.partMover = ConstrainedPartsMover(
+                            FreeCADGui.activeDocument().activeView(),
+                            selection[0].Object
+                            )
+
+    def IsActive(self):
+        doc = FreeCAD.activeDocument()
+        if doc == None: return False
+        #
+        selection = [s for s in FreeCADGui.Selection.getSelectionEx() if s.Document == doc ]
+        if len(selection) != 1: return False
+        #
+        obj = selection[0].Object
+        if not a2plib.isA2pPart(obj): return False
+        #
+        return True
+
+    def GetResources(self):
+        return {
+            #'Pixmap' : ':/assembly2/icons/MovePart.svg',
+            'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_MovePart.svg',
+            'MenuText': 'Move the selected part under constraints',
+            'ToolTip': toolTip
+            }
+
+FreeCADGui.addCommand('a2p_MovePartUnderConstraints', a2p_MovePartUnderConstraints())
+#===============================================================================
 
 
 

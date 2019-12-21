@@ -71,6 +71,7 @@ class A2plusWorkbench (Workbench):
                 'a2p_updateImportedParts',
                 'a2p_recursiveUpdateImportedPartsCommand',
                 'a2p_movePart',
+                'a2p_MovePartUnderConstraints',
                 'a2p_duplicatePart',
                 'a2p_ConvertPart',
                 'a2p_editImportedPart',
