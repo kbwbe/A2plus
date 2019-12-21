@@ -921,16 +921,30 @@ class a2p_MovePartCommand:
 FreeCADGui.addCommand('a2p_movePart', a2p_MovePartCommand())
 #===============================================================================
 class ConstrainedPartsMover:
-    def __init__(self, view, obj):
-        self.obj = obj
-        self.initialPosition = self.obj.Placement.Base
+    def __init__(self, view):
+        self.obj = None
         self.view = view
-        self.callbackMove = self.view.addEventCallback("SoLocation2Event",self.moveMouse)
-        self.callbackClick = self.view.addEventCallback("SoMouseButtonEvent",self.clickMouse)
+        self.callbackMove = self.view.addEventCallback("SoLocation2Event",self.onMouseMove)
+        self.callbackClick = self.view.addEventCallback("SoMouseButtonEvent",self.onMouseClicked)
         self.callbackKey = self.view.addEventCallback("SoKeyboardEvent",self.KeyboardEvent)
         self.motionActivated = False
         
-    def moveMouse(self, info):
+    def setPreselection(self,doc,obj,sub):
+        if not self.motionActivated:
+            doc = FreeCAD.activeDocument()
+            self.obj = doc.getObject(obj)
+    
+    def addSelection(self,doc,obj,sub,pnt):
+        pass
+        
+    def removeSelection(self,doc,obj,sub):
+        pass
+    
+    def clearSelection(self,doc):
+        pass
+    
+    def onMouseMove(self, info):
+        if self.obj is None: return
         if self.motionActivated:
             newPos = self.view.getPoint( *info['Position'] )
             self.obj.Placement.Base = newPos
@@ -942,12 +956,22 @@ class ConstrainedPartsMover:
         self.view.removeEventCallback("SoLocation2Event",self.callbackMove)
         self.view.removeEventCallback("SoMouseButtonEvent",self.callbackClick)
         self.view.removeEventCallback("SoKeyboardEvent",self.callbackKey)
+        FreeCADGui.Selection.removeObserver(self)
+        del self
         
-    def clickMouse(self, info):
-        #for item in info.keys():
-        #    print("{}:{}".format(item,info[item]))
+    def onMouseClicked(self, info):
+        if self.obj is None: return
         if info['Button'] == 'BUTTON1' and info['State'] == 'DOWN':
-            self.motionActivated = not self.motionActivated # toggle motion
+            if hasattr(self.obj, 'fixedPosition') and self.obj.fixedPosition == True:
+                QtGui.QMessageBox.information(
+                    QtGui.QApplication.activeWindow(),
+                   "Invalid selection",
+                   '''A2plus will not move a part with property fixedPosition == True'''
+                   )
+                self.removeCallbacks()
+            self.motionActivated = not self.motionActivated
+            if self.motionActivated == False:
+                self.removeCallbacks()
                     
     def KeyboardEvent(self, info):
         if info['State'] == 'UP' and info['Key'] == 'ESCAPE':
@@ -973,22 +997,20 @@ class a2p_MovePartUnderConstraints:
         self.partMover = None
     
     def Activated(self):
-        doc = FreeCAD.activeDocument()
-        selection = [s for s in FreeCADGui.Selection.getSelectionEx() if s.Document == doc ]
         self.partMover = ConstrainedPartsMover(
-                            FreeCADGui.activeDocument().activeView(),
-                            selection[0].Object
+                            FreeCADGui.activeDocument().activeView()
                             )
+        FreeCADGui.Selection.addObserver(self.partMover)
 
     def IsActive(self):
         doc = FreeCAD.activeDocument()
         if doc == None: return False
         #
-        selection = [s for s in FreeCADGui.Selection.getSelectionEx() if s.Document == doc ]
-        if len(selection) != 1: return False
+        #selection = [s for s in FreeCADGui.Selection.getSelectionEx() if s.Document == doc ]
+        #if len(selection) != 1: return False
         #
-        obj = selection[0].Object
-        if not a2plib.isA2pPart(obj): return False
+        #obj = selection[0].Object
+        #if not a2plib.isA2pPart(obj): return False
         #
         return True
 
