@@ -476,25 +476,31 @@ class SolverSystem():
 
         systemSolved = self.solveAccuracySteps(doc)
         if self.status == "loadingDependencyError":
-            return
+            return systemSolved
         if systemSolved:
             self.status = "solved"
             if not a2plib.SIMULATION_STATE:
                 Msg( "===== System solved using partial + recursive unfixing =====\n")
                 self.checkForUnmovedParts()
         else:
-            self.status = "unsolved"
-            Msg( "===== Could not solve system ====== \n" )
-            msg = \
-    '''
-    Constraints inconsistent. Cannot solve System.
-    Please delete your last created constraint !
-    '''
-            QtGui.QMessageBox.information(
-                QtGui.QApplication.activeWindow(),
-                "Constraint mismatch",
-                msg
-                )
+            if a2plib.SIMULATION_STATE == True:
+                self.status = "unsolved"
+                return systemSolved
+
+            else: # a2plib.SIMULATION_STATE == False
+                self.status = "unsolved"
+                Msg( "===== Could not solve system ====== \n" )
+                msg = \
+'''
+Constraints inconsistent. Cannot solve System.
+Please delete your last created constraint !
+'''
+                QtGui.QMessageBox.information(
+                    QtGui.QApplication.activeWindow(),
+                    "Constraint mismatch",
+                    msg
+                    )
+                return systemSolved
 
     def checkForUnmovedParts(self):
         '''
@@ -663,9 +669,10 @@ to a fixed part!
 def solveConstraints( doc, cache=None, useTransaction = True ):
     if useTransaction: doc.openTransaction("a2p_systemSolving")
     ss = SolverSystem()
-    ss.solveSystem(doc)
+    systemSolved = ss.solveSystem(doc)
     if useTransaction: doc.commitTransaction()
-
+    return systemSolved
+    
 def autoSolveConstraints( doc, callingFuncName, cache=None, useTransaction = True ):
     if not a2plib.getAutoSolveState():
         return

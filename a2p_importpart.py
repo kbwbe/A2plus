@@ -39,6 +39,7 @@ from a2p_importedPart_class import ImportedPartViewProviderProxy
 from a2p_filecache import getOrCreateA2pFile
 from a2p_topomapper import TopoMapper
 import a2p_filecache
+import a2p_solversystem
 
 PYVERSION =  sys.version_info[0]
 
@@ -924,6 +925,7 @@ class ConstrainedPartsMover:
     def __init__(self, view):
         self.obj = None
         self.view = view
+        self.doc = FreeCAD.activeDocument()
         self.callbackMove = self.view.addEventCallback("SoLocation2Event",self.onMouseMove)
         self.callbackClick = self.view.addEventCallback("SoMouseButtonEvent",self.onMouseClicked)
         self.callbackKey = self.view.addEventCallback("SoKeyboardEvent",self.KeyboardEvent)
@@ -949,15 +951,23 @@ class ConstrainedPartsMover:
             newPos = self.view.getPoint( *info['Position'] )
             self.obj.Placement.Base = newPos
             a2plib.setSimulationState(True)
-            FreeCADGui.runCommand('a2p_SolverCommand',0) # solve the system
+            systemSolved = a2p_solversystem.solveConstraints(self.doc, useTransaction = False)
             a2plib.setSimulationState(False)
+            if systemSolved == False:
+                self.doc.commitTransaction()
+                QtGui.QMessageBox.information(
+                    QtGui.QApplication.activeWindow(),
+                   "Animation problem detected",
+                   "Use system undo if necessary."
+                   )
+                self.removeCallbacks()
+                del self
         
     def removeCallbacks(self):
         self.view.removeEventCallback("SoLocation2Event",self.callbackMove)
         self.view.removeEventCallback("SoMouseButtonEvent",self.callbackClick)
         self.view.removeEventCallback("SoKeyboardEvent",self.callbackKey)
         FreeCADGui.Selection.removeObserver(self)
-        del self
         
     def onMouseClicked(self, info):
         if self.obj is None: return
@@ -969,16 +979,25 @@ class ConstrainedPartsMover:
                    '''A2plus will not move a part with property fixedPosition == True'''
                    )
                 self.removeCallbacks()
-            self.motionActivated = not self.motionActivated
-            if self.motionActivated == False:
-                self.removeCallbacks()
-                # Solve last time with high accuracy to finish
-                a2plib.setSimulationState(False)
-                FreeCADGui.runCommand('a2p_SolverCommand',0) # solve the system
+                del self
+            else:
+                self.motionActivated = not self.motionActivated
+                if self.motionActivated == True:
+                    self.doc.openTransaction("drag constrained parts")
+                if self.motionActivated == False:
+                    # Solve last time with high accuracy to finish
+                    a2plib.setSimulationState(False)
+                    a2p_solversystem.solveConstraints(self.doc, useTransaction = False)
+                    self.doc.commitTransaction()
+                    self.removeCallbacks()
+                    del self
                     
     def KeyboardEvent(self, info):
+        doc = FreeCAD.activeDocument()
         if info['State'] == 'UP' and info['Key'] == 'ESCAPE':
+            doc.commitTransaction()
             self.removeCallbacks()
+            del self
 #===============================================================================
 toolTip = \
 '''
