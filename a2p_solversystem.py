@@ -528,35 +528,43 @@ to a fixed part!
         self.stepCount = 0
         workList = []
 
-        # load initial worklist with all fixed parts...
-        for rig in self.rigids:
-            if rig.fixed:
-                workList.append(rig);
-        #self.printList("Initial-Worklist", workList)
-
-        while True:
-            addList = []
-            newRigFound = False
-            for rig in workList:
-                for linkedRig in rig.linkedRigids:
-                    if linkedRig in workList: continue
-                    if rig.isFullyConstrainedByRigid(linkedRig):
-                        addList.append(linkedRig)
-                        newRigFound = True
-                        break
-            if not newRigFound:
+        if a2plib.SIMULATION_STATE == True:
+            # Solve complete System at once if simulation is running
+            workList = self.rigids
+            solutionFound = self.calculateWorkList(doc, workList)
+            if not solutionFound: return False
+            return True
+        else:
+            # Normal partial solving if no simulation is running
+            # load initial worklist with all fixed parts...
+            for rig in self.rigids:
+                if rig.fixed:
+                    workList.append(rig);
+            #self.printList("Initial-Worklist", workList)
+    
+            while True:
+                addList = []
+                newRigFound = False
                 for rig in workList:
-                    addList.extend(rig.getCandidates())
-            addList = set(addList)
-            #self.printList("AddList", addList)
-            if len(addList) > 0:
-                workList.extend(addList)
-                solutionFound = self.calculateWorkList(doc, workList)
-                if not solutionFound: return False
-            else:
-                break
+                    for linkedRig in rig.linkedRigids:
+                        if linkedRig in workList: continue
+                        if rig.isFullyConstrainedByRigid(linkedRig):
+                            addList.append(linkedRig)
+                            newRigFound = True
+                            break
+                if not newRigFound:
+                    for rig in workList:
+                        addList.extend(rig.getCandidates())
+                addList = set(addList)
+                #self.printList("AddList", addList)
+                if len(addList) > 0:
+                    workList.extend(addList)
+                    solutionFound = self.calculateWorkList(doc, workList)
+                    if not solutionFound: return False
+                else:
+                    break
 
-        return True
+            return True
 
     def calculateWorkList(self, doc, workList):
         reqPosAccuracy = self.mySOLVER_POS_ACCURACY
