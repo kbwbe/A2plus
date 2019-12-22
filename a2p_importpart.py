@@ -1115,6 +1115,9 @@ class ConstrainedPartsMover:
             self.motionActivated = not self.motionActivated
             if self.motionActivated == False:
                 self.removeCallbacks()
+                # Solve last time with high accuracy to finish
+                a2plib.setSimulationState(False)
+                FreeCADGui.runCommand('a2p_SolverCommand',0) # solve the system
                     
     def KeyboardEvent(self, info):
         if info['State'] == 'UP' and info['Key'] == 'ESCAPE':
