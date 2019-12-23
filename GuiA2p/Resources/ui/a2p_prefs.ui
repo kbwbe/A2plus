@@ -418,7 +418,7 @@ where they were created</string>
     </rect>
    </property>
    <property name="text">
-    <string>use native file manager of your OS</string>
+    <string>Use native file manager of your OS</string>
    </property>
    <property name="checked">
     <bool>true</bool>
