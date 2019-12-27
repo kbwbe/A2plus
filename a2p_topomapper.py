@@ -270,7 +270,10 @@ class TopoMapper(object):
         self.doneObjects.append(objName)
         ob = self.doc.getObject(objName)
         shape = ob.Shape
-        pl = ob.getGlobalPlacement().multiply(ob.Placement.inverse())
+        if objName.startswith("Link"):
+            pl = ob.Placement
+        else:
+            pl = ob.getGlobalPlacement().multiply(ob.Placement.inverse())
         #
         # Populate vertex entries...
         vertexes = shape.Vertexes
@@ -350,9 +353,10 @@ class TopoMapper(object):
         shapeDict with geometricKey/toponame entries
         '''
         level+=1
-        inList, outList = self.treeNodes[objName]
-        for ob in outList:
-            self.processTopoData(ob.Name,level)
+        if not objName.startswith("Link"):
+            inList, outList = self.treeNodes[objName]
+            for ob in outList:
+                self.processTopoData(ob.Name,level)
         if (
             not objName.startswith("Body") and
             objName not in self.doneObjects
