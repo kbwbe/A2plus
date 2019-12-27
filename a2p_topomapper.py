@@ -520,19 +520,22 @@ class TopoMapper(object):
         
         for objName in self.topLevelShapes:
             ob = self.doc.getObject(objName)
-            needDiffuseExtension = ( len(ob.ViewObject.DiffuseColor) < len(ob.Shape.Faces) )
-            shapeCol = ob.ViewObject.ShapeColor
-            diffuseCol = ob.ViewObject.DiffuseColor
             tempShape = self.makePlacedShape(ob)
-            transparency = ob.ViewObject.Transparency
-            shape_list.append(ob.Shape)
+            try: # will not work is object is a link
+                needDiffuseExtension = ( len(ob.ViewObject.DiffuseColor) < len(ob.Shape.Faces) )
+                shapeCol = ob.ViewObject.ShapeColor
+                diffuseCol = ob.ViewObject.DiffuseColor
+                transparency = ob.ViewObject.Transparency
+                shape_list.append(ob.Shape)
+                if needDiffuseExtension:
+                    diffuseElement = a2plib.makeDiffuseElement(shapeCol,transparency)
+                    for i in range(0,len(tempShape.Faces)):
+                        faceColors.append(diffuseElement)
+                else:
+                    faceColors.extend(diffuseCol) #let python libs extend faceColors, much faster
+            except:
+                pass
             
-            if needDiffuseExtension:
-                diffuseElement = a2plib.makeDiffuseElement(shapeCol,transparency)
-                for i in range(0,len(tempShape.Faces)):
-                    faceColors.append(diffuseElement)
-            else:
-                faceColors.extend(diffuseCol) #let python libs extend faceColors, much faster
             faces.extend(tempShape.Faces) #let python libs extend faces, much faster
 
         shell = Part.makeShell(faces)
