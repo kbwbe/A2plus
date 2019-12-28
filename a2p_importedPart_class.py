@@ -76,14 +76,7 @@ class Proxy_importPart:
         return None
     
     def execute(self, obj):
-        # if a group containing LCS's exists, then move it
-        # according to the imported part
-        if hasattr(obj,"lcsLink"):
-            if len(obj.lcsLink) > 0:
-                lcsGroup = obj.lcsLink[0]
-                lcsGroup.Placement = obj.Placement
-                lcsGroup.purgeTouched() #untouch the lcsGroup, otherwise it stays touched.
-
+        pass
 
 #==============================================================================
 class ImportedPartViewProviderProxy:
@@ -98,10 +91,7 @@ class ImportedPartViewProviderProxy:
             try:
                 children = list()
                 for obj in self.Object.InList:
-                    if a2plib.isA2pObject(obj):
-                        children.append(obj)
-                if hasattr(self.Object,'lcsLink'):
-                    for obj in self.Object.lcsLink:
+                    if a2plib.isA2pConstraint(obj):
                         children.append(obj)
                 return children
             except:

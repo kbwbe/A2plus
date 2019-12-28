@@ -26,7 +26,7 @@
 __title__ = 'A2plus assembly Workbench - InitGui file'
 __author__ = 'kbwbe'
 
-A2P_VERSION = 'V0.4.34a'
+A2P_VERSION = 'V0.5.1'
 
 import sys
 PyVersion = sys.version_info[0]
@@ -176,7 +176,8 @@ class A2plusWorkbench (Workbench):
         menuEntries = [
             'a2p_repairTreeViewCommand',
             'a2p_absPath_to_relPath_Command',
-            'a2p_recursiveToponamingMigrationCommand'
+            'a2p_recursiveToponamingMigrationCommand',
+            'a2p_MigrateProxiesCommand'
             ]
         self.appendMenu(
             'A2plus',

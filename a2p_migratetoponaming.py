@@ -30,6 +30,7 @@ import a2p_filecache
 from a2p_importpart import migrateImportedParts
 #from a2p_fcdocumentreader import FCdocumentReader
 from a2p_simpleXMLreader import FCdocumentReader
+import a2p_importedPart_class
 
 
 #==============================================================================
@@ -166,6 +167,41 @@ class a2p_recursiveToponamingMigrationCommand:
             }
 
 FreeCADGui.addCommand('a2p_recursiveToponamingMigrationCommand', a2p_recursiveToponamingMigrationCommand())
+#==============================================================================
+toolTip = \
+'''
+Migrate proxies of imported parts
+'''
+
+class a2p_MigrateProxiesCommand():
+    
+    def Activated(self):
+        doc = FreeCAD.activeDocument()
+        for ob in doc.Objects:
+            if a2plib.isA2pPart(ob):
+                #setup proxies
+                a2p_importedPart_class.Proxy_importPart(ob)
+                if FreeCAD.GuiUp:
+                    a2p_importedPart_class.ImportedPartViewProviderProxy(ob.ViewObject)
+                #delete obsolete properties
+                deleteList = []
+                tmp = ob.PropertiesList
+                for prop in tmp:
+                    if prop.startswith('pi_') or prop == 'assembly2Version':
+                        deleteList.append(prop)
+                for prop in deleteList:
+                    ob.removeProperty(prop)
+                
+
+    def GetResources(self):
+        return {
+            #'Pixmap' : ':/icons/a2p_RecursiveUpdate.svg',
+            'MenuText': 'migrate proxies of imported parts',
+            'ToolTip': toolTip
+            }
+    
+FreeCADGui.addCommand('a2p_MigrateProxiesCommand', a2p_MigrateProxiesCommand())
+#==============================================================================
             
     
             
