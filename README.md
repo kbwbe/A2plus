@@ -10,6 +10,12 @@ occurred with the original solver. It is still under development and experimenta
 The main goal of A2plus is to create a very simple, easy to use, and not over-featured workbench for
 FreeCAD assemblies. Using the KISS principle: KEEP IT SIMPLE, STUPID
 
+<details>
+  <summary>Videos</summary>
+
+[![A2plus - Gripper assembly](https://i9.ytimg.com/vi/QMxcQ5tssWk/mq3.jpg?sqp=CIGWo_AF&rs=AOn4CLDXtUiVBWVImLrsddeNpxLEa3M3tw)]( https://youtu.be/QMxcQ5tssWk)
+
+</details>
 
 What are the differences between Assembly 2 and A2plus ?
 --------------------------------------------------------
