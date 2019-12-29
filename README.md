@@ -13,9 +13,7 @@ FreeCAD assemblies. Using the KISS principle: KEEP IT SIMPLE, STUPID
 <details>
   <summary>Videos</summary>
 
-[![FreeCAD - Using compound](https://i.ytimg.com/vi/xi3tyENlOTY/sddefault.jpg)](https://www.youtube.com/watch?v=xi3tyENlOTY)
-
-[![FreeCAD - Kitchen cabinet assembly](https://i.ytimg.com/vi/NaUrKwYbCeI/sddefault.jpg)](https://www.youtube.com/watch?v=NaUrKwYbCeI)
+[![A2plus - Gripper assembly](https://i9.ytimg.com/vi/QMxcQ5tssWk/mq3.jpg?sqp=CIGWo_AF&rs=AOn4CLDXtUiVBWVImLrsddeNpxLEa3M3tw)]( https://youtu.be/QMxcQ5tssWk)
 
 </details>
 
