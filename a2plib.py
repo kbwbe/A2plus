@@ -85,12 +85,31 @@ CONSTRAINT_DIALOG_REF = None
 CONSTRAINT_EDITOR__REF = None
 CONSTRAINT_VIEWMODE = False
 
+
+# This Icon map is necessary to show correct icons within very old assemblies
+A2P_CONSTRAINTS_ICON_MAP = {
+    # constraintType:       iconPath
+    'pointIdentity':        ':/icons/a2p_PointIdentity.svg',
+    'pointOnLine':          ':/icons/a2p_PointOnLineConstraint.svg',
+    'pointOnPlane':         ':/icons/a2p_PointOnPlaneConstraint.svg',
+    'circularEdge':         ':/icons/a2p_CircularEdgeConstraint.svg',
+    'axial':                ':/icons/a2p_AxialConstraint.svg',
+    'axisParallel':         ':/icons/a2p_AxisParallelConstraint.svg',
+    'axisPlaneParallel':    ':/icons/a2p_AxisPlaneParallelConstraint.svg',
+    'axisPlaneNormal':      ':/icons/a2p_AxisPlaneNormalConstraint.svg',
+    'planesParallel':       ':/icons/a2p_PlanesParallelConstraint.svg',
+    'plane':                ':/icons/a2p_PlaneCoincidentConstraint.svg',
+    'angledPlanes':         ':/icons/a2p_AngleConstraint.svg',
+    'sphereCenterIdent':    ':/icons/a2p_SphericalSurfaceConstraint.svg',
+    'CenterOfMass':         ':/icons/a2p_CenterOfMassConstraint.svg'
+}
+
+
 #------------------------------------------------------------------------------
 # Detect the operating system...
 #------------------------------------------------------------------------------
 tmp = platform.system()
 tmp = tmp.upper()
-#print("loading A2plus on operating system '{}'".format(tmp))
 tmp = tmp.split(' ')
 
 OPERATING_SYSTEM = 'UNKNOWN'
