@@ -10,6 +10,14 @@ occurred with the original solver. It is still under development and experimenta
 The main goal of A2plus is to create a very simple, easy to use, and not over-featured workbench for
 FreeCAD assemblies. Using the KISS principle: KEEP IT SIMPLE, STUPID
 
+<details>
+  <summary>Videos</summary>
+
+[![FreeCAD - Using compound](https://i.ytimg.com/vi/xi3tyENlOTY/sddefault.jpg)](https://www.youtube.com/watch?v=xi3tyENlOTY)
+
+[![FreeCAD - Kitchen cabinet assembly](https://i.ytimg.com/vi/NaUrKwYbCeI/sddefault.jpg)](https://www.youtube.com/watch?v=NaUrKwYbCeI)
+
+</details>
 
 What are the differences between Assembly 2 and A2plus ?
 --------------------------------------------------------
