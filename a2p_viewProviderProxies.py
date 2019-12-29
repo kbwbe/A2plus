@@ -71,7 +71,9 @@ class ConstraintViewProviderProxy:
         self.enableDeleteCounterPart = True #allow to delete the mirror
 
     def getIcon(self):
-        return self.iconPath
+        return a2plib.A2P_CONSTRAINTS_ICON_MAP[
+            FreeCAD.ActiveDocument.getObject(self.constraintObj_name).Type
+            ]
     
     def doubleClicked(self,vobj):
         FreeCADGui.activateWorkbench('A2plusWorkbench')
@@ -120,7 +122,9 @@ class ConstraintMirrorViewProviderProxy:
         FreeCADGui.runCommand("a2p_EditConstraintCommand")
 
     def getIcon(self):
-        return self.iconPath
+        return a2plib.A2P_CONSTRAINTS_ICON_MAP[
+            FreeCAD.ActiveDocument.getObject(self.constraintObj_name).Type
+            ]
 
 #WF: next 3 methods not required
     def attach(self, vobj):

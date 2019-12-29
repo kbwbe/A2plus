@@ -171,26 +171,53 @@ FreeCADGui.addCommand('a2p_recursiveToponamingMigrationCommand', a2p_recursiveTo
 toolTip = \
 '''
 Migrate proxies of imported parts
+
+Very old A2plus assemblies do not
+show the correct icons for imported
+parts and have obsolete properties.
+
+With this function, you can migrate
+the viewProviders of old imported parts
+to the recent state.
+
+After running this function, you
+should save and reopen your
+assembly file.
 '''
 
 class a2p_MigrateProxiesCommand():
     
     def Activated(self):
-        doc = FreeCAD.activeDocument()
-        for ob in doc.Objects:
-            if a2plib.isA2pPart(ob):
-                #setup proxies
-                a2p_importedPart_class.Proxy_importPart(ob)
-                if FreeCAD.GuiUp:
-                    a2p_importedPart_class.ImportedPartViewProviderProxy(ob.ViewObject)
-                #delete obsolete properties
-                deleteList = []
-                tmp = ob.PropertiesList
-                for prop in tmp:
-                    if prop.startswith('pi_') or prop == 'assembly2Version':
-                        deleteList.append(prop)
-                for prop in deleteList:
-                    ob.removeProperty(prop)
+        flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
+        response = QtGui.QMessageBox.information(
+            QtGui.QApplication.activeWindow(), 
+            u"Migrate proxies of importedParts to recent version", 
+            u"Make sure you have a backup of your files. Proceed?", 
+            flags
+            )
+        if response == QtGui.QMessageBox.Yes:
+            doc = FreeCAD.activeDocument()
+            for ob in doc.Objects:
+                if a2plib.isA2pPart(ob):
+                    #setup proxies
+                    a2p_importedPart_class.Proxy_importPart(ob)
+                    if FreeCAD.GuiUp:
+                        a2p_importedPart_class.ImportedPartViewProviderProxy(ob.ViewObject)
+                    #delete obsolete properties
+                    deleteList = []
+                    tmp = ob.PropertiesList
+                    for prop in tmp:
+                        if prop.startswith('pi_') or prop == 'assembly2Version':
+                            deleteList.append(prop)
+                    for prop in deleteList:
+                        ob.removeProperty(prop)
+                        
+        QtGui.QMessageBox.information(
+            QtGui.QApplication.activeWindow(), 
+            u"The proxies have been migrated.", 
+            u"Please save and reopen this assembly file" 
+            )
+        
                 
 
     def GetResources(self):
