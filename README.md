@@ -17,7 +17,7 @@ FreeCAD assemblies. Using the KISS principle: KEEP IT SIMPLE, STUPID
 
 [![FreeCAD - Kitchen cabinet assembly](https://i.ytimg.com/vi/NaUrKwYbCeI/sddefault.jpg)](https://www.youtube.com/watch?v=NaUrKwYbCeI)
 
-<details>
+</details>
 
 What are the differences between Assembly 2 and A2plus ?
 --------------------------------------------------------
