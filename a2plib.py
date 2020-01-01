@@ -97,6 +97,7 @@ A2P_CONSTRAINTS_ICON_MAP = {
     'axisParallel':         ':/icons/a2p_AxisParallelConstraint.svg',
     'axisPlaneParallel':    ':/icons/a2p_AxisPlaneParallelConstraint.svg',
     'axisPlaneNormal':      ':/icons/a2p_AxisPlaneNormalConstraint.svg',
+    'axisPlaneAngle':       ':/icons/a2p_AxisPlaneAngleConstraint.svg',
     'planesParallel':       ':/icons/a2p_PlanesParallelConstraint.svg',
     'plane':                ':/icons/a2p_PlaneCoincidentConstraint.svg',
     'angledPlanes':         ':/icons/a2p_AngleConstraint.svg',
