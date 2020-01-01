@@ -457,6 +457,60 @@ correct selection.
         return validSelection
 
 #==============================================================================
+class AxisPlaneAngleConstraint(BasicConstraint):
+    def __init__(self,selection):
+        BasicConstraint.__init__(self, selection)
+        self.typeInfo = 'axisPlaneAngle'
+        self.constraintBaseName = 'axisPlaneAngle'
+        self.iconPath = ':/icons/a2p_AxisPlaneAngleConstraint.svg'
+        self.create(selection)
+        
+    def calcInitialValues(self):
+        c = self.constraintObject
+        axis1 = getAxis(self.ob1, c.SubElement1)
+        plane2 = getObjectFaceFromName(self.ob2, c.SubElement2)
+        axis2 = a2plib.getPlaneNormal(plane2.Surface)
+        angle = math.degrees(axis1.getAngle(axis2))
+        if angle <= 90.0:
+            self.direction = "aligned"
+        else:
+            self.direction = "opposed"
+        self.angle = 0.0
+
+    @staticmethod
+    def getToolTip():
+        return \
+'''
+Add an axisPlaneAngle constraint
+
+1) select a linear edge or cylinder axis
+2) select a plane face on another part
+
+At first this constraint adjusts an axis parallel
+to a selected plane. Within the following popUp dialog
+you can define an angle.
+
+The parts are not
+moved to be coincident.
+
+Button gets active after
+correct selection.
+'''
+
+    @staticmethod
+    def isValidSelection(selection):
+        validSelection = False
+        if len(selection) == 2:
+            s1, s2 = selection
+            if s1.ObjectName != s2.ObjectName:
+                if (
+                    (LinearEdgeSelected(s1) or cylindricalFaceSelected(s1)) and
+                    planeSelected(s2)
+                    ):
+                    validSelection = True
+        return validSelection
+
+#==============================================================================
 class AxisPlaneNormalConstraint(BasicConstraint):
     def __init__(self,selection):
         BasicConstraint.__init__(self, selection)

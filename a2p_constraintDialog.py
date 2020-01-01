@@ -607,11 +607,21 @@ class a2p_ConstraintCollection(QtGui.QWidget):
         QtCore.QObject.connect(self.axisPlaneNormalButton, QtCore.SIGNAL("clicked()"), self.onAxisPlaneNormalButton)
         self.constraintButtons.append(self.axisPlaneNormalButton)
         #-------------------------------------
+        self.axisPlaneAngleButton = QtGui.QPushButton(self.panel2)
+        self.axisPlaneAngleButton.setFixedSize(48,48)
+        self.axisPlaneAngleButton.setIcon(QtGui.QIcon(':/icons/a2p_AxisPlaneAngleConstraint.svg'))
+        self.axisPlaneAngleButton.setIconSize(QtCore.QSize(32,32))
+        self.axisPlaneAngleButton.setToolTip(a2p_constraints.AxisPlaneAngleConstraint.getToolTip())
+        self.axisPlaneAngleButton.setText("")
+        QtCore.QObject.connect(self.axisPlaneAngleButton, QtCore.SIGNAL("clicked()"), self.onAxisPlaneAngleButton)
+        self.constraintButtons.append(self.axisPlaneAngleButton)
+        #-------------------------------------
         panel2_Layout.addWidget(self.circularEdgeButton)
         panel2_Layout.addWidget(self.axialButton)
         panel2_Layout.addWidget(self.axisParallelButton)
         panel2_Layout.addWidget(self.axisPlaneParallelButton)
         panel2_Layout.addWidget(self.axisPlaneNormalButton)
+        panel2_Layout.addWidget(self.axisPlaneAngleButton)
         panel2_Layout.addStretch(1)
         self.panel2.setLayout(panel2_Layout)
         #-------------------------------------
@@ -733,6 +743,8 @@ button.
                 self.axialButton.setEnabled(True)
             if a2p_constraints.AxisPlaneParallelConstraint.isValidSelection(selection):
                 self.axisPlaneParallelButton.setEnabled(True)
+            if a2p_constraints.AxisPlaneAngleConstraint.isValidSelection(selection):
+                self.axisPlaneAngleButton.setEnabled(True)
             if a2p_constraints.AxisPlaneNormalConstraint.isValidSelection(selection):
                 self.axisPlaneNormalButton.setEnabled(True)
             if a2p_constraints.CircularEdgeConstraint.isValidSelection(selection):
@@ -802,6 +814,11 @@ button.
     def onAxisParallelButton(self):
         selection = FreeCADGui.Selection.getSelectionEx()
         self.activeConstraint = a2p_constraints.AxisParallelConstraint(selection)
+        self.manageConstraint()
+
+    def onAxisPlaneAngleButton(self):
+        selection = FreeCADGui.Selection.getSelectionEx()
+        self.activeConstraint = a2p_constraints.AxisPlaneAngleConstraint(selection)
         self.manageConstraint()
 
     def onAxisPlaneParallelButton(self):
