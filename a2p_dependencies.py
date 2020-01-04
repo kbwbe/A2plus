@@ -140,19 +140,7 @@ class Dependency():
     def Create(doc, constraint, solver, rigid1, rigid2):
         c = constraint
 
-        if c.Type == "pointIdentity":
-            dep1 = DependencyPointIdentity(c, "point")
-            dep2 = DependencyPointIdentity(c, "point")
-
-            ob1 = doc.getObject(c.Object1)
-            ob2 = doc.getObject(c.Object2)
-
-            vert1 = getObjectVertexFromName(ob1, c.SubElement1)
-            vert2 = getObjectVertexFromName(ob2, c.SubElement2)
-            dep1.refPoint = vert1.Point
-            dep2.refPoint = vert2.Point
-
-        elif c.Type == "sphereCenterIdent":
+        if c.Type == "sphereCenterIdent" or c.Type == "pointIdentity":
             dep1 = DependencyPointIdentity(c, "point")
             dep2 = DependencyPointIdentity(c, "point")
 

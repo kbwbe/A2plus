@@ -27,6 +27,7 @@ from PySide import QtGui, QtCore
 import math
 from a2p_viewProviderProxies import *
 import a2p_filecache
+from _ast import Or
 
 #==============================================================================
 class BasicConstraint():
@@ -162,8 +163,8 @@ class PointIdentityConstraint(BasicConstraint):
 '''
 Add a pointIdentity Constraint:
 selection:
-1.) select a vertex on a part
-2.) select a vertex on another part
+1.) select a vertex, circle or sphere on a part
+2.) select a vertex, circle or sphere on another part
 
 Button gets active after
 correct selection.
@@ -175,7 +176,16 @@ correct selection.
         if len(selection) == 2:
             s1, s2 = selection
             if s1.ObjectName != s2.ObjectName:
-                if vertexSelected(s1) and vertexSelected(s2):
+                if ( 
+                    (vertexSelected(s1) or 
+                     sphericalSurfaceSelected(s1) or
+                     CircularEdgeSelected(s1)
+                     ) and
+                    (vertexSelected(s2) or 
+                     sphericalSurfaceSelected(s2) or
+                     CircularEdgeSelected(s2)
+                     )
+                    ):
                     validSelection = True
         return validSelection
     
@@ -196,7 +206,7 @@ class PointOnLineConstraint(BasicConstraint):
         return \
 '''
 Add a pointOnLine constraint between two objects
-1.) select a vertex or a sphere from a part
+1.) select a vertex, a sphere or a circle from a part
 2.) select a linear edge or a cylindrical face on another part
 
 Button gets active after
@@ -210,7 +220,7 @@ correct selection.
             s1, s2 = selection
             if s1.ObjectName != s2.ObjectName:
                 if (
-                    (vertexSelected(s1) or sphericalSurfaceSelected(s1)) and 
+                    (vertexSelected(s1) or sphericalSurfaceSelected(s1) or CircularEdgeSelected(s1)) and 
                     (LinearEdgeSelected(s2) or cylindricalFaceSelected(s2))
                     ):
                     validSelection = True
@@ -743,6 +753,8 @@ Selection options:
 - spherical surface or vertex on a part
 - spherical surface or vertex on another part
 
+Also when selecting a circle, it's center is used as a vertex.
+
 Button gets active after
 correct selection.
 '''
@@ -753,9 +765,17 @@ correct selection.
         if len(selection) == 2:
             s1, s2 = selection
             if s1.ObjectName != s2.ObjectName:
-                if ( vertexSelected(s1) or sphericalSurfaceSelected(s1)) \
-                        and ( vertexSelected(s2) or sphericalSurfaceSelected(s2)):
-                        validSelection = True
+                if ( 
+                    (vertexSelected(s1) or 
+                     sphericalSurfaceSelected(s1) or
+                     CircularEdgeSelected(s1)
+                     ) and
+                    (vertexSelected(s2) or 
+                     sphericalSurfaceSelected(s2) or
+                     CircularEdgeSelected(s2)
+                     )
+                    ):
+                    validSelection = True
         return validSelection
 
 #==============================================================================
