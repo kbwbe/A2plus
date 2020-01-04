@@ -159,7 +159,6 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
 
         #==============================
         if hasattr(self.constraintObject,"angle"):
-            print(self.constraintObject.Type)
             angle = self.constraintObject.angle
             lbl5 = QtGui.QLabel(self)
             lbl5.setText("Angle")
