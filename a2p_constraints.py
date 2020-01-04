@@ -471,11 +471,16 @@ class AxisPlaneAngleConstraint(BasicConstraint):
         plane2 = getObjectFaceFromName(self.ob2, c.SubElement2)
         axis2 = a2plib.getPlaneNormal(plane2.Surface)
         angle = math.degrees(axis1.getAngle(axis2))
+        # the following section has been tested and is working,
+        # just it does not meet expectations.
+        # opposed/aligned are set to the opposite of expectation
+        # this has to be checked again.
         if angle <= 90.0:
-            self.direction = "aligned"
-        else:
             self.direction = "opposed"
-        self.angle = 0.0
+            self.angle = 90 - angle
+        else:
+            self.direction = "aligned"
+            self.angle = -90 + angle
 
     @staticmethod
     def getToolTip():
