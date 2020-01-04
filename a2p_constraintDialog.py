@@ -157,6 +157,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
 
         #==============================
         if hasattr(self.constraintObject,"angle"):
+            print(self.constraintObject.Type)
             angle = self.constraintObject.angle
             lbl5 = QtGui.QLabel(self)
             lbl5.setText("Angle")
@@ -166,10 +167,15 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             self.angleEdit = QtGui.QDoubleSpinBox(self)
             # get the angle unit as string
             self.angleEdit.setSuffix(" " + str(FreeCAD.Units.Quantity(1, FreeCAD.Units.Angle))[2:])
-            self.angleEdit.setMaximum(180)
-            # the solver treats negative values as positive
-            self.angleEdit.setMinimum(0)
-            # use the number of decimals defined by thew user in FC
+            
+            if self.constraintObject.Type == "axisPlaneAngle":
+                self.angleEdit.setMaximum(90.0)
+                self.angleEdit.setMinimum(0.0)  # the solver treats negative values as positive
+            else:
+                self.angleEdit.setMaximum(180)
+                self.angleEdit.setMinimum(0)    # the solver treats negative values as positive
+
+            # use the number of decimals defined by the user in FC
             params = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Units")
             self.angleEdit.setDecimals(params.GetInt('Decimals'))
             self.angleEdit.setValue(angle)
@@ -352,29 +358,50 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             self.solve()
     
     def roundAngle(self):
-        # rounds angle to 90 degrees
-        self.winModified = True
-        q = self.angleEdit.value() / 90
-        q = round(q)
-        q = q * 90
-        self.angleEdit.setValue(q)
-        if a2plib.getAutoSolveState():
-            self.solve()
+        if self.constraintObject.Type == "axisPlaneAngle":
+            # rounds angle to 1 degrees
+            self.winModified = True
+            q = self.angleEdit.value()
+            q = round(q)
+            q = q
+            self.angleEdit.setValue(q)
+            if a2plib.getAutoSolveState():
+                self.solve()
+        else:
+            # rounds angle to 90 degrees
+            self.winModified = True
+            q = self.angleEdit.value() / 90
+            q = round(q)
+            q = q * 90
+            self.angleEdit.setValue(q)
+            if a2plib.getAutoSolveState():
+                self.solve()
     
     def perpendicularAngle(self):
-        #adds /subtracs 90 degrees
-        # we want to go this way: 0 -> 90 -> 180 -> 90 -> 0
-        # but: 12 -> 102 -> 12
-        self.winModified = True
-        q = self.angleEdit.value() + 90
-        if q == 270:
-            self.angleEdit.setValue(0)
-        elif q > 180:
-            self.angleEdit.setValue(q - 180)
-        elif q <= 180:
-            self.angleEdit.setValue(q)
-        if a2plib.getAutoSolveState():
-            self.solve()
+        if self.constraintObject.Type == "axisPlaneAngle":
+            # we want to go this way: 0 -> 90 -> 0
+            self.winModified = True
+            q = self.angleEdit.value()
+            if q>=45:
+                self.angleEdit.setValue(0)
+            else:
+                self.angleEdit.setValue(90)
+            if a2plib.getAutoSolveState():
+                self.solve()
+        else:
+            #adds /subtracs 90 degrees
+            # we want to go this way: 0 -> 90 -> 180 -> 90 -> 0
+            # but: 12 -> 102 -> 12
+            self.winModified = True
+            q = self.angleEdit.value() + 90
+            if q == 270:
+                self.angleEdit.setValue(0)
+            elif q > 180:
+                self.angleEdit.setValue(q - 180)
+            elif q <= 180:
+                self.angleEdit.setValue(q)
+            if a2plib.getAutoSolveState():
+                self.solve()
 
     def restoreConstraintValues(self):
         if self.savedOffset != None:
