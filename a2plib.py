@@ -309,6 +309,50 @@ def numpyVecToFC(nv):
     assert len(nv) == 3
     return Base.Vector(nv[0],nv[1],nv[2])
 #------------------------------------------------------------------------------
+def fit_rotation_axis_to_surface1( surface, n_u=3, n_v=3 ):
+    'should work for cylinders and possibly cones (depending on the u,v mapping)'
+    uv = sum( [ [ (u,v) for u in linspace(0,1,n_u)] for v in linspace(0,1,n_v) ], [] )
+    P = [ numpy.array(surface.value(u,v)) for u,v in uv ] #positions at u,v points
+    N = [ crossProduct( *surface.tangent(u,v) ) for u,v in uv ] 
+    intersections = []
+    for i in range(len(N)-1):
+        for j in range(i+1,len(N)):
+            # based on the distance_between_axes( p1, u1, p2, u2) function,
+            if 1 - abs(dot( N[i], N[j])) < 10**-6:
+                continue #ignore parrallel case
+            p1_x, p1_y, p1_z = P[i]
+            u1_x, u1_y, u1_z = N[i]
+            p2_x, p2_y, p2_z = P[j]
+            u2_x, u2_y, u2_z = N[j]
+            t1_t1_coef = u1_x**2 + u1_y**2 + u1_z**2 #should equal 1
+            t1_t2_coef = -2*u1_x*u2_x - 2*u1_y*u2_y - 2*u1_z*u2_z # collect( expand(d_sqrd), [t1*t2] )
+            t2_t2_coef = u2_x**2 + u2_y**2 + u2_z**2 #should equal 1 too
+            t1_coef    = 2*p1_x*u1_x + 2*p1_y*u1_y + 2*p1_z*u1_z - 2*p2_x*u1_x - 2*p2_y*u1_y - 2*p2_z*u1_z
+            t2_coef    =-2*p1_x*u2_x - 2*p1_y*u2_y - 2*p1_z*u2_z + 2*p2_x*u2_x + 2*p2_y*u2_y + 2*p2_z*u2_z
+            A = numpy.array([ [ 2*t1_t1_coef , t1_t2_coef ] , [ t1_t2_coef, 2*t2_t2_coef ] ])
+            b = numpy.array([ t1_coef, t2_coef])
+            try:
+                t1, t2 = numpy.linalg.solve(A,-b)
+            except numpy.linalg.LinAlgError:
+                continue #print('distance_between_axes, failed to solve problem due to LinAlgError, using numerical solver instead')
+            pos_t1 = P[i] + numpy.array(N[i])*t1
+            pos_t2 = P[j] + N[j]*t2
+            intersections.append( pos_t1 )
+            intersections.append( pos_t2 )
+    if len(intersections) < 2:
+        error = numpy.inf
+        return None, None, error
+    else: #fit vector to intersection points; http://mathforum.org/library/drmath/view/69103.html
+        X = numpy.array(intersections)
+        centroid = numpy.mean(X,axis=0)
+        M = numpy.array([i - centroid for i in intersections ])
+        A = numpy.dot(M.transpose(), M)
+        U,s,V = numpy.linalg.svd(A)    #numpy docs: s : (..., K) The singular values for every matrix, sorted in descending order.
+        axis_pos = centroid
+        axis_dir = V[0]
+        error = s[1] #dont know if this will work
+        return numpyVecToFC(axis_dir), numpyVecToFC(axis_pos), error
+#------------------------------------------------------------------------------
 def fit_plane_to_surface1( surface, n_u=3, n_v=3 ):
     uv = sum( [ [ (u,v) for u in numpy.linspace(0,1,n_u)] for v in numpy.linspace(0,1,n_v) ], [] )
     P = [ surface.value(u,v) for u,v in uv ] #positions at u,v points
@@ -603,6 +647,15 @@ def CircularEdgeSelected( selection ):
                 return False
             if hasattr( edge.Curve, 'Radius' ):
                 return True
+
+            BSpline = edge.Curve.toBSpline()
+            arcs = BSpline.toBiArcs(10**-6)
+            if all( hasattr(a,'Center') for a in arcs ):
+                centers = numpy.array([a.Center for a in arcs])
+                sigma = numpy.std( centers, axis=0 )
+                if max(sigma) < 10**-6: #then circular curve
+                    return True
+            
     return False
 #------------------------------------------------------------------------------
 def ClosedEdgeSelected( selection ):
@@ -623,6 +676,11 @@ def AxisOfPlaneSelected( selection ): #adding Planes/Faces selection for Axial c
             face = getObjectFaceFromName( selection.Object, subElement)
             if str(face.Surface) == '<Plane object>':
                 return True
+            else:
+                axis, center, error = fit_rotation_axis_to_surface1(face.Surface)
+                error_normalized = error / face.BoundBox.DiagonalLength
+                if error_normalized < 10**-6:
+                    return True
     return False
 #------------------------------------------------------------------------------
 def printSelection(selection):
@@ -671,6 +729,11 @@ def cylindricalFaceSelected( selection ):
                 return True
             elif str(face.Surface).startswith('<SurfaceOfRevolution'):
                 return True
+            else:
+                axis, center, error = fit_rotation_axis_to_surface1(face.Surface)
+                error_normalized = error / face.BoundBox.DiagonalLength
+                if error_normalized < 10**-6:
+                    return True
     return False
 #------------------------------------------------------------------------------
 def LinearEdgeSelected( selection ):
@@ -682,6 +745,14 @@ def LinearEdgeSelected( selection ):
                 return False
             if isLine(edge.Curve):
                 return True
+
+            BSpline = edge.Curve.toBSpline()
+            arcs = BSpline.toBiArcs(10**-6)
+            if all(isLine(a) for a in arcs):
+                lines = arcs
+                D = numpy.array([L.tangent(0)[0] for L in lines]) #D(irections)
+                if numpy.std( D, axis=0 ).max() < 10**-9: #then linear curve
+                    return True
     return False
 #------------------------------------------------------------------------------
 def sphericalSurfaceSelected( selection ):
@@ -706,6 +777,7 @@ def removeConstraint( constraint ):
 #------------------------------------------------------------------------------
 def getPos(obj, subElementName):
     pos = None
+    
     if subElementName.startswith('Face'):
         face = getObjectFaceFromName(obj, subElementName)
         surface = face.Surface
@@ -720,7 +792,16 @@ def getPos(obj, subElementName):
         elif str(surface).startswith('<SurfaceOfRevolution'):
             pos = getObjectFaceFromName(obj, subElementName).Edges[0].Curve.Center
         elif str(surface).startswith('<BSplineSurface'):
-            axis,pos,error = fit_plane_to_surface1(surface)
+            axis,pos1,error = fit_plane_to_surface1(surface)
+            error_normalized = error / face.BoundBox.DiagonalLength
+            if error_normalized < 10**-6: #then good plane fit
+                pos = pos1
+            axis, center, error = fit_rotation_axis_to_surface1(face.Surface)
+            if axis != None:
+                error_normalized = error / face.BoundBox.DiagonalLength
+                if error_normalized < 10**-6: #then good rotation_axis fix
+                    pos = center
+            
     elif subElementName.startswith('Edge'):
         edge = getObjectEdgeFromName(obj, subElementName)
         if isLine(edge.Curve):
@@ -730,8 +811,24 @@ def getPos(obj, subElementName):
                 pos = edge.firstVertex(True).Point
         elif hasattr( edge.Curve, 'Center'): #circular curve
             pos = edge.Curve.Center
+        else:
+            BSpline = edge.Curve.toBSpline()
+            arcs = BSpline.toBiArcs(10**-6)
+            if all( hasattr(a,'Center') for a in arcs ):
+                centers = numpy.array([a.Center for a in arcs])
+                sigma = numpy.std( centers, axis=0 )
+                if max(sigma) < 10**-6: #then circular curce
+                    pos = numpyVecToFC(centers[0])
+            if all(isLine(a) for a in arcs):
+                lines = arcs
+                D = numpy.array([L.tangent(0)[0] for L in lines]) #D(irections)
+                if numpy.std( D, axis=0 ).max() < 10**-9: #then linear curve
+                    pos = lines[0].value(0)
+            
+            
     elif subElementName.startswith('Vertex'):
-        return  getObjectVertexFromName(obj, subElementName).Point
+        pos = getObjectVertexFromName(obj, subElementName).Point
+    
     return pos # maybe none !!
 #------------------------------------------------------------------------------
 def getPlaneNormal(surface):
@@ -752,7 +849,15 @@ def getAxis(obj, subElementName):
         elif str(surface).startswith('<SurfaceOfRevolution'):
             axis = face.Edges[0].Curve.Axis
         elif str(surface).startswith('<BSplineSurface'):
-            axis,pos,error = fit_plane_to_surface1(surface)
+            axis1,pos,error = fit_plane_to_surface1(surface)
+            error_normalized = error / face.BoundBox.DiagonalLength
+            if error_normalized < 10**-6: #then good plane fit
+                axis = axis1
+            axis_fitted, center, error = fit_rotation_axis_to_surface1(face.Surface)
+            if axis_fitted is not None:
+                error_normalized = error / face.BoundBox.DiagonalLength
+                if error_normalized < 10**-6: #then good rotation_axis fix
+                    axis = axis_fitted
             
     elif subElementName.startswith('Edge'):
         edge = getObjectEdgeFromName(obj, subElementName)
@@ -760,6 +865,20 @@ def getAxis(obj, subElementName):
             axis = edge.Curve.tangent(0)[0]
         elif hasattr( edge.Curve, 'Axis'): #circular curve
             axis =  edge.Curve.Axis
+        else:
+            BSpline = edge.Curve.toBSpline()
+            arcs = BSpline.toBiArcs(10**-6)
+            if all( hasattr(a,'Center') for a in arcs ):
+                centers = numpy.array([a.Center for a in arcs])
+                sigma = numpy.std( centers, axis=0 )
+                if max(sigma) < 10**-6: #then circular curce
+                    axis = a.Axis
+            if all(isLine(a) for a in arcs):
+                lines = arcs
+                D = numpy.array([L.tangent(0)[0] for L in lines]) #D(irections)
+                if numpy.std( D, axis=0 ).max() < 10**-9: #then linear curve
+                    axis = a2plib.numpyVecToFC(D[0])
+            
     return axis # may be none!
 #------------------------------------------------------------------------------
 def isA2pPart(obj):
