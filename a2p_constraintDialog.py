@@ -358,24 +358,14 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             self.solve()
     
     def roundAngle(self):
-        if self.constraintObject.Type == "axisPlaneAngle":
-            # rounds angle to 1 degrees
-            self.winModified = True
-            q = self.angleEdit.value()
-            q = round(q)
-            q = q
-            self.angleEdit.setValue(q)
-            if a2plib.getAutoSolveState():
-                self.solve()
-        else:
-            # rounds angle to 90 degrees
-            self.winModified = True
-            q = self.angleEdit.value() / 90
-            q = round(q)
-            q = q * 90
-            self.angleEdit.setValue(q)
-            if a2plib.getAutoSolveState():
-                self.solve()
+        # rounds angle to 5 degrees
+        self.winModified = True
+        q = self.angleEdit.value() / 5
+        q = round(q)
+        q = q * 5
+        self.angleEdit.setValue(q)
+        if a2plib.getAutoSolveState():
+            self.solve()
     
     def perpendicularAngle(self):
         if self.constraintObject.Type == "axisPlaneAngle":
