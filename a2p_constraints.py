@@ -84,6 +84,8 @@ class BasicConstraint():
         Toponame2 = a2p_filecache.fileCache.getTopoName(self.ob2, self.sub2)
         ob.addProperty("App::PropertyString","Toponame2","ConstraintInfo").Toponame2 = Toponame2
         
+        ob.addProperty("App::PropertyBool","suppressed","ConstraintInfo").suppressed = False
+        
         for prop in ["Object1","Object2","SubElement1","SubElement2","Type"]:
             ob.setEditorMode(prop, 1)
 
