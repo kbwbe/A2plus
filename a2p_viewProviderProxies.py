@@ -211,6 +211,23 @@ def create_constraint_mirror( constraintObj, iconPath, origLabel= '', mirrorLabe
 class ConstraintObjectProxy:
     def __init__(self,obj=None):
         self.disable_onChanged = False
+        if obj is not None:
+            ConstraintObjectProxy.setProperties(self,obj)
+        self.type = "a2p_constraint"
+        
+    def setProperties(self,obj):
+        propList = obj.PropertiesList
+        if not "Toponame1" in propList:
+            obj.addProperty("App::PropertyString", "Toponame1", "ConstraintInfo")
+        if not "Toponame2" in propList:
+            obj.addProperty("App::PropertyString", "Toponame2", "ConstraintInfo")
+        if not "suppressed" in propList:
+            obj.addProperty("App::PropertyBool","suppressed","ConstraintInfo")
+            
+        self.type = "a2p_constraint"
+
+    def onDocumentRestored(self,obj):
+        ConstraintObjectProxy.setProperties(self,obj)
 
     def execute(self, obj):
         return # functionality removed with new UserInterface, avoid nested recomputes...
@@ -253,6 +270,22 @@ class ConstraintMirrorObjectProxy:
         constraintObj.Proxy.mirror_name = obj.Name
         self.disable_onChanged = False
         obj.Proxy = self
+        if obj is not None:
+            ConstraintMirrorObjectProxy.setProperties(self,obj)
+        self.type = "a2p_constraint_mirror"
+        
+    def setProperties(self,obj):
+        propList = obj.PropertiesList
+        if not "Toponame1" in propList:
+            obj.addProperty("App::PropertyString", "Toponame1", "ConstraintNfo")
+        if not "Toponame2" in propList:
+            obj.addProperty("App::PropertyString", "Toponame2", "ConstraintNfo")
+        if not "suppressed" in propList:
+            obj.addProperty("App::PropertyBool","suppressed","ConstraintNfo")
+        self.type = "a2p_constraint_mirror"
+
+    def onDocumentRestored(self,obj):
+        ConstraintMirrorObjectProxy.setProperties(self,obj)
 
     def execute(self, obj):
         return #no work required in onChanged causes touched in original constraint ...

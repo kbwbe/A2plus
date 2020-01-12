@@ -134,7 +134,7 @@ class SolverSystem():
         if len(rigs) > 0: return rigs[0]
         return None
 
-    def loadSystem(self,doc):
+    def loadSystem(self,doc, matelist=None):
         self.clear()
         self.doc = doc
         self.status = "loading"
@@ -143,7 +143,22 @@ class SolverSystem():
         self.lastPositionError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
         self.lastAxisError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
         #
-        self.constraints = [ obj for obj in doc.Objects if 'ConstraintInfo' in obj.Content]
+        self.constraints = []
+        constraints =[]             #temporary list
+        if matelist != None:        #Transfer matelist to the temp list
+            for obj in matelist:
+                if 'ConstraintInfo' in obj.Content:
+                    constraints.append(obj)
+        else:
+            # if there is not a list of my mates get the list from the doc
+            constraints = [ obj for obj in doc.Objects if 'ConstraintInfo' in obj.Content]
+        #check for suppressed mates here and transfer mates to self.constraints
+        for obj in constraints:
+            if hasattr(obj,'suppressed'):
+                #if the mate is suppressed do not add it
+                if obj.suppressed == False:
+                    self.constraints.append(obj)
+
         #
         # Extract all the objectnames which are affected by constraints..
         self.objectNames = []
@@ -425,12 +440,12 @@ class SolverSystem():
                     doc.getObject(rig.objectName)
                     )
     
-    def solveAccuracySteps(self,doc):
+    def solveAccuracySteps(self,doc, matelist=None):
         self.level_of_accuracy=1
         self.mySOLVER_POS_ACCURACY = self.getSolverControlData()[self.level_of_accuracy][0]
         self.mySOLVER_SPIN_ACCURACY = self.getSolverControlData()[self.level_of_accuracy][1]
 
-        self.loadSystem(doc)
+        self.loadSystem(doc, matelist)
         if self.status == "loadingDependencyError":
             return
         self.assignParentship(doc)
@@ -446,7 +461,7 @@ class SolverSystem():
                     break
                 self.mySOLVER_POS_ACCURACY = self.getSolverControlData()[self.level_of_accuracy][0]
                 self.mySOLVER_SPIN_ACCURACY = self.getSolverControlData()[self.level_of_accuracy][1]
-                self.loadSystem(doc)
+                self.loadSystem(doc, matelist)
             else:
                 completeSolvingRequired = self.getSolverControlData()[self.level_of_accuracy][2]
                 if not completeSolvingRequired: systemSolved = True
@@ -470,11 +485,11 @@ class SolverSystem():
             
         return systemSolved
 
-    def solveSystem(self,doc):
+    def solveSystem(self,doc,matelist=None):
         if not a2plib.SIMULATION_STATE:        
             Msg( "\n===== Start Solving System ====== \n" )
 
-        systemSolved = self.solveAccuracySteps(doc)
+        systemSolved = self.solveAccuracySteps(doc,matelist)
         if self.status == "loadingDependencyError":
             return systemSolved
         if systemSolved:
@@ -666,14 +681,14 @@ to a fixed part!
             rig.applySolution(doc, self);
 
 #------------------------------------------------------------------------------
-def solveConstraints( doc, cache=None, useTransaction = True ):
+def solveConstraints( doc, cache=None, useTransaction = True, matelist=None):
     if useTransaction: doc.openTransaction("a2p_systemSolving")
     ss = SolverSystem()
-    systemSolved = ss.solveSystem(doc)
+    systemSolved = ss.solveSystem(doc, matelist )
     if useTransaction: doc.commitTransaction()
     return systemSolved
 
-def autoSolveConstraints( doc, callingFuncName, cache=None, useTransaction = True ):
+def autoSolveConstraints( doc, callingFuncName, cache=None, useTransaction=True, matelist=None):
     if not a2plib.getAutoSolveState():
         return
     if callingFuncName != None:
