@@ -443,6 +443,17 @@ class TopoMapper(object):
                     if not invalidObjects:
                         if numBodies == numClones:
                             self.topLevelShapes.append(objName)
+                #-------------------------------------------
+                # search for missing non top-level objects,
+                # as they are referenced by fasteners WB objects
+                #-------------------------------------------
+                allObjectsAreFasteners = True
+                for o in inList:
+                    if not a2plib.isFastenerObject(o):
+                        allObjectsAreFasteners = False
+                        break
+                    if allObjectsAreFasteners == True:
+                        self.topLevelShapes.append(objName)
         #-------------------------------------------
         # Got some shapes created by PathWB? filter out...
         # also filter out invisible shapes...
