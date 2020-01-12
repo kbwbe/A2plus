@@ -1111,6 +1111,16 @@ def isA2pObject(obj):
         result = True
     return result
 #------------------------------------------------------------------------------
+def isFastenerObject(obj):
+    '''
+    recognize an object created by the fasteners WB
+    '''
+    if hasattr(obj,'Proxy'):
+        if str(obj.Proxy).startswith('<FastenersCmd.FSScrewObject'): return True
+        if str(obj.Proxy).startswith('<FastenersCmd.FSWasherObject'): return True
+        if str(obj.Proxy).startswith('<FastenersCmd.FSScrewRodObject'): return True
+    return False
+#------------------------------------------------------------------------------
 def makeDiffuseElement(color,trans):
     return (color[0],color[1],color[2],trans/100.0)
 #------------------------------------------------------------------------------
