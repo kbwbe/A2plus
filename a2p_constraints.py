@@ -112,7 +112,8 @@ class BasicConstraint():
         parent = FreeCAD.ActiveDocument.getObject(c.Object1)
         c.addProperty("App::PropertyLink","ParentTreeObject","ConstraintInfo").ParentTreeObject = parent
         c.setEditorMode('ParentTreeObject',1)
-        parent.Label = parent.Label # this is needed to trigger an update
+        # this is needed to trigger an update
+        parent.touch()
     
     def setInitialValues(self):
         c = self.constraintObject

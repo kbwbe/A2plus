@@ -953,12 +953,14 @@ class a2p_ConstraintValuePanel(QtGui.QDockWidget):
         self.storeWindowPosition()
         self.Accepted.emit()
         a2plib.setConstraintEditorRef(None)
+        a2plib.unTouchA2pObjects()
         self.deleteLater()
 
     def onDeleteConstraint(self):
         self.storeWindowPosition()
         self.Deleted.emit()
         a2plib.setConstraintEditorRef(None)
+        a2plib.unTouchA2pObjects()
         self.deleteLater()
 
     def closeEvent(self,event):
