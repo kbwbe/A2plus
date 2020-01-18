@@ -686,6 +686,7 @@ def solveConstraints( doc, cache=None, useTransaction = True, matelist=None):
     ss = SolverSystem()
     systemSolved = ss.solveSystem(doc, matelist )
     if useTransaction: doc.commitTransaction()
+    a2plib.unTouchA2pObjects()
     return systemSolved
 
 def autoSolveConstraints( doc, callingFuncName, cache=None, useTransaction=True, matelist=None):
