@@ -28,6 +28,7 @@ import os, sys, math, copy
 #from a2p_viewProviderProxies import *
 from  FreeCAD import Base
 
+import a2plib
 from a2plib import *
 from a2p_solversystem import solveConstraints
 import a2p_constraints
@@ -956,12 +957,14 @@ class a2p_ConstraintValuePanel(QtGui.QDockWidget):
         self.storeWindowPosition()
         self.Accepted.emit()
         a2plib.setConstraintEditorRef(None)
+        a2plib.unTouchA2pObjects()
         self.deleteLater()
 
     def onDeleteConstraint(self):
         self.storeWindowPosition()
         self.Deleted.emit()
         a2plib.setConstraintEditorRef(None)
+        a2plib.unTouchA2pObjects()
         self.deleteLater()
 
     def closeEvent(self,event):

@@ -410,9 +410,11 @@ class TopoMapper(object):
         
         S = set(shapeObs)
         for ob in S:
+            inList = a2plib.filterShapeObs(ob.InList)
+            outList = a2plib.filterShapeObs(ob.OutList)
             self.treeNodes[ob.Name] = (
-                    a2plib.filterShapeObs(ob.InList),
-                    a2plib.filterShapeObs(ob.OutList)
+                    inList,
+                    outList
                     )
         #-------------------------------------------
         # nodes with empty inList are top level shapes for sure
@@ -455,12 +457,29 @@ class TopoMapper(object):
                     if allObjectsAreFasteners == True:
                         self.topLevelShapes.append(objName)
         #-------------------------------------------
+        # Got some shapes used by sections?
+        # collect them to a blacklist
+        # InLists of objects used by section are empty, therefore they
+        # are recognized falsely as topLevelShapes
+        #-------------------------------------------
+        blackList = []
+        for ob in self.doc.Objects:
+            if ob.Name.startswith("Section"):
+                if hasattr(ob,"Base"):
+                    if ob.Base is not None:
+                        blackList.append(ob.Base.Name)
+                if hasattr(ob,"Tool"):
+                    if ob.Tool is not None:
+                        blackList.append(ob.Tool.Name)
+        #-------------------------------------------
         # Got some shapes created by PathWB? filter out...
         # also filter out invisible shapes...
+        # also filter out the blackList
         #-------------------------------------------
         tmp = []
         for n in self.topLevelShapes:
             if self.addedByPathWB(n): continue
+            if n in blackList: continue
             #
             if a2plib.doNotImportInvisibleShapes():
                 ob = self.doc.getObject(n)

@@ -201,7 +201,9 @@ def create_constraint_mirror( constraintObj, iconPath, origLabel= '', mirrorLabe
     parent = FreeCAD.ActiveDocument.getObject(constraintObj.Object2)
     cMirror.ParentTreeObject = parent
     cMirror.setEditorMode('ParentTreeObject',1)
-    parent.Label = parent.Label # this is needed to trigger an update
+    # this is needed to trigger an update
+    parent.touch()
+    
 
     ConstraintMirrorObjectProxy( cMirror, constraintObj )
     cMirror.ViewObject.Proxy = ConstraintMirrorViewProviderProxy( constraintObj, iconPath )

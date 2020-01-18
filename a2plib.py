@@ -231,7 +231,16 @@ def isPartialProcessing():
 def filterShapeObs(_list):
     lst = []
     for ob in _list:
-        if ob.hasExtension('App::GeoFeatureGroupExtension'):continue #Part Containers within FC0.19.18405 seem to have a shape property..
+        if (
+            #Following object now have App::GeoFeatureGroupExtension in FC0.19
+            #prevent them from beeing filtered out.
+            ob.Name.startswith("Boolean") or 
+            ob.Name.startswith("Body")
+            ):
+            pass
+        elif ob.hasExtension('App::GeoFeatureGroupExtension'):
+            #Part Containers within FC0.19.18405 seem to have a shape property..
+            continue
         if hasattr(ob,"Shape"):
             if len(ob.Shape.Faces) > 0 and len(ob.Shape.Vertexes) > 0:
                 lst.append(ob)
@@ -881,6 +890,12 @@ def getAxis(obj, subElementName):
             
     return axis # may be none!
 #------------------------------------------------------------------------------
+def unTouchA2pObjects():
+    doc = FreeCAD.activeDocument()
+    for obj in doc.Objects:
+        if isA2pObject(obj):
+            obj.purgeTouched();
+#------------------------------------------------------------------------------
 def isA2pPart(obj):
     result = False
     if hasattr(obj,"Content"):
@@ -1020,7 +1035,7 @@ def a2p_repairTreeView():
             c.setEditorMode("ParentTreeObject", 1)
         parent = doc.getObject(c.Object1)
         c.ParentTreeObject = parent
-        parent.Label = parent.Label # trigger an update...
+        if parent is not None: parent.touch()
         if c.Proxy != None:
             c.Proxy.disable_onChanged = False
     #
@@ -1033,7 +1048,9 @@ def a2p_repairTreeView():
             m.setEditorMode("ParentTreeObject", 1)
         parent = doc.getObject(m.Object2)
         m.ParentTreeObject = parent
-        parent.Label = parent.Label # trigger an update...
+        if parent is not None: parent.touch()
         if m.Proxy != None:
             m.Proxy.disable_onChanged = False
+            
+    unTouchA2pObjects()
 #------------------------------------------------------------------------------
