@@ -231,7 +231,16 @@ def isPartialProcessing():
 def filterShapeObs(_list):
     lst = []
     for ob in _list:
-        if ob.hasExtension('App::GeoFeatureGroupExtension'):continue #Part Containers within FC0.19.18405 seem to have a shape property..
+        if (
+            #Following object now have App::GeoFeatureGroupExtension in FC0.19
+            #prevent them from beeing filtered out.
+            ob.Name.startswith("Boolean") or 
+            ob.Name.startswith("Body")
+            ):
+            pass
+        elif ob.hasExtension('App::GeoFeatureGroupExtension'):
+            #Part Containers within FC0.19.18405 seem to have a shape property..
+            continue
         if hasattr(ob,"Shape"):
             if len(ob.Shape.Faces) > 0 and len(ob.Shape.Vertexes) > 0:
                 lst.append(ob)
