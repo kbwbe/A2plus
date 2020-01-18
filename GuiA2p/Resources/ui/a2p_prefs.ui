@@ -10,6 +10,12 @@
     <height>793</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="windowTitle">
    <string>A2plus settings</string>
   </property>
@@ -22,16 +28,22 @@
      <height>81</height>
     </rect>
    </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <property name="title">
     <string>User interface settings</string>
    </property>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>20</x>
       <y>30</y>
-      <width>199</width>
-      <height>42</height>
+      <width>241</width>
+      <height>50</height>
      </rect>
     </property>
     <layout class="QFormLayout" name="formLayout_3">
@@ -82,19 +94,25 @@
      <height>231</height>
     </rect>
    </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <property name="toolTip">
     <string/>
    </property>
    <property name="title">
     <string>Behavior when updating imported parts</string>
    </property>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>22</x>
       <y>21</y>
-      <width>391</width>
-      <height>134</height>
+      <width>476</width>
+      <height>158</height>
      </rect>
     </property>
     <layout class="QFormLayout" name="formLayout">
@@ -215,6 +233,12 @@ subassemblies. Otherwise you can break the assembly.</string>
      <height>161</height>
     </rect>
    </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <property name="title">
     <string>Storage of files</string>
    </property>
@@ -323,6 +347,12 @@ subassemblies. Otherwise you can break the assembly.</string>
      <height>61</height>
     </rect>
    </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <property name="title">
     <string>Default solver behavior</string>
    </property>
@@ -358,16 +388,22 @@ subassemblies. Otherwise you can break the assembly.</string>
      <height>131</height>
     </rect>
    </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <property name="title">
     <string>Default solving method</string>
    </property>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>21</x>
       <y>21</y>
-      <width>384</width>
-      <height>65</height>
+      <width>469</width>
+      <height>77</height>
      </rect>
     </property>
     <layout class="QFormLayout" name="formLayout_2">
