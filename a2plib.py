@@ -654,16 +654,23 @@ def CircularEdgeSelected( selection ):
             edge = getObjectEdgeFromName( selection.Object, subElement)
             if not hasattr(edge, 'Curve'): #issue 39
                 return False
+            if isLine(edge.Curve):
+                return False
             if hasattr( edge.Curve, 'Radius' ):
                 return True
-
-            BSpline = edge.Curve.toBSpline()
-            arcs = BSpline.toBiArcs(10**-6)
-            if all( hasattr(a,'Center') for a in arcs ):
-                centers = numpy.array([a.Center for a in arcs])
-                sigma = numpy.std( centers, axis=0 )
-                if max(sigma) < 10**-6: #then circular curve
-                    return True
+            
+            # the following section fails for linear edges, protect it
+            # by try/except block
+            try:
+                BSpline = edge.Curve.toBSpline()
+                arcs = BSpline.toBiArcs(10**-6)
+                if all( hasattr(a,'Center') for a in arcs ):
+                    centers = numpy.array([a.Center for a in arcs])
+                    sigma = numpy.std( centers, axis=0 )
+                    if max(sigma) < 10**-6: #then circular curve
+                        return True
+            except:
+                pass
             
     return False
 #------------------------------------------------------------------------------
