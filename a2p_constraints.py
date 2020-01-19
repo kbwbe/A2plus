@@ -76,9 +76,9 @@ class BasicConstraint():
         ob.addProperty("App::PropertyString","SubElement1","ConstraintInfo").SubElement1 = self.sub1
         ob.addProperty("App::PropertyString","Object2","ConstraintInfo").Object2 = self.ob2Name
         ob.addProperty("App::PropertyString","SubElement2","ConstraintInfo").SubElement2 = self.sub2
-        ob.addProperty("App::PropertyString", "Toponame1", "ConstraintInfo").Toponame1 = ''
-        ob.addProperty("App::PropertyString", "Toponame2", "ConstraintInfo").Toponame2 = ''
-        ob.addProperty("App::PropertyBool","suppressed","ConstraintInfo").suppressed = False
+        ob.addProperty("App::PropertyString","Toponame1","ConstraintInfo").Toponame1 = ''
+        ob.addProperty("App::PropertyString","Toponame2","ConstraintInfo").Toponame2 = ''
+        ob.addProperty("App::PropertyBool","Suppressed","ConstraintInfo").Suppressed = False
         
         for prop in ["Object1","Object2","SubElement1","SubElement2","Type"]:
             ob.setEditorMode(prop, 1)
@@ -117,7 +117,7 @@ class BasicConstraint():
             c.directionConstraint = self.direction
             c.setEditorMode("directionConstraint", 0) # set not editable...
         if self.offset != None:
-            c.addProperty('App::PropertyDistance','offset',"ConstraintInfo").offset = self.offset
+            c.addProperty("App::PropertyDistance","offset","ConstraintInfo").offset = self.offset
             c.setEditorMode("offset", 0) # set not editable...
         if self.angle != None:
             c.addProperty("App::PropertyAngle","angle","ConstraintInfo").angle = self.angle
