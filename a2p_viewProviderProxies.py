@@ -220,11 +220,13 @@ class ConstraintObjectProxy:
     def setProperties(self,obj):
         propList = obj.PropertiesList
         if not "Toponame1" in propList:
-            obj.addProperty("App::PropertyString", "Toponame1", "ConstraintInfo")
+            obj.addProperty("App::PropertyString","Toponame1","ConstraintInfo")
         if not "Toponame2" in propList:
-            obj.addProperty("App::PropertyString", "Toponame2", "ConstraintInfo")
-        if not "suppressed" in propList:
-            obj.addProperty("App::PropertyBool","suppressed","ConstraintInfo")
+            obj.addProperty("App::PropertyString","Toponame2","ConstraintInfo")
+        if not "Suppressed" in propList:
+            obj.addProperty("App::PropertyBool","Suppressed","ConstraintInfo")
+        if "suppressed" in propList:
+            obj.removeProperty("suppressed")
         self.type = "a2p_constraint"
 
     def onDocumentRestored(self,obj):
@@ -281,8 +283,10 @@ class ConstraintMirrorObjectProxy:
             obj.addProperty("App::PropertyString", "Toponame1", "ConstraintNfo")
         if not "Toponame2" in propList:
             obj.addProperty("App::PropertyString", "Toponame2", "ConstraintNfo")
-        if not "suppressed" in propList:
-            obj.addProperty("App::PropertyBool","suppressed","ConstraintNfo")
+        if not "Suppressed" in propList:
+            obj.addProperty("App::PropertyBool","Suppressed","ConstraintInfo")
+        if "suppressed" in propList:
+            obj.removeProperty("suppressed")
         self.type = "a2p_constraint_mirror"
 
     def onDocumentRestored(self,obj):

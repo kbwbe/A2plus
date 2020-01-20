@@ -152,11 +152,11 @@ class SolverSystem():
         else:
             # if there is not a list of my mates get the list from the doc
             constraints = [ obj for obj in doc.Objects if 'ConstraintInfo' in obj.Content]
-        #check for suppressed mates here and transfer mates to self.constraints
+        #check for Suppressed mates here and transfer mates to self.constraints
         for obj in constraints:
-            if hasattr(obj,'suppressed'):
-                #if the mate is suppressed do not add it
-                if obj.suppressed == False:
+            if hasattr(obj,'Suppressed'):
+                #if the mate is Suppressed do not add it
+                if obj.Suppressed == False:
                     self.constraints.append(obj)
 
         #
