@@ -513,14 +513,14 @@ def numpyVecToFC(nv):
 #------------------------------------------------------------------------------
 def fit_rotation_axis_to_surface1( surface, n_u=3, n_v=3 ):
     'should work for cylinders and possibly cones (depending on the u,v mapping)'
-    uv = sum( [ [ (u,v) for u in linspace(0,1,n_u)] for v in linspace(0,1,n_v) ], [] )
+    uv = sum( [ [ (u,v) for u in numpy.linspace(0,1,n_u)] for v in numpy.linspace(0,1,n_v) ], [] )
     P = [ numpy.array(surface.value(u,v)) for u,v in uv ] #positions at u,v points
-    N = [ crossProduct( *surface.tangent(u,v) ) for u,v in uv ] 
+    N = [ numpy.cross( *surface.tangent(u,v) ) for u,v in uv ] 
     intersections = []
     for i in range(len(N)-1):
         for j in range(i+1,len(N)):
             # based on the distance_between_axes( p1, u1, p2, u2) function,
-            if 1 - abs(dot( N[i], N[j])) < 10**-6:
+            if 1 - abs(numpy.dot( N[i], N[j])) < 10**-6:
                 continue #ignore parrallel case
             p1_x, p1_y, p1_z = P[i]
             u1_x, u1_y, u1_z = N[i]
