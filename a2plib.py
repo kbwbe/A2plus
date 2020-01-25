@@ -904,8 +904,17 @@ def getAxis(obj, subElementName):
 def unTouchA2pObjects():
     doc = FreeCAD.activeDocument()
     for obj in doc.Objects:
+        # leave A2pSketches touched (for recomputing dependent shapes)
+        if isA2pSketch(obj): continue
         if isA2pObject(obj):
             obj.purgeTouched();
+#------------------------------------------------------------------------------
+def isA2pSketch(obj):
+    result = False
+    if isA2pPart(obj):
+        if len(obj.Shape.Faces) == 0:
+            result = True
+    return result
 #------------------------------------------------------------------------------
 def isA2pPart(obj):
     result = False
