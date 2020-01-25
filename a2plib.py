@@ -228,9 +228,13 @@ def setPartialProcessing(enabled):
 def isPartialProcessing():
     return PARTIAL_PROCESSING_ENABLED
 #------------------------------------------------------------------------------
-def filterShapeObs(_list):
+def filterShapeObs(_list, allowSketches=False):
     lst = []
     for ob in _list:
+        if allowSketches == True:
+            if ob.Name.startswith("Sketch"):
+                lst.append(ob)
+                continue
         if (
             #Following object now have App::GeoFeatureGroupExtension in FC0.19
             #prevent them from beeing filtered out.
