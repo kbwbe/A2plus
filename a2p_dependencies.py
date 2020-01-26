@@ -519,6 +519,7 @@ class DependencyPointIdentity(Dependency):
         # These constraint have to be the last evaluated in the chain of constraints.
             
         tmpaxis = cleanAxis(create_Axis(self.refPoint, self.currentRigid.getRigidCenter()))
+        
         #dofpos = PointIdentityPos(tmpaxis,_dofPos,_pointconstraints)
         #dofrot = PointIdentityRot(tmpaxis,_dofRot,_pointconstraints)
         return PointIdentity(tmpaxis, _dofPos, _dofRot, _pointconstraints)
