@@ -203,6 +203,9 @@ def getOrCreateA2pFile(
 
     # Get a list of the importable Objects
     importableObjects = topoMapper.getTopLevelObjects()
+    # if nothing is found, look for importable Sketches (FIXME)
+    if len(importableObjects) == 0:
+        importableObjects = topoMapper.getTopLevelObjects(allowSketches=True)
     
     if len(importableObjects) == 0:
         msg = "No visible Part to import found. Create no A2p-file.."
@@ -328,6 +331,8 @@ class FileCache():
     def getTopoName(self,obj,subName):
         # No toponaming for import of single shapes
         # Single Shape references have been removed for next time
+        if obj is None:
+            return("")
         if obj.sourcePart is not None and len(obj.sourcePart)>0: 
             return ""
         if not self.loadObject(obj.sourceFile): return ""

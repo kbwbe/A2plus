@@ -421,9 +421,13 @@ def setPartialProcessing(enabled):
 def isPartialProcessing():
     return PARTIAL_PROCESSING_ENABLED
 #------------------------------------------------------------------------------
-def filterShapeObs(_list):
+def filterShapeObs(_list, allowSketches=False):
     lst = []
     for ob in _list:
+        if allowSketches == True:
+            if ob.Name.startswith("Sketch"):
+                lst.append(ob)
+                continue
         if (
             #Following object now have App::GeoFeatureGroupExtension in FC0.19
             #prevent them from beeing filtered out.
@@ -1096,8 +1100,17 @@ def getAxis(obj, subElementName):
 def unTouchA2pObjects():
     doc = FreeCAD.activeDocument()
     for obj in doc.Objects:
+        # leave A2pSketches touched (for recomputing dependent shapes)
+        if isA2pSketch(obj): continue
         if isA2pObject(obj):
             obj.purgeTouched();
+#------------------------------------------------------------------------------
+def isA2pSketch(obj):
+    result = False
+    if isA2pPart(obj):
+        if len(obj.Shape.Faces) == 0:
+            result = True
+    return result
 #------------------------------------------------------------------------------
 def isA2pPart(obj):
     result = False

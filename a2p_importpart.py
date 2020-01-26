@@ -130,7 +130,7 @@ def importSingleShapeFromFile(
     #-------------------------------------------
     # Get a list of the importable Objects
     #-------------------------------------------
-    importableObjects = topoMapper.getTopLevelObjects()
+    importableObjects = topoMapper.getTopLevelObjects(allowSketches=True)
     
     if len(importableObjects) == 0:
         msg = "No visible Part to import found. Aborting operation"

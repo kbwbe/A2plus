@@ -403,17 +403,17 @@ class TopoMapper(object):
             else: return False
         return True
 
-    def getTopLevelObjects(self):
+    def getTopLevelObjects(self, allowSketches=False):
         #-------------------------------------------
         # Create treenodes of the importable Objects with a shape
         #-------------------------------------------
         self.treeNodes = {}
-        shapeObs = a2plib.filterShapeObs(self.doc.Objects)
+        shapeObs = a2plib.filterShapeObs(self.doc.Objects,allowSketches)
         
         S = set(shapeObs)
         for ob in S:
-            inList = a2plib.filterShapeObs(ob.InList)
-            outList = a2plib.filterShapeObs(ob.OutList)
+            inList = a2plib.filterShapeObs(ob.InList,allowSketches)
+            outList = a2plib.filterShapeObs(ob.OutList,allowSketches)
             self.treeNodes[ob.Name] = (
                     inList,
                     outList
@@ -517,8 +517,13 @@ class TopoMapper(object):
         assigns toponames to its geometry if toponaming is
         enabled.
         '''
+        if desiredShapeLabel is not None:
+            allowSketches = True
+        else:
+            allowSketches = False
+        
         self.detectPartDesignDocument()
-        self.getTopLevelObjects()
+        self.getTopLevelObjects(allowSketches)
         
         # filter topLevelShapes if there is a desiredShapeLabel 
         # means: extract only one desired shape out of whole file...
@@ -548,44 +553,56 @@ class TopoMapper(object):
         transparency = 0
         shape_list = []
         
-        for objName in self.topLevelShapes:
-            ob = self.doc.getObject(objName)
-            tempShape = self.makePlacedShape(ob)
-            try: # will not work is object is a link
-                needDiffuseExtension = ( len(ob.ViewObject.DiffuseColor) < len(ob.Shape.Faces) )
-                shapeCol = ob.ViewObject.ShapeColor
-                diffuseCol = ob.ViewObject.DiffuseColor
-                transparency = ob.ViewObject.Transparency
-                shape_list.append(ob.Shape)
-                if needDiffuseExtension:
-                    diffuseElement = a2plib.makeDiffuseElement(shapeCol,transparency)
-                    for i in range(0,len(tempShape.Faces)):
-                        faceColors.append(diffuseElement)
-                else:
-                    faceColors.extend(diffuseCol) #let python libs extend faceColors, much faster
-            except:
-                pass
-            
-            faces.extend(tempShape.Faces) #let python libs extend faces, much faster
+        if len(self.topLevelShapes)==1 and self.topLevelShapes[0].startswith("Sketch"):
+            importingSketch = True
+        else:
+            importingSketch = False
 
-        shell = Part.makeShell(faces)
+        if importingSketch == True:
+            # We are importing a sketch object
+            objName = self.topLevelShapes[0]
+            sketchOb = self.doc.getObject(objName)
+            solid = sketchOb.Shape
+        else:
+            # We are importing no sketch object
+            for objName in self.topLevelShapes:
+                ob = self.doc.getObject(objName)
+                tempShape = self.makePlacedShape(ob)
+                try: # will not work is object is a link
+                    needDiffuseExtension = ( len(ob.ViewObject.DiffuseColor) < len(ob.Shape.Faces) )
+                    shapeCol = ob.ViewObject.ShapeColor
+                    diffuseCol = ob.ViewObject.DiffuseColor
+                    transparency = ob.ViewObject.Transparency
+                    shape_list.append(ob.Shape)
+                    if needDiffuseExtension:
+                        diffuseElement = a2plib.makeDiffuseElement(shapeCol,transparency)
+                        for i in range(0,len(tempShape.Faces)):
+                            faceColors.append(diffuseElement)
+                    else:
+                        faceColors.extend(diffuseCol) #let python libs extend faceColors, much faster
+                except:
+                    pass
                 
-        try:
-            if a2plib.getUseSolidUnion():
-                if len(shape_list) > 1:
-                    shape_base=shape_list[0]
-                    shapes=shape_list[1:]
-                    solid = shape_base.fuse(shapes)
-                else:   #one shape only
-                    solid = Part.Solid(shape_list[0])
-            else:
-                solid = Part.Solid(shell) # fails with missing faces if shell contains spheres
-                if len(shell.Faces) != len(solid.Faces):
-                    solid = shell # fall back to shell if faces are missing
-        except:
-            # keeping a shell if solid is failing
-            FreeCAD.Console.PrintWarning('Union of Shapes FAILED\n')
-            solid = shell
+                faces.extend(tempShape.Faces) #let python libs extend faces, much faster
+    
+            shell = Part.makeShell(faces)
+                    
+            try:
+                if a2plib.getUseSolidUnion():
+                    if len(shape_list) > 1:
+                        shape_base=shape_list[0]
+                        shapes=shape_list[1:]
+                        solid = shape_base.fuse(shapes)
+                    else:   #one shape only
+                        solid = Part.Solid(shape_list[0])
+                else:
+                    solid = Part.Solid(shell) # fails with missing faces if shell contains spheres
+                    if len(shell.Faces) != len(solid.Faces):
+                        solid = shell # fall back to shell if faces are missing
+            except:
+                # keeping a shell if solid is failing
+                FreeCAD.Console.PrintWarning('Union of Shapes FAILED\n')
+                solid = shell
         
         #-------------------------------------------
         # if toponaming is used, assign toponames to
