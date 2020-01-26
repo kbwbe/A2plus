@@ -94,7 +94,10 @@ def zeroIfLessThanTol(vector):
 def cleanAxis(axisa):
     axis=FreeCAD.Axis(axisa)
     axis.Base = zeroIfLessThanTol(axis.Base)
-    axis.Direction.normalize()
+    try:
+        axis.Direction.normalize()
+    except:
+        pass
     axis.Direction = zeroIfLessThanTol(axis.Direction)
     return axis
 
