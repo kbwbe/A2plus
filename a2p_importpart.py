@@ -441,7 +441,7 @@ Check your settings of A2plus preferences.
 
 # WF: how will this work for multiple imported objects?
 #     only A2p AI's will have property "fixedPosition"
-        if importedObject and not importedObject.fixedPosition:
+        if importedObject and not a2plib.isA2pSketch(importedObject) and not importedObject.fixedPosition:
             PartMover( view, importedObject, deleteOnEscape = True )
         else:
             self.timer = QtCore.QTimer()
