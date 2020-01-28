@@ -425,6 +425,8 @@ class TopoMapper(object):
             inList,dummy = self.treeNodes[objName]
             if self.isTopLevelInList(inList):
                 self.topLevelShapes.append(objName)
+            elif allowSketches==True and objName.startswith('Sketch'): # want to have all sketches
+                self.topLevelShapes.append(objName)
             else:
                 #-------------------------------------------
                 # search for missing non top-level clone-basefeatures

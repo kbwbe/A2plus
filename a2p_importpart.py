@@ -439,9 +439,11 @@ Check your settings of A2plus preferences.
         if sub != None:
             sub.showMaximized()
 
-# WF: how will this work for multiple imported objects?
-#     only A2p AI's will have property "fixedPosition"
-        if importedObject and not importedObject.fixedPosition:
+        # WF: how will this work for multiple imported objects?
+        #     only A2p AI's will have property "fixedPosition"
+        if importedObject  and a2plib.isA2pSketch(importedObject):
+            importedObject.fixedPosition = True
+        if importedObject and not a2plib.isA2pSketch(importedObject) and not importedObject.fixedPosition:
             PartMover( view, importedObject, deleteOnEscape = True )
         else:
             self.timer = QtCore.QTimer()
