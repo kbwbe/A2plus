@@ -206,6 +206,9 @@ Add a pointOnLine constraint between two objects
 1.) select a vertex, a sphere or a circle from a part
 2.) select a linear edge or a cylindrical face on another part
 
+For second selection you also can use a circular edge. Then
+it's axis will be taken as line definition
+
 Button gets active after
 correct selection.
 '''
@@ -218,7 +221,7 @@ correct selection.
             if s1.ObjectName != s2.ObjectName:
                 if (
                     (vertexSelected(s1) or sphericalSurfaceSelected(s1) or CircularEdgeSelected(s1)) and 
-                    (LinearEdgeSelected(s2) or cylindricalFaceSelected(s2))
+                    (LinearEdgeSelected(s2) or cylindricalFaceSelected(s2) or CircularEdgeSelected(s2))
                     ):
                     validSelection = True
         return validSelection
@@ -362,7 +365,8 @@ correct selection.
         
         def ValidSelection(selectionExObj):
             return cylindricalFaceSelected(selectionExObj) \
-                or LinearEdgeSelected(selectionExObj) 
+                or LinearEdgeSelected(selectionExObj) \
+                or CircularEdgeSelected(selectionExObj)
         
         validSelection = False
         if len(selection) == 2:
@@ -404,6 +408,9 @@ select:
 1.) linear edge or cylindrical face from a part
 2.) linear edge or cylindrical face from another part
 
+You can use also a circular edge. It's axis will
+be taken as line
+
 Button gets active after
 correct selection.
 '''
@@ -415,8 +422,8 @@ correct selection.
             s1, s2 = selection
             if s1.ObjectName != s2.ObjectName:
                 if (
-                    (LinearEdgeSelected(s1) or cylindricalFaceSelected(s1)) and
-                    (LinearEdgeSelected(s2) or cylindricalFaceSelected(s2))
+                    (LinearEdgeSelected(s1) or cylindricalFaceSelected(s1) or CircularEdgeSelected(s1)) and
+                    (LinearEdgeSelected(s2) or cylindricalFaceSelected(s2) or CircularEdgeSelected(s2))
                     ): 
                     validSelection = True
         return validSelection
