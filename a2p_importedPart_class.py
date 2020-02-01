@@ -44,6 +44,10 @@ class Proxy_importPart:
         
     def setProperties(self,obj):
         propList = obj.PropertiesList
+        
+        if not "objectType" in propList:
+            obj.addProperty("App::PropertyString", "objectType", "importPart")
+            obj.objectType = 'a2pPart'
         if not "a2p_Version" in propList:
             obj.addProperty("App::PropertyString", "a2p_Version", "importPart")
             obj.a2p_Version = A2P_VERSION

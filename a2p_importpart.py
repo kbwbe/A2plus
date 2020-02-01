@@ -307,7 +307,12 @@ def importPartFromFile(
         else:
             newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = \
                 topoMapper.createTopoNames()
-        
+    
+    newObj.objectType = 'a2pPart'
+    if extractSingleShape == True:
+        if a2plib.isA2pSketch(newObj):
+            newObj.objectType = 'a2pSketch'
+    newObj.setEditorMode("objectType",1)
 
     doc.recompute()
 

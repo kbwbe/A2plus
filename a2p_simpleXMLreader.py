@@ -71,6 +71,7 @@ class simpleXMLObject(object):
         subAssemblyImportFound = False
         timeLastImportFound = False
         spreadSheetCellsFound = False
+        a2pObjectTypeFound = False
         
         numLines = len(self.xmlDefs)
         # Readout object's name and save it (1rst line)
@@ -139,6 +140,15 @@ class simpleXMLObject(object):
                         cellDict[cellAdress] = a2plib.to_str(cellContent)
                     idx += 1
                 self.propertyDict[b'cells'] = cellDict
+                
+            elif not a2pObjectTypeFound and line.startswith(b'<Property name="objectType"'):
+                idx+=1
+                line = self.xmlDefs[idx]
+                segments = line.split(b'"')
+                objectType = segments[1]
+                self.propertyDict[b'objectType'] = a2plib.to_bytes(objectType)
+                a2pObjectTypeFound = True
+                
             idx+=1
         self.xmlDefs = [] # we are done, free memory...
         
@@ -160,6 +170,15 @@ class simpleXMLObject(object):
         if self.propertyDict.get(b'a2p_Version',None) != None: return True
         return False
     
+    def isA2pSketch(self):
+        if self.isA2pObject:
+            value = self.propertyDict.get(b'objectType',None)
+            if value != None:
+                if value == b'a2pSketch':
+                    #print("Sketch detected")
+                    return True
+        return False
+
     def isSpreadSheet(self):
         if self.propertyDict.get(b'cells',None) != None: return True
         return False
@@ -271,6 +290,10 @@ class FCdocumentReader(object):
         if not self.successfulOpened: return []
         out = []
         for ob in self.objects:
+            value = ob.propertyDict.get(b'objectType',None)
+            if value != None:
+                if value == b'a2pSketch':
+                    continue
             if ob.propertyDict.get(b'a2p_Version',None) != None:
                 out.append(ob)
                 continue
