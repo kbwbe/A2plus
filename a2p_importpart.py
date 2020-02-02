@@ -208,6 +208,11 @@ def importSingleShapeFromFile(
     newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = \
         topoMapper.createTopoNames(desiredShapeLabel = dc.tx)
 
+    newObj.objectType = 'a2pPart'
+    if a2plib.isA2pSketch(newObj):
+        newObj.objectType = 'a2pSketch'
+    newObj.setEditorMode("objectType",1)
+
     doc.recompute()
 
     if not a2plib.getPerFaceTransparency():
@@ -282,6 +287,9 @@ def importPartFromFile(
         newObj.fixedPosition = not any([i.fixedPosition for i in doc.Objects if hasattr(i, 'fixedPosition') ])
     newObj.subassemblyImport = subAssemblyImport
     newObj.setEditorMode("subassemblyImport",1)
+    
+    newObj.objectType = 'a2pPart'
+    newObj.setEditorMode("objectType",1)
 
     #newObj.muxInfo = iMuxInfo
     newObj.muxInfo = []
