@@ -529,7 +529,7 @@ Please delete your last created constraint !
             for obj in self.unmovedParts:
                 FreeCADGui.Selection.addSelection(obj)
             msg = '''    
-The highlighted parts where not moved. They are
+The highlighted parts were not moved. They are
 not constrained (also over constraint chains)
 to a fixed part!
 '''
