@@ -691,7 +691,10 @@ def updateImportedParts(doc):
                     # save Placement because following newObject.Shape.copy() isn't resetting it to zeroes...
                     savedPlacement  = obj.Placement
                     obj.Shape = newObject.Shape.copy()
-                    obj.Placement = savedPlacement # restore the old placement
+                    if a2plib.isA2pSketch(obj):
+                        pass
+                    else:
+                        obj.Placement = savedPlacement # restore the old placement
                     a2plib.copyObjectColors(obj,newObject)
 
 
