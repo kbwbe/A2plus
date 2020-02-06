@@ -744,9 +744,8 @@ def findUnusedObjectName(base, counterStart=1, fmt='%03i', document=None):
         i += 1
         objName = '%s%s' % (base2, fmt%i)
     return objName
-
 #------------------------------------------------------------------------------
-def findUnusedObjectLabel(base, counterStart=1, fmt='%03i', document=None):
+def findUnusedObjectLabel(base, counterStart=1, fmt='%03i', document=None, extension=None):
     if document == None:
         document = FreeCAD.ActiveDocument
     i = counterStart
@@ -757,13 +756,17 @@ def findUnusedObjectLabel(base, counterStart=1, fmt='%03i', document=None):
     else:
         base2 = base
     base2 = base2 + '_'
+    
+    if extension==None:
+        base3 = base2
+    else:
+        base3 = base2+extension+'_'
 
-    objLabel = '%s%s' % (base2, fmt%i)
+    objLabel = '%s%s' % (base3, fmt%i)
     while objLabel in usedLabels:
         i += 1
-        objLabel = '%s%s' % (base2, fmt%i)
+        objLabel = '%s%s' % (base3, fmt%i)
     return objLabel
-
 #------------------------------------------------------------------------------
 class ConstraintSelectionObserver:
 

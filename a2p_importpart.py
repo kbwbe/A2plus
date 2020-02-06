@@ -169,7 +169,11 @@ def importSingleShapeFromFile(
     subAssemblyImport = False
         
     partName = a2plib.findUnusedObjectName( importDoc.Label, document=doc )
-    partLabel = a2plib.findUnusedObjectLabel( importDoc.Label, document=doc )
+    partLabel = a2plib.findUnusedObjectLabel(
+        importDoc.Label,
+        document=doc,
+        extension=dc.tx
+        )
     if PYVERSION < 3:
         newObj = doc.addObject( "Part::FeaturePython", partName.encode('utf-8') )
     else:
