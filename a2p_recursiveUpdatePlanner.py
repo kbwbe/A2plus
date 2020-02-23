@@ -206,7 +206,7 @@ class a2p_recursiveUpdateImportedPartsCommand:
     def GetResources(self):
         return {
             'Pixmap' : ':/icons/a2p_RecursiveUpdate.svg',
-            'MenuText': 'update imports recursively',
+            'MenuText': 'Update imports recursively',
             'ToolTip': toolTip
             }
 
