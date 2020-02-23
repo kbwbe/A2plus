@@ -36,7 +36,8 @@ def createUpdateFileList(
             importPath,
             parentAssemblyDir,
             filesToUpdate,
-            recursive=False
+            recursive=False,
+            selectedFiles=[] #only update parts with these sourceFiles
             ):
     
     # do not update converted parts
@@ -65,6 +66,11 @@ def createUpdateFileList(
                     ob.name
                     )
                 )
+            continue
+        
+        #Only update parts which are selected by the user...
+        fDir,fName = os.path.split(ob.getA2pSource())
+        if len(selectedFiles)>0 and fName not in selectedFiles:
             continue
         
         if ob.isSubassembly() and recursive:
@@ -117,13 +123,34 @@ class a2p_recursiveUpdateImportedPartsCommand:
         fileName = doc.FileName
         workingDir,basicFileName = os.path.split(fileName)
         
+        selectedFiles=[]
+        partial = False
+        selection = [s for s in FreeCADGui.Selection.getSelection() 
+                     if s.Document == FreeCAD.ActiveDocument and
+                     (a2plib.isA2pPart(s) or a2plib.isA2pSketch())
+                     ]
+        if selection and len(selection)>0:
+            flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
+            msg = u"Do you want to update only the selected parts?"
+            response = QtGui.QMessageBox.information(
+                            QtGui.QApplication.activeWindow(),
+                            u"RECURSIVE UPDATE",
+                            msg,
+                            flags
+                            )
+            if response == QtGui.QMessageBox.Yes:
+                partial = True
+                for s in selection:
+                    fDir, fName = os.path.split(s.sourceFile) 
+                    selectedFiles.append(fName)
 
         filesToUpdate = []
         subAsmNeedsUpdate, filesToUpdate = createUpdateFileList(
                                             fileName,
                                             workingDir,
                                             filesToUpdate,
-                                            True
+                                            True,
+                                            selectedFiles
                                             )
         
         for f in filesToUpdate:
@@ -158,7 +185,11 @@ class a2p_recursiveUpdateImportedPartsCommand:
                     QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Value Error", msg )
                     return
             
-            updateImportedParts(importDoc)
+            if importDoc == doc and partial==True:
+                updateImportedParts(importDoc,True)
+            else:
+                updateImportedParts(importDoc)
+
             FreeCADGui.updateGui()
             importDoc.save()
             print(
