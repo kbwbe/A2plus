@@ -398,6 +398,8 @@ class TopoMapper(object):
     def isTopLevelInList(self,lst):
         if len(lst) == 0: return True
         for ob in lst:
+            if ob.Name.startswith("Binder"): continue
+            if ob.Name.startswith("ShapeBinder"): continue
             if ob.Name.startswith("Clone"): continue
             if ob.Name.startswith("Part__Mirroring"): continue
             else: return False
