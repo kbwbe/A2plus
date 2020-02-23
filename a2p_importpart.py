@@ -623,7 +623,7 @@ FreeCADGui.addCommand('a2p_ImportPart',a2p_ImportPartCommand())
 
 
 
-def updateImportedParts(doc):
+def updateImportedParts(doc, partial=False):
     if doc == None:
         QtGui.QMessageBox.information(  
                         QtGui.QApplication.activeWindow(),
@@ -634,7 +634,35 @@ def updateImportedParts(doc):
         
     doc.openTransaction("updateImportParts")    
     objectCache.cleanUp(doc)
-    for obj in doc.Objects:
+    
+    
+    selectedObjects=[]
+    selection = [s for s in FreeCADGui.Selection.getSelection() 
+                 if s.Document == FreeCAD.ActiveDocument and
+                 (a2plib.isA2pPart(s) or a2plib.isA2pSketch())
+                 ]
+    if selection and len(selection)>0:
+        if partial==True:
+            response = QtGui.QMessageBox.Yes
+        else:
+            flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
+            msg = u"Do you want to update only the selected parts?"
+            response = QtGui.QMessageBox.information(
+                            QtGui.QApplication.activeWindow(),
+                            u"ASSEMBLY UPDATE",
+                            msg,
+                            flags
+                            )
+        if response == QtGui.QMessageBox.Yes:
+            for s in selection:
+                selectedObjects.append(s)
+    
+    if len(selectedObjects) >0:
+        workingSet = selectedObjects
+    else:
+        workingSet = doc.Objects
+    
+    for obj in workingSet:
         if hasattr(obj, 'sourceFile') and a2plib.to_str(obj.sourceFile) != a2plib.to_str('converted'):
 
             
