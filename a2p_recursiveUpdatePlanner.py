@@ -125,6 +125,7 @@ class a2p_recursiveUpdateImportedPartsCommand:
         workingDir,basicFileName = os.path.split(fileName)
         
         selectedFiles=[]
+        partial = False
         selection = [s for s in FreeCADGui.Selection.getSelection() 
                      if s.Document == FreeCAD.ActiveDocument and
                      (a2plib.isA2pPart(s) or a2plib.isA2pSketch())
@@ -142,6 +143,7 @@ class a2p_recursiveUpdateImportedPartsCommand:
                 for s in selection:
                     fDir, fName = os.path.split(s.sourceFile) 
                     selectedFiles.append(fName)
+                    partial = True
 
         filesToUpdate = []
         subAsmNeedsUpdate, filesToUpdate = createUpdateFileList(
@@ -184,7 +186,11 @@ class a2p_recursiveUpdateImportedPartsCommand:
                     QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Value Error", msg )
                     return
             
-            updateImportedParts(importDoc)
+            if importDoc==doc and partial==True:
+                updateImportedParts(importDoc,True)
+            else:
+                updateImportedParts(importDoc)
+                
             FreeCADGui.updateGui()
             importDoc.save()
             print(
