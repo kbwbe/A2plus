@@ -127,7 +127,7 @@ class a2p_recursiveUpdateImportedPartsCommand:
         selectedFiles=[]
         selection = [s for s in FreeCADGui.Selection.getSelection() 
                      if s.Document == FreeCAD.ActiveDocument and
-                     a2plib.isA2pPart(s)
+                     (a2plib.isA2pPart(s) or a2plib.isA2pSketch())
                      ]
         if selection and len(selection)>0:
             flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
