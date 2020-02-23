@@ -396,6 +396,7 @@ class TopoMapper(object):
     def isTopLevelInList(self,lst):
         if len(lst) == 0: return True
         for ob in lst:
+            if ob.Name.startswith("Group"): continue
             if ob.Name.startswith("Binder"): continue
             if ob.Name.startswith("ShapeBinder"): continue
             if ob.Name.startswith("Clone"): continue
@@ -465,10 +466,14 @@ class TopoMapper(object):
         # collect them to a blacklist
         # InLists of objects used by section are empty, therefore they
         # are recognized falsely as topLevelShapes
+        #
+        # 2020-02-23: "Group" added to blackList
         #-------------------------------------------
         blackList = []
         for ob in self.doc.Objects:
-            if ob.Name.startswith("Section"):
+            if ob.Name.startswith("Group"):
+                blackList.append(ob.Name)
+            elif ob.Name.startswith("Section"):
                 if hasattr(ob,"Base"):
                     if ob.Base is not None:
                         blackList.append(ob.Base.Name)
