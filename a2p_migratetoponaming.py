@@ -222,7 +222,7 @@ class a2p_MigrateProxiesCommand():
 
     def GetResources(self):
         return {
-            'Pixmap' : ':/icons/a2p_RecursiveUpdate.svg',
+            'Pixmap' : ':/icons/a2p_Upgrade.svg',
             'MenuText': 'Migrate proxies of imported parts',
             'ToolTip': toolTip
             }
