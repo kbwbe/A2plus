@@ -121,7 +121,7 @@ class SolverSystem():
                 #Index:(posAccuracy,spinAccuracy,completeSolvingRequired)
                 1:(0.1,0.1,True),
                 2:(0.01,0.01,True),
-                3:(0.001,0.001,True),
+                3:(0.001,0.001,False),
                 4:(0.0001,0.0001,False),
                 5:(0.00001,0.00001,False)
                 }
