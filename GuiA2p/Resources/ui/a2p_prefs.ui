@@ -10,45 +10,79 @@
     <height>793</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="windowTitle">
    <string>A2plus settings</string>
   </property>
   <widget class="QGroupBox" name="groupBox_4">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>0</x>
      <y>480</y>
      <width>621</width>
-     <height>61</height>
+     <height>81</height>
     </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
    </property>
    <property name="title">
     <string>User interface settings</string>
    </property>
-   <widget class="Gui::PrefCheckBox" name="checkBox_6">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>20</x>
       <y>30</y>
-      <width>591</width>
-      <height>21</height>
+      <width>241</width>
+      <height>50</height>
      </rect>
     </property>
-    <property name="toolTip">
-     <string>Adds a creation button for every constraint type to the toolbar</string>
-    </property>
-    <property name="text">
-     <string>Show constraints in toolbar</string>
-    </property>
-    <property name="checked">
-     <bool>true</bool>
-    </property>
-    <property name="prefEntry" stdset="0">
-     <cstring>showConstraintsOnToolbar</cstring>
-    </property>
-    <property name="prefPath" stdset="0">
-     <cstring>Mod/A2plus</cstring>
-    </property>
+    <layout class="QFormLayout" name="formLayout_3">
+     <item row="0" column="0">
+      <widget class="Gui::PrefCheckBox" name="checkBox_6">
+       <property name="toolTip">
+        <string>Adds a creation button for every constraint type to the toolbar</string>
+       </property>
+       <property name="text">
+        <string>Show constraints in toolbar</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+       <property name="prefEntry" stdset="0">
+        <cstring>showConstraintsOnToolbar</cstring>
+       </property>
+       <property name="prefPath" stdset="0">
+        <cstring>Mod/A2plus</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="Gui::PrefCheckBox" name="checkBox_10">
+       <property name="text">
+        <string>Use native file manager of your OS</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+       <property name="prefEntry" stdset="0">
+        <cstring>useNativeFileManager</cstring>
+       </property>
+       <property name="prefPath" stdset="0">
+        <cstring>Mod/A2plus</cstring>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QGroupBox" name="groupBox_3">
@@ -60,6 +94,12 @@
      <height>231</height>
     </rect>
    </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <property name="toolTip">
     <string/>
    </property>
@@ -69,10 +109,10 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>21</x>
-      <y>20</y>
-      <width>641</width>
-      <height>194</height>
+      <x>22</x>
+      <y>21</y>
+      <width>476</width>
+      <height>158</height>
      </rect>
     </property>
     <layout class="QFormLayout" name="formLayout">
@@ -187,11 +227,17 @@ subassemblies. Otherwise you can break the assembly.</string>
   <widget class="QGroupBox" name="groupBox_6">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>0</x>
      <y>610</y>
-     <width>441</width>
+     <width>621</width>
      <height>161</height>
     </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
    </property>
    <property name="title">
     <string>Storage of files</string>
@@ -301,6 +347,12 @@ subassemblies. Otherwise you can break the assembly.</string>
      <height>61</height>
     </rect>
    </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <property name="title">
     <string>Default solver behavior</string>
    </property>
@@ -330,11 +382,17 @@ subassemblies. Otherwise you can break the assembly.</string>
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>0</x>
      <y>10</y>
      <width>621</width>
      <height>131</height>
     </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
    </property>
    <property name="title">
     <string>Default solving method</string>
@@ -342,10 +400,10 @@ subassemblies. Otherwise you can break the assembly.</string>
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>20</y>
-      <width>599</width>
-      <height>95</height>
+      <x>21</x>
+      <y>21</y>
+      <width>469</width>
+      <height>77</height>
      </rect>
     </property>
     <layout class="QFormLayout" name="formLayout_2">
@@ -407,28 +465,6 @@ where they were created</string>
      </item>
     </layout>
    </widget>
-  </widget>
-  <widget class="Gui::PrefCheckBox" name="checkBox_10">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>550</y>
-     <width>591</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>use native file manager of your OS</string>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-   <property name="prefEntry" stdset="0">
-    <cstring>useNativeFileManager</cstring>
-   </property>
-   <property name="prefPath" stdset="0">
-    <cstring>Mod/A2plus</cstring>
-   </property>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>

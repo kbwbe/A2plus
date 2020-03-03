@@ -49,6 +49,9 @@ SHOW_CONSTRAINTS_ON_TOOLBAR= preferences.GetBool('showConstraintsOnToolbar',True
 RECURSIVE_UPDATE_ENABLED = preferences.GetBool('enableRecursiveUpdate',False)
 USE_SOLID_UNION = preferences.GetBool('useSolidUnion',True)
 
+# if SIMULATION_STATE == True assemblies are solved with less accuracy
+SIMULATION_STATE = False
+
 SAVED_TRANSPARENCY = []
 
 DEBUGPROGRAM = 1
@@ -82,12 +85,32 @@ CONSTRAINT_DIALOG_REF = None
 CONSTRAINT_EDITOR__REF = None
 CONSTRAINT_VIEWMODE = False
 
+
+# This Icon map is necessary to show correct icons within very old assemblies
+A2P_CONSTRAINTS_ICON_MAP = {
+    # constraintType:       iconPath
+    'pointIdentity':        ':/icons/a2p_PointIdentity.svg',
+    'pointOnLine':          ':/icons/a2p_PointOnLineConstraint.svg',
+    'pointOnPlane':         ':/icons/a2p_PointOnPlaneConstraint.svg',
+    'circularEdge':         ':/icons/a2p_CircularEdgeConstraint.svg',
+    'axial':                ':/icons/a2p_AxialConstraint.svg',
+    'axisParallel':         ':/icons/a2p_AxisParallelConstraint.svg',
+    'axisPlaneParallel':    ':/icons/a2p_AxisPlaneParallelConstraint.svg',
+    'axisPlaneNormal':      ':/icons/a2p_AxisPlaneNormalConstraint.svg',
+    'axisPlaneAngle':       ':/icons/a2p_AxisPlaneAngleConstraint.svg',
+    'planesParallel':       ':/icons/a2p_PlanesParallelConstraint.svg',
+    'plane':                ':/icons/a2p_PlaneCoincidentConstraint.svg',
+    'angledPlanes':         ':/icons/a2p_AngleConstraint.svg',
+    'sphereCenterIdent':    ':/icons/a2p_SphericalSurfaceConstraint.svg',
+    'CenterOfMass':         ':/icons/a2p_CenterOfMassConstraint.svg'
+}
+
+
 #------------------------------------------------------------------------------
 # Detect the operating system...
 #------------------------------------------------------------------------------
 tmp = platform.system()
 tmp = tmp.upper()
-#print("loading A2plus on operating system '{}'".format(tmp))
 tmp = tmp.split(' ')
 
 OPERATING_SYSTEM = 'UNKNOWN'
@@ -126,6 +149,10 @@ def to_str(tx):
         else:
             value = tx.decode("utf-8")
     return value # Instance of unicode string
+#------------------------------------------------------------------------------
+def setSimulationState(boolVal):
+    global SIMULATION_STATE
+    SIMULATION_STATE = boolVal
 #------------------------------------------------------------------------------
 def doNotImportInvisibleShapes():
     preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
@@ -201,10 +228,23 @@ def setPartialProcessing(enabled):
 def isPartialProcessing():
     return PARTIAL_PROCESSING_ENABLED
 #------------------------------------------------------------------------------
-def filterShapeObs(_list):
+def filterShapeObs(_list, allowSketches=False):
     lst = []
     for ob in _list:
-        if ob.hasExtension('App::GeoFeatureGroupExtension'):continue #Part Containers within FC0.19.18405 seem to have a shape property..
+        if allowSketches == True:
+            if ob.Name.startswith("Sketch"):
+                lst.append(ob)
+                continue
+        if (
+            #Following object now have App::GeoFeatureGroupExtension in FC0.19
+            #prevent them from beeing filtered out.
+            ob.Name.startswith("Boolean") or 
+            ob.Name.startswith("Body")
+            ):
+            pass
+        elif ob.hasExtension('App::GeoFeatureGroupExtension'):
+            #Part Containers within FC0.19.18405 seem to have a shape property..
+            continue
         if hasattr(ob,"Shape"):
             if len(ob.Shape.Faces) > 0 and len(ob.Shape.Vertexes) > 0:
                 lst.append(ob)
@@ -281,6 +321,50 @@ def appVersionStr():
 def numpyVecToFC(nv):
     assert len(nv) == 3
     return Base.Vector(nv[0],nv[1],nv[2])
+#------------------------------------------------------------------------------
+def fit_rotation_axis_to_surface1( surface, n_u=3, n_v=3 ):
+    'should work for cylinders and possibly cones (depending on the u,v mapping)'
+    uv = sum( [ [ (u,v) for u in numpy.linspace(0,1,n_u)] for v in numpy.linspace(0,1,n_v) ], [] )
+    P = [ numpy.array(surface.value(u,v)) for u,v in uv ] #positions at u,v points
+    N = [ numpy.cross( *surface.tangent(u,v) ) for u,v in uv ] 
+    intersections = []
+    for i in range(len(N)-1):
+        for j in range(i+1,len(N)):
+            # based on the distance_between_axes( p1, u1, p2, u2) function,
+            if 1 - abs(numpy.dot( N[i], N[j])) < 10**-6:
+                continue #ignore parrallel case
+            p1_x, p1_y, p1_z = P[i]
+            u1_x, u1_y, u1_z = N[i]
+            p2_x, p2_y, p2_z = P[j]
+            u2_x, u2_y, u2_z = N[j]
+            t1_t1_coef = u1_x**2 + u1_y**2 + u1_z**2 #should equal 1
+            t1_t2_coef = -2*u1_x*u2_x - 2*u1_y*u2_y - 2*u1_z*u2_z # collect( expand(d_sqrd), [t1*t2] )
+            t2_t2_coef = u2_x**2 + u2_y**2 + u2_z**2 #should equal 1 too
+            t1_coef    = 2*p1_x*u1_x + 2*p1_y*u1_y + 2*p1_z*u1_z - 2*p2_x*u1_x - 2*p2_y*u1_y - 2*p2_z*u1_z
+            t2_coef    =-2*p1_x*u2_x - 2*p1_y*u2_y - 2*p1_z*u2_z + 2*p2_x*u2_x + 2*p2_y*u2_y + 2*p2_z*u2_z
+            A = numpy.array([ [ 2*t1_t1_coef , t1_t2_coef ] , [ t1_t2_coef, 2*t2_t2_coef ] ])
+            b = numpy.array([ t1_coef, t2_coef])
+            try:
+                t1, t2 = numpy.linalg.solve(A,-b)
+            except numpy.linalg.LinAlgError:
+                continue #print('distance_between_axes, failed to solve problem due to LinAlgError, using numerical solver instead')
+            pos_t1 = P[i] + numpy.array(N[i])*t1
+            pos_t2 = P[j] + N[j]*t2
+            intersections.append( pos_t1 )
+            intersections.append( pos_t2 )
+    if len(intersections) < 2:
+        error = numpy.inf
+        return None, None, error
+    else: #fit vector to intersection points; http://mathforum.org/library/drmath/view/69103.html
+        X = numpy.array(intersections)
+        centroid = numpy.mean(X,axis=0)
+        M = numpy.array([i - centroid for i in intersections ])
+        A = numpy.dot(M.transpose(), M)
+        U,s,V = numpy.linalg.svd(A)    #numpy docs: s : (..., K) The singular values for every matrix, sorted in descending order.
+        axis_pos = centroid
+        axis_dir = V[0]
+        error = s[1] #dont know if this will work
+        return numpyVecToFC(axis_dir), numpyVecToFC(axis_pos), error
 #------------------------------------------------------------------------------
 def fit_plane_to_surface1( surface, n_u=3, n_v=3 ):
     uv = sum( [ [ (u,v) for u in numpy.linspace(0,1,n_u)] for v in numpy.linspace(0,1,n_v) ], [] )
@@ -466,9 +550,8 @@ def findUnusedObjectName(base, counterStart=1, fmt='%03i', document=None):
         i += 1
         objName = '%s%s' % (base2, fmt%i)
     return objName
-
 #------------------------------------------------------------------------------
-def findUnusedObjectLabel(base, counterStart=1, fmt='%03i', document=None):
+def findUnusedObjectLabel(base, counterStart=1, fmt='%03i', document=None, extension=None):
     if document == None:
         document = FreeCAD.ActiveDocument
     i = counterStart
@@ -479,13 +562,17 @@ def findUnusedObjectLabel(base, counterStart=1, fmt='%03i', document=None):
     else:
         base2 = base
     base2 = base2 + '_'
+    
+    if extension==None:
+        base3 = base2
+    else:
+        base3 = base2+extension+'_'
 
-    objLabel = '%s%s' % (base2, fmt%i)
+    objLabel = '%s%s' % (base3, fmt%i)
     while objLabel in usedLabels:
         i += 1
-        objLabel = '%s%s' % (base2, fmt%i)
+        objLabel = '%s%s' % (base3, fmt%i)
     return objLabel
-
 #------------------------------------------------------------------------------
 class ConstraintSelectionObserver:
 
@@ -574,8 +661,24 @@ def CircularEdgeSelected( selection ):
             edge = getObjectEdgeFromName( selection.Object, subElement)
             if not hasattr(edge, 'Curve'): #issue 39
                 return False
+            if isLine(edge.Curve):
+                return False
             if hasattr( edge.Curve, 'Radius' ):
                 return True
+            
+            # the following section fails for linear edges, protect it
+            # by try/except block
+            try:
+                BSpline = edge.Curve.toBSpline()
+                arcs = BSpline.toBiArcs(10**-6)
+                if all( hasattr(a,'Center') for a in arcs ):
+                    centers = numpy.array([a.Center for a in arcs])
+                    sigma = numpy.std( centers, axis=0 )
+                    if max(sigma) < 10**-6: #then circular curve
+                        return True
+            except:
+                pass
+            
     return False
 #------------------------------------------------------------------------------
 def ClosedEdgeSelected( selection ):
@@ -596,6 +699,11 @@ def AxisOfPlaneSelected( selection ): #adding Planes/Faces selection for Axial c
             face = getObjectFaceFromName( selection.Object, subElement)
             if str(face.Surface) == '<Plane object>':
                 return True
+            else:
+                axis, center, error = fit_rotation_axis_to_surface1(face.Surface)
+                error_normalized = error / face.BoundBox.DiagonalLength
+                if error_normalized < 10**-6:
+                    return True
     return False
 #------------------------------------------------------------------------------
 def printSelection(selection):
@@ -644,6 +752,11 @@ def cylindricalFaceSelected( selection ):
                 return True
             elif str(face.Surface).startswith('<SurfaceOfRevolution'):
                 return True
+            else:
+                axis, center, error = fit_rotation_axis_to_surface1(face.Surface)
+                error_normalized = error / face.BoundBox.DiagonalLength
+                if error_normalized < 10**-6:
+                    return True
     return False
 #------------------------------------------------------------------------------
 def LinearEdgeSelected( selection ):
@@ -655,6 +768,14 @@ def LinearEdgeSelected( selection ):
                 return False
             if isLine(edge.Curve):
                 return True
+
+            BSpline = edge.Curve.toBSpline()
+            arcs = BSpline.toBiArcs(10**-6)
+            if all(isLine(a) for a in arcs):
+                lines = arcs
+                D = numpy.array([L.tangent(0)[0] for L in lines]) #D(irections)
+                if numpy.std( D, axis=0 ).max() < 10**-9: #then linear curve
+                    return True
     return False
 #------------------------------------------------------------------------------
 def sphericalSurfaceSelected( selection ):
@@ -679,6 +800,7 @@ def removeConstraint( constraint ):
 #------------------------------------------------------------------------------
 def getPos(obj, subElementName):
     pos = None
+    
     if subElementName.startswith('Face'):
         face = getObjectFaceFromName(obj, subElementName)
         surface = face.Surface
@@ -693,7 +815,16 @@ def getPos(obj, subElementName):
         elif str(surface).startswith('<SurfaceOfRevolution'):
             pos = getObjectFaceFromName(obj, subElementName).Edges[0].Curve.Center
         elif str(surface).startswith('<BSplineSurface'):
-            axis,pos,error = fit_plane_to_surface1(surface)
+            axis,pos1,error = fit_plane_to_surface1(surface)
+            error_normalized = error / face.BoundBox.DiagonalLength
+            if error_normalized < 10**-6: #then good plane fit
+                pos = pos1
+            axis, center, error = fit_rotation_axis_to_surface1(face.Surface)
+            if axis != None:
+                error_normalized = error / face.BoundBox.DiagonalLength
+                if error_normalized < 10**-6: #then good rotation_axis fix
+                    pos = center
+            
     elif subElementName.startswith('Edge'):
         edge = getObjectEdgeFromName(obj, subElementName)
         if isLine(edge.Curve):
@@ -703,8 +834,24 @@ def getPos(obj, subElementName):
                 pos = edge.firstVertex(True).Point
         elif hasattr( edge.Curve, 'Center'): #circular curve
             pos = edge.Curve.Center
+        else:
+            BSpline = edge.Curve.toBSpline()
+            arcs = BSpline.toBiArcs(10**-6)
+            if all( hasattr(a,'Center') for a in arcs ):
+                centers = numpy.array([a.Center for a in arcs])
+                sigma = numpy.std( centers, axis=0 )
+                if max(sigma) < 10**-6: #then circular curce
+                    pos = numpyVecToFC(centers[0])
+            if all(isLine(a) for a in arcs):
+                lines = arcs
+                D = numpy.array([L.tangent(0)[0] for L in lines]) #D(irections)
+                if numpy.std( D, axis=0 ).max() < 10**-9: #then linear curve
+                    pos = lines[0].value(0)
+            
+            
     elif subElementName.startswith('Vertex'):
-        return  getObjectVertexFromName(obj, subElementName).Point
+        pos = getObjectVertexFromName(obj, subElementName).Point
+    
     return pos # maybe none !!
 #------------------------------------------------------------------------------
 def getPlaneNormal(surface):
@@ -725,7 +872,15 @@ def getAxis(obj, subElementName):
         elif str(surface).startswith('<SurfaceOfRevolution'):
             axis = face.Edges[0].Curve.Axis
         elif str(surface).startswith('<BSplineSurface'):
-            axis,pos,error = fit_plane_to_surface1(surface)
+            axis1,pos,error = fit_plane_to_surface1(surface)
+            error_normalized = error / face.BoundBox.DiagonalLength
+            if error_normalized < 10**-6: #then good plane fit
+                axis = axis1
+            axis_fitted, center, error = fit_rotation_axis_to_surface1(face.Surface)
+            if axis_fitted is not None:
+                error_normalized = error / face.BoundBox.DiagonalLength
+                if error_normalized < 10**-6: #then good rotation_axis fix
+                    axis = axis_fitted
             
     elif subElementName.startswith('Edge'):
         edge = getObjectEdgeFromName(obj, subElementName)
@@ -733,7 +888,36 @@ def getAxis(obj, subElementName):
             axis = edge.Curve.tangent(0)[0]
         elif hasattr( edge.Curve, 'Axis'): #circular curve
             axis =  edge.Curve.Axis
+        else:
+            BSpline = edge.Curve.toBSpline()
+            arcs = BSpline.toBiArcs(10**-6)
+            if all( hasattr(a,'Center') for a in arcs ):
+                centers = numpy.array([a.Center for a in arcs])
+                sigma = numpy.std( centers, axis=0 )
+                if max(sigma) < 10**-6: #then circular curce
+                    axis = a.Axis
+            if all(isLine(a) for a in arcs):
+                lines = arcs
+                D = numpy.array([L.tangent(0)[0] for L in lines]) #D(irections)
+                if numpy.std( D, axis=0 ).max() < 10**-9: #then linear curve
+                    axis = a2plib.numpyVecToFC(D[0])
+            
     return axis # may be none!
+#------------------------------------------------------------------------------
+def unTouchA2pObjects():
+    doc = FreeCAD.activeDocument()
+    for obj in doc.Objects:
+        # leave A2pSketches touched (for recomputing dependent shapes)
+        if isA2pSketch(obj): continue
+        if isA2pObject(obj):
+            obj.purgeTouched();
+#------------------------------------------------------------------------------
+def isA2pSketch(obj):
+    result = False
+    if isA2pPart(obj):
+        if len(obj.Shape.Faces) == 0:
+            result = True
+    return result
 #------------------------------------------------------------------------------
 def isA2pPart(obj):
     result = False
@@ -767,6 +951,16 @@ def isA2pObject(obj):
     if isA2pPart(obj) or isA2pConstraint(obj):
         result = True
     return result
+#------------------------------------------------------------------------------
+def isFastenerObject(obj):
+    '''
+    recognize an object created by the fasteners WB
+    '''
+    if hasattr(obj,'Proxy'):
+        if str(obj.Proxy).startswith('<FastenersCmd.FSScrewObject'): return True
+        if str(obj.Proxy).startswith('<FastenersCmd.FSWasherObject'): return True
+        if str(obj.Proxy).startswith('<FastenersCmd.FSScrewRodObject'): return True
+    return False
 #------------------------------------------------------------------------------
 def makeDiffuseElement(color,trans):
     elem = (color[0],color[1],color[2],trans/100.0)
@@ -864,7 +1058,7 @@ def a2p_repairTreeView():
             c.setEditorMode("ParentTreeObject", 1)
         parent = doc.getObject(c.Object1)
         c.ParentTreeObject = parent
-        parent.Label = parent.Label # trigger an update...
+        if parent is not None: parent.touch()
         if c.Proxy != None:
             c.Proxy.disable_onChanged = False
     #
@@ -877,7 +1071,9 @@ def a2p_repairTreeView():
             m.setEditorMode("ParentTreeObject", 1)
         parent = doc.getObject(m.Object2)
         m.ParentTreeObject = parent
-        parent.Label = parent.Label # trigger an update...
+        if parent is not None: parent.touch()
         if m.Proxy != None:
             m.Proxy.disable_onChanged = False
+            
+    unTouchA2pObjects()
 #------------------------------------------------------------------------------

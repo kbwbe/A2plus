@@ -76,6 +76,9 @@ class BasicConstraint():
         ob.addProperty("App::PropertyString","SubElement1","ConstraintInfo").SubElement1 = self.sub1
         ob.addProperty("App::PropertyString","Object2","ConstraintInfo").Object2 = self.ob2Name
         ob.addProperty("App::PropertyString","SubElement2","ConstraintInfo").SubElement2 = self.sub2
+        ob.addProperty("App::PropertyString","Toponame1","ConstraintInfo").Toponame1 = ''
+        ob.addProperty("App::PropertyString","Toponame2","ConstraintInfo").Toponame2 = ''
+        ob.addProperty("App::PropertyBool","Suppressed","ConstraintInfo").Suppressed = False
         
         for prop in ["Object1","Object2","SubElement1","SubElement2","Type"]:
             ob.setEditorMode(prop, 1)
@@ -103,7 +106,8 @@ class BasicConstraint():
         parent = FreeCAD.ActiveDocument.getObject(c.Object1)
         c.addProperty("App::PropertyLink","ParentTreeObject","ConstraintInfo").ParentTreeObject = parent
         c.setEditorMode('ParentTreeObject',1)
-        parent.Label = parent.Label # this is needed to trigger an update
+        # this is needed to trigger an update
+        parent.touch()
     
     def setInitialValues(self):
         c = self.constraintObject
@@ -113,7 +117,7 @@ class BasicConstraint():
             c.directionConstraint = self.direction
             c.setEditorMode("directionConstraint", 0) # set not editable...
         if self.offset != None:
-            c.addProperty('App::PropertyDistance','offset',"ConstraintInfo").offset = self.offset
+            c.addProperty("App::PropertyDistance","offset","ConstraintInfo").offset = self.offset
             c.setEditorMode("offset", 0) # set not editable...
         if self.angle != None:
             c.addProperty("App::PropertyAngle","angle","ConstraintInfo").angle = self.angle
@@ -156,8 +160,8 @@ class PointIdentityConstraint(BasicConstraint):
 '''
 Add a pointIdentity Constraint:
 selection:
-1.) select a vertex on a part
-2.) select a vertex on another part
+1.) select a vertex, circle or sphere on a part
+2.) select a vertex, circle or sphere on another part
 
 Button gets active after
 correct selection.
@@ -169,7 +173,16 @@ correct selection.
         if len(selection) == 2:
             s1, s2 = selection
             if s1.ObjectName != s2.ObjectName:
-                if vertexSelected(s1) and vertexSelected(s2):
+                if ( 
+                    (vertexSelected(s1) or 
+                     sphericalSurfaceSelected(s1) or
+                     CircularEdgeSelected(s1)
+                     ) and
+                    (vertexSelected(s2) or 
+                     sphericalSurfaceSelected(s2) or
+                     CircularEdgeSelected(s2)
+                     )
+                    ):
                     validSelection = True
         return validSelection
     
@@ -190,8 +203,11 @@ class PointOnLineConstraint(BasicConstraint):
         return \
 '''
 Add a pointOnLine constraint between two objects
-1.) select a vertex or a sphere from a part
+1.) select a vertex, a sphere or a circle from a part
 2.) select a linear edge or a cylindrical face on another part
+
+For second selection you also can use a circular edge. Then
+it's axis will be taken as line definition
 
 Button gets active after
 correct selection.
@@ -204,8 +220,8 @@ correct selection.
             s1, s2 = selection
             if s1.ObjectName != s2.ObjectName:
                 if (
-                    (vertexSelected(s1) or sphericalSurfaceSelected(s1)) and 
-                    (LinearEdgeSelected(s2) or cylindricalFaceSelected(s2))
+                    (vertexSelected(s1) or sphericalSurfaceSelected(s1) or CircularEdgeSelected(s1)) and 
+                    (LinearEdgeSelected(s2) or cylindricalFaceSelected(s2) or CircularEdgeSelected(s2))
                     ):
                     validSelection = True
         return validSelection
@@ -349,7 +365,8 @@ correct selection.
         
         def ValidSelection(selectionExObj):
             return cylindricalFaceSelected(selectionExObj) \
-                or LinearEdgeSelected(selectionExObj) 
+                or LinearEdgeSelected(selectionExObj) \
+                or CircularEdgeSelected(selectionExObj)
         
         validSelection = False
         if len(selection) == 2:
@@ -391,6 +408,9 @@ select:
 1.) linear edge or cylindrical face from a part
 2.) linear edge or cylindrical face from another part
 
+You can use also a circular edge. It's axis will
+be taken as line
+
 Button gets active after
 correct selection.
 '''
@@ -402,8 +422,8 @@ correct selection.
             s1, s2 = selection
             if s1.ObjectName != s2.ObjectName:
                 if (
-                    (LinearEdgeSelected(s1) or cylindricalFaceSelected(s1)) and
-                    (LinearEdgeSelected(s2) or cylindricalFaceSelected(s2))
+                    (LinearEdgeSelected(s1) or cylindricalFaceSelected(s1) or CircularEdgeSelected(s1)) and
+                    (LinearEdgeSelected(s2) or cylindricalFaceSelected(s2) or CircularEdgeSelected(s2))
                     ): 
                     validSelection = True
         return validSelection
@@ -431,6 +451,65 @@ Add an axisPlaneParallel constraint
 
 This constraint adjusts an axis parallel
 to a selected plane. The parts are not
+moved to be coincident.
+
+Button gets active after
+correct selection.
+'''
+
+    @staticmethod
+    def isValidSelection(selection):
+        validSelection = False
+        if len(selection) == 2:
+            s1, s2 = selection
+            if s1.ObjectName != s2.ObjectName:
+                if (
+                    (LinearEdgeSelected(s1) or cylindricalFaceSelected(s1)) and
+                    planeSelected(s2)
+                    ):
+                    validSelection = True
+        return validSelection
+
+#==============================================================================
+class AxisPlaneAngleConstraint(BasicConstraint):
+    def __init__(self,selection):
+        BasicConstraint.__init__(self, selection)
+        self.typeInfo = 'axisPlaneAngle'
+        self.constraintBaseName = 'axisPlaneAngle'
+        self.iconPath = ':/icons/a2p_AxisPlaneAngleConstraint.svg'
+        self.create(selection)
+        
+    def calcInitialValues(self):
+        c = self.constraintObject
+        axis1 = getAxis(self.ob1, c.SubElement1)
+        plane2 = getObjectFaceFromName(self.ob2, c.SubElement2)
+        axis2 = a2plib.getPlaneNormal(plane2.Surface)
+        angle = math.degrees(axis1.getAngle(axis2))
+        # the following section has been tested and is working,
+        # just it does not meet expectations.
+        # opposed/aligned are set to the opposite of expectation
+        # this has to be checked again.
+        if angle <= 90.0:
+            self.direction = "opposed"
+            self.angle = 90 - angle
+        else:
+            self.direction = "aligned"
+            self.angle = -90 + angle
+
+    @staticmethod
+    def getToolTip():
+        return \
+'''
+Add an axisPlaneAngle constraint
+
+1) select a linear edge or cylinder axis
+2) select a plane face on another part
+
+At first this constraint adjusts an axis parallel
+to a selected plane. Within the following popUp dialog
+you can define an angle.
+
+The parts are not
 moved to be coincident.
 
 Button gets active after
@@ -678,6 +757,8 @@ Selection options:
 - spherical surface or vertex on a part
 - spherical surface or vertex on another part
 
+Also when selecting a circle, it's center is used as a vertex.
+
 Button gets active after
 correct selection.
 '''
@@ -688,9 +769,17 @@ correct selection.
         if len(selection) == 2:
             s1, s2 = selection
             if s1.ObjectName != s2.ObjectName:
-                if ( vertexSelected(s1) or sphericalSurfaceSelected(s1)) \
-                        and ( vertexSelected(s2) or sphericalSurfaceSelected(s2)):
-                        validSelection = True
+                if ( 
+                    (vertexSelected(s1) or 
+                     sphericalSurfaceSelected(s1) or
+                     CircularEdgeSelected(s1)
+                     ) and
+                    (vertexSelected(s2) or 
+                     sphericalSurfaceSelected(s2) or
+                     CircularEdgeSelected(s2)
+                     )
+                    ):
+                    validSelection = True
         return validSelection
 
 #==============================================================================

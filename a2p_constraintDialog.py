@@ -28,6 +28,7 @@ import os, sys, math, copy
 #from a2p_viewProviderProxies import *
 from  FreeCAD import Base
 
+import a2plib
 from a2plib import *
 from a2p_solversystem import solveConstraints
 import a2p_constraints
@@ -168,10 +169,15 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             self.angleEdit = QtGui.QDoubleSpinBox(self)
             # get the angle unit as string
             self.angleEdit.setSuffix(" " + str(FreeCAD.Units.Quantity(1, FreeCAD.Units.Angle))[2:])
-            self.angleEdit.setMaximum(180)
-            # the solver treats negative values as positive
-            self.angleEdit.setMinimum(0)
-            # use the number of decimals defined by thew user in FC
+            
+            if self.constraintObject.Type == "axisPlaneAngle":
+                self.angleEdit.setMaximum(90.0)
+                self.angleEdit.setMinimum(0.0)  # the solver treats negative values as positive
+            else:
+                self.angleEdit.setMaximum(180)
+                self.angleEdit.setMinimum(0)    # the solver treats negative values as positive
+
+            # use the number of decimals defined by the user in FC
             params = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Units")
             self.angleEdit.setDecimals(params.GetInt('Decimals'))
             self.angleEdit.setValue(angle)
@@ -183,7 +189,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             self.roundAngleButton = QtGui.QPushButton(self)
             self.roundAngleButton.setText("Round")
             self.roundAngleButton.setFixedHeight(32)
-            self.roundAngleButton.setToolTip("Round angle to multiples of 90")
+            self.roundAngleButton.setToolTip("Round angle to multiples of 5")
             QtCore.QObject.connect(self.roundAngleButton, QtCore.SIGNAL("clicked()"), self.roundAngle)
             self.mainLayout.addWidget(self.roundAngleButton,self.lineNo,2)
             
@@ -356,29 +362,40 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             self.solve()
     
     def roundAngle(self):
-        # rounds angle to 90 degrees
+        # rounds angle to 5 degrees
         self.winModified = True
-        q = self.angleEdit.value() / 90
+        q = self.angleEdit.value() / 5
         q = round(q)
-        q = q * 90
+        q = q * 5
         self.angleEdit.setValue(q)
         if a2plib.getAutoSolveState():
             self.solve()
     
     def perpendicularAngle(self):
-        #adds /subtracs 90 degrees
-        # we want to go this way: 0 -> 90 -> 180 -> 90 -> 0
-        # but: 12 -> 102 -> 12
-        self.winModified = True
-        q = self.angleEdit.value() + 90
-        if q == 270:
-            self.angleEdit.setValue(0)
-        elif q > 180:
-            self.angleEdit.setValue(q - 180)
-        elif q <= 180:
-            self.angleEdit.setValue(q)
-        if a2plib.getAutoSolveState():
-            self.solve()
+        if self.constraintObject.Type == "axisPlaneAngle":
+            # we want to go this way: 0 -> 90 -> 0
+            self.winModified = True
+            q = self.angleEdit.value()
+            if q>=45:
+                self.angleEdit.setValue(0)
+            else:
+                self.angleEdit.setValue(90)
+            if a2plib.getAutoSolveState():
+                self.solve()
+        else:
+            #adds /subtracs 90 degrees
+            # we want to go this way: 0 -> 90 -> 180 -> 90 -> 0
+            # but: 12 -> 102 -> 12
+            self.winModified = True
+            q = self.angleEdit.value() + 90
+            if q == 270:
+                self.angleEdit.setValue(0)
+            elif q > 180:
+                self.angleEdit.setValue(q - 180)
+            elif q <= 180:
+                self.angleEdit.setValue(q)
+            if a2plib.getAutoSolveState():
+                self.solve()
 
     def restoreConstraintValues(self):
         if self.savedOffset != None:
@@ -611,11 +628,21 @@ class a2p_ConstraintCollection(QtGui.QWidget):
         QtCore.QObject.connect(self.axisPlaneNormalButton, QtCore.SIGNAL("clicked()"), self.onAxisPlaneNormalButton)
         self.constraintButtons.append(self.axisPlaneNormalButton)
         #-------------------------------------
+        self.axisPlaneAngleButton = QtGui.QPushButton(self.panel2)
+        self.axisPlaneAngleButton.setFixedSize(48,48)
+        self.axisPlaneAngleButton.setIcon(QtGui.QIcon(':/icons/a2p_AxisPlaneAngleConstraint.svg'))
+        self.axisPlaneAngleButton.setIconSize(QtCore.QSize(32,32))
+        self.axisPlaneAngleButton.setToolTip(a2p_constraints.AxisPlaneAngleConstraint.getToolTip())
+        self.axisPlaneAngleButton.setText("")
+        QtCore.QObject.connect(self.axisPlaneAngleButton, QtCore.SIGNAL("clicked()"), self.onAxisPlaneAngleButton)
+        self.constraintButtons.append(self.axisPlaneAngleButton)
+        #-------------------------------------
         panel2_Layout.addWidget(self.circularEdgeButton)
         panel2_Layout.addWidget(self.axialButton)
         panel2_Layout.addWidget(self.axisParallelButton)
         panel2_Layout.addWidget(self.axisPlaneParallelButton)
         panel2_Layout.addWidget(self.axisPlaneNormalButton)
+        panel2_Layout.addWidget(self.axisPlaneAngleButton)
         panel2_Layout.addStretch(1)
         self.panel2.setLayout(panel2_Layout)
         #-------------------------------------
@@ -737,6 +764,8 @@ button.
                 self.axialButton.setEnabled(True)
             if a2p_constraints.AxisPlaneParallelConstraint.isValidSelection(selection):
                 self.axisPlaneParallelButton.setEnabled(True)
+            if a2p_constraints.AxisPlaneAngleConstraint.isValidSelection(selection):
+                self.axisPlaneAngleButton.setEnabled(True)
             if a2p_constraints.AxisPlaneNormalConstraint.isValidSelection(selection):
                 self.axisPlaneNormalButton.setEnabled(True)
             if a2p_constraints.CircularEdgeConstraint.isValidSelection(selection):
@@ -811,6 +840,11 @@ button.
     def onAxisPlaneParallelButton(self):
         selection = FreeCADGui.Selection.getSelectionEx()
         self.activeConstraint = a2p_constraints.AxisPlaneParallelConstraint(selection)
+        self.manageConstraint()
+
+    def onAxisPlaneAngleButton(self):
+        selection = FreeCADGui.Selection.getSelectionEx()
+        self.activeConstraint = a2p_constraints.AxisPlaneAngleConstraint(selection)
         self.manageConstraint()
 
     def onAxisPlaneNormalButton(self):
@@ -923,12 +957,14 @@ class a2p_ConstraintValuePanel(QtGui.QDockWidget):
         self.storeWindowPosition()
         self.Accepted.emit()
         a2plib.setConstraintEditorRef(None)
+        a2plib.unTouchA2pObjects()
         self.deleteLater()
 
     def onDeleteConstraint(self):
         self.storeWindowPosition()
         self.Deleted.emit()
         a2plib.setConstraintEditorRef(None)
+        a2plib.unTouchA2pObjects()
         self.deleteLater()
 
     def closeEvent(self,event):

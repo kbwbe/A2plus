@@ -46,6 +46,7 @@ from a2plib import (
     A2P_DEBUG_3,
     getRelativePathesEnabled
     )
+import a2p_importedPart_class
 
 from a2p_topomapper import (
     TopoMapper
@@ -202,7 +203,7 @@ def importPartFromFile(
     #-------------------------------------------
     # Get a list of the importable Objects
     #-------------------------------------------
-    importableObjects = topoMapper.getTopLevelObjects()
+    importableObjects = topoMapper.getTopLevelObjects(allowSketches=True)
     
     if len(importableObjects) == 0:
         msg = "No visible Part to import found. Aborting operation"
@@ -255,7 +256,14 @@ def importPartFromFile(
         newObj.Label = partName
     else:
         partName = a2plib.findUnusedObjectName( importDoc.Label, document=doc )
-        partLabel = a2plib.findUnusedObjectLabel( importDoc.Label, document=doc )
+        if extractSingleShape == False:
+            partLabel = a2plib.findUnusedObjectLabel( importDoc.Label, document=doc )
+        else:
+            partLabel = a2plib.findUnusedObjectLabel(
+                importDoc.Label,
+                document=doc,
+                extension=dc.tx
+                )
         if PYVERSION < 3:
             newObj = doc.addObject( "Part::FeaturePython", partName.encode('utf-8') )
         else:
@@ -306,7 +314,12 @@ def importPartFromFile(
         else:
             newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = \
                 topoMapper.createTopoNames()
-        
+    
+    newObj.objectType = 'a2pPart'
+    if extractSingleShape == True:
+        if a2plib.isA2pSketch(newObj):
+            newObj.objectType = 'a2pSketch'
+    newObj.setEditorMode("objectType",1)
 
     doc.recompute()
 
@@ -438,9 +451,11 @@ Check your settings of A2plus preferences.
         if sub != None:
             sub.showMaximized()
 
-# WF: how will this work for multiple imported objects?
-#     only A2p AI's will have property "fixedPosition"
-        if importedObject and not importedObject.fixedPosition:
+        # WF: how will this work for multiple imported objects?
+        #     only A2p AI's will have property "fixedPosition"
+        if importedObject  and a2plib.isA2pSketch(importedObject):
+            importedObject.fixedPosition = True
+        if importedObject and not a2plib.isA2pSketch(importedObject) and not importedObject.fixedPosition:
             PartMover( view, importedObject, deleteOnEscape = True )
         else:
             self.timer = QtCore.QTimer()
@@ -608,7 +623,7 @@ FreeCADGui.addCommand('a2p_ImportPart',a2p_ImportPartCommand())
 
 
 
-def updateImportedParts(doc):
+def updateImportedParts(doc, partial=False):
     if doc == None:
         QtGui.QMessageBox.information(  
                         QtGui.QApplication.activeWindow(),
@@ -619,7 +634,35 @@ def updateImportedParts(doc):
         
     doc.openTransaction("updateImportParts")    
     objectCache.cleanUp(doc)
-    for obj in doc.Objects:
+    
+    
+    selectedObjects=[]
+    selection = [s for s in FreeCADGui.Selection.getSelection() 
+                 if s.Document == FreeCAD.ActiveDocument and
+                 (a2plib.isA2pPart(s) or a2plib.isA2pSketch())
+                 ]
+    if selection and len(selection)>0:
+        if partial==True:
+            response = QtGui.QMessageBox.Yes
+        else:
+            flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
+            msg = u"Do you want to update only the selected parts?"
+            response = QtGui.QMessageBox.information(
+                            QtGui.QApplication.activeWindow(),
+                            u"ASSEMBLY UPDATE",
+                            msg,
+                            flags
+                            )
+        if response == QtGui.QMessageBox.Yes:
+            for s in selection:
+                selectedObjects.append(s)
+    
+    if len(selectedObjects) >0:
+        workingSet = selectedObjects
+    else:
+        workingSet = doc.Objects
+    
+    for obj in workingSet:
         if hasattr(obj, 'sourceFile') and a2plib.to_str(obj.sourceFile) != a2plib.to_str('converted'):
 
             
@@ -683,7 +726,10 @@ def updateImportedParts(doc):
                     # save Placement because following newObject.Shape.copy() isn't resetting it to zeroes...
                     savedPlacement  = obj.Placement
                     obj.Shape = newObject.Shape.copy()
-                    obj.Placement = savedPlacement # restore the old placement
+                    if a2plib.isA2pSketch(obj):
+                        pass
+                    else:
+                        obj.Placement = savedPlacement # restore the old placement
                     a2plib.copyObjectColors(obj,newObject)
 
 
@@ -960,6 +1006,7 @@ FreeCADGui.addCommand('a2p_editImportedPart', a2p_EditPartCommand())
 
 
 
+#===============================================================================
 class PartMover:
     def __init__(self, view, obj, deleteOnEscape):
         self.obj = obj
@@ -999,9 +1046,7 @@ class PartMover:
                 self.objectToDelete = self.obj #This can be asked by a timer in a calling func...
                 #This causes a crash in FC0.19/Qt5/Py3             
                 #FreeCAD.activeDocument().removeObject(self.obj.Name)
-                
-
-
+#===============================================================================
 toolTip = \
 '''
 Move the selected part.
@@ -1023,24 +1068,8 @@ class a2p_MovePartCommand:
     def Activated(self):
         doc = FreeCAD.activeDocument()
         selection = [s for s in FreeCADGui.Selection.getSelectionEx() if s.Document == doc ]
-        self.partMover = PartMover(
-            FreeCADGui.activeDocument().activeView(),
-            selection[0].Object,
-            deleteOnEscape = False
-            )
-        self.timer = QtCore.QTimer()
-        QtCore.QObject.connect(self.timer, QtCore.SIGNAL("timeout()"), self.onTimer)
-        self.timer.start( 100 )
-
-    def onTimer(self):
-        # if someone holds shift during moving, the partMover goes to copying mode. Catch this here...
-        # Especially handle the ESC key in partmover, which delivers an object which is to delete.
-        if self.partMover != None:
-            if self.partMover.objectToDelete != None:
-                FreeCAD.activeDocument().removeObject(self.partMover.objectToDelete.Name)
-                self.partMover.objectToDelete = None
-        self.timer.start(100)
-
+        FreeCADGui.ActiveDocument.setEdit(selection[0].Object)
+    
     def IsActive(self):
         doc = FreeCAD.activeDocument()
         if doc == None: return False
@@ -1062,6 +1091,127 @@ class a2p_MovePartCommand:
             }
 
 FreeCADGui.addCommand('a2p_movePart', a2p_MovePartCommand())
+#===============================================================================
+class ConstrainedPartsMover:
+    def __init__(self, view):
+        self.obj = None
+        self.view = view
+        self.doc = FreeCAD.activeDocument()
+        self.callbackMove = self.view.addEventCallback("SoLocation2Event",self.onMouseMove)
+        self.callbackClick = self.view.addEventCallback("SoMouseButtonEvent",self.onMouseClicked)
+        self.callbackKey = self.view.addEventCallback("SoKeyboardEvent",self.KeyboardEvent)
+        self.motionActivated = False
+        
+    def setPreselection(self,doc,obj,sub):
+        if not self.motionActivated:
+            doc = FreeCAD.activeDocument()
+            self.obj = doc.getObject(obj)
+    
+    def addSelection(self,doc,obj,sub,pnt):
+        pass
+        
+    def removeSelection(self,doc,obj,sub):
+        pass
+    
+    def clearSelection(self,doc):
+        pass
+    
+    def onMouseMove(self, info):
+        if self.obj is None: return
+        if self.motionActivated:
+            newPos = self.view.getPoint( *info['Position'] )
+            self.obj.Placement.Base = newPos
+            a2plib.setSimulationState(True)
+            systemSolved = a2p_solversystem.solveConstraints(self.doc, useTransaction = False)
+            a2plib.setSimulationState(False)
+            if systemSolved == False:
+                self.doc.commitTransaction()
+                QtGui.QMessageBox.information(
+                    QtGui.QApplication.activeWindow(),
+                   "Animation problem detected",
+                   "Use system undo if necessary."
+                   )
+                self.removeCallbacks()
+                del self
+        
+    def removeCallbacks(self):
+        self.view.removeEventCallback("SoLocation2Event",self.callbackMove)
+        self.view.removeEventCallback("SoMouseButtonEvent",self.callbackClick)
+        self.view.removeEventCallback("SoKeyboardEvent",self.callbackKey)
+        FreeCADGui.Selection.removeObserver(self)
+        
+    def onMouseClicked(self, info):
+        if self.obj is None: return
+        if info['Button'] == 'BUTTON1' and info['State'] == 'DOWN':
+            if hasattr(self.obj, 'fixedPosition') and self.obj.fixedPosition == True:
+                QtGui.QMessageBox.information(
+                    QtGui.QApplication.activeWindow(),
+                   "Invalid selection",
+                   '''A2plus will not move a part with property fixedPosition == True'''
+                   )
+                self.removeCallbacks()
+                del self
+            else:
+                self.motionActivated = not self.motionActivated
+                if self.motionActivated == True:
+                    self.doc.openTransaction("drag constrained parts")
+                if self.motionActivated == False:
+                    # Solve last time with high accuracy to finish
+                    a2plib.setSimulationState(False)
+                    a2p_solversystem.solveConstraints(self.doc, useTransaction = False)
+                    self.doc.commitTransaction()
+                    self.removeCallbacks()
+                    del self
+                    
+    def KeyboardEvent(self, info):
+        doc = FreeCAD.activeDocument()
+        if info['State'] == 'UP' and info['Key'] == 'ESCAPE':
+            doc.commitTransaction()
+            self.removeCallbacks()
+            del self
+#===============================================================================
+toolTip = \
+'''
+Move the a part under rule of constraints.
+
+1) Hit this button
+2) Click a part and it is glued to the cursor and can be moved
+3) Click again (or press ESC) and the command terminates
+'''
+
+class a2p_MovePartUnderConstraints:
+
+    def __init__(self):
+        self.partMover = None
+    
+    def Activated(self):
+        self.partMover = ConstrainedPartsMover(
+                            FreeCADGui.activeDocument().activeView()
+                            )
+        FreeCADGui.Selection.addObserver(self.partMover)
+
+    def IsActive(self):
+        doc = FreeCAD.activeDocument()
+        if doc == None: return False
+        #
+        #selection = [s for s in FreeCADGui.Selection.getSelectionEx() if s.Document == doc ]
+        #if len(selection) != 1: return False
+        #
+        #obj = selection[0].Object
+        #if not a2plib.isA2pPart(obj): return False
+        #
+        return True
+
+    def GetResources(self):
+        return {
+            #'Pixmap' : ':/assembly2/icons/MovePart.svg',
+            'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_MovePartUnderConstraints.svg',
+            'MenuText': 'Move the selected part under constraints',
+            'ToolTip': toolTip
+            }
+
+FreeCADGui.addCommand('a2p_MovePartUnderConstraints', a2p_MovePartUnderConstraints())
+#===============================================================================
 
 
 
@@ -1614,6 +1764,7 @@ FreeCADGui.addCommand('a2p_absPath_to_relPath_Command', a2p_absPath_to_relPath_C
 
 
 
+#==============================================================================
 class a2p_SaveAndExit_Command:
     def Activated(self):
         doc = FreeCAD.activeDocument()
@@ -1641,6 +1792,71 @@ class a2p_SaveAndExit_Command:
             'ToolTip':      'Save and exit the active document'
             }
 FreeCADGui.addCommand('a2p_SaveAndExit_Command', a2p_SaveAndExit_Command())
+
+#==============================================================================
+toolTip = \
+'''
+Migrate proxies of imported parts
+
+Very old A2plus assemblies do not
+show the correct icons for imported
+parts and have obsolete properties.
+
+With this function, you can migrate
+the viewProviders of old imported parts
+to the recent state.
+
+After running this function, you
+should save and reopen your
+assembly file.
+'''
+
+class a2p_MigrateProxiesCommand():
+    
+    def Activated(self):
+        flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
+        response = QtGui.QMessageBox.information(
+            QtGui.QApplication.activeWindow(), 
+            u"Migrate proxies of importedParts to recent version", 
+            u"Make sure you have a backup of your files. Proceed?", 
+            flags
+            )
+        if response == QtGui.QMessageBox.Yes:
+            doc = FreeCAD.activeDocument()
+            for ob in doc.Objects:
+                if a2plib.isA2pPart(ob):
+                    #setup proxies
+                    a2p_importedPart_class.Proxy_importPart(ob)
+                    if FreeCAD.GuiUp:
+                        a2p_importedPart_class.ImportedPartViewProviderProxy(ob.ViewObject)
+                    #delete obsolete properties
+                    deleteList = []
+                    tmp = ob.PropertiesList
+                    for prop in tmp:
+                        if prop.startswith('pi_') or prop == 'assembly2Version':
+                            deleteList.append(prop)
+                    for prop in deleteList:
+                        ob.removeProperty(prop)
+                        
+        QtGui.QMessageBox.information(
+            QtGui.QApplication.activeWindow(), 
+            u"The proxies have been migrated.", 
+            u"Please save and reopen this assembly file" 
+            )
+        
+                
+
+    def GetResources(self):
+        return {
+            'Pixmap' : ':/icons/a2p_Upgrade.svg',
+            'MenuText': 'Migrate proxies of imported parts',
+            'ToolTip': toolTip
+            }
+    
+FreeCADGui.addCommand('a2p_MigrateProxiesCommand', a2p_MigrateProxiesCommand())
+#==============================================================================
+
+
 
 
 

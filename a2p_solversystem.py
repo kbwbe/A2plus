@@ -56,16 +56,15 @@ from os.path import expanduser
 
 SOLVER_MAXSTEPS = 50000
 
-SOLVER_CONTROLDATA = {
-    #Index:(posAccuracy,spinAccuracy,completeSolvingRequired)
-    1:(0.1,0.1,True),
-    2:(0.01,0.01,True),
-    3:(0.001,0.001,True),
-    4:(0.0001,0.0001,False),
-    5:(0.00001,0.00001,False)
-    }
-#MAX_LEVEL_ACCURACY = 4  #accuracy reached is 1.0e-MAX_LEVEL_ACCURACY
-
+# SOLVER_CONTROLDATA has been replaced by SolverSystem.getSolverControlData()
+#SOLVER_CONTROLDATA = {
+#    #Index:(posAccuracy,spinAccuracy,completeSolvingRequired)
+#    1:(0.1,0.1,True),
+#    2:(0.01,0.01,True),
+#    3:(0.001,0.001,True),
+#    4:(0.0001,0.0001,False),
+#    5:(0.00001,0.00001,False)
+#    }
 
 SOLVER_POS_ACCURACY = 1.0e-1  # gets to smaller values during solving
 SOLVER_SPIN_ACCURACY = 1.0e-1 # gets to smaller values during solving
@@ -109,6 +108,25 @@ class SolverSystem():
         self.constraints = []
         self.objectNames = []
         self.partialSolverCurrentStage = PARTIAL_SOLVE_STAGE1
+        
+    def getSolverControlData(self):
+        if a2plib.SIMULATION_STATE:
+            # do less accurate solving for simulations...
+            solverControlData = {
+                #Index:(posAccuracy,spinAccuracy,completeSolvingRequired)
+                1:(0.1,0.1,True)
+                }
+        else:
+            solverControlData = {
+                #Index:(posAccuracy,spinAccuracy,completeSolvingRequired)
+                1:(0.1,0.1,True),
+                2:(0.01,0.01,True),
+                3:(0.001,0.001,False),
+                4:(0.0001,0.0001,False),
+                5:(0.00001,0.00001,False)
+                }
+        return solverControlData
+            
 
     def getRigid(self,objectName):
         '''get a Rigid by objectName'''
@@ -116,7 +134,7 @@ class SolverSystem():
         if len(rigs) > 0: return rigs[0]
         return None
 
-    def loadSystem(self,doc):
+    def loadSystem(self,doc, matelist=None):
         self.clear()
         self.doc = doc
         self.status = "loading"
@@ -125,7 +143,22 @@ class SolverSystem():
         self.lastPositionError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
         self.lastAxisError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
         #
-        self.constraints = [ obj for obj in doc.Objects if 'ConstraintInfo' in obj.Content]
+        self.constraints = []
+        constraints =[]             #temporary list
+        if matelist != None:        #Transfer matelist to the temp list
+            for obj in matelist:
+                if 'ConstraintInfo' in obj.Content:
+                    constraints.append(obj)
+        else:
+            # if there is not a list of my mates get the list from the doc
+            constraints = [ obj for obj in doc.Objects if 'ConstraintInfo' in obj.Content]
+        #check for Suppressed mates here and transfer mates to self.constraints
+        for obj in constraints:
+            if hasattr(obj,'Suppressed'):
+                #if the mate is suppressed do not add it
+                if obj.Suppressed == False:
+                    self.constraints.append(obj)
+
         #
         # Extract all the objectnames which are affected by constraints..
         self.objectNames = []
@@ -407,12 +440,12 @@ class SolverSystem():
                     doc.getObject(rig.objectName)
                     )
     
-    def solveAccuracySteps(self,doc):
+    def solveAccuracySteps(self,doc, matelist=None):
         self.level_of_accuracy=1
-        self.mySOLVER_POS_ACCURACY = SOLVER_CONTROLDATA[self.level_of_accuracy][0]
-        self.mySOLVER_SPIN_ACCURACY = SOLVER_CONTROLDATA[self.level_of_accuracy][1]
+        self.mySOLVER_POS_ACCURACY = self.getSolverControlData()[self.level_of_accuracy][0]
+        self.mySOLVER_SPIN_ACCURACY = self.getSolverControlData()[self.level_of_accuracy][1]
 
-        self.loadSystem(doc)
+        self.loadSystem(doc, matelist)
         if self.status == "loadingDependencyError":
             return
         self.assignParentship(doc)
@@ -423,14 +456,14 @@ class SolverSystem():
                                             # where not a final solution is required.
             if systemSolved:
                 self.level_of_accuracy+=1
-                if self.level_of_accuracy > len(SOLVER_CONTROLDATA):
+                if self.level_of_accuracy > len(self.getSolverControlData()):
                     self.solutionToParts(doc)
                     break
-                self.mySOLVER_POS_ACCURACY = SOLVER_CONTROLDATA[self.level_of_accuracy][0]
-                self.mySOLVER_SPIN_ACCURACY = SOLVER_CONTROLDATA[self.level_of_accuracy][1]
-                self.loadSystem(doc)
+                self.mySOLVER_POS_ACCURACY = self.getSolverControlData()[self.level_of_accuracy][0]
+                self.mySOLVER_SPIN_ACCURACY = self.getSolverControlData()[self.level_of_accuracy][1]
+                self.loadSystem(doc, matelist)
             else:
-                completeSolvingRequired = SOLVER_CONTROLDATA[self.level_of_accuracy][2]
+                completeSolvingRequired = self.getSolverControlData()[self.level_of_accuracy][2]
                 if not completeSolvingRequired: systemSolved = True
                 break
         self.maxAxisError = 0.0
@@ -443,37 +476,46 @@ class SolverSystem():
                 self.maxAxisError = rig.maxAxisError
             if rig.maxSingleAxisError > self.maxSingleAxisError:
                 self.maxSingleAxisError = rig.maxSingleAxisError
-        Msg( 'TARGET   POS-ACCURACY :{}\n'.format(self.mySOLVER_POS_ACCURACY) )
-        Msg( 'REACHED  POS-ACCURACY :{}\n'.format(self.maxPosError) )
-        Msg( 'TARGET  SPIN-ACCURACY :{}\n'.format(self.mySOLVER_SPIN_ACCURACY) )
-        Msg( 'REACHED SPIN-ACCURACY :{}\n'.format(self.maxAxisError) )
-        Msg( 'SA SPIN-ACCURACY      :{}\n'.format(self.maxSingleAxisError) )
+        if not a2plib.SIMULATION_STATE:        
+            Msg( 'TARGET   POS-ACCURACY :{}\n'.format(self.mySOLVER_POS_ACCURACY) )
+            Msg( 'REACHED  POS-ACCURACY :{}\n'.format(self.maxPosError) )
+            Msg( 'TARGET  SPIN-ACCURACY :{}\n'.format(self.mySOLVER_SPIN_ACCURACY) )
+            Msg( 'REACHED SPIN-ACCURACY :{}\n'.format(self.maxAxisError) )
+            Msg( 'SA SPIN-ACCURACY      :{}\n'.format(self.maxSingleAxisError) )
             
         return systemSolved
 
-    def solveSystem(self,doc):
-        Msg( "\n===== Start Solving System ====== \n" )
+    def solveSystem(self,doc,matelist=None):
+        if not a2plib.SIMULATION_STATE:        
+            Msg( "\n===== Start Solving System ====== \n" )
 
-        systemSolved = self.solveAccuracySteps(doc)
+        systemSolved = self.solveAccuracySteps(doc,matelist)
         if self.status == "loadingDependencyError":
-            return
+            return systemSolved
         if systemSolved:
             self.status = "solved"
-            Msg( "===== System solved using partial + recursive unfixing =====\n")
-            self.checkForUnmovedParts()
+            if not a2plib.SIMULATION_STATE:
+                Msg( "===== System solved using partial + recursive unfixing =====\n")
+                self.checkForUnmovedParts()
         else:
-            self.status = "unsolved"
-            Msg( "===== Could not solve system ====== \n" )
-            msg = \
-    '''
-    Constraints inconsistent. Cannot solve System.
-    Please delete your last created constraint !
-    '''
-            QtGui.QMessageBox.information(
-                QtGui.QApplication.activeWindow(),
-                "Constraint mismatch",
-                msg
-                )
+            if a2plib.SIMULATION_STATE == True:
+                self.status = "unsolved"
+                return systemSolved
+
+            else: # a2plib.SIMULATION_STATE == False
+                self.status = "unsolved"
+                Msg( "===== Could not solve system ====== \n" )
+                msg = \
+'''
+Constraints inconsistent. Cannot solve System.
+Please delete your last created constraint !
+'''
+                QtGui.QMessageBox.information(
+                    QtGui.QApplication.activeWindow(),
+                    "Constraint mismatch",
+                    msg
+                    )
+                return systemSolved
 
     def checkForUnmovedParts(self):
         '''
@@ -487,7 +529,7 @@ class SolverSystem():
             for obj in self.unmovedParts:
                 FreeCADGui.Selection.addSelection(obj)
             msg = '''    
-The highlighted parts where not moved. They are
+The highlighted parts were not moved. They are
 not constrained (also over constraint chains)
 to a fixed part!
 '''
@@ -507,35 +549,43 @@ to a fixed part!
         self.stepCount = 0
         workList = []
 
-        # load initial worklist with all fixed parts...
-        for rig in self.rigids:
-            if rig.fixed:
-                workList.append(rig);
-        #self.printList("Initial-Worklist", workList)
-
-        while True:
-            addList = []
-            newRigFound = False
-            for rig in workList:
-                for linkedRig in rig.linkedRigids:
-                    if linkedRig in workList: continue
-                    if rig.isFullyConstrainedByRigid(linkedRig):
-                        addList.append(linkedRig)
-                        newRigFound = True
-                        break
-            if not newRigFound:
+        if a2plib.SIMULATION_STATE == True:
+            # Solve complete System at once if simulation is running
+            workList = self.rigids
+            solutionFound = self.calculateWorkList(doc, workList)
+            if not solutionFound: return False
+            return True
+        else:
+            # Normal partial solving if no simulation is running
+            # load initial worklist with all fixed parts...
+            for rig in self.rigids:
+                if rig.fixed:
+                    workList.append(rig);
+            #self.printList("Initial-Worklist", workList)
+    
+            while True:
+                addList = []
+                newRigFound = False
                 for rig in workList:
-                    addList.extend(rig.getCandidates())
-            addList = set(addList)
-            #self.printList("AddList", addList)
-            if len(addList) > 0:
-                workList.extend(addList)
-                solutionFound = self.calculateWorkList(doc, workList)
-                if not solutionFound: return False
-            else:
-                break
+                    for linkedRig in rig.linkedRigids:
+                        if linkedRig in workList: continue
+                        if rig.isFullyConstrainedByRigid(linkedRig):
+                            addList.append(linkedRig)
+                            newRigFound = True
+                            break
+                if not newRigFound:
+                    for rig in workList:
+                        addList.extend(rig.getCandidates())
+                addList = set(addList)
+                #self.printList("AddList", addList)
+                if len(addList) > 0:
+                    workList.extend(addList)
+                    solutionFound = self.calculateWorkList(doc, workList)
+                    if not solutionFound: return False
+                else:
+                    break
 
-        return True
+            return True
 
     def calculateWorkList(self, doc, workList):
         reqPosAccuracy = self.mySOLVER_POS_ACCURACY
@@ -631,13 +681,15 @@ to a fixed part!
             rig.applySolution(doc, self);
 
 #------------------------------------------------------------------------------
-def solveConstraints( doc, cache=None, useTransaction = True ):
+def solveConstraints( doc, cache=None, useTransaction = True, matelist=None):
     if useTransaction: doc.openTransaction("a2p_systemSolving")
     ss = SolverSystem()
-    ss.solveSystem(doc)
+    systemSolved = ss.solveSystem(doc, matelist )
     if useTransaction: doc.commitTransaction()
+    a2plib.unTouchA2pObjects()
+    return systemSolved
 
-def autoSolveConstraints( doc, callingFuncName, cache=None, useTransaction = True ):
+def autoSolveConstraints( doc, callingFuncName, cache=None, useTransaction=True, matelist=None):
     if not a2plib.getAutoSolveState():
         return
     if callingFuncName != None:

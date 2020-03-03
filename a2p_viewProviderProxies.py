@@ -71,7 +71,11 @@ class ConstraintViewProviderProxy:
         self.enableDeleteCounterPart = True #allow to delete the mirror
 
     def getIcon(self):
-        return self.iconPath
+        ob = FreeCAD.ActiveDocument.getObject(self.constraintObj_name)
+        if ob is not None:
+            return a2plib.A2P_CONSTRAINTS_ICON_MAP[
+                ob.Type
+                ]
     
     def doubleClicked(self,vobj):
         FreeCADGui.activateWorkbench('A2plusWorkbench')
@@ -120,7 +124,11 @@ class ConstraintMirrorViewProviderProxy:
         FreeCADGui.runCommand("a2p_EditConstraintCommand")
 
     def getIcon(self):
-        return self.iconPath
+        ob = FreeCAD.ActiveDocument.getObject(self.constraintObj_name)
+        if ob is not None:
+            return a2plib.A2P_CONSTRAINTS_ICON_MAP[
+                ob.Type
+                ]
 
 #WF: next 3 methods not required
     def attach(self, vobj):
@@ -193,7 +201,9 @@ def create_constraint_mirror( constraintObj, iconPath, origLabel= '', mirrorLabe
     parent = FreeCAD.ActiveDocument.getObject(constraintObj.Object2)
     cMirror.ParentTreeObject = parent
     cMirror.setEditorMode('ParentTreeObject',1)
-    parent.Label = parent.Label # this is needed to trigger an update
+    # this is needed to trigger an update
+    parent.touch()
+    
 
     ConstraintMirrorObjectProxy( cMirror, constraintObj )
     cMirror.ViewObject.Proxy = ConstraintMirrorViewProviderProxy( constraintObj, iconPath )
@@ -203,6 +213,25 @@ def create_constraint_mirror( constraintObj, iconPath, origLabel= '', mirrorLabe
 class ConstraintObjectProxy:
     def __init__(self,obj=None):
         self.disable_onChanged = False
+        if obj is not None:
+            ConstraintObjectProxy.setProperties(self,obj)
+        self.type = "a2p_constraint"
+        
+    def setProperties(self,obj):
+        propList = obj.PropertiesList
+        if not "Toponame1" in propList:
+            obj.addProperty("App::PropertyString", "Toponame1", "ConstraintInfo")
+        if not "Toponame2" in propList:
+            obj.addProperty("App::PropertyString", "Toponame2", "ConstraintInfo")
+        if not "Suppressed" in propList:
+            obj.addProperty("App::PropertyBool", "Suppressed", "ConstraintInfo")
+        # remove relict from renaming...
+        if "suppressed" in propList:
+            obj.removeProperty("suppressed")
+        self.type = "a2p_constraint"
+
+    def onDocumentRestored(self,obj):
+        ConstraintObjectProxy.setProperties(self,obj)
 
     def execute(self, obj):
         return # functionality removed with new UserInterface, avoid nested recomputes...
@@ -245,6 +274,25 @@ class ConstraintMirrorObjectProxy:
         constraintObj.Proxy.mirror_name = obj.Name
         self.disable_onChanged = False
         obj.Proxy = self
+        if obj is not None:
+            ConstraintMirrorObjectProxy.setProperties(self,obj)
+        self.type = "a2p_constraint_mirror"
+        
+    def setProperties(self,obj):
+        propList = obj.PropertiesList
+        if not "Toponame1" in propList:
+            obj.addProperty("App::PropertyString", "Toponame1", "ConstraintNfo")
+        if not "Toponame2" in propList:
+            obj.addProperty("App::PropertyString", "Toponame2", "ConstraintNfo")
+        if not "Suppressed" in propList:
+            obj.addProperty("App::PropertyBool", "Suppressed", "ConstraintNfo")
+        # remove relict from renaming...
+        if "suppressed" in propList:
+            obj.removeProperty("suppressed")
+        self.type = "a2p_constraint_mirror"
+
+    def onDocumentRestored(self,obj):
+        ConstraintMirrorObjectProxy.setProperties(self,obj)
 
     def execute(self, obj):
         return #no work required in onChanged causes touched in original constraint ...
