@@ -28,17 +28,15 @@ This project started as a fork of Hamish's Assembly 2 workbench (development on 
 * Some new small features as visibility helpers (isolate and show only selected parts, transparency of whole assembly)
 
 
-Is A2plus compatible with Assembly 2 ?
---------------------------------------
+## Is A2plus compatible with Assembly2 ?
 
 No. A2plus would have to handle everything in same way as Assembly 2, including bugs, exact orientations, etc.
 You have to assemble existing projects again.
 
+## Releases 
 
-Releases of A2plus available ?
-------------------------------
+There are prereleases available, please browse the [releases](https://github.comkbwbe/A2plus/releases) section of this repository.
 
-There are prereleases available. Please have a look at the releases section of this repository
 
 Known Issues:
 -------------
