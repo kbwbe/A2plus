@@ -1,6 +1,7 @@
 # A2plus
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/kbwbe/A2plus.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/kbwbe/A2plus/alerts/) [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/kbwbe/A2plus.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/kbwbe/A2plus/context:python)  
 
+## Description
 Another assembly workbench for FreeCAD, following and extending [Hamish's Assembly 2 workbench](https://github.com/hamish2014/FreeCAD_assembly2) hence Assembly2**plus**.
 
 The main goal of A2plus is to create a very simple, easy to use, and not over-featured workbench for FreeCAD assemblies. Using the KISS principle: KEEP IT SIMPLE, STUPID
@@ -9,9 +10,7 @@ A2plus workbench tries to implement a new constraint solving algorithm to avoid 
 
 This project started as a fork of Hamish's Assembly 2 workbench (development on A2 went dormant and was unmaintained for a long period). A2plus can be used with FreeCAD v0.16, v0.17 and v0.18 including support for importing parts from external files.
 
-
-[![A2plus - Gripper assembly](https://i9.ytimg.com/vi/QMxcQ5tssWk/mq3.jpg?sqp=CIGWo_AF&rs=AOn4CLDXtUiVBWVImLrsddeNpxLEa3M3tw)]( https://youtu.be/QMxcQ5tssWk)
-
+[![Assembly-of-gripping-unig](http://img.youtube.com/vi/QMxcQ5tssWk/maxresdefault.jpg)](http://www.youtube.com/watch?v=QMxcQ5tssWk "A2plus: Assembly of a gripping unit.")
 
 ## Assembly2 and A2plus
 
