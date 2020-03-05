@@ -34,7 +34,7 @@ You have to assemble existing projects again.
 
 ## Releases 
 
-There are prereleases available, please browse the [releases](https://github.comkbwbe/A2plus/releases) section of this repository.
+There are prereleases available, please browse the [releases](https://github.com/kbwbe/A2plus/releases) section of this repository.
 
 
 ## Known Issues
