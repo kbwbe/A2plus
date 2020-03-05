@@ -1,14 +1,11 @@
 # A2plus
 Another assembly workbench for FreeCAD, following and extending [Hamish's Assembly 2 workbench](https://github.com/hamish2014/FreeCAD_assembly2)
 
-This workbench project has been started as a fork of Hamish's Assembly 2 workbench, which is not maintained at
-moment of writing this. A2plus can be used with FreeCAD v0.16, v0.17 and v0.18 including support for importing parts from external files.
+Another assembly workbench for FreeCAD, following and extending [Hamish's Assembly 2 workbench](https://github.com/hamish2014/FreeCAD_assembly2) hence Assembly2**plus**.
 
-This workbench tries to implement a new constraint solving algorithm to avoid some problems that
-occurred with the original solver. It is still under development and experimental at this moment but is showing some potential.
+The main goal of A2plus is to create a very simple, easy to use, and not over-featured workbench for FreeCAD assemblies. Using the KISS principle: KEEP IT SIMPLE, STUPID
 
-The main goal of A2plus is to create a very simple, easy to use, and not over-featured workbench for
-FreeCAD assemblies. Using the KISS principle: KEEP IT SIMPLE, STUPID
+A2plus workbench tries to implement a new constraint solving algorithm to avoid some problems that occurred with the original solver. It is still under development and experimental at this moment but is showing some potential.
 
 <details>
   <summary>Videos</summary>
