@@ -13,15 +13,14 @@ This project started as a fork of Hamish's Assembly 2 workbench (development on 
 [![A2plus - Gripper assembly](https://i9.ytimg.com/vi/QMxcQ5tssWk/mq3.jpg?sqp=CIGWo_AF&rs=AOn4CLDXtUiVBWVImLrsddeNpxLEa3M3tw)]( https://youtu.be/QMxcQ5tssWk)
 
 
-What are the differences between Assembly 2 and A2plus ?
---------------------------------------------------------
+## Assembly2 and A2plus
 
-Similar is:
+### Similarities
 
-* the workflow and kind of user interface, so users of Assembly 2 can use it in an intuitive way
+* The workflow and the UI, so users of Assembly 2 can use it in an intuitive way
 * Same as Assembly 2 it mainly aims at importing external files to the assembly.
 
-Different is:
+### Differences
 * A new designed solving algorithm, able to solve some more complicated relations.
 * Different and in future more constraints, internally with different names.
 * No animation for degrees of freedom, as difficult for new solver type.
