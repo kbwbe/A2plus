@@ -7,12 +7,11 @@ The main goal of A2plus is to create a very simple, easy to use, and not over-fe
 
 A2plus workbench tries to implement a new constraint solving algorithm to avoid some problems that occurred with the original solver. It is still under development and experimental at this moment but is showing some potential.
 
-<details>
-  <summary>Videos</summary>
+This project started as a fork of Hamish's Assembly 2 workbench (development on A2 went dormant and was unmaintained for a long period). A2plus can be used with FreeCAD v0.16, v0.17 and v0.18 including support for importing parts from external files.
+
 
 [![A2plus - Gripper assembly](https://i9.ytimg.com/vi/QMxcQ5tssWk/mq3.jpg?sqp=CIGWo_AF&rs=AOn4CLDXtUiVBWVImLrsddeNpxLEa3M3tw)]( https://youtu.be/QMxcQ5tssWk)
 
-</details>
 
 What are the differences between Assembly 2 and A2plus ?
 --------------------------------------------------------
