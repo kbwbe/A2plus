@@ -1,5 +1,5 @@
 # A2plus
-Another assembly workbench for FreeCAD, following and extending [Hamish's Assembly 2 workbench](https://github.com/hamish2014/FreeCAD_assembly2)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/kbwbe/A2plus.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/kbwbe/A2plus/alerts/) [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/kbwbe/A2plus.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/kbwbe/A2plus/context:python)  
 
 Another assembly workbench for FreeCAD, following and extending [Hamish's Assembly 2 workbench](https://github.com/hamish2014/FreeCAD_assembly2) hence Assembly2**plus**.
 
