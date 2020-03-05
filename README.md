@@ -47,14 +47,22 @@ After that please constrain these parts again.
 This behaviour is due to FreeCAD's lack of [Topological Naming](https://wiki.freecadweb.org/Topological_naming_problem) and is difficult to correct at the moment.
 This phenomena is seen in many proprietary CAD solutions. Some work is being done to address this in future releases of FreeCAD which will improve this behaviour.
 
-Installation
-------------
-A2plus can now be installed by FreeCAD's add-on manager.
+## Installation
 
-Linux Installation Instructions
--------------------------------
-FreeCAD-version of your choice has to be installed before
-Use commandline bash to install A2plus
+### Automatic Installation
+
+The recommended way to install A2plus is via FreeCAD's [Addon Manager](https://wiki.freecadweb.org/Addon_Manager) under  the Tools →  'Addon Manager' dropdown menu.
+
+### Manual Installation 
+
+<details>
+  <summary>The following directions explain how to install A2plus manually on different platforms</summary>
+
+#### Linux
+
+FreeCAD(version of your choice) has to be installed beforehand.
+
+Use the CLI to install A2plus:
 
 ```bash
 $ sudo apt-get install git python-numpy python-pyside
@@ -63,7 +71,7 @@ $ cd ~/.FreeCAD/Mod
 $ git clone https://github.com/kbwbe/A2plus.git
 ```
 
-Once installed, use git to easily update to the latest version:
+Once installed, use `git` to easily update to the latest version:
 
 ```bash
 $ cd ~/.FreeCAD/Mod/A2plus
@@ -71,14 +79,13 @@ $ git pull
 $ rm *.pyc
 ```
 
-Windows Installation Instructions
----------------------------------
+#### Windows
+
 Pre-requisite: FreeCAD >= v0.16+
 
 Download the git repository as a ZIP on to you local drive.
 
-Refer to the corresponding tutorial on the FreeCAD-Homepage:
-http://www.freecadweb.org/wiki/How_to_install_additional_workbenches
+Refer to the [corresponding tutorial](https://wiki.freecadweb.org/How_to_install_additional_workbenches) on the FreeCAD wiki.
 
 Unzip the downloaded repository within your Mod/ folder. A A2plus-folder should appear
 within you Mod/ folder.
@@ -86,8 +93,8 @@ within you Mod/ folder.
 If you a familiar with `git` you can `git clone https://github.com/kbwbe/A2plus.git` directly in to your Mod/ folder.
 
 
-Mac Installation Instructions
------------------------------
+#### MacOS
+
 (borrowed from Hamish2014)
 
 * download the git repository as ZIP
@@ -98,6 +105,7 @@ Mac Installation Instructions
 * in the folder "Mod" create a new folder named "A2plus"
 * unzip downloaded repository in the folder "Contents/Mod/A2plus"
 
+</details>
 
 Features of the A2plus workbench
 --------------------------------
