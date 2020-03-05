@@ -38,14 +38,14 @@ You have to assemble existing projects again.
 There are prereleases available, please browse the [releases](https://github.comkbwbe/A2plus/releases) section of this repository.
 
 
-Known Issues:
--------------
-Weak point is, same as in Assembly 2, updating / reimporting parts from external files.
+## Known Issues
+
+A weak point is, and is similar to Assembly 2, updating / reimporting parts from external files.
 Constraints will break. You should delete constraints of parts before reimporting them.
 After that please constrain these parts again.
 
-This behaviour is due to FreeCAD's lack of topolocigal naming and is difficult to handle at moment.
-Some work will be done in future to improve this behaviour.
+This behaviour is due to FreeCAD's lack of [Topological Naming](https://wiki.freecadweb.org/Topological_naming_problem) and is difficult to correct at the moment.
+This phenomena is seen in many proprietary CAD solutions. Some work is being done to address this in future releases of FreeCAD which will improve this behaviour.
 
 Installation
 ------------
