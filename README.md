@@ -1,31 +1,25 @@
 # A2plus
-Another assembly workbench for FreeCAD, following and extending [Hamish's Assembly 2 workbench](https://github.com/hamish2014/FreeCAD_assembly2)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/kbwbe/A2plus.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/kbwbe/A2plus/alerts/) [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/kbwbe/A2plus.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/kbwbe/A2plus/context:python)  
 
-This workbench project has been started as a fork of Hamish's Assembly 2 workbench, which is not maintained at
-moment of writing this. A2plus can be used with FreeCAD v0.16, v0.17 and v0.18 including support for importing parts from external files.
+## Description
+Another assembly workbench for FreeCAD, following and extending [Hamish's Assembly 2 workbench](https://github.com/hamish2014/FreeCAD_assembly2) hence Assembly2**plus**.
 
-This workbench tries to implement a new constraint solving algorithm to avoid some problems that
-occurred with the original solver. It is still under development and experimental at this moment but is showing some potential.
+The main goal of A2plus is to create a very simple, easy to use, and not over-featured workbench for FreeCAD assemblies. Using the KISS principle: KEEP IT SIMPLE, STUPID
 
-The main goal of A2plus is to create a very simple, easy to use, and not over-featured workbench for
-FreeCAD assemblies. Using the KISS principle: KEEP IT SIMPLE, STUPID
+A2plus workbench tries to implement a new constraint solving algorithm to avoid some problems that occurred with the original solver. It is still under development and experimental at this moment but is showing some potential.
 
-<details>
-  <summary>Videos</summary>
+This project started as a fork of Hamish's Assembly 2 workbench (development on A2 went dormant and was unmaintained for a long period). A2plus can be used with FreeCAD v0.16, v0.17 and v0.18 including support for importing parts from external files.
 
-[![A2plus - Gripper assembly](https://i9.ytimg.com/vi/QMxcQ5tssWk/mq3.jpg?sqp=CIGWo_AF&rs=AOn4CLDXtUiVBWVImLrsddeNpxLEa3M3tw)]( https://youtu.be/QMxcQ5tssWk)
+[![Assembly-of-gripping-unig](https://i.imgur.com/P8VqEFo.png)](http://www.youtube.com/watch?v=QMxcQ5tssWk "A2plus: Assembly of a gripping unit.")
 
-</details>
+## Assembly2 and A2plus
 
-What are the differences between Assembly 2 and A2plus ?
---------------------------------------------------------
+### Similarities
 
-Similar is:
-
-* the workflow and kind of user interface, so users of Assembly 2 can use it in an intuitive way
+* The workflow and the UI, so users of Assembly 2 can use it in an intuitive way
 * Same as Assembly 2 it mainly aims at importing external files to the assembly.
 
-Different is:
+### Differences
 * A new designed solving algorithm, able to solve some more complicated relations.
 * Different and in future more constraints, internally with different names.
 * No animation for degrees of freedom, as difficult for new solver type.
@@ -33,35 +27,41 @@ Different is:
 * Some new small features as visibility helpers (isolate and show only selected parts, transparency of whole assembly)
 
 
-Is A2plus compatible with Assembly 2 ?
---------------------------------------
+## Is A2plus compatible with Assembly2 ?
 
 No. A2plus would have to handle everything in same way as Assembly 2, including bugs, exact orientations, etc.
 You have to assemble existing projects again.
 
+## Releases 
 
-Releases of A2plus available ?
-------------------------------
+There are prereleases available, please browse the [releases](https://github.com/kbwbe/A2plus/releases) section of this repository.
 
-There are prereleases available. Please have a look at the releases section of this repository
 
-Known Issues:
--------------
-Weak point is, same as in Assembly 2, updating / reimporting parts from external files.
+## Known Issues
+
+A weak point is, and is similar to Assembly 2, updating / reimporting parts from external files.
 Constraints will break. You should delete constraints of parts before reimporting them.
 After that please constrain these parts again.
 
-This behaviour is due to FreeCAD's lack of topolocigal naming and is difficult to handle at moment.
-Some work will be done in future to improve this behaviour.
+This behaviour is due to FreeCAD's lack of [Topological Naming](https://wiki.freecadweb.org/Topological_naming_problem) and is difficult to correct at the moment.
+This phenomena is seen in many proprietary CAD solutions. Some work is being done to address this in future releases of FreeCAD which will improve this behaviour.
 
-Installation
-------------
-A2plus can now be installed by FreeCAD's add-on manager.
+## Installation
 
-Linux Installation Instructions
--------------------------------
-FreeCAD-version of your choice has to be installed before
-Use commandline bash to install A2plus
+### Automatic Installation
+
+The recommended way to install A2plus is via FreeCAD's [Addon Manager](https://wiki.freecadweb.org/Addon_Manager) under  the Tools →  'Addon Manager' dropdown menu.
+
+### Manual Installation 
+
+<details>
+  <summary>The following directions explain how to install A2plus manually on different platforms</summary>
+
+#### Linux
+
+FreeCAD(version of your choice) has to be installed beforehand.
+
+Use the CLI to install A2plus:
 
 ```bash
 $ sudo apt-get install git python-numpy python-pyside
@@ -70,7 +70,7 @@ $ cd ~/.FreeCAD/Mod
 $ git clone https://github.com/kbwbe/A2plus.git
 ```
 
-Once installed, use git to easily update to the latest version:
+Once installed, use `git` to easily update to the latest version:
 
 ```bash
 $ cd ~/.FreeCAD/Mod/A2plus
@@ -78,14 +78,13 @@ $ git pull
 $ rm *.pyc
 ```
 
-Windows Installation Instructions
----------------------------------
+#### Windows
+
 Pre-requisite: FreeCAD >= v0.16+
 
 Download the git repository as a ZIP on to you local drive.
 
-Refer to the corresponding tutorial on the FreeCAD-Homepage:
-http://www.freecadweb.org/wiki/How_to_install_additional_workbenches
+Refer to the [corresponding tutorial](https://wiki.freecadweb.org/How_to_install_additional_workbenches) on the FreeCAD wiki.
 
 Unzip the downloaded repository within your Mod/ folder. A A2plus-folder should appear
 within you Mod/ folder.
@@ -93,8 +92,8 @@ within you Mod/ folder.
 If you a familiar with `git` you can `git clone https://github.com/kbwbe/A2plus.git` directly in to your Mod/ folder.
 
 
-Mac Installation Instructions
------------------------------
+#### MacOS
+
 (borrowed from Hamish2014)
 
 * download the git repository as ZIP
@@ -105,6 +104,7 @@ Mac Installation Instructions
 * in the folder "Mod" create a new folder named "A2plus"
 * unzip downloaded repository in the folder "Contents/Mod/A2plus"
 
+</details>
 
 Features of the A2plus workbench
 --------------------------------
