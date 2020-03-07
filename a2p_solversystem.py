@@ -159,7 +159,6 @@ class SolverSystem():
                 obj.Suppressed = not obj.ViewObject.isVisible()
                 #update even the mirrored constraint
                 doc.getObject(obj.Name+'_mirror').Suppressed = obj.Suppressed
-                doc.getObject(obj.Name+'_mirror').ViewObject.Visibility = obj.ViewObject.isVisible()
                 #if the mate is suppressed do not add it      
                 if obj.Suppressed == False:
                     self.constraints.append(obj)
