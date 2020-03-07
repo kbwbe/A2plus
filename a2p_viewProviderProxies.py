@@ -69,6 +69,7 @@ class ConstraintViewProviderProxy:
                 extraLabel
                 )
         self.enableDeleteCounterPart = True #allow to delete the mirror
+        self.onChangedEnabled = True
 
     def getIcon(self):
         ob = FreeCAD.ActiveDocument.getObject(self.constraintObj_name)
@@ -90,6 +91,22 @@ class ConstraintViewProviderProxy:
 
     def getDefaultDisplayMode(self):
         return "Standard"
+
+    def onChanged(self,viewObject,prop):
+        if not hasattr(viewObject.Proxy, "onChangedEnabled"):
+            viewObject.Proxy.onChangedEnabled = True
+        if viewObject.Proxy.onChangedEnabled == False: return
+        if prop == "Visibility":
+            obj = viewObject.Object
+            doc = obj.Document
+            if hasattr( obj.Proxy, 'mirror_name'):
+                try:
+                    m = doc.getObject(obj.Proxy.mirror_name)
+                    m.ViewObject.Proxy.onChangedEnabled = False
+                    m.ViewObject.Visibility = viewObject.Visibility
+                    m.ViewObject.Proxy.onChangedEnabled = True
+                except:
+                    pass # if original has already been removed...
 
     def onDelete(self, viewObject, subelements): # subelements is a tuple of strings
         if FreeCAD.activeDocument() != viewObject.Object.Document:
@@ -118,6 +135,7 @@ class ConstraintMirrorViewProviderProxy:
         self.iconPath = iconPath
         self.constraintObj_name = constraintObj.Name
         self.enableDeleteCounterPart = True #allow to delete the original of the mirror
+        self.onChangedEnabled = True
 
     def doubleClicked(self,vobj):
         FreeCADGui.activateWorkbench('A2plusWorkbench')
@@ -139,6 +157,22 @@ class ConstraintMirrorViewProviderProxy:
 
     def getDefaultDisplayMode(self):
         return "Standard"
+
+    def onChanged(self,viewObject,prop):
+        if not hasattr(viewObject.Proxy, "onChangedEnabled"):
+            viewObject.Proxy.onChangedEnabled = True
+        if viewObject.Proxy.onChangedEnabled == False: return
+         
+        if prop == "Visibility":
+            obj = viewObject.Object
+            doc = obj.Document
+            try:
+                c = doc.getObject(obj.Proxy.constraintObj_name)
+                c.ViewObject.Proxy.onChangedEnabled = False
+                c.ViewObject.Visibility = viewObject.Visibility
+                c.ViewObject.Proxy.onChangedEnabled = True
+            except:
+                pass # if original has already been removed...
 
     def onDelete(self, viewObject, subelements): # subelements is a tuple of strings
         if FreeCAD.activeDocument() != viewObject.Object.Document:

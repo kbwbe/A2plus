@@ -1270,6 +1270,7 @@ class a2p_isolateCommand:
                 if obj.Name == 'PartInformation': continue
                 if obj.Name[:4] == 'Page': continue
                 if obj.Name == 'SimpleAssemblyShape': continue
+                if a2plib.isA2pConstraint(obj): continue
                 if hasattr(obj,'ViewObject'):
                     if hasattr(obj.ViewObject,'Visibility'):
                         if obj in selection:
