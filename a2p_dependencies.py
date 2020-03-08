@@ -427,8 +427,13 @@ class Dependency():
     def enable(self, workList):
         if self.dependedRigid not in workList:
             return
+        if self.Enabled == True:
+            return
+        
         self.Enabled = True
         self.foreignDependency.Enabled = True
+        self.currentRigid.calcSpinBasicDataDepsEnabled()
+        self.dependedRigid.calcSpinBasicDataDepsEnabled()
 
     def disable(self):
         self.Enabled = False

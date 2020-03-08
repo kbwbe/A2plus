@@ -591,8 +591,6 @@ to a fixed part!
 
         for rig in workList:
             rig.enableDependencies(workList)
-        for rig in workList:
-            rig.calcSpinBasicDataDepsEnabled()
 
         self.lastPositionError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
         self.lastAxisError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
