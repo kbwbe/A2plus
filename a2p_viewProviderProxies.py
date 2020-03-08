@@ -264,6 +264,7 @@ class ConstraintObjectProxy:
         if not "Suppressed" in propList:
             obj.addProperty("App::PropertyBool","Suppressed","ConstraintInfo")
         obj.setEditorMode('Suppressed',1)
+        obj.Suppressed = False # do not suppress constraints after document loading...
         if "suppressed" in propList:
             obj.removeProperty("suppressed")
         self.type = "a2p_constraint"
@@ -324,6 +325,7 @@ class ConstraintMirrorObjectProxy:
         if not "Suppressed" in propList:
             obj.addProperty("App::PropertyBool","Suppressed","ConstraintInfo")
         obj.setEditorMode('Suppressed',1)
+        obj.Suppressed = False # do not suppress constraints after document loading...
         if "suppressed" in propList:
             obj.removeProperty("suppressed")
         self.type = "a2p_constraint_mirror"

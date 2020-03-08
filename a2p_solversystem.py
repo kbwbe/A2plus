@@ -451,8 +451,7 @@ class SolverSystem():
         while True:
             systemSolved = self.calculateChain(doc)
             if self.level_of_accuracy == 1:
-                self.detectUnmovedParts()   # do only once here. It can fail at higher accuracy levels
-                                            # where not a final solution is required.
+                self.detectUnmovedParts()   # doing this one time is enough...
             if systemSolved:
                 self.level_of_accuracy+=1
                 if self.level_of_accuracy > len(self.getSolverControlData()):

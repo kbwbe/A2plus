@@ -217,18 +217,6 @@ class Rigid():
         _currentRigid = FreeCAD.ActiveDocument.getObject(self.objectName)
         return _currentRigid.Shape.BoundBox.Center
     
-    def calcSpinCenterDepsEnabled(self):
-        newSpinCenter = Base.Vector(self.spinCenter)
-        countRefPoints = 0
-        for dep in self.dependencies:
-            if dep.Enabled:
-                if dep.refPoint != None:
-                    newSpinCenter = newSpinCenter.add(dep.refPoint)
-                    countRefPoints += 1
-        if countRefPoints > 0:
-            newSpinCenter.multiply(1.0/countRefPoints)
-            self.spinCenter = newSpinCenter
-
     def calcSpinCenter(self):
         newSpinCenter = Base.Vector(0,0,0)
         countRefPoints = 0
@@ -267,23 +255,6 @@ class Rigid():
             newSpinCenter.multiply(1.0/countRefPoints)
             self.spinCenter = newSpinCenter
         
-    def calcRefPointsBoundBoxSizeDepsEnabled(self):
-        xmin = 0
-        xmax = 0
-        ymin = 0
-        ymax = 0
-        zmin = 0
-        zmax = 0
-        for dep in self.dependencies:
-            if dep.Enabled:
-                if dep.refPoint.x < xmin: xmin=dep.refPoint.x
-                if dep.refPoint.x > xmax: xmax=dep.refPoint.x
-                if dep.refPoint.y < ymin: ymin=dep.refPoint.y
-                if dep.refPoint.y > ymax: ymax=dep.refPoint.y
-                if dep.refPoint.z < zmin: zmin=dep.refPoint.z
-                if dep.refPoint.z > zmax: zmax=dep.refPoint.z
-        self.refPointsBoundBoxSize = math.sqrt( (xmax-xmin)**2 + (ymax-ymin)**2 + (zmax-zmin)**2 )
-
     def calcRefPointsBoundBoxSize(self):
         xmin = 0
         xmax = 0
@@ -324,11 +295,6 @@ class Rigid():
             if dep.useRefPointSpin:
                 depRefPoints_Spin.append(refPoint)
                 depMoveVectors_Spin.append(moveVector)
-            '''
-            if not self.tempfixed:
-                a2plib.drawSphere(refPoint, a2plib.RED)
-                a2plib.drawVector(refPoint, refPoint.add(moveVector), a2plib.RED)
-            ''' 
             # Calculate max move error
             if moveVector.Length > self.maxPosError: self.maxPosError = moveVector.Length
 
