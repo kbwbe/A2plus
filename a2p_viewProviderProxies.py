@@ -98,6 +98,8 @@ class ConstraintViewProviderProxy:
         if viewObject.Proxy.onChangedEnabled == False: return
         if prop == "Visibility":
             obj = viewObject.Object
+            if hasattr(obj,"Suppressed"):
+                obj.Suppressed = not viewObject.isVisible()
             doc = obj.Document
             if hasattr( obj.Proxy, 'mirror_name'):
                 try:
@@ -165,6 +167,8 @@ class ConstraintMirrorViewProviderProxy:
          
         if prop == "Visibility":
             obj = viewObject.Object
+            if hasattr(obj,"Suppressed"):
+                obj.Suppressed = not viewObject.isVisible()
             doc = obj.Document
             try:
                 c = doc.getObject(obj.Proxy.constraintObj_name)
@@ -259,6 +263,7 @@ class ConstraintObjectProxy:
             obj.addProperty("App::PropertyString", "Toponame2", "ConstraintInfo")
         if not "Suppressed" in propList:
             obj.addProperty("App::PropertyBool", "Suppressed", "ConstraintInfo")
+        obj.setEditorMode('Suppressed',1)
         # remove relict from renaming...
         if "suppressed" in propList:
             obj.removeProperty("suppressed")
@@ -320,6 +325,7 @@ class ConstraintMirrorObjectProxy:
             obj.addProperty("App::PropertyString", "Toponame2", "ConstraintNfo")
         if not "Suppressed" in propList:
             obj.addProperty("App::PropertyBool", "Suppressed", "ConstraintNfo")
+        obj.setEditorMode('Suppressed',1)
         # remove relict from renaming...
         if "suppressed" in propList:
             obj.removeProperty("suppressed")
