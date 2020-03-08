@@ -264,6 +264,7 @@ class ConstraintObjectProxy:
         if not "Suppressed" in propList:
             obj.addProperty("App::PropertyBool", "Suppressed", "ConstraintInfo")
         obj.setEditorMode('Suppressed',1)
+        obj.Suppressed = False # do not suppress constraints after document loading...
         # remove relict from renaming...
         if "suppressed" in propList:
             obj.removeProperty("suppressed")
@@ -326,6 +327,7 @@ class ConstraintMirrorObjectProxy:
         if not "Suppressed" in propList:
             obj.addProperty("App::PropertyBool", "Suppressed", "ConstraintNfo")
         obj.setEditorMode('Suppressed',1)
+        obj.Suppressed = False # do not suppress constraints after document loading...
         # remove relict from renaming...
         if "suppressed" in propList:
             obj.removeProperty("suppressed")

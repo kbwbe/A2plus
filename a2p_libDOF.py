@@ -511,7 +511,6 @@ def PointIdentity(axisa, dofpos, dofrot, pointconstraints, dbg=False):
 
 #some test for helper functions
 if __name__ == "__main__":
-    pass
     '''
     AXIS1=FreeCAD.Axis()
 
