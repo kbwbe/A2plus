@@ -155,14 +155,9 @@ class SolverSystem():
         #check for Suppressed mates here and transfer mates to self.constraints
         for obj in constraints:
             if hasattr(obj,'Suppressed'):
-                #modify suppressed properties according to visibility of constraint
-                obj.Suppressed = not obj.ViewObject.isVisible()
-                #update even the mirrored constraint
-                doc.getObject(obj.Name+'_mirror').Suppressed = obj.Suppressed
                 #if the mate is suppressed do not add it      
                 if obj.Suppressed == False:
                     self.constraints.append(obj)
-
         #
         # Extract all the objectnames which are affected by constraints..
         self.objectNames = []
