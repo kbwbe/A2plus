@@ -22,18 +22,18 @@
 #*                                                                         *
 #***************************************************************************
 
-import FreeCADGui,FreeCAD
+import FreeCADGui
+import FreeCAD
 from PySide import QtGui, QtCore
-import os, copy, time, sys, platform
+import os
+import copy
+import sys
+import platform
 
 import a2plib
 from a2plib import getRelativePathesEnabled
-from a2plib import openImportDocFromFile
 
-from a2p_viewProviderProxies import *
 from a2p_versionmanagement import A2P_VERSION
-import a2p_solversystem
-
 from a2p_importedPart_class import Proxy_importPart
 from a2p_importedPart_class import ImportedPartViewProviderProxy
 from a2p_filecache import getOrCreateA2pFile
@@ -987,7 +987,7 @@ class ConstrainedPartsMover:
                    "Use system undo if necessary."
                    )
                 self.removeCallbacks()
-                del self
+                #del self
         
     def removeCallbacks(self):
         self.view.removeEventCallback("SoLocation2Event",self.callbackMove)
@@ -1005,7 +1005,7 @@ class ConstrainedPartsMover:
                    '''A2plus will not move a part with property fixedPosition == True'''
                    )
                 self.removeCallbacks()
-                del self
+                #del self
             else:
                 self.motionActivated = not self.motionActivated
                 if self.motionActivated == True:
@@ -1016,7 +1016,7 @@ class ConstrainedPartsMover:
                     a2p_solversystem.solveConstraints(self.doc, useTransaction = False)
                     self.doc.commitTransaction()
                     self.removeCallbacks()
-                    del self
+                    #del self
                     
     def KeyboardEvent(self, info):
         doc = FreeCAD.activeDocument()

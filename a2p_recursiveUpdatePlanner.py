@@ -21,9 +21,8 @@
 #***************************************************************************
 
 import FreeCADGui,FreeCAD
-from PySide import QtGui, QtCore
+from PySide import QtGui
 import os
-import string
 
 import a2plib
 from a2p_importpart import updateImportedParts
