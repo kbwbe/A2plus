@@ -598,30 +598,25 @@ to a fixed part!
         self.lastAxisError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
         self.convergencyCounter = 0
 
-        calcCount = 0
         goodAccuracy = False
         while not goodAccuracy:
             maxPosError = 0.0
             maxAxisError = 0.0
             maxSingleAxisError = 0.0
 
-            calcCount += 1
             self.stepCount += 1
             self.convergencyCounter += 1
             # First calculate all the movement vectors
-            for w in workList:
-                w.moved = True
-                w.calcMoveData(doc, self)
-                if w.maxPosError > maxPosError:
-                    maxPosError = w.maxPosError
-                if w.maxAxisError > maxAxisError:
-                    maxAxisError = w.maxAxisError
-                if w.maxSingleAxisError > maxSingleAxisError:
-                    maxSingleAxisError = w.maxSingleAxisError
-
-            # Perform the move
-            for w in workList:
-                w.move(doc)
+            for rig in workList:
+                rig.moved = True
+                rig.calcMoveData(doc, self)
+                if rig.maxPosError > maxPosError:
+                    maxPosError = rig.maxPosError
+                if rig.maxAxisError > maxAxisError:
+                    maxAxisError = rig.maxAxisError
+                if rig.maxSingleAxisError > maxSingleAxisError:
+                    maxSingleAxisError = rig.maxSingleAxisError
+                rig.move(doc)
 
             # The accuracy is good, apply the solution to FreeCAD's objects
             if (maxPosError <= reqPosAccuracy and # relevant check
@@ -632,9 +627,10 @@ to a fixed part!
                 # The accuracy is good, we're done here
                 goodAccuracy = True
                 # Mark the rigids as tempfixed and add its constrained rigids to pending list to be processed next
-                for r in workList:
-                    r.applySolution(doc, self)
-                    r.tempfixed = True
+                for rig in workList:
+                    rig.applySolution(doc, self)
+                    rig.tempfixed = True
+                break
 
             if self.convergencyCounter > SOLVER_STEPS_CONVERGENCY_CHECK:
                 if (
