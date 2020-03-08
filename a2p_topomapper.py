@@ -91,11 +91,10 @@ parts are been edited.
 
 
 
-from PySide import QtGui, QtCore
-import FreeCAD, FreeCADGui, Part
+import FreeCAD
+import Part
 from FreeCAD import Base
 import a2plib
-import os
 
 class TopoMapper(object):
     def __init__(self,doc):

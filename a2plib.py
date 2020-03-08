@@ -563,7 +563,7 @@ def findUnusedObjectLabel(base, counterStart=1, fmt='%03i', document=None, exten
         base2 = base
     base2 = base2 + '_'
     
-    if extension==None:
+    if extension is None:
         base3 = base2
     else:
         base3 = base2+extension+'_'
@@ -719,11 +719,6 @@ def printSelection(selection):
 #------------------------------------------------------------------------------
 def updateObjectProperties( c ):
     return
-    '''
-    if c.Type == 'axial' or c.Type == 'circularEdge':
-        if not hasattr(c, 'lockRotation'):
-            c.addProperty("App::PropertyBool","lockRotation","ConstraintInfo")
-    '''
 #------------------------------------------------------------------------------
 def planeSelected( selection ):
     if len( selection.SubElementNames ) == 1:

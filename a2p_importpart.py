@@ -24,28 +24,15 @@
 
 import FreeCADGui,FreeCAD
 from PySide import QtGui, QtCore
-import os, copy, time, sys, platform
+import os
+import copy
+import sys
+import platform
 import a2plib
-from a2p_MuxAssembly import (
-    Proxy_muxAssemblyObj,
-    makePlacedShape,
-    muxAssemblyWithTopoNames
-    )
-from a2p_viewProviderProxies import *
+from a2p_MuxAssembly import muxAssemblyWithTopoNames
 from a2p_versionmanagement import A2P_VERSION
 import a2p_solversystem
-from a2plib import (
-    appVersionStr,
-    AUTOSOLVE_ENABLED,
-    Msg,
-    DebugMsg,
-    A2P_DEBUG_LEVEL,
-    A2P_DEBUG_NONE,
-    A2P_DEBUG_1,
-    A2P_DEBUG_2,
-    A2P_DEBUG_3,
-    getRelativePathesEnabled
-    )
+from a2plib import getRelativePathesEnabled
 import a2p_importedPart_class
 
 from a2p_topomapper import (
@@ -229,7 +216,7 @@ def importPartFromFile(
                 labelList,
                 dc)
             dialog.exec_()
-            if dc.tx == None:
+            if dc.tx is None:
                 msg = "Import of a shape reference aborted by user"
                 QtGui.QMessageBox.information(
                     QtGui.QApplication.activeWindow(),
@@ -350,8 +337,8 @@ def importPartFromFile(
             lcsGroup = doc.addObject( "Part::FeaturePython", str(lcsGroupObjectName.encode('utf-8')) )    # works on Python 3.6.5
         lcsGroup.Label = lcsGroupLabel
     
-        proxy = a2p_lcs_support.LCS_Group(lcsGroup)
-        vp_proxy = a2p_lcs_support.VP_LCS_Group(lcsGroup.ViewObject)
+        a2p_lcs_support.LCS_Group(lcsGroup)
+        a2p_lcs_support.VP_LCS_Group(lcsGroup.ViewObject)
         
         for lcs in lcsList:
             lcsGroup.addObject(lcs)
@@ -384,7 +371,7 @@ class a2p_ImportShapeReferenceCommand():
                 }
 
     def Activated(self):
-        if FreeCAD.ActiveDocument == None:
+        if FreeCAD.ActiveDocument is None:
             QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
                "No active Document found",
@@ -465,7 +452,7 @@ Check your settings of A2plus preferences.
 
     def IsActive(self):
         doc = FreeCAD.activeDocument()
-        if doc == None: return False
+        if doc is None: return False
         return True
 
     def GuiViewFit(self):
@@ -530,7 +517,7 @@ class a2p_ImportPartCommand():
                 }
 
     def Activated(self):
-        if FreeCAD.ActiveDocument == None:
+        if FreeCAD.ActiveDocument is None:
             QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
                "No active Document found",
@@ -609,7 +596,7 @@ Check your settings of A2plus preferences.
 
     def IsActive(self):
         doc = FreeCAD.activeDocument()
-        if doc == None: return False
+        if doc is None: return False
         return True
 
     def GuiViewFit(self):
@@ -624,7 +611,7 @@ FreeCADGui.addCommand('a2p_ImportPart',a2p_ImportPartCommand())
 
 
 def updateImportedParts(doc, partial=False):
-    if doc == None:
+    if doc is None:
         QtGui.QMessageBox.information(  
                         QtGui.QApplication.activeWindow(),
                         "No active document found!",
@@ -676,7 +663,7 @@ def updateImportedParts(doc, partial=False):
             assemblyPath = os.path.normpath(os.path.split(doc.FileName)[0])
             absPath = a2plib.findSourceFileInProject(obj.sourceFile, assemblyPath)
 
-            if absPath == None:
+            if absPath is None:
                 QtGui.QMessageBox.critical(  QtGui.QApplication.activeWindow(),
                                             u"Source file not found",
                                             u"Unable to find {}".format(
@@ -904,7 +891,7 @@ class a2p_EditPartCommand:
         #====================================================
         # Is there an open Doc ?
         #====================================================
-        if doc == None:
+        if doc is None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
                                         u"No active document found!",
                                         u"Before editing a part, you have to open an assembly file."
@@ -941,7 +928,7 @@ class a2p_EditPartCommand:
         FreeCADGui.Selection.clearSelection() # very important! Avoid Editing the assembly the part was called from!
         assemblyPath = os.path.normpath(os.path.split(doc.FileName)[0])
         fileNameWithinProjectFile = a2plib.findSourceFileInProject(obj.sourceFile, assemblyPath)
-        if fileNameWithinProjectFile == None:
+        if fileNameWithinProjectFile is None:
             msg = \
 '''
 You want to edit a file which
@@ -1072,7 +1059,7 @@ class a2p_MovePartCommand:
     
     def IsActive(self):
         doc = FreeCAD.activeDocument()
-        if doc == None: return False
+        if doc is None: return False
         #
         selection = [s for s in FreeCADGui.Selection.getSelectionEx() if s.Document == doc ]
         if len(selection) != 1: return False
@@ -1132,7 +1119,6 @@ class ConstrainedPartsMover:
                    "Use system undo if necessary."
                    )
                 self.removeCallbacks()
-                del self
         
     def removeCallbacks(self):
         self.view.removeEventCallback("SoLocation2Event",self.callbackMove)
@@ -1161,14 +1147,12 @@ class ConstrainedPartsMover:
                     a2p_solversystem.solveConstraints(self.doc, useTransaction = False)
                     self.doc.commitTransaction()
                     self.removeCallbacks()
-                    del self
                     
     def KeyboardEvent(self, info):
         doc = FreeCAD.activeDocument()
         if info['State'] == 'UP' and info['Key'] == 'ESCAPE':
             doc.commitTransaction()
             self.removeCallbacks()
-            del self
 #===============================================================================
 toolTip = \
 '''
@@ -1192,7 +1176,7 @@ class a2p_MovePartUnderConstraints:
 
     def IsActive(self):
         doc = FreeCAD.activeDocument()
-        if doc == None: return False
+        if doc is None: return False
         #
         #selection = [s for s in FreeCADGui.Selection.getSelectionEx() if s.Document == doc ]
         #if len(selection) != 1: return False
@@ -1438,7 +1422,7 @@ FreeCADGui.addCommand('a2p_isolateCommand', a2p_isolateCommand())
 
 class a2p_ToggleTransparencyCommand:
     def Activated(self, checked):
-        if FreeCAD.activeDocument() == None:
+        if FreeCAD.activeDocument() is None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
                                         "No active document found!",
                                         "You have to open an assembly file first."
@@ -1531,7 +1515,7 @@ corresponding parts again.
 class a2p_repairTreeViewCommand:
 
     def Activated(self):
-        if FreeCAD.activeDocument() == None:
+        if FreeCAD.activeDocument() is None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
                                         "No active document found!",
                                         "You have to open an assembly file first."
@@ -1562,7 +1546,7 @@ toggled between 'aligned' and
 class a2p_FlipConstraintDirectionCommand:
 
     def Activated(self):
-        if FreeCAD.activeDocument() == None:
+        if FreeCAD.activeDocument() is None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
                                         "No active document found!",
                                         "You have to open an assembly file first."
@@ -1606,7 +1590,7 @@ class a2p_Show_Hierarchy_Command:
 
     def Activated(self):
         doc = FreeCAD.activeDocument()
-        if doc == None:
+        if doc is None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
                                         "No active document found!",
                                         "You have to open an assembly file first."
@@ -1652,7 +1636,7 @@ class a2p_Show_PartLabels_Command:
                 return
             
             labelGroup = doc.getObject("partLabels")
-            if labelGroup == None:
+            if labelGroup is None:
                 labelGroup=doc.addObject("App::DocumentObjectGroup", "partLabels")
             else:
                 for lbl in labelGroup.Group:
@@ -1732,7 +1716,7 @@ FreeCADGui.addCommand('a2p_Show_DOF_info_Command', a2p_Show_DOF_info_Command())
 class a2p_absPath_to_relPath_Command:
     def Activated(self):
         doc = FreeCAD.activeDocument()
-        if doc == None:
+        if doc is None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
                                         "No active document found!",
                                         "You have to open an assembly file first."
