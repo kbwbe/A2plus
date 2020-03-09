@@ -23,12 +23,9 @@
 #***************************************************************************
 
 import FreeCAD, FreeCADGui
-from PySide import QtGui, QtCore
 from pivy import coin
 import traceback
 import a2plib
-from a2p_importedPart_class import ImportedPartViewProviderProxy # for compat
-
 
 #==============================================================================
 class PopUpMenuItem:
@@ -283,8 +280,8 @@ class ConstraintObjectProxy:
         if self.disable_onChanged: return
         if hasattr(self, 'mirror_name'):
             cMirror = obj.Document.getObject( self.mirror_name )
-            if cMirror == None: return #catch issues during deleting...
-            if cMirror.Proxy == None:
+            if cMirror is None: return #catch issues during deleting...
+            if cMirror.Proxy is None:
                 return #this occurs during document loading ...
             if obj.getGroupOfProperty( prop ) == 'ConstraintInfo':
                 cMirror.Proxy.disable_onChanged = True

@@ -845,7 +845,7 @@ class a2p_DuplicatePartCommand:
         
     def IsActive(self):
         doc = FreeCAD.activeDocument()
-        if doc == None: return False
+        if doc is None: return False
         #
         selection = [s for s in FreeCADGui.Selection.getSelectionEx() if s.Document == doc ]
         if len(selection) != 1: return False
@@ -1375,7 +1375,7 @@ class a2p_isolateCommand:
         return False
 
     def Activated(self):
-        if FreeCAD.activeDocument() == None:
+        if FreeCAD.activeDocument() is None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
                                         "No active document found!",
                                         "You have to open an assembly file first."
