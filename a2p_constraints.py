@@ -22,6 +22,7 @@
 #*                                                                         *
 #***************************************************************************
 
+import FreeCAD
 import  Part
 import a2plib
 from a2plib import (

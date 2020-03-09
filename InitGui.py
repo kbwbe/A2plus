@@ -28,6 +28,8 @@ __author__ = 'kbwbe'
 
 A2P_VERSION = 'V0.4.45c'
 
+import FreeCAD
+import FreeCADGui
 
 
 import sys
