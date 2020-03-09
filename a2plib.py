@@ -34,8 +34,6 @@ import copy
 import platform
 import numpy
 
-from a2p_viewProviderProxies import *
-
 PYVERSION =  sys.version_info[0]
 
 preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
@@ -399,7 +397,7 @@ def getProjectFolder():
 
 #------------------------------------------------------------------------------
 def pathToOS(path):
-    if path == None: return None
+    if path is None: return None
     p = to_str(path)
     if OPERATING_SYSTEM == 'WINDOWS':
         p = p.replace(u'/',u'\\')
@@ -534,7 +532,7 @@ def drawVector(fromPoint,toPoint, color):
     doc.recompute()
 #------------------------------------------------------------------------------
 def findUnusedObjectName(base, counterStart=1, fmt='%03i', document=None):
-    if document == None:
+    if document is None:
         document = FreeCAD.ActiveDocument
     i = counterStart
     usedNames = [ obj.Name for obj in document.Objects ]
@@ -552,7 +550,7 @@ def findUnusedObjectName(base, counterStart=1, fmt='%03i', document=None):
     return objName
 #------------------------------------------------------------------------------
 def findUnusedObjectLabel(base, counterStart=1, fmt='%03i', document=None, extension=None):
-    if document == None:
+    if document is None:
         document = FreeCAD.ActiveDocument
     i = counterStart
     usedLabels = [ obj.Label for obj in document.Objects ]
@@ -895,7 +893,7 @@ def getAxis(obj, subElementName):
                 lines = arcs
                 D = numpy.array([L.tangent(0)[0] for L in lines]) #D(irections)
                 if numpy.std( D, axis=0 ).max() < 10**-9: #then linear curve
-                    axis = a2plib.numpyVecToFC(D[0])
+                    axis = numpyVecToFC(D[0])
             
     return axis # may be none!
 #------------------------------------------------------------------------------
@@ -1040,7 +1038,7 @@ def deleteConstraintsOfDeletedObjects():
 #------------------------------------------------------------------------------
 def a2p_repairTreeView():
     doc = FreeCAD.activeDocument()
-    if doc == None: return
+    if doc is None: return
     
     deleteConstraintsOfDeletedObjects()
 

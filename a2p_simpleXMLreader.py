@@ -32,7 +32,8 @@
 
 
 
-import FreeCAD, FreeCADGui, os
+import FreeCAD
+import os
 import zipfile
 import a2plib
 
@@ -238,7 +239,7 @@ class FCdocumentReader(object):
         self.clear()
         
         # got a fileName != None ?
-        if fileName == None:
+        if fileName is None:
             print (u"fcDocumentReader: failed to open file with None name!")
             return
 

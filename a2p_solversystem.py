@@ -20,38 +20,20 @@
 #*                                                                         *
 #***************************************************************************
 
-import random
-import time
-import traceback
-import math
-import copy
-import FreeCAD, FreeCADGui, Part
-from PySide import QtGui, QtCore
-from  FreeCAD import Base
+import FreeCAD, FreeCADGui
+from PySide import QtGui
 import a2plib
 from a2plib import (
-    drawVector,
     path_a2p,
-    getObjectVertexFromName,
-    getObjectEdgeFromName,
-    getObjectFaceFromName,
-    isLine,
-    getPos,
-    getAxis,
-    appVersionStr,
     Msg,
     DebugMsg,
     A2P_DEBUG_LEVEL,
     A2P_DEBUG_1,
-    A2P_DEBUG_2,
-    A2P_DEBUG_3,
-    
     PARTIAL_SOLVE_STAGE1,
     )
 from a2p_dependencies import Dependency
 from a2p_rigid import Rigid
-import os, sys
-from os.path import expanduser
+import os
 
 
 SOLVER_MAXSTEPS = 50000
@@ -234,7 +216,7 @@ class SolverSystem():
         doc = FreeCAD.activeDocument()
 
         dofGroup = doc.getObject("dofLabels")
-        if dofGroup == None:
+        if dofGroup is None:
             dofGroup=doc.addObject("App::DocumentObjectGroup", "dofLabels")
         else:
             for lbl in dofGroup.Group:

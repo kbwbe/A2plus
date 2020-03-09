@@ -22,10 +22,25 @@
 #*                                                                         *
 #***************************************************************************
 
-from a2plib import *
-from PySide import QtGui, QtCore
+import  Part
+import a2plib
+from a2plib import (
+    path_a2p,
+    findUnusedObjectName,
+    vertexSelected,
+    LinearEdgeSelected,
+    planeSelected,
+    sphericalSurfaceSelected,
+    cylindricalFaceSelected,
+    CircularEdgeSelected,
+    ClosedEdgeSelected,
+    getPos,
+    getAxis,
+    getObjectEdgeFromName,
+    getObjectFaceFromName
+    )
 import math
-from a2p_viewProviderProxies import *
+from a2p_viewProviderProxies import ConstraintObjectProxy, ConstraintViewProviderProxy
 
 #==============================================================================
 class BasicConstraint():
@@ -236,17 +251,6 @@ class PointOnPlaneConstraint(BasicConstraint):
         self.create(selection)
         
     def calcInitialValues(self):
-        c = self.constraintObject
-        point = getPos(self.ob1, c.SubElement1)
-        plane = getObjectFaceFromName(self.ob2, c.SubElement2)
-        planeNormal = a2plib.getPlaneNormal(plane.Surface)
-        planePos = getPos(self.ob2, c.SubElement2)
-        #
-        # calculate recent offset...
-        #delta = point.sub(planePos)
-        #self.offset = delta.dot(planeNormal)
-        #
-        # propose offset = 0 for better usability
         self.offset = 0.0
 
     @staticmethod
@@ -803,8 +807,6 @@ class CenterOfMassConstraint(BasicConstraint):
         elif self.sub2.startswith('Edge'):
             plane2 = Part.Face(Part.Wire(getObjectEdgeFromName(self.ob2, self.sub2)))
         #plane2 = getObjectFaceFromName(self.ob2, self.sub2)
-        CoM1 = plane1.CenterOfMass
-        CoM2 = plane2.CenterOfMass
         axis1 = a2plib.getPlaneNormal(plane1.Surface)
         axis2 = a2plib.getPlaneNormal(plane2.Surface)
         angle = math.degrees(axis1.getAngle(axis2))
