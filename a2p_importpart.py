@@ -40,6 +40,7 @@ from a2p_filecache import getOrCreateA2pFile
 from a2p_topomapper import TopoMapper
 import a2p_filecache
 import a2p_solversystem
+import a2p_constraintServices
 
 PYVERSION =  sys.version_info[0]
 
@@ -593,6 +594,8 @@ def updateImportedParts(doc, partial=False):
                         obj.Shape = entry.shape
                         obj.Placement = savedPlacement # restore the old placement
                         obj.ViewObject.DiffuseColor = entry.diffuseColor
+
+    a2p_constraintServices.redefineConstraintDirections(doc)
 
     mw = FreeCADGui.getMainWindow()
     mdi = mw.findChild(QtGui.QMdiArea)

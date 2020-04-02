@@ -33,41 +33,50 @@ def redefineConstraintDirections(doc):
     '''
     recalculate value of property 'direction' and the sign of property 'offset' of all
     a2p-constraints of a document, in order to reach a solvable state if 
-    possible.
+    possible, especially used after updating of imported parts.
     '''
+    unknown_constraints = []
     constraints = [ obj for obj in doc.Objects if 'ConstraintInfo' in obj.Content]
     for c in constraints:
-        if c.Type == 'pointIdentity':
-            a2p_constraints.PointIdentityConstraint.recalculateMatingDirection(c)
-        elif c.Type == 'pointOnLine':
-            a2p_constraints.PointOnLineConstraint.recalculateMatingDirection(c)
-        elif c.Type == 'pointOnPlane':
-            a2p_constraints.PointOnPlaneConstraint.recalculateMatingDirection(c)
-        elif c.Type == 'circularEdge':
-            a2p_constraints.CircularEdgeConstraint.recalculateMatingDirection(c)
-        elif c.Type == 'axial':
-            a2p_constraints.AxialConstraint.recalculateMatingDirection(c)
-        elif c.Type == 'axisParallel':
-            a2p_constraints.AxisParallelConstraint.recalculateMatingDirection(c)
-        elif c.Type == 'axisPlaneParallel':
-            a2p_constraints.AxisPlaneParallelConstraint.recalculateMatingDirection(c)
-        elif c.Type == 'axisPlaneAngle':
-            a2p_constraints.AxisPlaneAngleConstraint.recalculateMatingDirection(c)
-        elif c.Type == 'axisPlaneNormal':
-            a2p_constraints.AxisPlaneNormalConstraint.recalculateMatingDirection(c)
-        elif c.Type == 'planesParallel':
-            a2p_constraints.PlanesParallelConstraint.recalculateMatingDirection(c)
-        elif c.Type == 'plane':
-            a2p_constraints.PlaneConstraint.recalculateMatingDirection(c)
-        elif c.Type == 'angledPlanes':
-            a2p_constraints.AngledPlanesConstraint.recalculateMatingDirection(c)
-        elif c.Type == 'sphereCenterIdent':
-            a2p_constraints.SphericalConstraint.recalculateMatingDirection(c)
-        elif c.Type == 'CenterOfMass':
-            a2p_constraints.CenterOfMassConstraint.recalculateMatingDirection(c)
-        else:
-            a2p_constraints.BasicConstraint.recalculateMatingDirection(c) #Throws exception...
-            
+        try: #process as much constraints as possible
+            if c.Type == 'pointIdentity':
+                a2p_constraints.PointIdentityConstraint.recalculateMatingDirection(c)
+            elif c.Type == 'pointOnLine':
+                a2p_constraints.PointOnLineConstraint.recalculateMatingDirection(c)
+            elif c.Type == 'pointOnPlane':
+                a2p_constraints.PointOnPlaneConstraint.recalculateMatingDirection(c)
+            elif c.Type == 'circularEdge':
+                a2p_constraints.CircularEdgeConstraint.recalculateMatingDirection(c)
+            elif c.Type == 'axial':
+                a2p_constraints.AxialConstraint.recalculateMatingDirection(c)
+            elif c.Type == 'axisParallel':
+                a2p_constraints.AxisParallelConstraint.recalculateMatingDirection(c)
+            elif c.Type == 'axisPlaneParallel':
+                a2p_constraints.AxisPlaneParallelConstraint.recalculateMatingDirection(c)
+            elif c.Type == 'axisPlaneAngle':
+                a2p_constraints.AxisPlaneAngleConstraint.recalculateMatingDirection(c)
+            elif c.Type == 'axisPlaneNormal':
+                a2p_constraints.AxisPlaneNormalConstraint.recalculateMatingDirection(c)
+            elif c.Type == 'planesParallel':
+                a2p_constraints.PlanesParallelConstraint.recalculateMatingDirection(c)
+            elif c.Type == 'plane':
+                a2p_constraints.PlaneConstraint.recalculateMatingDirection(c)
+            elif c.Type == 'angledPlanes':
+                a2p_constraints.AngledPlanesConstraint.recalculateMatingDirection(c)
+            elif c.Type == 'sphereCenterIdent':
+                a2p_constraints.SphericalConstraint.recalculateMatingDirection(c)
+            elif c.Type == 'CenterOfMass':
+                a2p_constraints.CenterOfMassConstraint.recalculateMatingDirection(c)
+            else:
+                unknown_constraints.append(c.Type)
+        except:
+            print("Errors occured during processing of {}".format(c.Label))
+        
+    if len(unknown_constraints) > 0:
+        print("redefineConstraintDirections(): Found unknown constraints: {}".format(
+            set(unknown_constraints)
+            )
+        )
 
 #==============================================================================
 class a2p_redefineConstraintDirectionsCommand:
