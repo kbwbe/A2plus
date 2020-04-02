@@ -26,7 +26,7 @@
 __title__ = 'A2plus assembly Workbench - InitGui file'
 __author__ = 'kbwbe'
 
-A2P_VERSION = 'V0.5.25'
+A2P_VERSION = 'V0.5.26'
 
 import sys
 PyVersion = sys.version_info[0]
@@ -63,6 +63,7 @@ class A2plusWorkbench (Workbench):
         import a2p_constraintcommands
         import a2p_migratetoponaming
         import a2p_bom # bom == bill of materials == partslist
+        import a2p_constraintServices
 
         if a2plib.getRecursiveUpdateEnabled():
             partCommands = [
@@ -121,6 +122,7 @@ class A2plusWorkbench (Workbench):
             'a2p_SolverCommand',
             'a2p_ToggleAutoSolveCommand',
             'a2p_FlipConstraintDirectionCommand',
+            'a2p_redefineConstraintDirectionsCommand',
             'a2p_Show_Hierarchy_Command'
             ]
         viewCommands = [

@@ -140,6 +140,14 @@ class BasicConstraint():
             )
         
     @staticmethod
+    def recalculateMatingDirection(c):
+        raise NotImplementedError(
+            "Class {} doesn't implement recalculateMatingDirection(), use inherited classes instead!".format(
+                c.__class__.__name__
+                )
+            )
+        
+    @staticmethod
     def getToolTip(self):
         return 'Invalid Base Class BasicConstraint'
     
@@ -160,6 +168,10 @@ class PointIdentityConstraint(BasicConstraint):
     def calcInitialValues(self):
         pass
 
+    @staticmethod
+    def recalculateMatingDirection(c):
+        pass
+    
     @staticmethod
     def getToolTip():
         return \
@@ -205,6 +217,10 @@ class PointOnLineConstraint(BasicConstraint):
         pass
 
     @staticmethod
+    def recalculateMatingDirection(c):
+        pass
+
+    @staticmethod
     def getToolTip():
         return \
 '''
@@ -242,18 +258,24 @@ class PointOnPlaneConstraint(BasicConstraint):
         self.create(selection)
         
     def calcInitialValues(self):
-        c = self.constraintObject
-        point = getPos(self.ob1, c.SubElement1)
-        plane = getObjectFaceFromName(self.ob2, c.SubElement2)
-        planeNormal = a2plib.getPlaneNormal(plane.Surface)
-        planePos = getPos(self.ob2, c.SubElement2)
-        #
-        # calculate recent offset...
-        #delta = point.sub(planePos)
-        #self.offset = delta.dot(planeNormal)
-        #
         # propose offset = 0 for better usability
         self.offset = 0.0
+        
+    
+    @staticmethod
+    def recalculateMatingDirection(c):
+        point = getPos(c.Object1, c.SubElement1)
+        plane = getObjectFaceFromName(c.Object2, c.SubElement2)
+        planeNormal = a2plib.getPlaneNormal(plane.Surface)
+        planePos = getPos(c.Object2, c.SubElement2)
+
+        # calculate recent offset...
+        delta = point.sub(planePos)
+        offset = delta.dot(planeNormal)
+        if offset >= 0:
+            c.offset = abs(c.offset)
+        else:
+            c.offset = -abs(c.offset)
 
     @staticmethod
     def getToolTip():
@@ -307,6 +329,23 @@ class CircularEdgeConstraint(BasicConstraint):
         self.lockRotation = False
 
     @staticmethod
+    def recalculateMatingDirection(c):
+        ob1 = c.Document.getObject(c.Object1)
+        ob2 = c.Document.getObject(c.Object2)
+        circleEdge1 = getObjectEdgeFromName(ob1, c.SubElement1)
+        circleEdge2 = getObjectEdgeFromName(ob2, c.SubElement2)
+        axis1 = circleEdge1.Curve.Axis
+        axis2 = circleEdge2.Curve.Axis
+        angle = math.degrees(axis1.getAngle(axis2))
+        if angle <= 90.0:
+            direction = "aligned"
+        else:
+            direction = "opposed"
+        if c.directionConstraint != direction:
+            c.offset = -c.offset
+        c.directionConstraint = direction    
+
+    @staticmethod
     def getToolTip():
         return \
 '''
@@ -348,6 +387,18 @@ class AxialConstraint(BasicConstraint):
         else:
             self.direction = "opposed"
         self.lockRotation = False
+
+    @staticmethod
+    def recalculateMatingDirection(c):
+        ob1 = c.Document.getObject(c.Object1)
+        ob2 = c.Document.getObject(c.Object2)
+        axis1 = getAxis(ob1, c.SubElement1)
+        axis2 = getAxis(ob2, c.SubElement2)
+        angle = math.degrees(axis1.getAngle(axis2))
+        if angle <= 90.0:
+            c.directionConstraint = "aligned"
+        else:
+            c.directionConstraint = "opposed"
 
     @staticmethod
     def getToolTip():
@@ -402,6 +453,18 @@ class AxisParallelConstraint(BasicConstraint):
             self.direction = "opposed"
 
     @staticmethod
+    def recalculateMatingDirection(c):
+        ob1 = c.Document.getObject(c.Object1)
+        ob2 = c.Document.getObject(c.Object2)
+        axis1 = getAxis(ob1, c.SubElement1)
+        axis2 = getAxis(ob2, c.SubElement2)
+        angle = math.degrees(axis1.getAngle(axis2))
+        if angle <= 90.0:
+            c.directionConstraint = "aligned"
+        else:
+            c.directionConstraint = "opposed"
+
+    @staticmethod
     def getToolTip():
         return \
 '''
@@ -446,6 +509,10 @@ class AxisPlaneParallelConstraint(BasicConstraint):
     def calcInitialValues(self):
         pass
 
+    @staticmethod
+    def recalculateMatingDirection(c):
+        pass
+    
     @staticmethod
     def getToolTip():
         return \
@@ -503,6 +570,20 @@ class AxisPlaneAngleConstraint(BasicConstraint):
             self.angle = -90 + angle
 
     @staticmethod
+    def recalculateMatingDirection(c):
+        ob1 = c.Document.getObject(c.Object1)
+        ob2 = c.Document.getObject(c.Object2)
+        axis1 = getAxis(ob1, c.SubElement1)
+        plane2 = getObjectFaceFromName(ob2, c.SubElement2)
+        axis2 = a2plib.getPlaneNormal(plane2.Surface)
+        angle = math.degrees(axis1.getAngle(axis2))
+        if angle <= 90.0:
+            direction = "opposed"
+        else:
+            direction = "aligned"
+        c.directionConstraint = direction
+
+    @staticmethod
     def getToolTip():
         return \
 '''
@@ -555,6 +636,20 @@ class AxisPlaneNormalConstraint(BasicConstraint):
             self.direction = "aligned"
         else:
             self.direction = "opposed"
+
+    @staticmethod
+    def recalculateMatingDirection(c):
+        ob1 = c.Document.getObject(c.Object1)
+        ob2 = c.Document.getObject(c.Object2)
+        axis1 = getAxis(ob1, c.SubElement1)
+        plane2 = getObjectFaceFromName(ob2, c.SubElement2)
+        axis2 = a2plib.getPlaneNormal(plane2.Surface)
+
+        angle = math.degrees(axis1.getAngle(axis2))
+        if angle <= 90.0:
+            c.directionConstraint = "aligned"
+        else:
+            c.directionConstraint = "opposed"
 
     @staticmethod
     def getToolTip():
@@ -610,6 +705,22 @@ class PlanesParallelConstraint(BasicConstraint):
             self.direction = "opposed"
 
     @staticmethod
+    def recalculateMatingDirection(c):
+        ob1 = c.Document.getObject(c.Object1)
+        ob2 = c.Document.getObject(c.Object2)
+        plane1 = getObjectFaceFromName(ob1, c.SubElement1)
+        plane2 = getObjectFaceFromName(ob2, c.SubElement2)
+        
+        normal1 = a2plib.getPlaneNormal(plane1.Surface)
+        normal2 = a2plib.getPlaneNormal(plane2.Surface)
+        
+        angle = math.degrees(normal1.getAngle(normal2))
+        if angle <= 90.0:
+            c.directionConstraint = "aligned"
+        else:
+            c.directionConstraint = "opposed"
+
+    @staticmethod
     def getToolTip():
         return \
 '''
@@ -663,6 +774,25 @@ class PlaneConstraint(BasicConstraint):
         self.offset = 0.0
 
     @staticmethod
+    def recalculateMatingDirection(c):
+        ob1 = c.Document.getObject(c.Object1)
+        ob2 = c.Document.getObject(c.Object2)
+        plane1 = getObjectFaceFromName(ob1, c.SubElement1)
+        plane2 = getObjectFaceFromName(ob2, c.SubElement2)
+        
+        normal1 = a2plib.getPlaneNormal(plane1.Surface)
+        normal2 = a2plib.getPlaneNormal(plane2.Surface)
+        
+        angle = math.degrees(normal1.getAngle(normal2))
+        if angle <= 90.0:
+            direction = "aligned"
+        else:
+            direction = "opposed"
+        #if c.directionConstraint != direction:
+        #    c.offset = -c.offset
+        c.directionConstraint = direction
+
+    @staticmethod
     def getToolTip():
         return \
 '''
@@ -704,6 +834,10 @@ class AngledPlanesConstraint(BasicConstraint):
         normal1 = a2plib.getPlaneNormal(plane1.Surface)
         normal2 = a2plib.getPlaneNormal(plane2.Surface)
         self.angle = math.degrees(normal2.getAngle(normal1))
+
+    @staticmethod
+    def recalculateMatingDirection(c):
+        pass
 
     @staticmethod
     def getToolTip():
@@ -751,6 +885,10 @@ class SphericalConstraint(BasicConstraint):
         self.create(selection)
         
     def calcInitialValues(self):
+        pass
+
+    @staticmethod
+    def recalculateMatingDirection(c):
         pass
 
     @staticmethod
@@ -820,6 +958,27 @@ class CenterOfMassConstraint(BasicConstraint):
             self.direction = "opposed"
         self.offset = 0.0
         self.lockRotation = False
+
+    @staticmethod
+    def recalculateMatingDirection(c):
+        ob1 = c.Document.getObject(c.Object1)
+        ob2 = c.Document.getObject(c.Object2)
+        if c.SubElement1.startswith('Face'):
+            plane1 = getObjectFaceFromName(ob1, c.SubElement1)
+        elif c.SubElement1.startswith('Edge'):
+            #print(self.sub1)
+            plane1 = Part.Face(Part.Wire(getObjectEdgeFromName(ob1, c.SubElement1)))
+        if c.SubElement2.startswith('Face'):
+            plane2 = getObjectFaceFromName(ob2, c.SubElement2)
+        elif c.SubElement2.startswith('Edge'):
+            plane2 = Part.Face(Part.Wire(getObjectEdgeFromName(ob2, c.SubElement2)))
+        axis1 = a2plib.getPlaneNormal(plane1.Surface)
+        axis2 = a2plib.getPlaneNormal(plane2.Surface)
+        angle = math.degrees(axis1.getAngle(axis2))
+        if angle <= 90.0:
+            c.directionConstraint = "aligned"
+        else:
+            c.directionConstraint = "opposed"
 
     @staticmethod
     def getToolTip():
