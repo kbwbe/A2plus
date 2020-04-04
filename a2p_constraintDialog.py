@@ -131,7 +131,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
 
             self.offsetEdit = QtGui.QDoubleSpinBox(self)
             # get the length unit as string
-            self.offsetEdit.setSuffix(" " + str(FreeCAD.Units.Quantity(1, FreeCAD.Units.Length))[2:])
+            self.offsetEdit.setSuffix(" " + str(FreeCAD.Units.Quantity(1, FreeCAD.Units.Length))[3:])
             # the maximum is by default 99.99 and we can allow more
             self.offsetEdit.setMaximum(1e7) # allow up to 1 km
             # set minimum to negative of maximum
@@ -168,7 +168,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
 
             self.angleEdit = QtGui.QDoubleSpinBox(self)
             # get the angle unit as string
-            self.angleEdit.setSuffix(" " + str(FreeCAD.Units.Quantity(1, FreeCAD.Units.Angle))[2:])
+            self.angleEdit.setSuffix(" " + str(FreeCAD.Units.Quantity(1, FreeCAD.Units.Angle))[3:])
             
             if self.constraintObject.Type == "axisPlaneAngle":
                 self.angleEdit.setMaximum(90.0)
