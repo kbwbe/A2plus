@@ -26,7 +26,7 @@
 __title__ = 'A2plus assembly Workbench - InitGui file'
 __author__ = 'kbwbe'
 
-A2P_VERSION = 'V0.4.45c'
+A2P_VERSION = 'V0.4.46'
 
 import FreeCAD
 import FreeCADGui
@@ -66,6 +66,7 @@ class A2plusWorkbench (Workbench):
         import a2p_constraintDialog
         import a2p_constraintcommands
         import a2p_bom # bom == bill of materials == partslist
+        import a2p_constraintServices
 
         if a2plib.getRecursiveUpdateEnabled():
             partCommands = [
@@ -97,6 +98,7 @@ class A2plusWorkbench (Workbench):
             constraintCommands = [
                 'a2p_ConstraintDialogCommand',
                 'a2p_EditConstraintCommand',
+                'a2p_reAdjustConstraintDirectionsCommand',
                 'a2p_DeleteConnectionsCommand',
                 'a2p_PointIdentityConstraintCommand',
                 'a2p_PointOnLineConstraintCommand',
@@ -117,6 +119,7 @@ class A2plusWorkbench (Workbench):
             constraintCommands = [
                 'a2p_ConstraintDialogCommand',
                 'a2p_EditConstraintCommand',
+                'a2p_reAdjustConstraintDirectionsCommand',
                 'a2p_DeleteConnectionsCommand',
                 ]
         

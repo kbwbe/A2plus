@@ -41,6 +41,7 @@ from a2p_topomapper import (
 
 import a2p_lcs_support
 from a2p_importedPart_class import Proxy_importPart, ImportedPartViewProviderProxy
+import a2p_constraintServices
 
 PYVERSION =  sys.version_info[0]
 
@@ -719,6 +720,8 @@ def updateImportedParts(doc, partial=False):
                         obj.Placement = savedPlacement # restore the old placement
                     a2plib.copyObjectColors(obj,newObject)
 
+    #repair constraint directions if for e.g. face-normals flipped around during updating of parts.
+    a2p_constraintServices.redAdjustConstraintDirections(doc)
 
     mw = FreeCADGui.getMainWindow()
     mdi = mw.findChild(QtGui.QMdiArea)
