@@ -95,6 +95,7 @@ class A2plusWorkbench (Workbench):
             constraintCommands = [
                 'a2p_ConstraintDialogCommand',
                 'a2p_EditConstraintCommand',
+                'a2p_reAdjustConstraintDirectionsCommand',
                 'a2p_DeleteConnectionsCommand',
                 'a2p_PointIdentityConstraintCommand',
                 'a2p_PointOnLineConstraintCommand',
@@ -115,6 +116,7 @@ class A2plusWorkbench (Workbench):
             constraintCommands = [
                 'a2p_ConstraintDialogCommand',
                 'a2p_EditConstraintCommand',
+                'a2p_reAdjustConstraintDirectionsCommand',
                 'a2p_DeleteConnectionsCommand',
                 ]
         
@@ -122,7 +124,6 @@ class A2plusWorkbench (Workbench):
             'a2p_SolverCommand',
             'a2p_ToggleAutoSolveCommand',
             'a2p_FlipConstraintDirectionCommand',
-            'a2p_redefineConstraintDirectionsCommand',
             'a2p_Show_Hierarchy_Command'
             ]
         viewCommands = [

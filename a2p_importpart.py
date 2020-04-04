@@ -595,7 +595,7 @@ def updateImportedParts(doc, partial=False):
                         obj.Placement = savedPlacement # restore the old placement
                         obj.ViewObject.DiffuseColor = entry.diffuseColor
 
-    a2p_constraintServices.redefineConstraintDirections(doc)
+    a2p_constraintServices.redAdjustConstraintDirections(doc)
 
     mw = FreeCADGui.getMainWindow()
     mdi = mw.findChild(QtGui.QMdiArea)

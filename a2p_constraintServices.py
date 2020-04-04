@@ -29,7 +29,7 @@ import a2plib
 import a2p_constraints
 
 #==============================================================================
-def redefineConstraintDirections(doc):
+def redAdjustConstraintDirections(doc):
     '''
     recalculate value of property 'direction' and the sign of property 'offset' of all
     a2p-constraints of a document, in order to reach a solvable state if 
@@ -77,9 +77,8 @@ def redefineConstraintDirections(doc):
             set(unknown_constraints)
             )
         )
-
 #==============================================================================
-class a2p_redefineConstraintDirectionsCommand:
+class a2p_reAdjustConstraintDirectionsCommand:
     def Activated(self):
         flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
         response = QtGui.QMessageBox.information(
@@ -90,8 +89,8 @@ class a2p_redefineConstraintDirectionsCommand:
             )
         if response == QtGui.QMessageBox.Yes:
             doc = FreeCAD.activeDocument()
-            doc.openTransaction("Recalcule constraint's directions")
-            redefineConstraintDirections(doc)
+            doc.openTransaction("Readjust constraint's directions")
+            redAdjustConstraintDirections(doc)
             doc.commitTransaction()
                     
     def IsActive(self):
@@ -100,11 +99,11 @@ class a2p_redefineConstraintDirectionsCommand:
                     
     def GetResources(self):
         return {
-            'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_PartialProcessing.svg',
-            'MenuText': 'Redefine directions of all constraints',
-            'ToolTip': 'Redefine directions of all constraints'
+            'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_ReAdjustConstraints.svg',
+            'MenuText': 'Readjust directions of all constraints',
+            'ToolTip': 'Readjust directions of all constraints to fit best'
             }
-FreeCADGui.addCommand('a2p_redefineConstraintDirectionsCommand', a2p_redefineConstraintDirectionsCommand())
+FreeCADGui.addCommand('a2p_reAdjustConstraintDirectionsCommand', a2p_reAdjustConstraintDirectionsCommand())
 #==============================================================================
 
 
