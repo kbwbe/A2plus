@@ -166,14 +166,14 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
 
             self.angleEdit = QtGui.QDoubleSpinBox(self)
             # get the angle unit as string
-            self.angleEdit.setSuffix(" " + str(FreeCAD.Units.Quantity(1, FreeCAD.Units.Angle))[2:])
+            self.angleEdit.setSuffix(" " + str(FreeCAD.Units.Quantity(1, FreeCAD.Units.Angle))[3:])
             
             if self.constraintObject.Type == "axisPlaneAngle":
                 self.angleEdit.setMaximum(90.0)
                 self.angleEdit.setMinimum(0.0)  # the solver treats negative values as positive
             else:
-                self.angleEdit.setMaximum(180)
-                self.angleEdit.setMinimum(0)    # the solver treats negative values as positive
+                self.angleEdit.setMaximum(180.0)
+                self.angleEdit.setMinimum(0.0)    # the solver treats negative values as positive
 
             # use the number of decimals defined by the user in FC
             params = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Units")
