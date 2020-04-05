@@ -437,6 +437,11 @@ def filterShapeObs(_list, allowSketches=False):
             pass
         elif ob.hasExtension('App::GeoFeatureGroupExtension'):
             #Part Containers within FC0.19.18405 seem to have a shape property..
+            #filter it out
+            continue
+        elif ob.Name.startswith("Group"):
+            #Group Containers within FC0.19 (2020/03/31) seem to have a shape property..
+            #filter it out
             continue
         if hasattr(ob,"Shape"):
             if len(ob.Shape.Faces) > 0 and len(ob.Shape.Vertexes) > 0:
