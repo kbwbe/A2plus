@@ -22,20 +22,21 @@
 #*                                                                         *
 #***************************************************************************
 
-import FreeCADGui,FreeCAD
-from PySide import QtGui, QtCore
-import os, copy, time
+import FreeCADGui
+import FreeCAD
+from PySide import QtGui
+import copy
+import time
 import a2plib
 from a2p_MuxAssembly import createTopoInfo
-from a2p_viewProviderProxies import *
 from a2p_versionmanagement import A2P_VERSION
-import a2p_solversystem
 from a2plib import (
     appVersionStr,
     AUTOSOLVE_ENABLED
     )
 from a2p_importedPart_class import Proxy_importPart
 from a2p_importedPart_class import Proxy_convertPart # for compat.
+from a2p_importedPart_class import ImportedPartViewProviderProxy # for compat.
 
 
 def convertToImportedPart(doc, obj):
@@ -109,7 +110,6 @@ within this workbench.
 class a2p_ConvertPartCommand():
 
     def GetResources(self):
-        import a2plib
         return {'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_ConvertPart.svg',
 #                'Accel' : "Shift+C", # a default shortcut (optional)
                 'MenuText': "Convert a part to A2plus",
