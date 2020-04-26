@@ -26,7 +26,7 @@
 __title__ = 'A2plus assembly Workbench - InitGui file'
 __author__ = 'kbwbe'
 
-A2P_VERSION = 'V0.4.46c'
+A2P_VERSION = 'V0.4.47'
 
 import FreeCAD
 import FreeCADGui
@@ -67,6 +67,7 @@ class A2plusWorkbench (Workbench):
         import a2p_constraintcommands
         import a2p_bom # bom == bill of materials == partslist
         import a2p_constraintServices
+        import a2p_searchConstraintConflicts
 
         if a2plib.getRecursiveUpdateEnabled():
             partCommands = [
@@ -127,7 +128,8 @@ class A2plusWorkbench (Workbench):
             'a2p_SolverCommand',
             'a2p_ToggleAutoSolveCommand',
             'a2p_FlipConstraintDirectionCommand',
-            'a2p_Show_Hierarchy_Command'
+            'a2p_Show_Hierarchy_Command',
+            'a2p_SearchConstraintConflictsCommand'
             ]
         viewCommands = [
             'a2p_isolateCommand',
