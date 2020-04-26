@@ -466,7 +466,7 @@ class SolverSystem():
             
         return systemSolved
 
-    def solveSystem(self,doc,matelist=None):
+    def solveSystem(self,doc,matelist=None, showFailMessage=True):
         if not a2plib.SIMULATION_STATE:        
             Msg( "\n===== Start Solving System ====== \n" )
 
@@ -485,17 +485,18 @@ class SolverSystem():
 
             else: # a2plib.SIMULATION_STATE == False
                 self.status = "unsolved"
-                Msg( "===== Could not solve system ====== \n" )
-                msg = \
+                if showFailMessage == True:
+                    Msg( "===== Could not solve system ====== \n" )
+                    msg = \
 '''
 Constraints inconsistent. Cannot solve System.
-Please delete your last created constraint !
+Please run the conflict finder tool !
 '''
-                QtGui.QMessageBox.information(
-                    QtGui.QApplication.activeWindow(),
-                    "Constraint mismatch",
-                    msg
-                    )
+                    QtGui.QMessageBox.information(
+                        QtGui.QApplication.activeWindow(),
+                        "Constraint mismatch",
+                        msg
+                        )
                 return systemSolved
 
     def checkForUnmovedParts(self):
@@ -662,10 +663,10 @@ to a fixed part!
             rig.applySolution(doc, self);
 
 #------------------------------------------------------------------------------
-def solveConstraints( doc, cache=None, useTransaction = True, matelist=None):
+def solveConstraints( doc, cache=None, useTransaction = True, matelist=None, showFailMessage=True):
     if useTransaction: doc.openTransaction("a2p_systemSolving")
     ss = SolverSystem()
-    systemSolved = ss.solveSystem(doc, matelist )
+    systemSolved = ss.solveSystem(doc, matelist, showFailMessage )
     if useTransaction: doc.commitTransaction()
     a2plib.unTouchA2pObjects()
     return systemSolved
