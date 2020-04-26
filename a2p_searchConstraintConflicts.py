@@ -87,6 +87,7 @@ Do you want to delete this constraint-pair?
                     )
                 if response == QtGui.QMessageBox.Yes:
                     a2plib.removeConstraint(c)
+                return
        
     def IsActive(self):
         if FreeCAD.activeDocument() is None: return False
