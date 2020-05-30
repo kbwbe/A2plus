@@ -275,6 +275,10 @@ class FileCache():
         self.cache = {}
         
     def loadObject(self, sourceFile):
+        
+        if a2plib.to_bytes(sourceFile) == b'converted':
+            return False
+        
         #Search cache for entry, create an entry if there none is found
         cacheKey = os.path.split(sourceFile)[1]
         fileName = sourceFile
