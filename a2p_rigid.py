@@ -56,14 +56,14 @@ from a2p_libDOF import (
     SystemZAxis
     )
 import os, sys
-#from __builtin__ import False
 
-
-SPINSTEP_DIVISOR = 12.0
-WEIGHT_LINEAR_MOVE = 0.5
+#SPINSTEP_DIVISOR = 12.0
+SPINSTEP_DIVISOR = 0.8 # initial value, will be recalculated during solving
+#WEIGHT_LINEAR_MOVE = 0.5
+WEIGHT_LINEAR_MOVE = 1.5 # initial value, will be recalculated during solving
 WEIGHT_REFPOINT_ROTATION = 8.0
 
-
+NUM_STEPS_CONVERGENCY_CHECK = 5
 
 class Rigid():
     ''' All data necessary for one rigid body'''
@@ -96,6 +96,10 @@ class Rigid():
         self.moveVectorSum = None
         self.maxPosError = 0.0
         self.maxAxisError = 0.0         # This is an avaverage of all single spins
+        
+        self.lastMoveDist = Base.Vector(0.0,0.0,0.0)
+        self.lastSpin = Base.Vector(0.0,0.0,0.0)
+        
         self.maxSingleAxisError = 0.0   # Also the max single Axis spin has to be checked for solvability       
         self.refPointsBoundBoxSize = 0.0
         self.countSpinVectors = 0
@@ -105,6 +109,11 @@ class Rigid():
         self.posDOF = a2p_libDOF.initPosDOF #each rigid has DOF for position
         self.rotDOF = a2p_libDOF.initRotDOF #each rigid has DOF for rotation
         #dof are useful only for animation at the moment? maybe it can be used to set tempfixed property
+        
+        self.SPINSTEP_DIVISOR = SPINSTEP_DIVISOR
+        self.WEIGHT_LINEAR_MOVE = WEIGHT_LINEAR_MOVE
+        self.convergencyStepCounter = 0
+        
 
     def prepareRestart(self):
         self.tempfixed = self.fixed
@@ -369,7 +378,17 @@ class Rigid():
         moveDist = Base.Vector(0,0,0)
         if self.moveVectorSum != None:
             moveDist = Base.Vector(self.moveVectorSum)
-            moveDist.multiply(WEIGHT_LINEAR_MOVE) # stabilize computation, adjust if needed...
+
+            if self.lastMoveDist.Length != 0.0:
+                dotMove = moveDist.dot(self.lastMoveDist)/self.lastMoveDist.Length
+                qMove = dotMove/self.lastMoveDist.Length
+                if qMove >= 0.25:
+                    self.WEIGHT_LINEAR_MOVE *= 1.1
+                    if self.WEIGHT_LINEAR_MOVE > WEIGHT_LINEAR_MOVE*2: self.WEIGHT_LINEAR_MOVE = WEIGHT_LINEAR_MOVE*2
+                if qMove < 0.0:
+                    self.WEIGHT_LINEAR_MOVE /= 1.1
+            self.lastMoveDist = copy.copy(moveDist)
+            moveDist.multiply(self.WEIGHT_LINEAR_MOVE) # stabilize computation, adjust if needed...
         #
         #Rotate the rigid...
         center = None
@@ -378,14 +397,38 @@ class Rigid():
             spinAngle = self.spin.Length / self.countSpinVectors
             if spinAngle>15.0: spinAngle=15.0 # do not accept more degrees
             try:
-                spinStep = spinAngle/(SPINSTEP_DIVISOR) #it was 250.0
+                if self.lastSpin.Length != 0.0:
+                    dotSpin = self.spin.dot(self.lastSpin)/self.lastSpin.Length
+                    qSpin = dotSpin/self.lastSpin.Length
+                    if qSpin >= 0.0:
+                        self.SPINSTEP_DIVISOR /= 1.1
+                        if self.SPINSTEP_DIVISOR < SPINSTEP_DIVISOR/2: self.SPINSTEP_DIVISOR = SPINSTEP_DIVISOR/2
+                    if qSpin < 0.0:
+                        self.SPINSTEP_DIVISOR *= 1.1
+                self.lastSpin = copy.copy(self.spin)
+                #
+                spinStep = spinAngle/(self.SPINSTEP_DIVISOR) #it was 250.0
                 self.spin.multiply(1.0e6)
                 self.spin.normalize()
                 rotation = FreeCAD.Rotation(self.spin, spinStep)
                 center = self.spinCenter
             except:
                 pass
-
+        '''
+        try:
+            print("rigid: {}, qMove: {}, moveWeight: {}, qSpin: {}, spinDivisor: {} spin: {}".format(
+                self.label,
+                "%9.4f"%qMove,
+                "%9.4f"%self.WEIGHT_LINEAR_MOVE,
+                "%9.4f"%qSpin,
+                "%9.4f"%self.SPINSTEP_DIVISOR,
+                "%12.7f"%self.lastSpin.Length
+                )
+            )
+        except:
+            pass
+        '''
+            
         if center != None and rotation != None:
             pl = FreeCAD.Placement(moveDist,rotation,center)
             self.applyPlacementStep(pl)
