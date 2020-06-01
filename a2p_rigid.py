@@ -57,10 +57,8 @@ from a2p_libDOF import (
     )
 import os, sys
 
-#SPINSTEP_DIVISOR = 12.0
-SPINSTEP_DIVISOR = 0.8 # initial value, will be recalculated during solving
-#WEIGHT_LINEAR_MOVE = 0.5
-WEIGHT_LINEAR_MOVE = 1.5 # initial value, will be recalculated during solving
+WEIGHT_SPINSTEP = 1.0 # initial value, will be recalculated during solving
+WEIGHT_LINEAR_MOVE = 1.0 # initial value, will be recalculated during solving
 WEIGHT_REFPOINT_ROTATION = 8.0
 
 NUM_STEPS_CONVERGENCY_CHECK = 5
@@ -110,7 +108,7 @@ class Rigid():
         self.rotDOF = a2p_libDOF.initRotDOF #each rigid has DOF for rotation
         #dof are useful only for animation at the moment? maybe it can be used to set tempfixed property
         
-        self.SPINSTEP_DIVISOR = SPINSTEP_DIVISOR
+        self.WEIGHT_SPINSTEP = WEIGHT_SPINSTEP
         self.WEIGHT_LINEAR_MOVE = WEIGHT_LINEAR_MOVE
         self.convergencyStepCounter = 0
         
@@ -307,7 +305,7 @@ class Rigid():
             # Calculate max move error
             if moveVector.Length > self.maxPosError: self.maxPosError = moveVector.Length
 
-            # Accomulate all the movements for later average calculations
+            # Accumulate all the movements for later average calculations
             self.moveVectorSum = self.moveVectorSum.add(moveVector)
 
         # Calculate the average of all the movements
@@ -333,6 +331,7 @@ class Rigid():
                     vec2 = depMoveVectors_Spin[i] # 'aka Force'
                     axis = vec1.cross(vec2) #torque-vector
 
+                    vec1.multiply(1e12)
                     vec1.normalize()
                     vec1.multiply(self.refPointsBoundBoxSize)
                     vec3 = vec1.add(vec2)
@@ -341,7 +340,7 @@ class Rigid():
                     if beta > self.maxSingleAxisError:
                         self.maxSingleAxisError = beta 
 
-                    axis.multiply(1.0e6)
+                    axis.multiply(1e12)
                     axis.normalize()
                     axis.multiply(beta*WEIGHT_REFPOINT_ROTATION) #here use degrees
                     self.spin = self.spin.add(axis)
@@ -382,13 +381,16 @@ class Rigid():
             if self.lastMoveDist.Length != 0.0:
                 dotMove = moveDist.dot(self.lastMoveDist)/self.lastMoveDist.Length
                 qMove = dotMove/self.lastMoveDist.Length
-                if qMove >= 0.25:
-                    self.WEIGHT_LINEAR_MOVE *= 1.1
-                    if self.WEIGHT_LINEAR_MOVE > WEIGHT_LINEAR_MOVE*2: self.WEIGHT_LINEAR_MOVE = WEIGHT_LINEAR_MOVE*2
-                if qMove < 0.0:
-                    self.WEIGHT_LINEAR_MOVE /= 1.1
+                if qMove >= 0.25 and qMove < 1.0:
+                    self.WEIGHT_LINEAR_MOVE *= 1.05
+                    if self.WEIGHT_LINEAR_MOVE > WEIGHT_LINEAR_MOVE*2:
+                        self.WEIGHT_LINEAR_MOVE = WEIGHT_LINEAR_MOVE*2
+                if qMove < 0.0 or qMove >= 1.0:
+                    self.WEIGHT_LINEAR_MOVE /= 1.2
+                    if self.WEIGHT_LINEAR_MOVE < 0.05*WEIGHT_LINEAR_MOVE:
+                        self.WEIGHT_LINEAR_MOVE = 0.05*WEIGHT_LINEAR_MOVE
             self.lastMoveDist = copy.copy(moveDist)
-            moveDist.multiply(self.WEIGHT_LINEAR_MOVE) # stabilize computation, adjust if needed...
+            moveDist.multiply(self.WEIGHT_LINEAR_MOVE) #adaptive
         #
         #Rotate the rigid...
         center = None
@@ -400,15 +402,18 @@ class Rigid():
                 if self.lastSpin.Length != 0.0:
                     dotSpin = self.spin.dot(self.lastSpin)/self.lastSpin.Length
                     qSpin = dotSpin/self.lastSpin.Length
-                    if qSpin >= 0.0:
-                        self.SPINSTEP_DIVISOR /= 1.1
-                        if self.SPINSTEP_DIVISOR < SPINSTEP_DIVISOR/2: self.SPINSTEP_DIVISOR = SPINSTEP_DIVISOR/2
-                    if qSpin < 0.0:
-                        self.SPINSTEP_DIVISOR *= 1.1
+                    if qSpin >= 0.25 and qSpin < 1.0:
+                        self.WEIGHT_SPINSTEP *= 1.05
+                        if self.WEIGHT_SPINSTEP > WEIGHT_SPINSTEP*2:
+                            self.WEIGHT_SPINSTEP = WEIGHT_SPINSTEP*2
+                    if qSpin < 0.0 or qSpin >= 1.0:
+                        self.WEIGHT_SPINSTEP /= 1.2
+                        if self.WEIGHT_SPINSTEP < 0.05*WEIGHT_SPINSTEP:
+                            self.WEIGHT_SPINSTEP = 0.05*WEIGHT_SPINSTEP
                 self.lastSpin = copy.copy(self.spin)
                 #
-                spinStep = spinAngle/(self.SPINSTEP_DIVISOR) #it was 250.0
-                self.spin.multiply(1.0e6)
+                spinStep = spinAngle*(self.WEIGHT_SPINSTEP) #adaptive
+                self.spin.multiply(1.0e12)
                 self.spin.normalize()
                 rotation = FreeCAD.Rotation(self.spin, spinStep)
                 center = self.spinCenter
@@ -416,12 +421,12 @@ class Rigid():
                 pass
         '''
         try:
-            print("rigid: {}, qMove: {}, moveWeight: {}, qSpin: {}, spinDivisor: {} spin: {}".format(
+            print("rigid: {}, qMove: {}, moveWeight: {}, qSpin: {}, spinWeight: {} spin: {}".format(
                 self.label,
                 "%9.4f"%qMove,
                 "%9.4f"%self.WEIGHT_LINEAR_MOVE,
                 "%9.4f"%qSpin,
-                "%9.4f"%self.SPINSTEP_DIVISOR,
+                "%9.4f"%self.WEIGHT_SPINSTEP,
                 "%12.7f"%self.lastSpin.Length
                 )
             )
