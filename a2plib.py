@@ -248,7 +248,7 @@ def filterShapeObs(_list, allowSketches=False):
             #Group Containers within FC0.19 (Release >= 2020/03/31) seem to have a shape property..
             #filter it out
             continue
-        if hasattr(ob,"Shape") and not ob.TypeId.startswith("TechDraw"):
+        if hasattr(ob,"Shape") and ob.Shape is not None and ob.Shape != 'None': #str 'None': TechDraw Balloons...
             if len(ob.Shape.Faces) > 0 and len(ob.Shape.Vertexes) > 0:
                 lst.append(ob)
     S = set(lst)
