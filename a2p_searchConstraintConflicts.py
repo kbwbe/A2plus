@@ -30,6 +30,15 @@ import a2plib
 import a2p_solversystem
 
 #==============================================================================
+
+toolTipMessage = \
+'''
+Conflict finder tool:
+
+Resolves conflicting constraints by
+trying to solve them one after another
+'''
+
 class a2p_SearchConstraintConflictsCommand:
     '''
     Search conflicting constraints by solving them one after each other.
@@ -96,8 +105,8 @@ Do you want to delete this constraint-pair?
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_SearchConstraintConflicts.svg',
-            'MenuText': 'Conflictfinder tool: Search conflicting constraints',
-            'ToolTip': 'Conflictfinder tool: Search conflicting constraints by solving them one after another'
+            'MenuText': 'Indentify conflicting constraints',
+            'ToolTip': toolTipMessage
             }
 FreeCADGui.addCommand('a2p_SearchConstraintConflictsCommand', a2p_SearchConstraintConflictsCommand())
 #==============================================================================
