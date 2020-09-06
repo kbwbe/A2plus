@@ -70,7 +70,7 @@ def redAdjustConstraintDirections(doc):
             else:
                 unknown_constraints.append(c.Type)
         except:
-            print("Errors occured during processing of {}".format(c.Label))
+            print("Errors occurred during processing of {}".format(c.Label))
         
     if len(unknown_constraints) > 0:
         print("redefineConstraintDirections(): Found unknown constraints: {}".format(
