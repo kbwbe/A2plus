@@ -575,10 +575,12 @@ def updateImportedParts(doc, partial=False):
                         savedPlacement  = obj.Placement
                         newObj = importSingleShapeFromFile(doc,absPath,obj.sourcePart)
                         obj.Shape = copy.copy(newObj.Shape)
-                        if a2plib.isA2pSketch(obj):
-                            pass
-                        else:
-                            obj.Placement = savedPlacement # restore the old placement
+                        #if a2plib.isA2pSketch(obj):
+                            #pass
+                        #else:
+                        #    obj.Placement = savedPlacement # restore the old placement
+                        obj.Placement = savedPlacement # restore the old placement
+                            
                         obj.ViewObject.DiffuseColor = newObj.ViewObject.DiffuseColor
                         doc.removeObject(newObj.Name)
                 else:
