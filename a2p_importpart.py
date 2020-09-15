@@ -236,7 +236,7 @@ def importPartFromFile(
         ):
     doc = _doc
     
-    a2pZipFilename = getOrCreateA2pFile(filename)
+    a2pZipFilename = getOrCreateA2pFile(filename,None)
     content = a2plib.readA2pFile(a2pZipFilename)
 
     iShape = content.shape
@@ -310,7 +310,7 @@ def importPartFromFile(
         newObj.ViewObject.Transparency = 0 # import assembly first time as non transparent.
 
     #instantly add a2pfile to a2pfilecache
-    a2p_filecache.fileCache.loadObject(newObj.sourceFile)
+    a2p_filecache.fileCache.loadObject(newObj.sourceFile,None)
 
     return newObj
 #==============================================================================
