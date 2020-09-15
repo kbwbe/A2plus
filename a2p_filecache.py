@@ -341,14 +341,17 @@ class FileCache():
         return True
         
     def getTopoName(self,obj,subName):
-        # No toponaming for import of single shapes
-        # Single Shape references have been removed for next time
         if obj is None:
             return("")
-        if obj.sourcePart is not None and len(obj.sourcePart)>0: 
-            return ""
-        if not self.loadObject(obj.sourceFile): return ""
-        cacheKey = os.path.split(obj.sourceFile)[1]
+        
+        singleShapeRequested = obj.sourcePart is not None and len(obj.sourcePart)>0 
+        if singleShapeRequested:
+            if not self.loadObject(obj.sourceFile, obj.sourcePart): return ""
+            cacheKey = os.path.split(obj.sourceFile)[1] + '-'+obj.sourcePart
+        else:
+            if not self.loadObject(obj.sourceFile, None): return ""
+            cacheKey = os.path.split(obj.sourceFile)[1]
+        
         try:
             idx = a2plib.getSubelementIndex(subName)
             if subName.startswith("Vertex"):
@@ -359,15 +362,19 @@ class FileCache():
                 return self.cache[cacheKey].faceNames[idx]
         except:
             return ""
+        
         return "" #default if there are problems
         
     def getFullEntry(self,obj):
-        # No toponaming for import of single shapes
-        # Single Shape references have been removed for next time
-        if obj.sourcePart is not None and len(obj.sourcePart)>0: 
-            return ""
-        if not self.loadObject(obj.sourceFile): return None
-        cacheKey = os.path.split(obj.sourceFile)[1]
+        singleShapeRequested = obj.sourcePart is not None and len(obj.sourcePart)>0 
+
+        if singleShapeRequested:
+            if not self.loadObject(obj.sourceFile, obj.sourcePart): return None
+            cacheKey = os.path.split(obj.sourceFile)[1] + '-'+obj.sourcePart
+        else:
+            if not self.loadObject(obj.sourceFile, None): return None
+            cacheKey = os.path.split(obj.sourceFile)[1]
+        
         try:
             entry = self.cache[cacheKey]
         except:
