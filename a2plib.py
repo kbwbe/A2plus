@@ -194,10 +194,17 @@ class A2pFileContent():
         self.diffuseColor = diffuseColor
         self.properties = properties
 #------------------------------------------------------------------------------
-def writeA2pFile(fileName,shape,toponames, facecolors, xml):
+def writeA2pFile(fileName,a2pFileName,shape,toponames, facecolors, xml):
+    '''
+    this function requires:
+    - the full absolute path to the FCStd part (fileName)
+    - the full absolute path to the .a2p file (a2pFileName)
+    
+    The calling functions have to ensure that the filenames are correct.
+    '''
     docPath, docFileName = os.path.split(fileName)
                     
-    zipFileName = os.path.join(docPath,docFileName+'.a2p')
+    zipFileName = a2pFileName
     zip = zipfile.ZipFile(zipFileName,'w',zipfile.ZIP_DEFLATED)
 
     brepFileName = os.path.join(docPath,docFileName+'.brep')

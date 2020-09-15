@@ -172,11 +172,12 @@ def getOrCreateA2pFile(
         print(u"Import error: File {} does not exist".format(filename))
         return
     
-    if singleShapeLabel is not None and len(singleShapeLabel)>0:
+    singleShapeRequested = singleShapeLabel is not None and len(singleShapeLabel)>0
+
+    if singleShapeRequested:
         a2pFileName = filename[:-6]+'-'+singleShapeLabel+'.a2p'
     else: # the normal case
         a2pFileName = filename+'.a2p' #replace .FCStd by .a2p
-        
     
     if not allwaysRecreate:
         if not a2plib.getRecalculateImportedParts(): # always create a new file if recalculation is needed...
@@ -223,7 +224,12 @@ def getOrCreateA2pFile(
         muxInfo, Shape, DiffuseColor, transparency = muxAssemblyWithTopoNames(importDoc)
     else:
         # TopoMapper manages import of non A2p-Files. It generates the shapes and appropriate topo names...
-        muxInfo, Shape, DiffuseColor, transparency = topoMapper.createTopoNames()
+        if singleShapeRequested:
+            muxInfo, Shape, DiffuseColor, transparency = topoMapper.createTopoNames(
+                                                            desiredShapeLabel=singleShapeLabel
+                                                            )
+        else:
+            muxInfo, Shape, DiffuseColor, transparency = topoMapper.createTopoNames()
         
     #if a step file has been imported, the importDoc is not saved...
     try:
@@ -245,7 +251,7 @@ def getOrCreateA2pFile(
 
     if not importDocIsOpen:
         FreeCAD.closeDocument(importDoc.Name)
-    zipFileName = a2plib.writeA2pFile(filename,Shape,muxInfo,DiffuseColor,xml)
+    zipFileName = a2plib.writeA2pFile(filename,a2pFileName,Shape,muxInfo,DiffuseColor,xml)
     return zipFileName
 #==============================================================================
 class FileCacheEntry():
