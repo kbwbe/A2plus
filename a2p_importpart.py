@@ -497,40 +497,21 @@ def updateImportedParts(doc, partial=False):
                                                 obj.sourceFile
                                                 )
                                         )
-            isSingleShapeRef = False
-            if hasattr(obj,'sourcePart') and obj.sourcePart is not None and len(obj.sourcePart)>0:
-                isSingleShapeRef = True
                 
             if absPath != None and os.path.exists( absPath ):
                 newPartCreationTime = os.path.getmtime( absPath )
-                if isSingleShapeRef:
-                    if (newPartCreationTime > obj.timeLastImport):
-                        obj.timeLastImport = newPartCreationTime
-                        obj.muxInfo = []
-                        savedPlacement  = obj.Placement
-                        newObj = importSingleShapeFromFile(doc,absPath,obj.sourcePart)
-                        obj.Shape = copy.copy(newObj.Shape)
-                        #if a2plib.isA2pSketch(obj):
-                            #pass
-                        #else:
-                        #    obj.Placement = savedPlacement # restore the old placement
-                        obj.Placement = savedPlacement # restore the old placement
-                            
-                        obj.ViewObject.DiffuseColor = newObj.ViewObject.DiffuseColor
-                        doc.removeObject(newObj.Name)
-                else:
-                    if ( 
-                        newPartCreationTime > obj.timeLastImport or
-                        a2plib.getRecalculateImportedParts() # open always all parts as they could depend on spreadsheets
-                        ):
-                        entry = a2p_filecache.fileCache.getFullEntry(obj)
-                        obj.timeLastImport = entry.sourcePartCreationTime
-                        updateConstraintsGeoRefs(doc,obj,entry)
-                        obj.muxInfo = []
-                        savedPlacement  = obj.Placement
-                        obj.Shape = entry.shape
-                        obj.Placement = savedPlacement # restore the old placement
-                        obj.ViewObject.DiffuseColor = entry.diffuseColor
+                if ( 
+                    newPartCreationTime > obj.timeLastImport or
+                    a2plib.getRecalculateImportedParts() # open always all parts as they could depend on spreadsheets
+                    ):
+                    entry = a2p_filecache.fileCache.getFullEntry(obj)
+                    obj.timeLastImport = entry.sourcePartCreationTime
+                    updateConstraintsGeoRefs(doc,obj,entry)
+                    obj.muxInfo = []
+                    savedPlacement  = obj.Placement
+                    obj.Shape = entry.shape
+                    obj.Placement = savedPlacement # restore the old placement
+                    obj.ViewObject.DiffuseColor = entry.diffuseColor
 
     a2p_constraintServices.redAdjustConstraintDirections(doc)
 
