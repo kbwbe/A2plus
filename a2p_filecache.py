@@ -254,6 +254,9 @@ def getOrCreateA2pFile(
     if not importDocIsOpen:
         FreeCAD.closeDocument(importDoc.Name)
     zipFileName = a2plib.writeA2pFile(filename,a2pFileName,Shape,muxInfo,DiffuseColor,xml)
+    
+    
+    
     return zipFileName
 #==============================================================================
 class FileCacheEntry():
@@ -316,7 +319,6 @@ class FileCache():
             return False
 
         #A valid sourcefile is found, search for corresponding a2p-file
-        #print(u"fileNameWithinProjectFile: {}".format(fileNameWithinProjectFile))
         if singleShapeRequested:
             zipFile = getOrCreateA2pFile(fileNameWithinProjectFile,sourcePart)
         else:
@@ -377,10 +379,12 @@ class FileCache():
         singleShapeRequested = obj.sourcePart is not None and len(obj.sourcePart)>0 
 
         if singleShapeRequested:
-            if not self.loadObject(obj.sourceFile, obj.sourcePart): return None
+            if not self.loadObject(obj.sourceFile, obj.sourcePart):
+                return None
             cacheKey = os.path.split(obj.sourceFile)[1] + '-'+obj.sourcePart
         else:
-            if not self.loadObject(obj.sourceFile, None): return None
+            if not self.loadObject(obj.sourceFile, None):
+                return None
             cacheKey = os.path.split(obj.sourceFile)[1]
         
         try:

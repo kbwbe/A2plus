@@ -1760,7 +1760,7 @@ def updateConstraintsGeoRefs(doc,obj,cacheContent):
             
             if topoString is None or topoString == "":
                 print(u"missing toponame for {}, do not update this constraint".format(c.Name))
-                return
+                continue
                 
             if SubElement: #same as subElement <> None
                 subElementName = getattr(c, SubElement)
