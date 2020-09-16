@@ -34,12 +34,6 @@ import a2p_topomapper
 import a2p_simpleXMLhandler
 
 #==============================================================================
-#forward declaration...(necessary?)
-#==============================================================================
-class FileCache():
-    pass
-fileCache = FileCache()
-#==============================================================================
 def createDefaultTopNames(obj): # used during converting an object to a2p object
     vertexNames = []
     edgeNames = []
@@ -79,16 +73,18 @@ def muxAssemblyWithTopoNames(doc):
     for obj in visibleObjects:
         extendNames = False
         entry = None
+        
+        singleShapeRequested = hasattr(obj,"sourcePart") and obj.sourcePart is not None and len(obj.sourcePart)>0
+        if singleShapeRequested:
+            loadObjectInfo = obj.sourcePart
+        else:
+            loadObjectInfo = None
+        
         if a2plib.to_bytes(obj.sourceFile) == b"converted":
             vertexNames,edgeNames,faceNames = createDefaultTopNames(obj)
             inputShape = obj.Shape 
 
-        #SingleShapeRefs            
-        elif hasattr(obj,"sourcePart") and obj.sourcePart is not None and len(obj.sourcePart)>0:
-            vertexNames,edgeNames,faceNames = createDefaultTopNames(obj)
-            inputShape = obj.Shape 
-            
-        elif a2plib.getUseTopoNaming() and fileCache.loadObject(obj.sourceFile):
+        elif a2plib.getUseTopoNaming() and fileCache.loadObject(obj.sourceFile,loadObjectInfo):
             extendNames = True
             entry = fileCache.getFullEntry(obj)
             vertexNames = entry.vertexNames
@@ -169,7 +165,8 @@ def muxAssemblyWithTopoNames(doc):
     return muxInfo, solid, faceColors, transparency
 #==============================================================================
 def getOrCreateA2pFile(
-        filename, #the full path of the fcstd file which a2p file has to be created from
+        filename, #the full path of the fcstd file from which a2p file has to be created
+        singleShapeLabel,
         allwaysRecreate = False # used for migration purposes
         ):
     
@@ -177,16 +174,20 @@ def getOrCreateA2pFile(
         print(u"Import error: File {} does not exist".format(filename))
         return
     
+    singleShapeRequested = singleShapeLabel is not None and len(singleShapeLabel)>0
+
+    if singleShapeRequested:
+        a2pFileName = filename[:-6]+'-'+singleShapeLabel+'.a2p'
+    else: # the normal case
+        a2pFileName = filename+'.a2p' #replace .FCStd by .a2p
+    
     if not allwaysRecreate:
         if not a2plib.getRecalculateImportedParts(): # always create a new file if recalculation is needed...
-            if filename != None and os.path.exists(filename):
-                importDocCreationTime = os.path.getmtime(filename)
-                a2pFileName = filename+'.a2p'
-                if os.path.exists( a2pFileName ):
-                    a2pFileCreationTime = os.path.getmtime( a2pFileName )
-                    if a2pFileCreationTime >= importDocCreationTime:
-                        #Found existing a2p file
-                        return a2pFileName # nothing to do...
+            importDocCreationTime = os.path.getmtime(filename)
+            if os.path.exists( a2pFileName ):
+                a2pFileCreationTime = os.path.getmtime( a2pFileName )
+                if a2pFileCreationTime >= importDocCreationTime:
+                    return a2pFileName # nothing to do...
     
     #Create a new a2p file
     importDoc,importDocIsOpen = a2plib.openImportDocFromFile(filename)
@@ -225,7 +226,12 @@ def getOrCreateA2pFile(
         muxInfo, Shape, DiffuseColor, transparency = muxAssemblyWithTopoNames(importDoc)
     else:
         # TopoMapper manages import of non A2p-Files. It generates the shapes and appropriate topo names...
-        muxInfo, Shape, DiffuseColor, transparency = topoMapper.createTopoNames()
+        if singleShapeRequested:
+            muxInfo, Shape, DiffuseColor, transparency = topoMapper.createTopoNames(
+                                                            desiredShapeLabel=singleShapeLabel
+                                                            )
+        else:
+            muxInfo, Shape, DiffuseColor, transparency = topoMapper.createTopoNames()
         
     #if a step file has been imported, the importDoc is not saved...
     try:
@@ -247,7 +253,7 @@ def getOrCreateA2pFile(
 
     if not importDocIsOpen:
         FreeCAD.closeDocument(importDoc.Name)
-    zipFileName = a2plib.writeA2pFile(filename,Shape,muxInfo,DiffuseColor,xml)
+    zipFileName = a2plib.writeA2pFile(filename,a2pFileName,Shape,muxInfo,DiffuseColor,xml)
     return zipFileName
 #==============================================================================
 class FileCacheEntry():
@@ -274,13 +280,19 @@ class FileCache():
     def __init__(self):
         self.cache = {}
         
-    def loadObject(self, sourceFile):
+    def loadObject(self, sourceFile, sourcePart):
         
         if a2plib.to_bytes(sourceFile) == b'converted':
             return False
         
-        #Search cache for entry, create an entry if there none is found
-        cacheKey = os.path.split(sourceFile)[1]
+        #Search cache for entry, create an entry if there none is found            cacheKey = os.path.split(sourceFile)[1]
+        singleShapeRequested = sourcePart is not None and len(sourcePart)>0
+
+        if singleShapeRequested:
+            cacheKey = os.path.split(sourceFile)[1] + '-'+sourcePart
+        else:
+            cacheKey = os.path.split(sourceFile)[1]
+            
         fileName = sourceFile
         
         if not a2plib.getRecalculateImportedParts(): #always refresh cache if recalculation is needed
@@ -305,7 +317,11 @@ class FileCache():
 
         #A valid sourcefile is found, search for corresponding a2p-file
         #print(u"fileNameWithinProjectFile: {}".format(fileNameWithinProjectFile))
-        zipFile = getOrCreateA2pFile(fileNameWithinProjectFile)
+        if singleShapeRequested:
+            zipFile = getOrCreateA2pFile(fileNameWithinProjectFile,sourcePart)
+        else:
+            zipFile = getOrCreateA2pFile(fileNameWithinProjectFile,None)
+            
         if zipFile is None: 
             QtGui.QMessageBox.critical(
                 QtGui.QApplication.activeWindow(),
@@ -333,14 +349,17 @@ class FileCache():
         return True
         
     def getTopoName(self,obj,subName):
-        # No toponaming for import of single shapes
-        # Single Shape references have been removed for next time
         if obj is None:
             return("")
-        if obj.sourcePart is not None and len(obj.sourcePart)>0: 
-            return ""
-        if not self.loadObject(obj.sourceFile): return ""
-        cacheKey = os.path.split(obj.sourceFile)[1]
+        
+        singleShapeRequested = obj.sourcePart is not None and len(obj.sourcePart)>0 
+        if singleShapeRequested:
+            if not self.loadObject(obj.sourceFile, obj.sourcePart): return ""
+            cacheKey = os.path.split(obj.sourceFile)[1] + '-'+obj.sourcePart
+        else:
+            if not self.loadObject(obj.sourceFile, None): return ""
+            cacheKey = os.path.split(obj.sourceFile)[1]
+        
         try:
             idx = a2plib.getSubelementIndex(subName)
             if subName.startswith("Vertex"):
@@ -351,15 +370,19 @@ class FileCache():
                 return self.cache[cacheKey].faceNames[idx]
         except:
             return ""
+        
         return "" #default if there are problems
         
     def getFullEntry(self,obj):
-        # No toponaming for import of single shapes
-        # Single Shape references have been removed for next time
-        if obj.sourcePart is not None and len(obj.sourcePart)>0: 
-            return ""
-        if not self.loadObject(obj.sourceFile): return None
-        cacheKey = os.path.split(obj.sourceFile)[1]
+        singleShapeRequested = obj.sourcePart is not None and len(obj.sourcePart)>0 
+
+        if singleShapeRequested:
+            if not self.loadObject(obj.sourceFile, obj.sourcePart): return None
+            cacheKey = os.path.split(obj.sourceFile)[1] + '-'+obj.sourcePart
+        else:
+            if not self.loadObject(obj.sourceFile, None): return None
+            cacheKey = os.path.split(obj.sourceFile)[1]
+        
         try:
             entry = self.cache[cacheKey]
         except:

@@ -97,83 +97,41 @@ class a2p_shapeExtractDialog(QtGui.QDialog):
 def importSingleShapeFromFile(
         _doc,
         filename,
-        desiredShapeLabel=None
+        desiredShapeLabel
         ):
     doc = _doc
+
+    #-------------------------------------------
+    # Look for or create an a2p-file for the file with
+    # and read it's data
+    #-------------------------------------------
+    a2pZipFilename = getOrCreateA2pFile(filename,desiredShapeLabel)
+    content = a2plib.readA2pFile(a2pZipFilename)
+
+    iShape = content.shape
+    iDiffuseColor = content.diffuseColor
+    iProperties = content.properties
+    
+    if iProperties["isSubAssembly"] == "True":
+        subAssemblyImport = True
+    else:
+        subAssemblyImport = False
+        
+    timeLastImport = float(iProperties["sourcePartCreationTime"])
+    transparency = int(iProperties["transparency"])
+    importDocLabel = iProperties["importDocLabel"]
+
     #-------------------------------------------
     # Get the importDocument
     #-------------------------------------------
-    
-    # look only for filenames, not paths, as there are problems on WIN10 (Address-translation??)
-    importDoc = None
-    importDocIsOpen = False
-    requestedFile = os.path.split(filename)[1]
-    for d in FreeCAD.listDocuments().values():
-        recentFile = os.path.split(d.FileName)[1]
-        if requestedFile == recentFile:
-            importDoc = d # file is already open...
-            importDocIsOpen = True
-            break
-
-    if not importDocIsOpen:
-        if filename.lower().endswith('.fcstd'):
-            importDoc = FreeCAD.openDocument(filename)
-        else:
-            msg = "A part can only be imported from a FreeCAD '*.FCStd' file"
-            QtGui.QMessageBox.information( QtGui.QApplication.activeWindow(), "Value Error", msg )
-            return
-
-    #-------------------------------------------
-    # Initialize the new TopoMapper
-    #-------------------------------------------
-    topoMapper = TopoMapper(importDoc)
-
-    #-------------------------------------------
-    # Get a list of the importable Objects
-    #-------------------------------------------
-    importableObjects = topoMapper.getTopLevelObjects(allowSketches=True)
-    
-    if len(importableObjects) == 0:
-        msg = "No visible Part to import found. Aborting operation"
-        QtGui.QMessageBox.information(
-            QtGui.QApplication.activeWindow(),
-            "Import Error",
-            msg
-            )
-        return
-    
-    #-------------------------------------------
-    # if only one single shape of the importdoc is wanted..
-    #-------------------------------------------
-    labelList = []
-    dc = DataContainer()
-    
-    if desiredShapeLabel is None: # ask for a shape label
-        for io in importableObjects:
-            labelList.append(io.Label)
-        dialog = a2p_shapeExtractDialog(
-            QtGui.QApplication.activeWindow(),
-            labelList,
-            dc)
-        dialog.exec_()
-        if dc.tx == None:
-            msg = "Import of a shape reference aborted by user"
-            QtGui.QMessageBox.information(
-                QtGui.QApplication.activeWindow(),
-                "Import Error",
-                msg
-                )
-            return
-    else: # use existent shape label
-        dc.tx = desiredShapeLabel
+    importDoc,importDocIsOpen = a2plib.openImportDocFromFile(filename)
+    if importDoc is None: return
             
-    subAssemblyImport = False
-        
-    partName = a2plib.findUnusedObjectName( importDoc.Label, document=doc )
+    partName = a2plib.findUnusedObjectName(importDocLabel,document=doc)
     partLabel = a2plib.findUnusedObjectLabel(
-        importDoc.Label,
+        importDocLabel,
         document=doc,
-        extension=dc.tx
+        extension=desiredShapeLabel
         )
     if PYVERSION < 3:
         newObj = doc.addObject( "Part::FeaturePython", partName.encode('utf-8') )
@@ -186,23 +144,12 @@ def importSingleShapeFromFile(
         ImportedPartViewProviderProxy(newObj.ViewObject)
 
     newObj.a2p_Version = A2P_VERSION
-    assemblyPath = os.path.normpath(os.path.split(doc.FileName)[0])
-    absPath = os.path.normpath(filename)
-    if getRelativePathesEnabled():
-        if platform.system() == "Windows":
-            prefix = '.\\'
-        else:
-            prefix = './'
-        relativePath = prefix+os.path.relpath(absPath, assemblyPath)
-        newObj.sourceFile = relativePath
-    else:
-        newObj.sourceFile = absPath
-        
-    if dc.tx is not None:
-        newObj.sourcePart = dc.tx
+    
+    newObj.sourceFile = a2plib.generateSourceFileEntry(doc,filename)   
+    newObj.sourcePart = desiredShapeLabel
     
     newObj.setEditorMode("timeLastImport",1)
-    newObj.timeLastImport = os.path.getmtime( filename )
+    newObj.timeLastImport = timeLastImport
     if a2plib.getForceFixedPosition():
         newObj.fixedPosition = True
     else:
@@ -210,8 +157,10 @@ def importSingleShapeFromFile(
     newObj.subassemblyImport = subAssemblyImport
     newObj.setEditorMode("subassemblyImport",1)
 
-    newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = \
-        topoMapper.createTopoNames(desiredShapeLabel = dc.tx)
+    newObj.muxInfo = []
+    newObj.Shape = iShape
+    newObj.ViewObject.DiffuseColor = iDiffuseColor
+    newObj.ViewObject.Transparency = transparency
 
     newObj.objectType = 'a2pPart'
     if a2plib.isA2pSketch(newObj):
@@ -225,6 +174,9 @@ def importSingleShapeFromFile(
         newObj.ViewObject.Transparency = 1
         newObj.ViewObject.Transparency = 0 # import assembly first time as non transparent.
 
+    #instantly add a2pfile to a2pfilecache
+    a2p_filecache.fileCache.loadObject(newObj.sourceFile,desiredShapeLabel)
+
     if not importDocIsOpen:
         FreeCAD.closeDocument(importDoc.Name)
 
@@ -236,17 +188,12 @@ def importPartFromFile(
         ):
     doc = _doc
     
-    a2pZipFilename = getOrCreateA2pFile(filename)
+    a2pZipFilename = getOrCreateA2pFile(filename,None)
     content = a2plib.readA2pFile(a2pZipFilename)
 
     iShape = content.shape
-    vertexNames = content.vertexNames
-    edgeNames = content.edgeNames
-    faceNames = content.faceNames
     iDiffuseColor = content.diffuseColor
     iProperties = content.properties
-    
-    iMuxInfo = vertexNames + edgeNames + faceNames
     
     if iProperties["isSubAssembly"] == "True":
         subAssemblyImport = True
@@ -271,18 +218,7 @@ def importPartFromFile(
     if FreeCAD.GuiUp:
         ImportedPartViewProviderProxy(newObj.ViewObject)
 
-    newObj.a2p_Version = A2P_VERSION
-    assemblyPath = os.path.normpath(os.path.split(doc.FileName)[0])
-    absPath = os.path.normpath(filename)
-    if getRelativePathesEnabled():
-        if platform.system() == "Windows":
-            prefix = '.\\'
-        else:
-            prefix = './'
-        relativePath = prefix+os.path.relpath(absPath, assemblyPath)
-        newObj.sourceFile = relativePath
-    else:
-        newObj.sourceFile = absPath
+    newObj.sourceFile = a2plib.generateSourceFileEntry(doc,filename)   
         
     newObj.setEditorMode("timeLastImport",1)
     newObj.timeLastImport = timeLastImport
@@ -296,7 +232,6 @@ def importPartFromFile(
     newObj.objectType = 'a2pPart'
     newObj.setEditorMode("objectType",1)
 
-    #newObj.muxInfo = iMuxInfo
     newObj.muxInfo = []
     newObj.Shape = iShape
     newObj.ViewObject.Transparency = transparency
@@ -310,7 +245,7 @@ def importPartFromFile(
         newObj.ViewObject.Transparency = 0 # import assembly first time as non transparent.
 
     #instantly add a2pfile to a2pfilecache
-    a2p_filecache.fileCache.loadObject(newObj.sourceFile)
+    a2p_filecache.fileCache.loadObject(newObj.sourceFile,None)
 
     return newObj
 #==============================================================================
@@ -562,40 +497,21 @@ def updateImportedParts(doc, partial=False):
                                                 obj.sourceFile
                                                 )
                                         )
-            isSingleShapeRef = False
-            if hasattr(obj,'sourcePart') and obj.sourcePart is not None and len(obj.sourcePart)>0:
-                isSingleShapeRef = True
                 
             if absPath != None and os.path.exists( absPath ):
                 newPartCreationTime = os.path.getmtime( absPath )
-                if isSingleShapeRef:
-                    if (newPartCreationTime > obj.timeLastImport):
-                        obj.timeLastImport = newPartCreationTime
-                        obj.muxInfo = []
-                        savedPlacement  = obj.Placement
-                        newObj = importSingleShapeFromFile(doc,absPath,obj.sourcePart)
-                        obj.Shape = copy.copy(newObj.Shape)
-                        #if a2plib.isA2pSketch(obj):
-                            #pass
-                        #else:
-                        #    obj.Placement = savedPlacement # restore the old placement
-                        obj.Placement = savedPlacement # restore the old placement
-                            
-                        obj.ViewObject.DiffuseColor = newObj.ViewObject.DiffuseColor
-                        doc.removeObject(newObj.Name)
-                else:
-                    if ( 
-                        newPartCreationTime > obj.timeLastImport or
-                        a2plib.getRecalculateImportedParts() # open always all parts as they could depend on spreadsheets
-                        ):
-                        entry = a2p_filecache.fileCache.getFullEntry(obj)
-                        obj.timeLastImport = entry.sourcePartCreationTime
-                        updateConstraintsGeoRefs(doc,obj,entry)
-                        obj.muxInfo = []
-                        savedPlacement  = obj.Placement
-                        obj.Shape = entry.shape
-                        obj.Placement = savedPlacement # restore the old placement
-                        obj.ViewObject.DiffuseColor = entry.diffuseColor
+                if ( 
+                    newPartCreationTime > obj.timeLastImport or
+                    a2plib.getRecalculateImportedParts() # open always all parts as they could depend on spreadsheets
+                    ):
+                    entry = a2p_filecache.fileCache.getFullEntry(obj)
+                    obj.timeLastImport = entry.sourcePartCreationTime
+                    updateConstraintsGeoRefs(doc,obj,entry)
+                    obj.muxInfo = []
+                    savedPlacement  = obj.Placement
+                    obj.Shape = entry.shape
+                    obj.Placement = savedPlacement # restore the old placement
+                    obj.ViewObject.DiffuseColor = entry.diffuseColor
 
     a2p_constraintServices.redAdjustConstraintDirections(doc)
 
@@ -1725,8 +1641,56 @@ Check your settings of A2plus preferences.
                 )
             return
 
+        importDoc,importDocIsOpen = a2plib.openImportDocFromFile(filename)
+        if importDoc is None: return
+
+        #-------------------------------------------
+        # Initialize the new TopoMapper
+        #-------------------------------------------
+        topoMapper = TopoMapper(importDoc)
+    
+        #-------------------------------------------
+        # Get a list of the importable Objects
+        #-------------------------------------------
+        importableObjects = topoMapper.getTopLevelObjects(allowSketches=True)
+        
+        if len(importableObjects) == 0:
+            msg = "No visible Part to import found. Aborting operation"
+            QtGui.QMessageBox.information(
+                QtGui.QApplication.activeWindow(),
+                "Import Error",
+                msg
+                )
+            return
+        
+        #-------------------------------------------
+        # if only one single shape of the importdoc is wanted..
+        #-------------------------------------------
+        labelList = []
+        dc = DataContainer()
+        
+        for io in importableObjects:
+            labelList.append(io.Label)
+        dialog = a2p_shapeExtractDialog(
+            QtGui.QApplication.activeWindow(),
+            labelList,
+            dc)
+        dialog.exec_()
+        if dc.tx == None:
+            msg = "Import of a shape reference aborted by user"
+            QtGui.QMessageBox.information(
+                QtGui.QApplication.activeWindow(),
+                "Import Error",
+                msg
+                )
+            return
+
         #TODO: change for multi separate part import
-        importedObject = importSingleShapeFromFile(doc, filename)
+        importedObject = importSingleShapeFromFile(
+            doc,
+            filename,
+            desiredShapeLabel=dc.tx
+            )
 
         if not importedObject:
             a2plib.Msg("imported Object is empty/none\n")
@@ -1748,6 +1712,10 @@ Check your settings of A2plus preferences.
             self.timer = QtCore.QTimer()
             QtCore.QObject.connect(self.timer, QtCore.SIGNAL("timeout()"), self.GuiViewFit)
             self.timer.start( 200 ) #0.2 seconds
+            
+        if not importDocIsOpen:
+            FreeCAD.closeDocument(importDoc.Name)
+            
         return
 
     def IsActive(self):

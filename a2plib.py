@@ -123,6 +123,24 @@ else:
     OPERATING_SYSTEM = "OTHER"
 
 #==============================================================================
+def generateSourceFileEntry(doc,filename):
+    '''
+    This function generates the text entry for the
+    property sourceFile of imported parts.
+    filename = the file of the imported part
+    doc = the document where the part is imported to
+    '''
+    assemblyPath = os.path.normpath(os.path.split(doc.FileName)[0])
+    absPath = os.path.normpath(filename)
+    if getRelativePathesEnabled():
+        if platform.system() == "Windows":
+            prefix = '.\\'
+        else:
+            prefix = './'
+        return prefix+os.path.relpath(absPath, assemblyPath)
+    else:
+        return absPath
+#==============================================================================
 def getMemSize(obj, seen=None):
     """
     Recursively finds memsize of objects
@@ -194,10 +212,17 @@ class A2pFileContent():
         self.diffuseColor = diffuseColor
         self.properties = properties
 #------------------------------------------------------------------------------
-def writeA2pFile(fileName,shape,toponames, facecolors, xml):
+def writeA2pFile(fileName,a2pFileName,shape,toponames, facecolors, xml):
+    '''
+    this function requires:
+    - the full absolute path to the FCStd part (fileName)
+    - the full absolute path to the .a2p file (a2pFileName)
+    
+    The calling functions have to ensure that the filenames are correct.
+    '''
     docPath, docFileName = os.path.split(fileName)
                     
-    zipFileName = os.path.join(docPath,docFileName+'.a2p')
+    zipFileName = a2pFileName
     zip = zipfile.ZipFile(zipFileName,'w',zipfile.ZIP_DEFLATED)
 
     brepFileName = os.path.join(docPath,docFileName+'.brep')
