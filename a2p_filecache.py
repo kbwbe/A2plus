@@ -73,16 +73,18 @@ def muxAssemblyWithTopoNames(doc):
     for obj in visibleObjects:
         extendNames = False
         entry = None
+        
+        singleShapeRequested = hasattr(obj,"sourcePart") and obj.sourcePart is not None and len(obj.sourcePart)>0
+        if singleShapeRequested:
+            loadObjectInfo = obj.sourcePart
+        else:
+            loadObjectInfo = None
+        
         if a2plib.to_bytes(obj.sourceFile) == b"converted":
             vertexNames,edgeNames,faceNames = createDefaultTopNames(obj)
             inputShape = obj.Shape 
 
-        #SingleShapeRefs            
-        elif hasattr(obj,"sourcePart") and obj.sourcePart is not None and len(obj.sourcePart)>0:
-            vertexNames,edgeNames,faceNames = createDefaultTopNames(obj)
-            inputShape = obj.Shape 
-            
-        elif a2plib.getUseTopoNaming() and fileCache.loadObject(obj.sourceFile):
+        elif a2plib.getUseTopoNaming() and fileCache.loadObject(obj.sourceFile,loadObjectInfo):
             extendNames = True
             entry = fileCache.getFullEntry(obj)
             vertexNames = entry.vertexNames
