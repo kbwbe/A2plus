@@ -1712,6 +1712,10 @@ Check your settings of A2plus preferences.
             self.timer = QtCore.QTimer()
             QtCore.QObject.connect(self.timer, QtCore.SIGNAL("timeout()"), self.GuiViewFit)
             self.timer.start( 200 ) #0.2 seconds
+            
+        if not importDocIsOpen:
+            FreeCAD.closeDocument(importDoc.Name)
+            
         return
 
     def IsActive(self):
