@@ -123,6 +123,24 @@ else:
     OPERATING_SYSTEM = "OTHER"
 
 #==============================================================================
+def generateSourceFileEntry(doc,filename):
+    '''
+    This function generates the text entry for the
+    property sourceFile of imported parts.
+    filename = the file of the imported part
+    doc = the document where the part is imported to
+    '''
+    assemblyPath = os.path.normpath(os.path.split(doc.FileName)[0])
+    absPath = os.path.normpath(filename)
+    if getRelativePathesEnabled():
+        if platform.system() == "Windows":
+            prefix = '.\\'
+        else:
+            prefix = './'
+        return prefix+os.path.relpath(absPath, assemblyPath)
+    else:
+        return absPath
+#==============================================================================
 def getMemSize(obj, seen=None):
     """
     Recursively finds memsize of objects

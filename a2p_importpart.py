@@ -145,18 +145,7 @@ def importSingleShapeFromFile(
 
     newObj.a2p_Version = A2P_VERSION
     
-    assemblyPath = os.path.normpath(os.path.split(doc.FileName)[0])
-    absPath = os.path.normpath(filename)
-    if getRelativePathesEnabled():
-        if platform.system() == "Windows":
-            prefix = '.\\'
-        else:
-            prefix = './'
-        relativePath = prefix+os.path.relpath(absPath, assemblyPath)
-        newObj.sourceFile = relativePath
-    else:
-        newObj.sourceFile = absPath
-        
+    newObj.sourceFile = a2plib.generateSourceFileEntry(doc,filename)   
     newObj.sourcePart = desiredShapeLabel
     
     newObj.setEditorMode("timeLastImport",1)
@@ -184,6 +173,9 @@ def importSingleShapeFromFile(
         # turn of perFaceTransparency by accessing ViewObject.Transparency and set to zero (non transparent)
         newObj.ViewObject.Transparency = 1
         newObj.ViewObject.Transparency = 0 # import assembly first time as non transparent.
+
+    #instantly add a2pfile to a2pfilecache
+    a2p_filecache.fileCache.loadObject(newObj.sourceFile,desiredShapeLabel)
 
     if not importDocIsOpen:
         FreeCAD.closeDocument(importDoc.Name)
@@ -226,18 +218,7 @@ def importPartFromFile(
     if FreeCAD.GuiUp:
         ImportedPartViewProviderProxy(newObj.ViewObject)
 
-    newObj.a2p_Version = A2P_VERSION
-    assemblyPath = os.path.normpath(os.path.split(doc.FileName)[0])
-    absPath = os.path.normpath(filename)
-    if getRelativePathesEnabled():
-        if platform.system() == "Windows":
-            prefix = '.\\'
-        else:
-            prefix = './'
-        relativePath = prefix+os.path.relpath(absPath, assemblyPath)
-        newObj.sourceFile = relativePath
-    else:
-        newObj.sourceFile = absPath
+    newObj.sourceFile = a2plib.generateSourceFileEntry(doc,filename)   
         
     newObj.setEditorMode("timeLastImport",1)
     newObj.timeLastImport = timeLastImport
