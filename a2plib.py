@@ -763,10 +763,13 @@ def findUnusedObjectName(base, counterStart=1, fmt='%03i', document=None):
     i = counterStart
     usedNames = [ obj.Name for obj in document.Objects ]
 
+    base2 = base
     if base[-4:-3] == '_':
-        base2 = base[:-4]
-    else:
-        base2 = base
+        try:
+            int(base[-3:])
+            base2 = base[:-4]
+        except:
+            pass
     base2 = base2 + '_'
 
     objName = '%s%s' % (base2, fmt%i)
@@ -781,10 +784,13 @@ def findUnusedObjectLabel(base, counterStart=1, fmt='%03i', document=None, exten
     i = counterStart
     usedLabels = [ obj.Label for obj in document.Objects ]
 
+    base2 = base
     if base[-4:-3] == '_':
-        base2 = base[:-4]
-    else:
-        base2 = base
+        try:
+            int(base[-3:])
+            base2 = base[:-4]
+        except:
+            pass
     base2 = base2 + '_'
     
     if extension==None:
