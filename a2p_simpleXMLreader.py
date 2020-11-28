@@ -35,6 +35,8 @@
 import FreeCAD
 import os
 import zipfile
+import xml.sax.saxutils as saxutils
+
 import a2plib
 
 #===========================================================================
@@ -138,7 +140,7 @@ class simpleXMLObject(object):
                     if line.startswith(b'</Cells>'): break
                     if line.startswith(b'<Cell address="'):
                         cellAdress,cellContent = self.parseCellLine(line)
-                        cellDict[cellAdress] = a2plib.to_str(cellContent)
+                        cellDict[cellAdress] = saxutils.unescape(a2plib.to_str(cellContent)) #allow references in cell content
                     idx += 1
                 self.propertyDict[b'cells'] = cellDict
                 
