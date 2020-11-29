@@ -21,48 +21,21 @@
 #***************************************************************************
 
 import random
-import time
-import traceback
 import math
-import copy
 import FreeCAD, FreeCADGui, Part
-from PySide import QtGui, QtCore
 from  FreeCAD import Base
 import a2plib
 from a2plib import (
-    drawVector,
-    drawSphere,
-    path_a2p,
-    getObjectVertexFromName,
     getObjectEdgeFromName,
     getObjectFaceFromName,
-    isLine,
     getPos,
-    getAxis,
-    appVersionStr,
-    Msg,
-    DebugMsg,
-    A2P_DEBUG_LEVEL,
-    A2P_DEBUG_1,
-    A2P_DEBUG_2,
-    A2P_DEBUG_3,
-    RED,
-    GREEN,
-    BLUE
+    getAxis
     )
 
-import a2p_libDOF
 from a2p_libDOF import (
-    SystemOrigin,
-    SystemXAxis,
-    SystemYAxis,
-    SystemZAxis,
-    initPosDOF,
-    initRotDOF,
     AxisAlignment,
     AxisDistance,
     PlaneOffset,
-    LockRotation,
     AngleAlignment,
     PointIdentity,
     create_Axis,
@@ -70,7 +43,6 @@ from a2p_libDOF import (
     create_Axis2Points
     
     )
-import os, sys
 
 #------------------------------------------------------------------------------
 class Dependency():
@@ -159,8 +131,6 @@ class Dependency():
             ob1 = doc.getObject(c.Object1)
             ob2 = doc.getObject(c.Object2)
 
-            #vert1 = getObjectVertexFromName(ob1, c.SubElement1)
-            #dep1.refPoint = vert1.Point
             dep1.refPoint = getPos(ob1, c.SubElement1)
             dep2.refPoint = getPos(ob2, c.SubElement2)
 
@@ -174,7 +144,6 @@ class Dependency():
             ob1 = doc.getObject(c.Object1)
             ob2 = doc.getObject(c.Object2)
 
-            #vert1 = getObjectVertexFromName(ob1, c.SubElement1)
             dep1.refPoint = getPos(ob1, c.SubElement1)
             
             plane2 = getObjectFaceFromName(ob2, c.SubElement2)
@@ -427,13 +396,8 @@ class Dependency():
     def enable(self, workList):
         if self.dependedRigid not in workList:
             return
-        if self.Enabled == True:
-            return
-        
         self.Enabled = True
         self.foreignDependency.Enabled = True
-        self.currentRigid.calcSpinBasicDataDepsEnabled()
-        self.dependedRigid.calcSpinBasicDataDepsEnabled()
 
     def disable(self):
         self.Enabled = False
@@ -524,6 +488,7 @@ class DependencyPointIdentity(Dependency):
         # These constraint have to be the last evaluated in the chain of constraints.
             
         tmpaxis = cleanAxis(create_Axis(self.refPoint, self.currentRigid.getRigidCenter()))
+        
         #dofpos = PointIdentityPos(tmpaxis,_dofPos,_pointconstraints)
         #dofrot = PointIdentityRot(tmpaxis,_dofRot,_pointconstraints)
         return PointIdentity(tmpaxis, _dofPos, _dofRot, _pointconstraints)
