@@ -33,6 +33,7 @@ import sys
 import copy
 import platform
 import numpy
+from pivy import coin
 
 PYVERSION =  sys.version_info[0]
 
@@ -53,13 +54,14 @@ SIMULATION_STATE = False
 SAVED_TRANSPARENCY = []
 
 DEBUGPROGRAM = 1
+GRAPHICALDEBUG = True
 
 path_a2p = os.path.dirname(__file__)
 path_a2p_resources = os.path.join( path_a2p, 'GuiA2p', 'Resources', 'resources.rcc')
 resourcesLoaded = QtCore.QResource.registerResource(path_a2p_resources)
 assert resourcesLoaded
 
-
+graphical_debug_output = [] #collect the graphical debug output here for deleting operation
 
 wb_globals = {}
 
@@ -121,6 +123,38 @@ else:
 
 
 
+#------------------------------------------------------------------------------
+def drawDebugVectorAt(position,direction,rgbColor):
+    '''
+    function draws a vector directly to 3D view using pivy/Coin
+    
+    expects position and direction as Base.vector type
+    color as tuple like (1,0,0)
+    '''
+    color = coin.SoBaseColor()
+    color.rgb = rgbColor
+
+    points=coin.SoCoordinate3()
+    lines=coin.SoLineSet()
+
+    startPoint = position.x,position.y,position.z
+    ep = position.add(direction)
+    endPoint = ep.x,ep.y,ep.z
+    
+    points.point.values = (startPoint,endPoint)
+    
+    #create and feed data to separator
+    sep=coin.SoSeparator()
+    sep.addChild(points)
+    sep.addChild(color)
+    sep.addChild(lines)    
+    
+    #add separator to sceneGraph
+    sg = FreeCADGui.ActiveDocument.ActiveView.getSceneGraph()
+    sg.addChild(sep)
+    
+    graphical_debug_output.append(sep)
+    
 #------------------------------------------------------------------------------
 def to_bytes(tx):
     if PYVERSION > 2:

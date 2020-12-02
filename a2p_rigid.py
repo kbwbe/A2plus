@@ -404,19 +404,24 @@ class Rigid():
         if self.moveVectorSum != None:
             moveDist = Base.Vector(self.moveVectorSum)
             moveDist.multiply(WEIGHT_LINEAR_MOVE) # stabilize computation, adjust if needed...
+            if a2plib.GRAPHICALDEBUG == True:
+                a2plib.drawDebugVectorAt(self.spinCenter, moveDist, (0,0,1))
         #
         #Rotate the rigid...
         center = None
         rotation = None
         if (self.spin != None and self.spin.Length != 0.0 and self.countSpinVectors != 0):
+            savedSpin = copy.copy(self.spin)
             spinAngle = self.spin.Length / self.countSpinVectors
             if spinAngle>15.0: spinAngle=15.0 # do not accept more degrees
             try:
                 spinStep = spinAngle/(SPINSTEP_DIVISOR) #it was 250.0
-                self.spin.multiply(1.0e6)
+                self.spin.multiply(1.0e12)
                 self.spin.normalize()
                 rotation = FreeCAD.Rotation(self.spin, spinStep)
                 center = self.spinCenter
+                if a2plib.GRAPHICALDEBUG == True:
+                    a2plib.drawDebugVectorAt(center, savedSpin, (1,0,0))
             except:
                 pass
 
