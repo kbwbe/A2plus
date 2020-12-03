@@ -1964,3 +1964,32 @@ def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
                 c = doc.getObject(cName)
                 a2plib.removeConstraint(c)
                 
+                
+#==============================================================================
+toolTip = \
+'''
+Clean up graphical debug output from 3D view
+'''
+
+class a2p_cleanUpDebugVectorsCommand():
+    
+    def Activated(self):
+        sg = FreeCADGui.ActiveDocument.ActiveView.getSceneGraph()
+        if sg is not None:
+            print('3D-Debug contained {} vectors'.format(len(a2plib.graphical_debug_output)))
+            for vec in a2plib.graphical_debug_output:
+                sg.removeChild(vec)
+                a2plib.graphical_debug_output = []
+                
+
+    def GetResources(self):
+        return {
+            #'Pixmap' : ':/icons/a2p_Upgrade.svg',
+            'MenuText': 'Clean up graphical debug output from 3D view',
+            'ToolTip': toolTip
+            }
+    
+FreeCADGui.addCommand('a2p_cleanUpDebugVectorsCommand', a2p_cleanUpDebugVectorsCommand())
+#==============================================================================
+                
+                

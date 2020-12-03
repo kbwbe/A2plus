@@ -102,10 +102,10 @@ class SolverSystem():
             solverControlData = {
                 #Index:(posAccuracy,spinAccuracy,completeSolvingRequired)
                 1:(0.1,0.1,True),
-                2:(0.01,0.01,True),
-                3:(0.001,0.001,False),
-                4:(0.0001,0.0001,False),
-                5:(0.00001,0.00001,False)
+                #2:(0.01,0.01,False),
+                #3:(0.001,0.001,False),
+                #4:(0.0001,0.0001,False),
+                #5:(0.00001,0.00001,False)
                 }
         return solverControlData
             
@@ -533,6 +533,12 @@ to a fixed part!
 
         if a2plib.SIMULATION_STATE == True:
             # Solve complete System at once if simulation is running
+            workList = self.rigids
+            solutionFound = self.calculateWorkList(doc, workList)
+            if not solutionFound: return False
+            return True
+        elif a2plib.PARTIAL_PROCESSING_ENABLED == False:
+            # Solve complete System at once
             workList = self.rigids
             solutionFound = self.calculateWorkList(doc, workList)
             if not solutionFound: return False
