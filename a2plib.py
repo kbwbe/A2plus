@@ -134,6 +134,11 @@ def drawDebugVectorAt(position,direction,rgbColor):
     color = coin.SoBaseColor()
     color.rgb = rgbColor
 
+    # Line style.
+    lineStyle = coin.SoDrawStyle()
+    lineStyle.style = coin.SoDrawStyle.LINES
+    lineStyle.lineWidth = 2
+
     points=coin.SoCoordinate3()
     lines=coin.SoLineSet()
 
@@ -147,6 +152,7 @@ def drawDebugVectorAt(position,direction,rgbColor):
     sep=coin.SoSeparator()
     sep.addChild(points)
     sep.addChild(color)
+    sep.addChild(lineStyle)    
     sep.addChild(lines)    
     
     #add separator to sceneGraph

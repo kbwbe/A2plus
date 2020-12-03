@@ -59,7 +59,7 @@ import os, sys
 #from __builtin__ import False
 
 
-SPINSTEP_DIVISOR = 12.0
+SPINSTEP_DIVISOR = 12.0 #12
 WEIGHT_LINEAR_MOVE = 0.5
 WEIGHT_REFPOINT_ROTATION = 8.0
 
@@ -413,7 +413,7 @@ class Rigid():
         if (self.spin != None and self.spin.Length != 0.0 and self.countSpinVectors != 0):
             savedSpin = copy.copy(self.spin)
             spinAngle = self.spin.Length / self.countSpinVectors
-            if spinAngle>15.0: spinAngle=15.0 # do not accept more degrees
+            #if spinAngle>15.0: spinAngle=15.0 # do not accept more degrees
             try:
                 spinStep = spinAngle/(SPINSTEP_DIVISOR) #it was 250.0
                 self.spin.multiply(1.0e12)
