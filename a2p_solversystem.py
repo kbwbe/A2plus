@@ -35,7 +35,6 @@ from a2p_dependencies import Dependency
 from a2p_rigid import Rigid
 import os
 
-
 SOLVER_MAXSTEPS = 50000
 
 # SOLVER_CONTROLDATA has been replaced by SolverSystem.getSolverControlData()
@@ -99,24 +98,13 @@ class SolverSystem():
                 1:(0.1,0.1,True)
                 }
         else:
-            '''
             solverControlData = {
                 #Index:(posAccuracy,spinAccuracy,completeSolvingRequired)
                 1:(0.1,0.1,True),
                 2:(0.01,0.01,True),
-                3:(0.001,0.001,False),
-                4:(0.0001,0.0001,False),
-                5:(0.00001,0.00001,False),
-                6:(0.000001,0.000001,False),
-                }
-            '''
-            solverControlData = {
-                #Index:(posAccuracy,spinAccuracy,completeSolvingRequired)
-                1:(0.01,      0.01,True),
-                2:(0.0001,    0.0001,False),
-                3:(0.000001,  0.000001,False),
-                4:(0.0000001, 0.0000001,False),
-                5:(0.00000001,0.00000001,False)
+                3:(0.0001,0.0001,False),
+                4:(0.000001,0.000001,False),
+                5:(0.00000001,0.0000001,False)
                 }
         return solverControlData
             
@@ -167,11 +155,16 @@ class SolverSystem():
                 fx = ob1.fixedPosition
             else:
                 fx = False
+            if hasattr(ob1, "debugmode"):
+                debugMode = ob1.debugmode
+            else:
+                debugMode = False
             rig = Rigid(
                 o,
                 ob1.Label,
                 fx,
-                ob1.Placement
+                ob1.Placement,
+                debugMode
                 )
             rig.spinCenter = ob1.Shape.BoundBox.Center
             self.rigids.append(rig)
@@ -444,7 +437,11 @@ class SolverSystem():
         while True:
             systemSolved = self.calculateChain(doc)
             if self.level_of_accuracy == 1:
-                self.detectUnmovedParts()   # doing this one time is enough...
+                self.detectUnmovedParts()   # do only once here. It can fail at higher accuracy levels
+                                            # where not a final solution is required.
+            if a2plib.SOLVER_ONESTEP > 0:
+                systemSolved = True
+                break
             if systemSolved:
                 self.level_of_accuracy+=1
                 if self.level_of_accuracy > len(self.getSolverControlData()):
@@ -547,6 +544,12 @@ to a fixed part!
             solutionFound = self.calculateWorkList(doc, workList)
             if not solutionFound: return False
             return True
+        elif a2plib.PARTIAL_PROCESSING_ENABLED == False:
+            # Solve complete System at once
+            workList = self.rigids
+            solutionFound = self.calculateWorkList(doc, workList)
+            if not solutionFound: return False
+            return True
         else:
             # Normal partial solving if no simulation is running
             # load initial worklist with all fixed parts...
@@ -576,6 +579,9 @@ to a fixed part!
                     if not solutionFound: return False
                 else:
                     break
+                
+                if a2plib.SOLVER_ONESTEP > 2:
+                    break
 
             return True
 
@@ -603,15 +609,15 @@ to a fixed part!
             self.stepCount += 1
             self.convergencyCounter += 1
             # First calculate all the movement vectors
-            for rig in workList:
-                rig.moved = True
-                rig.calcMoveData(doc, self)
-                if rig.maxPosError > maxPosError:
-                    maxPosError = rig.maxPosError
-                if rig.maxAxisError > maxAxisError:
-                    maxAxisError = rig.maxAxisError
-                if rig.maxSingleAxisError > maxSingleAxisError:
-                    maxSingleAxisError = rig.maxSingleAxisError
+            for w in workList:
+                w.moved = True
+                w.calcMoveData(doc, self)
+                if w.maxPosError > maxPosError:
+                    maxPosError = w.maxPosError
+                if w.maxAxisError > maxAxisError:
+                    maxAxisError = w.maxAxisError
+                if w.maxSingleAxisError > maxSingleAxisError:
+                    maxSingleAxisError = w.maxSingleAxisError
 
             # Perform the move
             for w in workList:
@@ -622,14 +628,13 @@ to a fixed part!
                 maxAxisError <= reqSpinAccuracy and # relevant check
                 maxSingleAxisError <= reqSpinAccuracy * 10  # additional check for insolvable assemblies
                                                             # sometimes spin can be solved but singleAxis not..
-                ):
+                ) or (a2plib.SOLVER_ONESTEP > 0):
                 # The accuracy is good, we're done here
                 goodAccuracy = True
                 # Mark the rigids as tempfixed and add its constrained rigids to pending list to be processed next
-                for rig in workList:
-                    rig.applySolution(doc, self)
-                    rig.tempfixed = True
-                break
+                for r in workList:
+                    r.applySolution(doc, self)
+                    r.tempfixed = True
 
             if self.convergencyCounter > SOLVER_STEPS_CONVERGENCY_CHECK:
                 if (

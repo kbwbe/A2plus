@@ -79,7 +79,20 @@ A2P_DEBUG_1         = 1
 A2P_DEBUG_2         = 2
 A2P_DEBUG_3         = 3
 
+#===================================================
+# do debug settings here:
+#===================================================
 A2P_DEBUG_LEVEL = A2P_DEBUG_NONE
+GRAPHICALDEBUG = False
+
+# for debug purposes
+# 0:normal
+# 1:one step in each worklist
+# 2:one step in first worklist
+SOLVER_ONESTEP = 0
+#===================================================
+solver_debug_objects = [] #collect objects for later removal
+#===================================================
 
 PARTIAL_SOLVE_STAGE1 = 1    #solve all rigid fully constrained to tempfixed rigid, enable only involved dep, then set them as tempfixed
 CONSTRAINT_DIALOG_REF = None
@@ -122,6 +135,44 @@ elif "LINUX" in tmp:
 else:
     OPERATING_SYSTEM = "OTHER"
 
+#==============================================================================
+def drawDebugVectorAt(position,direction,rgbColor):
+    '''
+    function draws a vector directly to 3D view using pivy/Coin
+    
+    expects position and direction as Base.vector type
+    color as tuple like (1,0,0)
+    '''
+    color = coin.SoBaseColor()
+    color.rgb = rgbColor
+
+    # Line style.
+    lineStyle = coin.SoDrawStyle()
+    lineStyle.style = coin.SoDrawStyle.LINES
+    lineStyle.lineWidth = 2
+
+    points=coin.SoCoordinate3()
+    lines=coin.SoLineSet()
+
+    startPoint = position.x,position.y,position.z
+    ep = position.add(direction)
+    endPoint = ep.x,ep.y,ep.z
+    
+    points.point.values = (startPoint,endPoint)
+    
+    #create and feed data to separator
+    sep=coin.SoSeparator()
+    sep.addChild(points)
+    sep.addChild(color)
+    sep.addChild(lineStyle)    
+    sep.addChild(lines)    
+    
+    #add separator to sceneGraph
+    sg = FreeCADGui.ActiveDocument.ActiveView.getSceneGraph()
+    sg.addChild(sep)
+    
+    solver_debug_objects.append(sep)
+    
 #==============================================================================
 def generateSourceFileEntry(doc,filename):
     '''

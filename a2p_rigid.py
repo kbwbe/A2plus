@@ -56,9 +56,10 @@ from a2p_libDOF import (
     SystemZAxis
     )
 import os, sys
+#from __builtin__ import False
 
 
-SPINSTEP_DIVISOR = 12.0
+SPINSTEP_DIVISOR = 12.0 #12
 WEIGHT_LINEAR_MOVE = 0.5
 WEIGHT_REFPOINT_ROTATION = 8.0
 
@@ -70,7 +71,8 @@ class Rigid():
                 name,
                 label,
                 fixed,
-                placement
+                placement,
+                debugMode
                 ):
         self.objectName = name
         self.label = label
@@ -78,6 +80,7 @@ class Rigid():
         self.tempfixed = fixed
         self.moved = False
         self.placement = placement
+        self.debugMode = debugMode
         self.savedPlacement = placement
         self.dependencies = []
         self.linkedRigids = []
@@ -323,10 +326,15 @@ class Rigid():
             if dep.useRefPointSpin:
                 depRefPoints_Spin.append(refPoint)
                 depMoveVectors_Spin.append(moveVector)
+            '''
+            if not self.tempfixed:
+                a2plib.drawSphere(refPoint, a2plib.RED)
+                a2plib.drawVector(refPoint, refPoint.add(moveVector), a2plib.RED)
+            ''' 
             # Calculate max move error
             if moveVector.Length > self.maxPosError: self.maxPosError = moveVector.Length
 
-            # Accumulate all the movements for later average calculations
+            # Accomulate all the movements for later average calculations
             self.moveVectorSum = self.moveVectorSum.add(moveVector)
 
         # Calculate the average of all the movements
@@ -352,7 +360,6 @@ class Rigid():
                     vec2 = depMoveVectors_Spin[i] # 'aka Force'
                     axis = vec1.cross(vec2) #torque-vector
 
-                    vec1.multiply(1e12)
                     vec1.normalize()
                     vec1.multiply(self.refPointsBoundBoxSize)
                     vec3 = vec1.add(vec2)
@@ -361,7 +368,7 @@ class Rigid():
                     if beta > self.maxSingleAxisError:
                         self.maxSingleAxisError = beta 
 
-                    axis.multiply(1e12)
+                    axis.multiply(1.0e6)
                     axis.normalize()
                     axis.multiply(beta*WEIGHT_REFPOINT_ROTATION) #here use degrees
                     self.spin = self.spin.add(axis)
@@ -399,11 +406,14 @@ class Rigid():
         if self.moveVectorSum != None:
             moveDist = Base.Vector(self.moveVectorSum)
             moveDist.multiply(WEIGHT_LINEAR_MOVE) # stabilize computation, adjust if needed...
+            if self.debugMode == True:
+                a2plib.drawDebugVectorAt(self.spinCenter, moveDist, a2plib.BLUE)
         #
         #Rotate the rigid...
         center = None
         rotation = None
         if (self.spin != None and self.spin.Length != 0.0 and self.countSpinVectors != 0):
+            savedSpin = copy.copy(self.spin)
             spinAngle = self.spin.Length / self.countSpinVectors
             if spinAngle>15.0: spinAngle=15.0 # do not accept more degrees
             try:
@@ -412,6 +422,8 @@ class Rigid():
                 self.spin.normalize()
                 rotation = FreeCAD.Rotation(self.spin, spinStep)
                 center = self.spinCenter
+                if self.debugMode == True:
+                    a2plib.drawDebugVectorAt(center, savedSpin, a2plib.RED)
             except:
                 pass
 
@@ -514,7 +526,6 @@ class Rigid():
                 Msg(u"        {}\n".format(dep) )
             Msg(u"        DOF Position free with this rigid = {}\n".format( len(self.dofPOSPerLinkedRigids[rig])))
             Msg(u"        DOF Rotation free with this rigid = {}\n".format( len(self.dofROTPerLinkedRigids[rig])))
-
 
 
 
