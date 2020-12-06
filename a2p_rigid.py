@@ -59,7 +59,7 @@ import os, sys
 #from __builtin__ import False
 
 
-SPINSTEP_DIVISOR = 12.0
+SPINSTEP_DIVISOR = 12.0 #12
 WEIGHT_LINEAR_MOVE = 0.5
 WEIGHT_REFPOINT_ROTATION = 8.0
 
@@ -71,7 +71,8 @@ class Rigid():
                 name,
                 label,
                 fixed,
-                placement
+                placement,
+                debugMode
                 ):
         self.objectName = name
         self.label = label
@@ -79,6 +80,7 @@ class Rigid():
         self.tempfixed = fixed
         self.moved = False
         self.placement = placement
+        self.debugMode = debugMode
         self.savedPlacement = placement
         self.dependencies = []
         self.linkedRigids = []
@@ -404,19 +406,24 @@ class Rigid():
         if self.moveVectorSum != None:
             moveDist = Base.Vector(self.moveVectorSum)
             moveDist.multiply(WEIGHT_LINEAR_MOVE) # stabilize computation, adjust if needed...
+            if self.debugMode == True:
+                a2plib.drawDebugVectorAt(self.spinCenter, moveDist, a2plib.BLUE)
         #
         #Rotate the rigid...
         center = None
         rotation = None
         if (self.spin != None and self.spin.Length != 0.0 and self.countSpinVectors != 0):
+            savedSpin = copy.copy(self.spin)
             spinAngle = self.spin.Length / self.countSpinVectors
             if spinAngle>15.0: spinAngle=15.0 # do not accept more degrees
             try:
                 spinStep = spinAngle/(SPINSTEP_DIVISOR) #it was 250.0
-                self.spin.multiply(1.0e6)
+                self.spin.multiply(1.0e12)
                 self.spin.normalize()
                 rotation = FreeCAD.Rotation(self.spin, spinStep)
                 center = self.spinCenter
+                if self.debugMode == True:
+                    a2plib.drawDebugVectorAt(center, savedSpin, a2plib.RED)
             except:
                 pass
 

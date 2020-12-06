@@ -35,7 +35,6 @@ from a2p_dependencies import Dependency
 from a2p_rigid import Rigid
 import os
 
-
 SOLVER_MAXSTEPS = 50000
 
 # SOLVER_CONTROLDATA has been replaced by SolverSystem.getSolverControlData()
@@ -156,11 +155,16 @@ class SolverSystem():
                 fx = ob1.fixedPosition
             else:
                 fx = False
+            if hasattr(ob1, "debugmode"):
+                debugMode = ob1.debugmode
+            else:
+                debugMode = False
             rig = Rigid(
                 o,
                 ob1.Label,
                 fx,
-                ob1.Placement
+                ob1.Placement,
+                debugMode
                 )
             rig.spinCenter = ob1.Shape.BoundBox.Center
             self.rigids.append(rig)
@@ -435,6 +439,9 @@ class SolverSystem():
             if self.level_of_accuracy == 1:
                 self.detectUnmovedParts()   # do only once here. It can fail at higher accuracy levels
                                             # where not a final solution is required.
+            if a2plib.SOLVER_ONESTEP > 0:
+                systemSolved = True
+                break
             if systemSolved:
                 self.level_of_accuracy+=1
                 if self.level_of_accuracy > len(self.getSolverControlData()):
@@ -537,6 +544,12 @@ to a fixed part!
             solutionFound = self.calculateWorkList(doc, workList)
             if not solutionFound: return False
             return True
+        elif a2plib.PARTIAL_PROCESSING_ENABLED == False:
+            # Solve complete System at once
+            workList = self.rigids
+            solutionFound = self.calculateWorkList(doc, workList)
+            if not solutionFound: return False
+            return True
         else:
             # Normal partial solving if no simulation is running
             # load initial worklist with all fixed parts...
@@ -565,6 +578,9 @@ to a fixed part!
                     solutionFound = self.calculateWorkList(doc, workList)
                     if not solutionFound: return False
                 else:
+                    break
+                
+                if a2plib.SOLVER_ONESTEP > 2:
                     break
 
             return True
@@ -612,7 +628,7 @@ to a fixed part!
                 maxAxisError <= reqSpinAccuracy and # relevant check
                 maxSingleAxisError <= reqSpinAccuracy * 10  # additional check for insolvable assemblies
                                                             # sometimes spin can be solved but singleAxis not..
-                ):
+                ) or (a2plib.SOLVER_ONESTEP > 0):
                 # The accuracy is good, we're done here
                 goodAccuracy = True
                 # Mark the rigids as tempfixed and add its constrained rigids to pending list to be processed next
