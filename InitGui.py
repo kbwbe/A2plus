@@ -124,14 +124,23 @@ class A2plusWorkbench (Workbench):
                 'a2p_DeleteConnectionsCommand',
                 ]
         
-        solverCommands = [
-            'a2p_SolverCommand',
-            'a2p_ToggleAutoSolveCommand',
-            'a2p_FlipConstraintDirectionCommand',
-            'a2p_Show_Hierarchy_Command',
-            'a2p_SearchConstraintConflictsCommand',
-            'a2p_cleanUpDebugVectorsCommand'
-            ]
+        if a2plib.GRAPHICALDEBUG:
+            solverCommands = [
+                'a2p_SolverCommand',
+                'a2p_ToggleAutoSolveCommand',
+                'a2p_FlipConstraintDirectionCommand',
+                'a2p_Show_Hierarchy_Command',
+                'a2p_SearchConstraintConflictsCommand',
+                'a2p_cleanUpDebug3dCommand'
+                ]
+        else:
+            solverCommands = [
+                'a2p_SolverCommand',
+                'a2p_ToggleAutoSolveCommand',
+                'a2p_FlipConstraintDirectionCommand',
+                'a2p_Show_Hierarchy_Command',
+                'a2p_SearchConstraintConflictsCommand'
+                ]
         viewCommands = [
             'a2p_isolateCommand',
             'a2p_ViewConnectionsCommand',

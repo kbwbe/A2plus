@@ -71,7 +71,8 @@ class Rigid():
                 name,
                 label,
                 fixed,
-                placement
+                placement,
+                debugMode
                 ):
         self.objectName = name
         self.label = label
@@ -79,6 +80,7 @@ class Rigid():
         self.tempfixed = fixed
         self.moved = False
         self.placement = placement
+        self.debugMode = debugMode
         self.savedPlacement = placement
         self.dependencies = []
         self.linkedRigids = []
@@ -404,8 +406,8 @@ class Rigid():
         if self.moveVectorSum != None:
             moveDist = Base.Vector(self.moveVectorSum)
             moveDist.multiply(WEIGHT_LINEAR_MOVE) # stabilize computation, adjust if needed...
-            if a2plib.GRAPHICALDEBUG == True:
-                a2plib.drawDebugVectorAt(self.spinCenter, moveDist, (0,0,1))
+            if self.debugMode == True:
+                a2plib.drawDebugVectorAt(self.spinCenter, moveDist, a2plib.BLUE)
         #
         #Rotate the rigid...
         center = None
@@ -420,8 +422,8 @@ class Rigid():
                 self.spin.normalize()
                 rotation = FreeCAD.Rotation(self.spin, spinStep)
                 center = self.spinCenter
-                if a2plib.GRAPHICALDEBUG == True:
-                    a2plib.drawDebugVectorAt(center, savedSpin, (1,0,0))
+                if self.debugMode == True:
+                    a2plib.drawDebugVectorAt(center, savedSpin, a2plib.RED)
             except:
                 pass
 

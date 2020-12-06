@@ -53,15 +53,12 @@ SIMULATION_STATE = False
 
 SAVED_TRANSPARENCY = []
 
-DEBUGPROGRAM = 1
-GRAPHICALDEBUG = True
 
 path_a2p = os.path.dirname(__file__)
 path_a2p_resources = os.path.join( path_a2p, 'GuiA2p', 'Resources', 'resources.rcc')
 resourcesLoaded = QtCore.QResource.registerResource(path_a2p_resources)
 assert resourcesLoaded
 
-graphical_debug_output = [] #collect the graphical debug output here for deleting operation
 
 wb_globals = {}
 
@@ -78,7 +75,21 @@ A2P_DEBUG_1         = 1
 A2P_DEBUG_2         = 2
 A2P_DEBUG_3         = 3
 
-A2P_DEBUG_LEVEL = A2P_DEBUG_NONE
+#===================================================
+# do debug settings here:
+#===================================================
+A2P_DEBUG_LEVEL = A2P_DEBUG_NONE    #normal: A2P_DEBUG_NONE
+GRAPHICALDEBUG = False               #normal: False
+
+# for debug purposes
+# 0:normal
+# 1:one step in each worklist
+# 2:one step in first worklist
+SOLVER_ONESTEP = 0                  #normal: 0
+#===================================================
+solver_debug_objects = [] #collect solver 3d output for later removal
+#===================================================
+
 
 PARTIAL_SOLVE_STAGE1 = 1    #solve all rigid fully constrained to tempfixed rigid, enable only involved dep, then set them as tempfixed
 CONSTRAINT_DIALOG_REF = None
@@ -159,7 +170,7 @@ def drawDebugVectorAt(position,direction,rgbColor):
     sg = FreeCADGui.ActiveDocument.ActiveView.getSceneGraph()
     sg.addChild(sep)
     
-    graphical_debug_output.append(sep)
+    solver_debug_objects.append(sep)
     
 #------------------------------------------------------------------------------
 def to_bytes(tx):
