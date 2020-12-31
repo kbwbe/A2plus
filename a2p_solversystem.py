@@ -139,6 +139,7 @@ class SolverSystem():
                 #if the mate is suppressed do not add it      
                 if obj.Suppressed == False:
                     self.constraints.append(obj)
+                
         #
         # Extract all the objectnames which are affected by constraints..
         self.objectNames = []
@@ -153,6 +154,10 @@ class SolverSystem():
             ob1 = doc.getObject(o)
             if hasattr(ob1, "fixedPosition"):
                 fx = ob1.fixedPosition
+            elif ob1.TypeId == "Sketcher::SketchObject":
+                fx = True # assume sketches as fixed
+            elif ob1.TypeId == "Part::Part2DObjectPython": #e.g. a clone of a sketch
+                fx = True # assume sketches as fixed
             else:
                 fx = False
             if hasattr(ob1, "debugmode"):

@@ -354,6 +354,9 @@ class FileCache():
         if obj is None:
             return("")
         
+        if obj.TypeId == 'Sketcher::SketchObject': return ""
+        if obj.TypeId == 'Part::Part2DObjectPython': return ""
+        
         singleShapeRequested = obj.sourcePart is not None and len(obj.sourcePart)>0 
         if singleShapeRequested:
             if not self.loadObject(obj.sourceFile, obj.sourcePart): return ""

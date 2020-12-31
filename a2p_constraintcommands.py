@@ -37,6 +37,9 @@ import a2p_filecache
 def loadToFileCache(selection):
     for s in selection:
         ob = FreeCAD.activeDocument().getObject(s.ObjectName)
+        if ob.TypeId == 'Sketcher::SketchObject': return # do not work with cache here
+        if ob.TypeId == 'Part::Part2DObjectPython': return
+        
         singleShapeRequested = ob.sourcePart is not None and len(ob.sourcePart)>0
         if singleShapeRequested:
             a2p_filecache.fileCache.loadObject(ob.sourceFile,ob.sourcePart)

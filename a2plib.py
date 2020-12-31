@@ -1292,7 +1292,9 @@ def copyObjectColors(ob1,ob2):
     FreeCADGui.Selection.removeSelection(ob1)
 #------------------------------------------------------------------------------
 def isConstrainedPart(doc,obj):
-    if not isA2pPart(obj): return False
+    if not isA2pPart(obj) and not obj.TypeId in (
+        "Sketcher::SketchObject","Part::Part2DObjectPython"
+        ): return False
     constraints = [ ob for ob in doc.Objects if 'ConstraintInfo' in ob.Content]
     for c in constraints:
         if c.Object1 == obj.Name:

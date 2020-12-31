@@ -96,6 +96,7 @@ class ConstraintViewProviderProxy:
         if not hasattr(viewObject.Proxy, "onChangedEnabled"):
             viewObject.Proxy.onChangedEnabled = True
         if viewObject.Proxy.onChangedEnabled == False: return
+        '''
         if prop == "Visibility":
             obj = viewObject.Object
             if hasattr(obj,"Suppressed"):
@@ -109,6 +110,7 @@ class ConstraintViewProviderProxy:
                     m.ViewObject.Proxy.onChangedEnabled = True
                 except:
                     pass # if original has already been removed...
+        '''
 
     def onDelete(self, viewObject, subelements): # subelements is a tuple of strings
         if FreeCAD.activeDocument() != viewObject.Object.Document:
@@ -164,7 +166,8 @@ class ConstraintMirrorViewProviderProxy:
         if not hasattr(viewObject.Proxy, "onChangedEnabled"):
             viewObject.Proxy.onChangedEnabled = True
         if viewObject.Proxy.onChangedEnabled == False: return
-         
+        
+        ''' 
         if prop == "Visibility":
             obj = viewObject.Object
             if hasattr(obj,"Suppressed"):
@@ -177,6 +180,7 @@ class ConstraintMirrorViewProviderProxy:
                 c.ViewObject.Proxy.onChangedEnabled = True
             except:
                 pass # if original has already been removed...
+        '''
 
     def onDelete(self, viewObject, subelements): # subelements is a tuple of strings
         if FreeCAD.activeDocument() != viewObject.Object.Document:
@@ -324,7 +328,7 @@ class ConstraintMirrorObjectProxy:
             obj.addProperty("App::PropertyString", "Toponame2", "ConstraintNfo")
         if not "Suppressed" in propList:
             obj.addProperty("App::PropertyBool","Suppressed","ConstraintInfo")
-        obj.setEditorMode('Suppressed',1)
+        #obj.setEditorMode('Suppressed',1)
         obj.Suppressed = False # do not suppress constraints after document loading...
         if "suppressed" in propList:
             obj.removeProperty("suppressed")
