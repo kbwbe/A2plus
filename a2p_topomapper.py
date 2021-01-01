@@ -496,7 +496,8 @@ class TopoMapper(object):
             if self.addedByPathWB(n): continue
             if n in blackList: continue
             #
-            if a2plib.doNotImportInvisibleShapes():
+            if a2plib.doNotImportInvisibleShapes() and allowSketches==False:    #also import invisible sketches
+                                                                                # and single shapeRefs
                 ob = self.doc.getObject(n)
                 if hasattr(ob,"ViewObject"):
                     if hasattr(ob.ViewObject,"Visibility"):
