@@ -175,7 +175,6 @@ def getOrCreateA2pFile(
         return
     
     singleShapeRequested = singleShapeLabel is not None and len(singleShapeLabel)>0
-    print("SingleShapeLabel: {}, Requested: {}".format(singleShapeLabel, singleShapeRequested))
 
     if singleShapeRequested:
         a2pFileName = filename[:-6]+'-'+singleShapeLabel+'.a2p'

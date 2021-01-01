@@ -403,6 +403,7 @@ class TopoMapper(object):
             if ob.Name.startswith("ShapeBinder"): continue
             if ob.Name.startswith("Clone"): continue
             if ob.Name.startswith("Part__Mirroring"): continue
+            if ob.Name.startswith("Sketch"): continue
             else: return False
         return True
 
@@ -412,6 +413,9 @@ class TopoMapper(object):
         #-------------------------------------------
         self.treeNodes = {}
         shapeObs = a2plib.filterShapeObs(self.doc.Objects,allowSketches)
+        
+        for o in shapeObs:
+            print(o.Label)
         
         S = set(shapeObs)
         for ob in S:
