@@ -175,6 +175,7 @@ def getOrCreateA2pFile(
         return
     
     singleShapeRequested = singleShapeLabel is not None and len(singleShapeLabel)>0
+    print("SingleShapeLabel: {}, Requested: {}".format(singleShapeLabel, singleShapeRequested))
 
     if singleShapeRequested:
         a2pFileName = filename[:-6]+'-'+singleShapeLabel+'.a2p'
@@ -203,9 +204,10 @@ def getOrCreateA2pFile(
     topoMapper = a2p_topomapper.TopoMapper(importDoc)
 
     # Get a list of the importable Objects
-    importableObjects = topoMapper.getTopLevelObjects()
-    # if nothing is found, look for importable Sketches (FIXME)
-    if len(importableObjects) == 0:
+    
+    if singleShapeRequested == False:
+        importableObjects = topoMapper.getTopLevelObjects()
+    else:
         importableObjects = topoMapper.getTopLevelObjects(allowSketches=True)
     
     if len(importableObjects) == 0:
