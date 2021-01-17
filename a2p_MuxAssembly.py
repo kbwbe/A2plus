@@ -116,6 +116,7 @@ def createOrUpdateSimpleAssemblyShape(doc):
                            and obj.ViewObject.isVisible()
                            and hasattr(obj,'Shape')
                            and len(obj.Shape.Faces) > 0
+                           and a2plib.isGlobalVisible(obj)
                            ]
 
     if len(visibleImportObjects) == 0:

@@ -174,6 +174,41 @@ def drawDebugVectorAt(position,direction,rgbColor):
     solver_debug_objects.append(sep)
     
 #==============================================================================
+def isGlobalVisible(ob):
+    '''
+    Part containers do not propagate visibility to all its childs.
+    
+    This function checks, whether at least one Part container is invisible in tree
+    upwards direction.
+    
+    This function returns always true, except one Part- or Group-Container
+    in tree-structure above is invisible
+    '''
+    result = True
+
+    #remove constraints from the InList
+    inList = []
+    for i in ob.InList:
+        if isA2pConstraint(i): continue
+        inList.append(i)
+    
+    if len(inList) == 0:
+        if (
+                ob.Name.startswith('Group') or
+                ob.Name.startswith('Part')
+                ):
+            return ob.ViewObject.Visibility # break the recursion
+    elif len(inList) == 1:
+        if (
+                inList[0].Name.startswith('Group') or
+                inList[0].Name.startswith('Part')
+                ):
+            if inList[0].ViewObject.Visibility == False:
+                return False # break instantly
+            # do search in tree upwards
+            result = isGlobalVisible(inList[0])
+    return result
+#==============================================================================
 def generateSourceFileEntry(doc,filename):
     '''
     This function generates the text entry for the

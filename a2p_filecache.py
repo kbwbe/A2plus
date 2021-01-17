@@ -65,6 +65,7 @@ def muxAssemblyWithTopoNames(doc):
                        if hasattr(obj,'ViewObject') and obj.ViewObject.isVisible()
                        and hasattr(obj,'Shape') and len(obj.Shape.Faces) > 0
                        and hasattr(obj,'muxInfo')
+                       and a2plib.isGlobalVisible(obj)
                        ]
     
     transparency = 0
