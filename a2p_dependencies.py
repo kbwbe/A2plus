@@ -41,7 +41,6 @@ from a2p_libDOF import (
     create_Axis,
     cleanAxis,
     create_Axis2Points
-    
     )
 
 #------------------------------------------------------------------------------
@@ -707,7 +706,7 @@ class DependencyAxial(Dependency):
     def __init__(self, constraint, refType):
         Dependency.__init__(self, constraint, refType, True)
         self.isPointConstraint = False
-        self.useRefPointSpin = True
+        self.useRefPointSpin = False
 
     def getMovement1(self):
         '''
