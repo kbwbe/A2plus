@@ -39,6 +39,34 @@ from a2p_importedPart_class import Proxy_convertPart # for compat.
 from a2p_importedPart_class import ImportedPartViewProviderProxy # for compat.
 
 
+def updateConvertedPart(doc, obj):
+
+    obj.timeLastImport = time.time()
+
+    baseObject = doc.getObject(obj.localReference)
+
+    obj.Shape = baseObject.Shape.copy()
+    obj.muxInfo = createTopoInfo(baseObject)
+
+    for p in baseObject.ViewObject.PropertiesList: 
+        if hasattr(baseObject.ViewObject, p) and p not in ['DiffuseColor','Proxy','MappedColors','DisplayModeBody']:
+            setattr(obj.ViewObject, p, getattr( baseObject.ViewObject, p))
+    obj.ViewObject.ShapeColor = baseObject.ViewObject.ShapeColor
+    obj.ViewObject.DiffuseColor = copy.copy( baseObject.ViewObject.DiffuseColor ) # diffuse needs to happen last
+    
+    if not a2plib.getPerFaceTransparency():
+        # switch of perFaceTransparency
+        obj.ViewObject.Transparency = 1
+        obj.ViewObject.Transparency = 0 # default = nontransparent
+        
+
+    obj.Placement.Base = baseObject.Placement.Base
+    obj.Placement.Rotation = baseObject.Placement.Rotation
+
+    #doc.removeObject(obj.Name)          # don't want the original in this doc anymore
+    obj.recompute()
+    obj.ViewObject.Visibility = True
+
 def convertToImportedPart(doc, obj):
     '''
     convertToImportedPart(document, documentObject) - changes a regular FreeCAD object into an A2plus
@@ -57,6 +85,7 @@ def convertToImportedPart(doc, obj):
 
     newObj.a2p_Version = A2P_VERSION
     newObj.sourceFile = filename
+    newObj.localReference = obj.Name
     #newObj.sourcePart = ""
     newObj.setEditorMode("timeLastImport",1)
     newObj.timeLastImport = time.time()
@@ -83,7 +112,8 @@ def convertToImportedPart(doc, obj):
     newObj.Placement.Base = obj.Placement.Base
     newObj.Placement.Rotation = obj.Placement.Rotation
 
-    doc.removeObject(obj.Name)          # don't want the original in this doc anymore
+    #doc.removeObject(obj.Name)          # don't want the original in this doc anymore
+    obj.ViewObject.Visibility = False
     newObj.recompute()
 
 
