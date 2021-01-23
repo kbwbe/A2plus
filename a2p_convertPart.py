@@ -61,11 +61,6 @@ def updateConvertedPart(doc, obj):
         obj.ViewObject.Transparency = 1
         obj.ViewObject.Transparency = 0 # default = nontransparent
         
-
-    #obj.Placement.Base = baseObject.Placement.Base
-    #obj.Placement.Rotation = baseObject.Placement.Rotation
-
-    #doc.removeObject(obj.Name)          # don't want the original in this doc anymore
     obj.recompute()
     obj.ViewObject.Visibility = True
 
@@ -114,7 +109,6 @@ def convertToImportedPart(doc, obj):
     newObj.Placement.Base = obj.Placement.Base
     newObj.Placement.Rotation = obj.Placement.Rotation
 
-    #doc.removeObject(obj.Name)          # don't want the original in this doc anymore
     obj.ViewObject.Visibility = False
     newObj.recompute()
 
