@@ -707,7 +707,7 @@ class DependencyAxial(Dependency):
     def __init__(self, constraint, refType):
         Dependency.__init__(self, constraint, refType, True)
         self.isPointConstraint = False
-        self.useRefPointSpin = False
+        self.useRefPointSpin = True
 
     def getMovement1(self):
         '''
