@@ -45,8 +45,10 @@ def updateConvertedPart(doc, obj):
 
     baseObject = doc.getObject(obj.localReference)
 
+    savedPlacement = obj.Placement
     obj.Shape = baseObject.Shape.copy()
     obj.muxInfo = createTopoInfo(baseObject)
+    obj.Placement = savedPlacement
 
     for p in baseObject.ViewObject.PropertiesList: 
         if hasattr(baseObject.ViewObject, p) and p not in ['DiffuseColor','Proxy','MappedColors','DisplayModeBody']:
@@ -60,8 +62,8 @@ def updateConvertedPart(doc, obj):
         obj.ViewObject.Transparency = 0 # default = nontransparent
         
 
-    obj.Placement.Base = baseObject.Placement.Base
-    obj.Placement.Rotation = baseObject.Placement.Rotation
+    #obj.Placement.Base = baseObject.Placement.Base
+    #obj.Placement.Rotation = baseObject.Placement.Rotation
 
     #doc.removeObject(obj.Name)          # don't want the original in this doc anymore
     obj.recompute()

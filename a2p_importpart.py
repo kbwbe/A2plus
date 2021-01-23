@@ -655,7 +655,7 @@ def updateImportedParts(doc, partial=False):
         if hasattr(obj, 'sourceFile') and a2plib.to_str(obj.sourceFile) == a2plib.to_str('converted'):
             if hasattr(obj,'localReference') and obj.localReference is not None and obj.localReference != "":
                 a2p_convertPart.updateConvertedPart(doc, obj)
-            return
+            continue
         
         if hasattr(obj, 'sourceFile') and a2plib.to_str(obj.sourceFile) != a2plib.to_str('converted'):
 
