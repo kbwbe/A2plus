@@ -148,10 +148,9 @@ After converting, constraints
 can be applied. Also you can
 duplicate the converted part.
 
-(The shape of the converted part
-is not editable anymore, as it
-is a static copy of the original
-shape.)
+For editing a converted part,
+hit the edit button and follow
+the instructions shown on screen.
 
 This function is useful, if
 you want to use e.g. fasteners

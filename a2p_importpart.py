@@ -896,39 +896,35 @@ within the assembly.
 class a2p_EditPartCommand:
     def Activated(self):
         doc = FreeCAD.activeDocument()
-        #====================================================
-        # Is there an open Doc ?
-        #====================================================
-        if doc is None:
-            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
-                                        u"No active document found!",
-                                        u"Before editing a part, you have to open an assembly file."
-                                    )
-            return
-        
-        #====================================================
-        # Is something been selected ?
-        #====================================================
         selection = [s for s in FreeCADGui.Selection.getSelection() if s.Document == FreeCAD.ActiveDocument ]
-        if not selection:
-            QtGui.QMessageBox.information(
-                QtGui.QApplication.activeWindow(),
-                u"Selection Error",
-                u"You must select a part to edit first."
-                )
-            return
-        
+
         #====================================================
-        # Has the selected object an editable a2p file ?
+        # Do we deal with a converted Part ?
         #====================================================
         obj = selection[0]
-        if not a2plib.isEditableA2pPart(obj):
-            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
-                                        u"Edit: Selection invalid!",
-                                        u"This object is no imported part!"
-                                    )
+        if obj.sourceFile == 'converted':
+            try:
+                originalPart = doc.getObject(obj.localSourceObject)
+                FreeCADGui.Selection.clearSelection()
+                FreeCADGui.Selection.addSelection(originalPart)
+
+                QtGui.QMessageBox.information(
+                    QtGui.QApplication.activeWindow(),
+                    u"Information ",
+                    u"Please edit the highlighted object.\nWhen finished, update the assembly"
+                    )
+                return
+            except:
+                pass
+            QtGui.QMessageBox.critical(
+                QtGui.QApplication.activeWindow(),
+                u"File error ! ",
+                u"Cannot find the local source object.\nHas it been deleted?"
+                )
             return
-        
+                
+                
+
         #====================================================
         # Does the file exist ?
         #====================================================
@@ -988,6 +984,16 @@ This is not allowed when using preference
                 mdi.setActiveSubWindow(s)
                 if FreeCAD.activeDocument().Name == name: break
 
+    def IsActive(self):
+        doc = FreeCAD.activeDocument()
+        if doc is None: return False
+        
+        selection = [s for s in FreeCADGui.Selection.getSelection() if s.Document == FreeCAD.ActiveDocument ]        
+        if len(selection) != 1: return False
+        
+        if not a2plib.isEditableA2pPart(selection[0]): return False
+        
+        return True
 
     def GetResources(self):
         return {
