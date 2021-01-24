@@ -985,7 +985,7 @@ def getAxis(obj, subElementName):
                 centers = numpy.array([a.Center for a in arcs])
                 sigma = numpy.std( centers, axis=0 )
                 if max(sigma) < 10**-6: #then circular curce
-                    axis = a.Axis
+                    axis = arcs[0].Axis
             if all(isLine(a) for a in arcs):
                 lines = arcs
                 D = numpy.array([L.tangent(0)[0] for L in lines]) #D(irections)
