@@ -324,10 +324,14 @@ class CircularEdgeConstraint(BasicConstraint):
         
     def calcInitialValues(self):
         c = self.constraintObject
-        circleEdge1 = getObjectEdgeFromName(self.ob1, c.SubElement1)
-        circleEdge2 = getObjectEdgeFromName(self.ob2, c.SubElement2)
-        axis1 = circleEdge1.Curve.Axis
-        axis2 = circleEdge2.Curve.Axis
+        #circleEdge1 = getObjectEdgeFromName(self.ob1, c.SubElement1)
+        #circleEdge2 = getObjectEdgeFromName(self.ob2, c.SubElement2)
+        #axis1 = circleEdge1.Curve.Axis
+        #axis2 = circleEdge2.Curve.Axis
+        axis1 = getAxis(self.ob1, c.SubElement1)
+        axis2 = getAxis(self.ob2, c.SubElement2)
+        
+        
         angle = math.degrees(axis1.getAngle(axis2))
         if angle <= 90.0:
             self.direction = "aligned"
@@ -340,10 +344,15 @@ class CircularEdgeConstraint(BasicConstraint):
     def recalculateMatingDirection(c):
         ob1 = c.Document.getObject(c.Object1)
         ob2 = c.Document.getObject(c.Object2)
-        circleEdge1 = getObjectEdgeFromName(ob1, c.SubElement1)
-        circleEdge2 = getObjectEdgeFromName(ob2, c.SubElement2)
-        axis1 = circleEdge1.Curve.Axis
-        axis2 = circleEdge2.Curve.Axis
+        #circleEdge1 = getObjectEdgeFromName(ob1, c.SubElement1)
+        #circleEdge2 = getObjectEdgeFromName(ob2, c.SubElement2)
+        #axis1 = circleEdge1.Curve.Axis
+        #axis2 = circleEdge2.Curve.Axis
+        
+        axis1 = getAxis(ob1, c.SubElement1)
+        axis2 = getAxis(ob2, c.SubElement2)
+        
+        
         angle = math.degrees(axis1.getAngle(axis2))
         if angle <= 90.0:
             direction = "aligned"
