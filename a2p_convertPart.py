@@ -51,8 +51,16 @@ def updateConvertedPart(doc, obj):
     obj.Placement = savedPlacement
 
     for p in baseObject.ViewObject.PropertiesList: 
-        if hasattr(baseObject.ViewObject, p) and p not in ['DiffuseColor','Proxy','MappedColors','DisplayModeBody']:
-            setattr(obj.ViewObject, p, getattr( baseObject.ViewObject, p))
+        if hasattr(baseObject.ViewObject, p) and p not in [
+                'DiffuseColor',
+                'Proxy',
+                'MappedColors',
+                'DisplayModeBody'
+                ]:
+            try:
+                setattr(obj.ViewObject, p, getattr( baseObject.ViewObject, p))
+            except:
+                pass #a lot of attributes related e.g. to sketcher
     obj.ViewObject.ShapeColor = baseObject.ViewObject.ShapeColor
     obj.ViewObject.DiffuseColor = copy.copy( baseObject.ViewObject.DiffuseColor ) # diffuse needs to happen last
     
