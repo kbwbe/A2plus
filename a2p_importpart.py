@@ -36,9 +36,7 @@ from a2plib import getRelativePathesEnabled
 import a2p_importedPart_class
 import a2p_convertPart
 
-from a2p_topomapper import (
-    TopoMapper
-    )
+from a2p_topomapper import TopoMapper
 
 import a2p_lcs_support
 from a2p_importedPart_class import Proxy_importPart, ImportedPartViewProviderProxy
@@ -653,7 +651,7 @@ def updateImportedParts(doc, partial=False):
     
     for obj in workingSet:
         if hasattr(obj, 'sourceFile') and a2plib.to_str(obj.sourceFile) == a2plib.to_str('converted'):
-            if hasattr(obj,'localReference') and obj.localReference is not None and obj.localReference != "":
+            if hasattr(obj,'localSourceObject') and obj.localSourceObject is not None and obj.localSourceObject != "":
                 a2p_convertPart.updateConvertedPart(doc, obj)
             continue
         
@@ -793,7 +791,7 @@ def duplicateImportedPart( part ):
     newObj.a2p_Version = part.a2p_Version
     newObj.sourceFile = part.sourceFile
     newObj.sourcePart = part.sourcePart
-    newObj.localReference = part.localReference
+    newObj.localSourceObject = part.localSourceObject
     newObj.timeLastImport =  part.timeLastImport
     newObj.setEditorMode("timeLastImport",1)
     newObj.fixedPosition = False

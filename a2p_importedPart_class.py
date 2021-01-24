@@ -55,8 +55,8 @@ class Proxy_importPart:
             obj.addProperty("App::PropertyFile", "sourceFile", "importPart")
         if not "sourcePart" in propList:
             obj.addProperty("App::PropertyString", "sourcePart", "importPart")
-        if not "localReference" in propList:
-            obj.addProperty("App::PropertyString", "localReference", "importPart")
+        if not "localSourceObject" in propList:
+            obj.addProperty("App::PropertyString", "localSourceObject", "importPart")
         if not "muxInfo" in propList:
             obj.addProperty("App::PropertyStringList","muxInfo","importPart")
         if not "timeLastImport" in propList:

@@ -38,16 +38,23 @@ from a2p_importedPart_class import Proxy_importPart
 from a2p_importedPart_class import Proxy_convertPart # for compat.
 from a2p_importedPart_class import ImportedPartViewProviderProxy # for compat.
 
+from a2p_topomapper import TopoMapper
+
+
 
 def updateConvertedPart(doc, obj):
 
     obj.timeLastImport = time.time()
 
-    baseObject = doc.getObject(obj.localReference)
+    baseObject = doc.getObject(obj.localSourceObject)
 
     savedPlacement = obj.Placement
-    obj.Shape = baseObject.Shape.copy()
-    obj.muxInfo = createTopoInfo(baseObject)
+    obj.ViewObject.ShapeColor = baseObject.ViewObject.ShapeColor
+    topoMapper = TopoMapper(doc) # imports the objects and creates toponames if wanted
+    baseObject.ViewObject.Visibility = True #the topomapper ignores invisible shapes
+    obj.muxInfo, obj.Shape, obj.ViewObject.DiffuseColor, obj.ViewObject.Transparency = \
+        topoMapper.createTopoNames(desiredShapeLabel = baseObject.Label)
+    baseObject.ViewObject.Visibility = False #set baseObject invisible again.
     obj.Placement = savedPlacement
 
     for p in baseObject.ViewObject.PropertiesList: 
@@ -61,9 +68,7 @@ def updateConvertedPart(doc, obj):
                 setattr(obj.ViewObject, p, getattr( baseObject.ViewObject, p))
             except:
                 pass #a lot of attributes related e.g. to sketcher
-    obj.ViewObject.ShapeColor = baseObject.ViewObject.ShapeColor
-    obj.ViewObject.DiffuseColor = copy.copy( baseObject.ViewObject.DiffuseColor ) # diffuse needs to happen last
-    
+            
     if not a2plib.getPerFaceTransparency():
         # switch of perFaceTransparency
         obj.ViewObject.Transparency = 1
@@ -75,8 +80,8 @@ def updateConvertedPart(doc, obj):
 def convertToImportedPart(doc, obj):
     '''
     convertToImportedPart(document, documentObject) - changes a regular FreeCAD object into an A2plus
-    importedPart, adds the importedPart to the document and removes the FreeCAD object from the 
-    document. Returns None
+    importedPart, adds the importedPart to the document and hides the original object from the 
+    document. Updating the assembly will also update the converted part
     '''
     partName = a2plib.findUnusedObjectName( obj.Label, document=doc )
     partLabel = a2plib.findUnusedObjectLabel( obj.Label, document=doc )
@@ -90,7 +95,7 @@ def convertToImportedPart(doc, obj):
 
     newObj.a2p_Version = A2P_VERSION
     newObj.sourceFile = filename
-    newObj.localReference = obj.Name
+    newObj.localSourceObject = obj.Name
     #newObj.sourcePart = ""
     newObj.setEditorMode("timeLastImport",1)
     newObj.timeLastImport = time.time()
@@ -99,14 +104,26 @@ def convertToImportedPart(doc, obj):
     newObj.setEditorMode("subassemblyImport",1)
     newObj.updateColors = True
 
-    newObj.Shape = obj.Shape.copy()
-    newObj.muxInfo = createTopoInfo(obj)
+    newObj.ViewObject.ShapeColor = obj.ViewObject.ShapeColor
+    
+    #-------------------------------------------
+    # Initialize the new TopoMapper
+    #-------------------------------------------
+    topoMapper = TopoMapper(doc)
+    newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = \
+        topoMapper.createTopoNames(desiredShapeLabel = obj.Label)
 
     for p in obj.ViewObject.PropertiesList: 
-        if hasattr(obj.ViewObject, p) and p not in ['DiffuseColor','Proxy','MappedColors','DisplayModeBody']:
-            setattr(newObj.ViewObject, p, getattr( obj.ViewObject, p))
-    newObj.ViewObject.ShapeColor = obj.ViewObject.ShapeColor
-    newObj.ViewObject.DiffuseColor = copy.copy( obj.ViewObject.DiffuseColor ) # diffuse needs to happen last
+        if hasattr(obj.ViewObject, p) and p not in [
+                'DiffuseColor',
+                'Proxy',
+                'MappedColors',
+                'DisplayModeBody'
+                ]:
+            try:
+                setattr(newObj.ViewObject, p, getattr( obj.ViewObject, p))
+            except: #some sketcher attributes e.g.
+                pass
     
     if not a2plib.getPerFaceTransparency():
         # switch of perFaceTransparency
@@ -153,58 +170,33 @@ class a2p_ConvertPartCommand():
     def Activated(self):
         doc = FreeCAD.activeDocument()
         selection = FreeCADGui.Selection.getSelection()
-        if not selection:
-            msg = \
-'''
-You must select a part to convert first.
-'''
-            QtGui.QMessageBox.information(
-                QtGui.QApplication.activeWindow(),
-                "Selection Error",
-                msg
-                )
-            return
-        elif not selection[0].isDerivedFrom("Part::Feature"):    # change here if allowing groups
-            msg = \
-'''
-Please select a Part.
-'''
-            QtGui.QMessageBox.information(
-                QtGui.QApplication.activeWindow(),
-                "Selection Error",
-                msg
-                )
-            return
-
-        elif len(selection) > 1:
-            for s in selection:
-                if not s.isDerivedFrom("Part::Feature"):    # change here if allowing groups
-                    msg = \
-'''
-Please select a Part.
-'''
-                    QtGui.QMessageBox.information(
-                        QtGui.QApplication.activeWindow(),
-                        "Selection Error",
-                        msg
-                        )
-                    return
-                else:
-                    doc.openTransaction("part converted to A2plus")
-                    convertToImportedPart(doc, s)
-                    doc.commitTransaction()
-        else:
-            doc.openTransaction("part converted to A2plus")
-            convertToImportedPart(doc, selection[0])
+        for s in selection:
+            if s.ViewObject.Visibility == False:
+                msg = u"Please select only visible parts!"
+                QtGui.QMessageBox.information(
+                    QtGui.QApplication.activeWindow(),
+                    u"Conversion Aborted",
+                    msg
+                    )
+                return
+        for s in selection:
+            doc.openTransaction(u"part converted to A2plus")
+            convertToImportedPart(doc, s)
             doc.commitTransaction()
 
     def IsActive(self):
-        """Here you can define if the command must be active or not (grayed out)
-        if certain conditions are met or not. This function is optional."""
         if FreeCAD.activeDocument() is None:
             return False
-        
-        return True
 
+        selection = FreeCADGui.Selection.getSelection()
+        if not selection: return False
+        for s in selection:
+            if a2plib.isA2pPart(s): return False
+            if (
+                    not s.isDerivedFrom("Part::Feature") and
+                    not s.Name.startswith('Sketch')
+                    ):
+                return False
+        return True
 
 FreeCADGui.addCommand('a2p_ConvertPart',a2p_ConvertPartCommand())
