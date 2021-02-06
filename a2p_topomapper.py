@@ -600,23 +600,21 @@ class TopoMapper(object):
                 #manage colors of faces                
                 if ob.ViewObject.TypeId == "Gui::ViewProviderLinkPython": # a link is involved...
                     linkedObject = self.getLinkedObjectRecursive(ob)
-                    print("linked object of {} is {}".format(ob.Name,linkedObject.Name))
-                    print("shapeLen of {} is {}, shapeLen of {} is {}".format(
-                                ob.Name,
-                                len(ob.Shape.Faces),
-                                linkedObject.Name,
-                                len(linkedObject.Shape.Faces)
-                                )
-                            )
+                    needDiffuseExtension = ( len(linkedObject.ViewObject.DiffuseColor) < len(linkedObject.Shape.Faces) )
                     shapeCol = linkedObject.ViewObject.ShapeColor
+                    diffuseCol = linkedObject.ViewObject.DiffuseColor
+                    transparency = linkedObject.ViewObject.Transparency
+                    shape_list.append(ob.Shape)
 
-                    #FIXME: test code
-                    diffuseElement = a2plib.makeDiffuseElement(shapeCol,transparency)
-                    for i in range(0,len(tempShape.Faces)):
-                        faceColors.append(diffuseElement)
-                    
-                            
-                else:
+                    if needDiffuseExtension:
+                        diffuseElement = a2plib.makeDiffuseElement(shapeCol,transparency)
+                        for i in range(0,len(tempShape.Faces)):
+                            faceColors.append(diffuseElement)
+                    else:
+                        count = len(ob.Shape.Faces)//len(linkedObject.Shape.Faces)
+                        for c in range(0,count): # add colors to multiple representations of linkedObject
+                            faceColors.extend(diffuseCol)
+                else: # no link is involved...
                     needDiffuseExtension = ( len(ob.ViewObject.DiffuseColor) < len(ob.Shape.Faces) )
                     shapeCol = ob.ViewObject.ShapeColor
                     diffuseCol = ob.ViewObject.DiffuseColor
