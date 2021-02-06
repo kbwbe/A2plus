@@ -412,14 +412,6 @@ class TopoMapper(object):
         self.treeNodes = {}
         shapeObs = a2plib.filterShapeObs(self.doc.Objects,allowSketches)
         
-        #FIXME
-        for ob in shapeObs:
-            inListNames = []
-            for i in ob.InList:
-                inListNames.append(i.Name)
-            print("ObjectName: {}, InList: {}".format(ob.Name,inListNames))
-        #FIXME
-        
         S = set(shapeObs)
         for ob in S:
             inList = a2plib.filterShapeObs(ob.InList,allowSketches)
@@ -527,6 +519,24 @@ class TopoMapper(object):
                 self.isPartDesignDocument = True
                 break
 
+    def getLinkedObjectRecursive(self,ob):
+        if ob.ViewObject.TypeId == "Gui::ViewProviderLinkPython": # a link is involved...
+            linkedObject = None
+            for p in ob.PropertiesList:
+                try:
+                    linkedObject = getattr(ob,p).getLinkedObject()
+                    if linkedObject is not None:
+                        linkedObject = self.getLinkedObjectRecursive(linkedObject)
+                        break
+                except:
+                    pass
+            if linkedObject is not None:
+                return linkedObject
+            else:
+                return ob
+        else:
+            return ob
+
     def createTopoNames(self, desiredShapeLabel = None):
         '''
         creates a combined shell of all toplevel objects and
@@ -585,7 +595,28 @@ class TopoMapper(object):
             for objName in self.topLevelShapes:
                 ob = self.doc.getObject(objName)
                 tempShape = self.makePlacedShape(ob)
-                try: # will not work is object is a link
+                faces.extend(tempShape.Faces) #let python libs extend faces, much faster
+
+                #manage colors of faces                
+                if ob.ViewObject.TypeId == "Gui::ViewProviderLinkPython": # a link is involved...
+                    linkedObject = self.getLinkedObjectRecursive(ob)
+                    print("linked object of {} is {}".format(ob.Name,linkedObject.Name))
+                    print("shapeLen of {} is {}, shapeLen of {} is {}".format(
+                                ob.Name,
+                                len(ob.Shape.Faces),
+                                linkedObject.Name,
+                                len(linkedObject.Shape.Faces)
+                                )
+                            )
+                    shapeCol = linkedObject.ViewObject.ShapeColor
+
+                    #FIXME: test code
+                    diffuseElement = a2plib.makeDiffuseElement(shapeCol,transparency)
+                    for i in range(0,len(tempShape.Faces)):
+                        faceColors.append(diffuseElement)
+                    
+                            
+                else:
                     needDiffuseExtension = ( len(ob.ViewObject.DiffuseColor) < len(ob.Shape.Faces) )
                     shapeCol = ob.ViewObject.ShapeColor
                     diffuseCol = ob.ViewObject.DiffuseColor
@@ -597,13 +628,9 @@ class TopoMapper(object):
                             faceColors.append(diffuseElement)
                     else:
                         faceColors.extend(diffuseCol) #let python libs extend faceColors, much faster
-                except:
-                    pass
-                    
-                faces.extend(tempShape.Faces) #let python libs extend faces, much faster
+                        
     
             shell = Part.makeShell(faces)
-                    
             try:
                 if a2plib.getUseSolidUnion():
                     if len(shape_list) > 1:
