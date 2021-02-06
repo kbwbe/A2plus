@@ -400,6 +400,8 @@ class TopoMapper(object):
             if ob.Name.startswith("ShapeBinder"): continue
             if ob.Name.startswith("Clone"): continue
             if ob.Name.startswith("Part__Mirroring"): continue
+            if ob.Name.startswith("mirror"): continue
+            if ob.hasExtension('App::GeoFeatureGroupExtension') and ob.Name.startswith("Part"): continue
             else: return False
         return True
 
@@ -409,6 +411,14 @@ class TopoMapper(object):
         #-------------------------------------------
         self.treeNodes = {}
         shapeObs = a2plib.filterShapeObs(self.doc.Objects,allowSketches)
+        
+        #FIXME
+        for ob in shapeObs:
+            inListNames = []
+            for i in ob.InList:
+                inListNames.append(i.Name)
+            print("ObjectName: {}, InList: {}".format(ob.Name,inListNames))
+        #FIXME
         
         S = set(shapeObs)
         for ob in S:
