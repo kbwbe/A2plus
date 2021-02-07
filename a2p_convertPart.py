@@ -43,41 +43,6 @@ import a2p_filecache
 
 
 
-def updateConvertedPart(doc, obj):
-
-    obj.timeLastImport = time.time()
-
-    baseObject = doc.getObject(obj.localSourceObject)
-
-    savedPlacement = obj.Placement
-    obj.ViewObject.ShapeColor = baseObject.ViewObject.ShapeColor
-    topoMapper = TopoMapper(doc) # imports the objects and creates toponames if wanted
-    baseObject.ViewObject.Visibility = True #the topomapper ignores invisible shapes
-    obj.muxInfo, obj.Shape, obj.ViewObject.DiffuseColor, obj.ViewObject.Transparency = \
-        topoMapper.createTopoNames(desiredShapeLabel = baseObject.Label)
-    baseObject.ViewObject.Visibility = False #set baseObject invisible again.
-    obj.Placement = savedPlacement
-
-    for p in baseObject.ViewObject.PropertiesList: 
-        if hasattr(baseObject.ViewObject, p) and p not in [
-                'DiffuseColor',
-                'Proxy',
-                'MappedColors',
-                'DisplayModeBody'
-                ]:
-            try:
-                setattr(obj.ViewObject, p, getattr( baseObject.ViewObject, p))
-            except:
-                pass #a lot of attributes related e.g. to sketcher
-            
-    if not a2plib.getPerFaceTransparency():
-        # switch of perFaceTransparency
-        obj.ViewObject.Transparency = 1
-        obj.ViewObject.Transparency = 0 # default = nontransparent
-        
-    obj.recompute()
-    obj.ViewObject.Visibility = True
-
 def convertToImportedPart(doc, obj):
     '''
     convertToImportedPart(document, documentObject) - changes a regular FreeCAD object into an A2plus

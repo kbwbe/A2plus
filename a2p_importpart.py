@@ -481,13 +481,8 @@ def updateImportedParts(doc, partial=False):
     
     for obj in workingSet:
         
-        if hasattr(obj, 'sourceFile') and a2plib.to_str(obj.sourceFile) == a2plib.to_str('converted'):
-            if hasattr(obj,'localSourceObject') and obj.localSourceObject is not None and obj.localSourceObject != "":
-                a2p_convertPart.updateConvertedPart(doc, obj)
-            continue
-        
-        if hasattr(obj, 'sourceFile') and a2plib.to_str(obj.sourceFile) != a2plib.to_str('converted'):
-
+        #if hasattr(obj, 'sourceFile') and a2plib.to_str(obj.sourceFile) != a2plib.to_str('converted'):
+        if hasattr(obj, 'sourceFile'): #converted parts are now able to update
             
             #repair data structures (perhaps an old Assembly2 import was found)
             if hasattr(obj,"Content") and 'importPart' in obj.Content: # be sure to have an assembly object
