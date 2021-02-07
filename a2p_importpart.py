@@ -41,6 +41,7 @@ from a2p_topomapper import TopoMapper
 import a2p_filecache
 import a2p_solversystem
 import a2p_constraintServices
+import a2p_convertPart
 
 PYVERSION =  sys.version_info[0]
 
@@ -454,8 +455,9 @@ def updateImportedParts(doc, partial=False):
     selectedObjects=[]
     selection = [s for s in FreeCADGui.Selection.getSelection() 
                  if s.Document == FreeCAD.ActiveDocument and
-                 (a2plib.isA2pPart(s) or a2plib.isA2pSketch())
+                 (a2plib.isA2pPart(s) or a2plib.isA2pSketch(s))
                  ]
+    
     if selection and len(selection)>0:
         if partial==True:
             response = QtGui.QMessageBox.Yes
@@ -478,6 +480,12 @@ def updateImportedParts(doc, partial=False):
         workingSet = doc.Objects
     
     for obj in workingSet:
+        
+        if hasattr(obj, 'sourceFile') and a2plib.to_str(obj.sourceFile) == a2plib.to_str('converted'):
+            if hasattr(obj,'localSourceObject') and obj.localSourceObject is not None and obj.localSourceObject != "":
+                a2p_convertPart.updateConvertedPart(doc, obj)
+            continue
+        
         if hasattr(obj, 'sourceFile') and a2plib.to_str(obj.sourceFile) != a2plib.to_str('converted'):
 
             
@@ -574,6 +582,7 @@ def duplicateImportedPart( part ):
     newObj.a2p_Version = part.a2p_Version
     newObj.sourceFile = part.sourceFile
     newObj.sourcePart = part.sourcePart
+    newObj.localSourceObject = part.localSourceObject
     newObj.timeLastImport =  part.timeLastImport
     newObj.setEditorMode("timeLastImport",1)
     newObj.fixedPosition = False
@@ -678,28 +687,7 @@ within the assembly.
 class a2p_EditPartCommand:
     def Activated(self):
         doc = FreeCAD.activeDocument()
-        #====================================================
-        # Is there an open Doc ?
-        #====================================================
-        if doc == None:
-            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
-                                        u"No active document found!",
-                                        u"Before editing a part, you have to open an assembly file."
-                                    )
-            return
-        
-        #====================================================
-        # Is something been selected ?
-        #====================================================
         selection = [s for s in FreeCADGui.Selection.getSelection() if s.Document == FreeCAD.ActiveDocument ]
-        if not selection:
-            QtGui.QMessageBox.information(
-                QtGui.QApplication.activeWindow(),
-                u"Selection Error",
-                u"You must select a part to edit first."
-                )
-            return
-        
         #====================================================
         # Has the selected object an editable a2p file ?
         #====================================================
@@ -710,9 +698,31 @@ class a2p_EditPartCommand:
                                         u"This object is no imported part!"
                                     )
             return
-        
         #====================================================
-        # Does the file exist ?
+        # Do we deal with a converted part?
+        #====================================================
+        if obj.sourceFile == 'converted':
+            try:
+                originalPart = doc.getObject(obj.localSourceObject)
+                FreeCADGui.Selection.clearSelection()
+                FreeCADGui.Selection.addSelection(originalPart)
+
+                QtGui.QMessageBox.information(
+                    QtGui.QApplication.activeWindow(),
+                    u"Information ",
+                    u"Please edit the highlighted object.\nWhen finished, update the assembly"
+                    )
+                return
+            except:
+                pass
+            QtGui.QMessageBox.critical(
+                QtGui.QApplication.activeWindow(),
+                u"File error ! ",
+                u"Cannot find the local source object.\nHas it been deleted?"
+                )
+            return        
+        #====================================================
+        # We are dealing with a regular imported part. Does the file exist ?
         #====================================================
         obj = selection[0]
         FreeCADGui.Selection.clearSelection() # very important! Avoid Editing the assembly the part was called from!
@@ -770,6 +780,16 @@ This is not allowed when using preference
                 mdi.setActiveSubWindow(s)
                 if FreeCAD.activeDocument().Name == name: break
 
+    def IsActive(self):
+        doc = FreeCAD.activeDocument()
+        if doc is None: return False
+
+        selection = [s for s in FreeCADGui.Selection.getSelection() if s.Document == FreeCAD.ActiveDocument ]        
+        if len(selection) != 1: return False
+
+        if not a2plib.isEditableA2pPart(selection[0]): return False
+
+        return True
 
     def GetResources(self):
         return {
