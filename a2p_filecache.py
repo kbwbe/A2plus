@@ -32,6 +32,7 @@ import sys
 import a2plib
 import a2p_topomapper
 import a2p_simpleXMLhandler
+from _threading_local import local
 
 #==============================================================================
 def createDefaultTopNames(obj): # used during converting an object to a2p object
@@ -359,10 +360,17 @@ class FileCache():
         if obj.TypeId == 'Sketcher::SketchObject': return ""
         if obj.TypeId == 'Part::Part2DObjectPython': return ""
         
-        singleShapeRequested = obj.sourcePart is not None and len(obj.sourcePart)>0 
-        if singleShapeRequested:
+        # is there any single Shape requested
+        ssr1 = obj.sourcePart is not None and len(obj.sourcePart)>0 
+        ssr2 = obj.localSourceObject is not None and len(obj.localSourceObject)>0
+        
+        if ssr1: #SingleShapeRequested 1
             if not self.loadObject(obj.sourceFile, obj.sourcePart): return ""
             cacheKey = os.path.split(obj.sourceFile)[1] + '-'+obj.sourcePart
+        elif ssr2: #SingleShapeRequested 2
+            localObject = obj.Document.getObject(obj.localSourceObject)
+            if not self.loadObject(obj.Document.FileName, localObject.Label): return ""
+            cacheKey = os.path.split(obj.Document.FileName)[1] + '-'+localObject.Label
         else:
             if not self.loadObject(obj.sourceFile, None): return ""
             cacheKey = os.path.split(obj.sourceFile)[1]
@@ -381,12 +389,19 @@ class FileCache():
         return "" #default if there are problems
         
     def getFullEntry(self,obj):
-        singleShapeRequested = obj.sourcePart is not None and len(obj.sourcePart)>0 
+        #any single Shape requested
+        sr1 = obj.sourcePart is not None and len(obj.sourcePart)>0 
+        sr2 = obj.localSourceObject is not None and len(obj.localSourceObject)>0
 
-        if singleShapeRequested:
+        if sr1:
             if not self.loadObject(obj.sourceFile, obj.sourcePart):
                 return None
             cacheKey = os.path.split(obj.sourceFile)[1] + '-'+obj.sourcePart
+        elif sr2:
+            localObject = obj.Document.getObject(obj.localSourceObject)
+            if not self.loadObject(obj.Document.FileName, localObject.Label):
+                return None
+            cacheKey = os.path.split(obj.Document.FileName)[1] + '-'+localObject.Label
         else:
             if not self.loadObject(obj.sourceFile, None):
                 return None

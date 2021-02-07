@@ -1253,7 +1253,6 @@ def isA2pPart(obj):
 def isEditableA2pPart(obj):
     if not isA2pPart(obj): return False
     if hasattr(obj,"sourceFile"):
-        #if obj.sourceFile == "converted": return False
         if obj.sourceFile == "": return False
     return True
 #------------------------------------------------------------------------------

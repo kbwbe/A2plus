@@ -38,6 +38,8 @@ from a2p_importedPart_class import Proxy_convertPart # for compat.
 from a2p_importedPart_class import ImportedPartViewProviderProxy # for compat.
 
 from a2p_topomapper import TopoMapper
+import a2p_filecache
+
 
 
 
@@ -94,24 +96,21 @@ def convertToImportedPart(doc, obj):
 
     newObj.a2p_Version = A2P_VERSION
     newObj.sourceFile = filename
+    newObj.sourcePart = ""
     newObj.localSourceObject = obj.Name
-    #newObj.sourcePart = ""
-    newObj.setEditorMode("timeLastImport",1)
-    newObj.timeLastImport = time.time()
     newObj.fixedPosition = False
     newObj.subassemblyImport = False
     newObj.setEditorMode("subassemblyImport",1)
     newObj.updateColors = True
-
     newObj.ViewObject.ShapeColor = obj.ViewObject.ShapeColor
     
-    #-------------------------------------------
-    # Initialize the new TopoMapper
-    #-------------------------------------------
-    topoMapper = TopoMapper(doc)
-    newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = \
-        topoMapper.createTopoNames(desiredShapeLabel = obj.Label)
-
+    entry = a2p_filecache.fileCache.getFullEntry(newObj)
+    newObj.timeLastImport = entry.sourcePartCreationTime
+    newObj.setEditorMode("timeLastImport",1)
+    newObj.muxInfo = []
+    newObj.Shape = entry.shape
+    newObj.ViewObject.DiffuseColor = entry.diffuseColor
+    
     for p in obj.ViewObject.PropertiesList: 
         if hasattr(obj.ViewObject, p) and p not in [
                 'DiffuseColor',

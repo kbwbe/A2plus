@@ -105,6 +105,93 @@ class a2p_reAdjustConstraintDirectionsCommand:
             }
 FreeCADGui.addCommand('a2p_reAdjustConstraintDirectionsCommand', a2p_reAdjustConstraintDirectionsCommand())
 #==============================================================================
+def updateConstraintsGeoRefs(doc,obj,cacheContent):
+    if not a2plib.getUseTopoNaming(): return
+    
+    # return if there are no constraints linked to the object 
+    if len([c for c in doc.Objects if  'ConstraintInfo' in c.Content and obj.Name in [c.Object1, c.Object2] ]) == 0:
+        return
+
+    deletionList = [] #for broken constraints
+
+    partName = obj.Name
+    for c in doc.Objects:
+        if 'ConstraintInfo' in c.Content:
+            if partName == c.Object1:
+                SubElement = "SubElement1"
+                topoName = "Toponame1"
+            elif partName == c.Object2:
+                SubElement = "SubElement2"
+                topoName = "Toponame2"
+            else:
+                SubElement = None
+            
+            topoString = None    
+            try:
+                topoString = getattr(c,topoName)
+            except:
+                pass
+            
+            if topoString is None or topoString == "":
+                print(u"missing toponame for {}, do not update this constraint".format(c.Name))
+                continue
+                
+            if SubElement: #same as subElement <> None
+                subElementName = getattr(c, SubElement)
+                if subElementName[:4] == 'Face':
+                    try:
+                        newIndex = cacheContent.faceNames.index(topoString)
+                        newSubElementName = 'Face'+str(newIndex+1)
+                    except:
+                        newIndex = -1
+                        newSubElementName = 'INVALID'
+                        
+                elif subElementName[:4] == 'Edge':
+                    try:
+                        newIndex = cacheContent.edgeNames.index(topoString)
+                        newSubElementName = 'Edge'+str(newIndex+1)
+                    except:
+                        newIndex = -1
+                        newSubElementName = 'INVALID'
+                        
+                elif subElementName[:6] == 'Vertex':
+                    try:
+                        newIndex = cacheContent.vertexNames.index(topoString)
+                        newSubElementName = 'Vertex'+str(newIndex+1)
+                    except:
+                        newIndex = -1
+                        newSubElementName = 'INVALID'
+                        
+                else:
+                    newIndex = -1
+                    newSubElementName = 'INVALID'
+                
+                if newIndex >= 0:
+                    setattr(c, SubElement, newSubElementName )
+                    print (u"Updating by SubElement-Map: {} => {} ".format(
+                               subElementName,newSubElementName
+                               )
+                           )
+                    continue
+                #
+                # if code coming here, constraint is broken
+                if c.Name not in deletionList:
+                    deletionList.append(c.Name)
+
+    if len(deletionList) > 0: # there are broken constraints..
+        for cName in deletionList:
+        
+            flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.Abort
+            message = "Constraint %s is broken. Delete constraint? Otherwise check for wrong linkage." % cName
+            #response = QtGui.QMessageBox.critical(QtGui.qApp.activeWindow(), "Broken Constraint", message, flags )
+            response = QtGui.QMessageBox.critical(None, "Broken Constraint", message, flags )
+        
+            if response == QtGui.QMessageBox.Yes:
+                FreeCAD.Console.PrintError("Removing constraint %s" % cName)
+                c = doc.getObject(cName)
+                a2plib.removeConstraint(c)
+#=====================================================================================
+
 
 
 
