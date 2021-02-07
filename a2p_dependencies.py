@@ -166,13 +166,13 @@ class Dependency():
 
             ob1 = doc.getObject(c.Object1)
             ob2 = doc.getObject(c.Object2)
-            circleEdge1 = getObjectEdgeFromName(ob1, c.SubElement1)
-            circleEdge2 = getObjectEdgeFromName(ob2, c.SubElement2)
-            dep1.refPoint = circleEdge1.Curve.Center
-            dep2.refPoint = circleEdge2.Curve.Center
-
-            axis1 = circleEdge1.Curve.Axis
-            axis2 = circleEdge2.Curve.Axis
+            
+            dep1.refPoint = getPos(ob1, c.SubElement1)
+            dep2.refPoint = getPos(ob2, c.SubElement2)
+            
+            axis1 = getAxis(ob1, c.SubElement1)
+            axis2 = getAxis(ob2, c.SubElement2)
+            
             if dep2.direction == "opposed":
                 axis2.multiply(-1.0)
             dep1.refAxisEnd = dep1.refPoint.add(axis1)
