@@ -296,12 +296,14 @@ class FileCache():
         #Search cache for entry, create an entry if there none is found            cacheKey = os.path.split(sourceFile)[1]
         singleShapeRequested = sourcePart is not None and len(sourcePart)>0
 
+
+        fileName = sourceFile
+
         if singleShapeRequested:
             cacheKey = os.path.split(sourceFile)[1] + '-'+sourcePart
         else:
             cacheKey = os.path.split(sourceFile)[1]
             
-        fileName = sourceFile
         
         if not a2plib.getRecalculateImportedParts(): #always refresh cache if recalculation is needed
             cacheEntry = self.cache.get(cacheKey,None)

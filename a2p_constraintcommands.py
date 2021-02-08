@@ -40,11 +40,22 @@ def loadToFileCache(selection):
         if ob.TypeId == 'Sketcher::SketchObject': return # do not work with cache here
         if ob.TypeId == 'Part::Part2DObjectPython': return
         
-        singleShapeRequested = ob.sourcePart is not None and len(ob.sourcePart)>0
+        sourcePart = ob.sourcePart
+        localSourceObject = ob.localSourceObject
+        sourceFile = ob.sourceFile
+        
+        singleShapeRequested = False
+        if ob.sourcePart is not None and len(ob.sourcePart)>0:
+            singleShapeRequested = True
+        if ob.localSourceObject is not None and len(ob.localSourceObject)>0:
+            singleShapeRequested = True
+            sourceFile = ob.Document.FileName
+            sourcePart = ob.Document.getObject(localSourceObject).Label
+            
         if singleShapeRequested:
-            a2p_filecache.fileCache.loadObject(ob.sourceFile,ob.sourcePart)
+            a2p_filecache.fileCache.loadObject(sourceFile,sourcePart)
         else:
-            a2p_filecache.fileCache.loadObject(ob.sourceFile, None)
+            a2p_filecache.fileCache.loadObject(sourceFile, None)
 #==============================================================================
 class a2p_PointIdentityConstraintCommand:
     def Activated(self):
