@@ -534,6 +534,8 @@ def isPartialProcessing():
 def filterShapeObs(_list, allowSketches=False):
     lst = []
     for ob in _list:
+        if ob.TypeId in ("App::Plane","App::Line","App::Origin"):
+            continue
         if allowSketches == True:
             lst.append(ob)
             continue
