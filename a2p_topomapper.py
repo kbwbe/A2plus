@@ -586,10 +586,12 @@ class TopoMapper(object):
         shape_list = []
         
         #if len(self.topLevelShapes)==1 and self.topLevelShapes[0].startswith("Sketch"):
+        importingSketch = False
         if len(self.topLevelShapes)==1: #allow everything
-            importingSketch = True
-        else:
-            importingSketch = False
+            objName = self.topLevelShapes[0]
+            ob = self.doc.getObject(objName)
+            if len(ob.Shape.Faces) == 0:
+                importingSketch = True
 
         if importingSketch == True:
             # We are importing a sketch object
