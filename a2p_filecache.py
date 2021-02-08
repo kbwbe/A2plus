@@ -32,7 +32,6 @@ import sys
 import a2plib
 import a2p_topomapper
 import a2p_simpleXMLhandler
-from _threading_local import local
 
 #==============================================================================
 def createDefaultTopNames(obj): # used during converting an object to a2p object
@@ -189,6 +188,7 @@ def getOrCreateA2pFile(
             if os.path.exists( a2pFileName ):
                 a2pFileCreationTime = os.path.getmtime( a2pFileName )
                 if a2pFileCreationTime >= importDocCreationTime:
+                    print("return existing a2p-file")
                     return a2pFileName # nothing to do...
     
     #Create a new a2p file
@@ -288,8 +288,10 @@ class FileCache():
         
     def loadObject(self, sourceFile, sourcePart):
         
+        '''
         if a2plib.to_bytes(sourceFile) == b'converted':
             return False
+        '''
         
         #Search cache for entry, create an entry if there none is found            cacheKey = os.path.split(sourceFile)[1]
         singleShapeRequested = sourcePart is not None and len(sourcePart)>0
@@ -390,8 +392,16 @@ class FileCache():
         
     def getFullEntry(self,obj):
         #any single Shape requested
-        sr1 = obj.sourcePart is not None and len(obj.sourcePart)>0 
-        sr2 = obj.localSourceObject is not None and len(obj.localSourceObject)>0
+        sr1 = False
+        sr2 = False
+        try:
+            sr1 = obj.sourcePart is not None and len(obj.sourcePart)>0
+        except:
+            pass 
+        try:
+            sr2 = obj.localSourceObject is not None and len(obj.localSourceObject)>0
+        except:
+            pass 
 
         if sr1:
             if not self.loadObject(obj.sourceFile, obj.sourcePart):

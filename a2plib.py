@@ -124,7 +124,6 @@ A2P_CONSTRAINTS_ICON_MAP = {
 #------------------------------------------------------------------------------
 tmp = platform.system()
 tmp = tmp.upper()
-#print("loading A2plus on operating system '{}'".format(tmp))
 tmp = tmp.split(' ')
 
 OPERATING_SYSTEM = 'UNKNOWN'
@@ -536,9 +535,8 @@ def filterShapeObs(_list, allowSketches=False):
     lst = []
     for ob in _list:
         if allowSketches == True:
-            if ob.Name.startswith("Sketch"):
-                lst.append(ob)
-                continue
+            lst.append(ob)
+            continue
         if (
             #Following object now have App::GeoFeatureGroupExtension in FC0.19
             #prevent them from beeing filtered out.

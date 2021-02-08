@@ -433,7 +433,8 @@ class TopoMapper(object):
             inList,dummy = self.treeNodes[objName]
             if self.isTopLevelInList(inList):
                 self.topLevelShapes.append(objName)
-            elif allowSketches==True and objName.startswith('Sketch'): # want to have all sketches
+            #elif allowSketches==True and objName.startswith('Sketch'): # want to have all sketches
+            elif allowSketches==True: # allow everything
                 self.topLevelShapes.append(objName)
             else:
                 #-------------------------------------------
@@ -584,7 +585,8 @@ class TopoMapper(object):
         transparency = 0
         shape_list = []
         
-        if len(self.topLevelShapes)==1 and self.topLevelShapes[0].startswith("Sketch"):
+        #if len(self.topLevelShapes)==1 and self.topLevelShapes[0].startswith("Sketch"):
+        if len(self.topLevelShapes)==1: #allow everything
             importingSketch = True
         else:
             importingSketch = False
