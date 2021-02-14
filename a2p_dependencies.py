@@ -562,7 +562,7 @@ class DependencyPointOnPlane(Dependency):
             dot = vec1.dot(normal1)
             normal1.multiply(dot)
             moveVector = normal1
-            verticalRefPointOnPlane = vec1.sub(moveVector)  #makes spinning around possible
+            verticalRefPointOnPlane = self.refPoint.add(vec1.sub(moveVector))  #makes spinning around possible
             return verticalRefPointOnPlane, moveVector
 
         else:
