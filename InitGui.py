@@ -43,7 +43,7 @@ class A2plusWorkbench (Workbench):
         import a2plib
         self.__class__.Icon = a2plib.pathOfModule() + "/icons/a2p_Workbench.svg"
         self.__class__.MenuText = 'A2plus '+A2P_VERSION
-        self.__class__.ToolTip  = 'An other assembly workbench for FreeCAD.'
+        self.__class__.ToolTip  = QT_TRANSLATE_NOOP("A2plus_solversystem", "An other assembly workbench for FreeCAD.")
 
     def Initialize(self):
         import sys

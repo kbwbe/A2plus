@@ -82,9 +82,9 @@ class a2p_CreatePartInformationSheet_Command:
 
     def GetResources(self):
         return {
-            'Pixmap'  :     ':/icons/a2p_PartsInfo.svg',
-            'MenuText':     'Create a spreadsheet for ordering or logistics information',
-            'ToolTip':      toolTip
+            'Pixmap'  : ':/icons/a2p_PartsInfo.svg',
+            'MenuText': QT_TRANSLATE_NOOP("A2plus_partinformation", "Create a spreadsheet for ordering or logistics information"),
+            'ToolTip' : toolTip
             }
         
 FreeCADGui.addCommand('a2p_CreatePartInformationSheet_Command', a2p_CreatePartInformationSheet_Command())

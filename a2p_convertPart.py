@@ -125,8 +125,8 @@ class a2p_ConvertPartCommand():
 
     def GetResources(self):
         return {'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_ConvertPart.svg',
-#                'Accel' : "Shift+C", # a default shortcut (optional)
-                'MenuText': "Convert a part to A2plus",
+#                'Accel'  : "Shift+C", # a default shortcut (optional)
+                'MenuText': QT_TRANSLATE_NOOP("A2plus_convertPart", "Convert a part to A2plus"),
                 'ToolTip' : toolTip
                 }
 

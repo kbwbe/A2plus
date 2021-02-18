@@ -260,9 +260,9 @@ class a2p_CreatePartlist():
 
     def GetResources(self):
         return {
-            'Pixmap'  :     ':/icons/a2p_PartsList.svg',
-            'MenuText':     'Create a spreadsheet with a parts list of this file',
-            'ToolTip':      toolTip
+            'Pixmap'  : ':/icons/a2p_PartsList.svg',
+            'MenuText': QT_TRANSLATE_NOOP("A2plus_CreatePartlist", "Create a spreadsheet with a parts list of this file"),
+            'ToolTip' : toolTip
             }
         
 FreeCADGui.addCommand('a2p_CreatePartlist', a2p_CreatePartlist())

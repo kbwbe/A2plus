@@ -114,10 +114,10 @@ class a2p_recursiveToponamingMigrationCommand:
                 pass
         print("=================")
         for f in baseSourceFiles: # this are the basic parts, no one is an assembly
-            print(u"create a2p file for '{}'".format(f))
+            print(translate(u"create a2p file for '{}'".format(f)))
             a2p_filecache.fileCache.loadObject(f) #recent version of part should be in cache now
         print("=================")
-        print("Assemblies to be updated..")
+        print(translate("A2plus", "Assemblies to be updated.."))
         for f in assembliesToUpdate:
             print(f)
         print("=================")
@@ -163,8 +163,8 @@ class a2p_recursiveToponamingMigrationCommand:
     def GetResources(self):
         return {
             #'Pixmap' : ':/icons/a2p_RecursiveUpdate.svg',
-            'MenuText': 'migrate to new toponaming recursively',
-            'ToolTip': toolTip
+            'MenuText': QT_TRANSLATE_NOOP("A2plus_recursiveToponamingMigration", "Migrate to new toponaming recursively"),
+            'ToolTip' : toolTip
             }
 
 FreeCADGui.addCommand('a2p_recursiveToponamingMigrationCommand', a2p_recursiveToponamingMigrationCommand())
@@ -223,9 +223,9 @@ class a2p_MigrateProxiesCommand():
 
     def GetResources(self):
         return {
-            'Pixmap' : ':/icons/a2p_Upgrade.svg',
-            'MenuText': 'Migrate proxies of imported parts',
-            'ToolTip': toolTip
+            'Pixmap'  : ':/icons/a2p_Upgrade.svg',
+            'MenuText': QT_TRANSLATE_NOOP("A2plus_recursiveToponamingMigration", "Migrate proxies of imported parts"),
+            'ToolTip' : toolTip
             }
     
 FreeCADGui.addCommand('a2p_MigrateProxiesCommand', a2p_MigrateProxiesCommand())
