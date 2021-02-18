@@ -21,6 +21,7 @@
 #***************************************************************************
 
 import FreeCAD, FreeCADGui, os
+from FreeCAD.Qt import translate
 
 import zipfile
 try:

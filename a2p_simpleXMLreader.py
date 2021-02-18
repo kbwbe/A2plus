@@ -34,6 +34,7 @@
 
 import FreeCAD
 import FreeCADGui
+from FreeCAD.Qt import translate
 import os
 import zipfile
 import xml.sax.saxutils as saxutils

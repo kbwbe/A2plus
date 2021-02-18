@@ -23,6 +23,7 @@
 import FreeCADGui,FreeCAD
 import Spreadsheet
 from PySide import QtGui, QtCore
+from FreeCAD.Qt import translate
 import os, copy, time, sys, platform
 import a2plib
 from a2p_partlistglobals import PARTLIST_COLUMN_NAMES

@@ -27,6 +27,7 @@ import math
 import copy
 import FreeCAD, FreeCADGui, Part
 from PySide import QtGui, QtCore
+from FreeCAD.Qt import translate
 from  FreeCAD import Base
 import a2plib
 from a2plib import (

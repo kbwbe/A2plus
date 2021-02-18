@@ -28,6 +28,7 @@ from FreeCAD import Base
 import  Part
 from PySide import QtGui
 from PySide import QtCore
+from FreeCAD.Qt import translate
 import os
 import sys
 import copy

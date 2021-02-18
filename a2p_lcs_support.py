@@ -22,6 +22,7 @@
 
 import FreeCAD
 import FreeCADGui
+from FreeCAD.Qt import translate
 
 
 #==============================================================================

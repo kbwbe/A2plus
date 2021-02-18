@@ -23,14 +23,15 @@
 #***************************************************************************
 
 import FreeCAD, FreeCADGui
-from a2plib import *
+from FreeCAD.Qt import translate
+from PySide import QtGui
 import Part
 import os, copy, numpy
 from random import random, choice
 from FreeCAD import  Base
 import time
 import a2plib
-from PySide import QtGui
+from a2plib import *
 
 from a2p_importedPart_class import Proxy_muxAssemblyObj # for compat
 

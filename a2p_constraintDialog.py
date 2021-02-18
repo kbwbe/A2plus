@@ -27,7 +27,7 @@ from PySide import QtGui, QtCore
 import os, sys, math, copy
 #from a2p_viewProviderProxies import *
 from  FreeCAD import Base
-
+from FreeCAD.Qt import translate
 from a2plib import *
 from a2p_solversystem import solveConstraints
 import a2p_constraints

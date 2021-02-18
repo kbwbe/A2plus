@@ -22,6 +22,7 @@
 #*                                                                         *
 #***************************************************************************
 
+from FreeCAD.Qt import translate
 import FreeCAD
 import  Part
 import a2plib

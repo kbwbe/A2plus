@@ -22,6 +22,7 @@
 
 import FreeCADGui,FreeCAD
 from PySide import QtGui, QtCore
+from FreeCAD.Qt import translate
 import Spreadsheet
 import os
 import string

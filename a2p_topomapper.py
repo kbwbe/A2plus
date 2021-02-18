@@ -92,6 +92,7 @@ parts are been edited.
 
 
 from PySide import QtGui, QtCore
+from FreeCAD.Qt import translate
 import FreeCAD, FreeCADGui, Part
 from FreeCAD import Base
 import a2plib
