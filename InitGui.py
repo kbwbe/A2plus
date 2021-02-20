@@ -26,7 +26,7 @@
 __title__ = 'A2plus assembly Workbench - InitGui file'
 __author__ = 'kbwbe'
 
-A2P_VERSION = 'V0.4.50a'
+A2P_VERSION = 'V0.4.51'
 
 import FreeCAD
 import FreeCADGui
@@ -44,6 +44,7 @@ class A2plusWorkbench (Workbench):
 
     def __init__(self):
         global A2P_VERSION
+        from a2p_translateUtils import QT_TRANSLATE_NOOP
         import a2plib
         self.__class__.Icon = a2plib.pathOfModule() + "/icons/a2p_Workbench.svg"
         self.__class__.MenuText = 'A2plus '+A2P_VERSION
