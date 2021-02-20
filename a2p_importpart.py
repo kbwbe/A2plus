@@ -1718,7 +1718,7 @@ class a2p_Show_DOF_info_Command:
         return dofGroup != None
 
     def GetResources(self):
-        return 
+        return {
             'Pixmap'   : a2plib.pathOfModule()+'/icons/a2p_DOFs.svg',
             'MenuText' : QT_TRANSLATE_NOOP("A2plus_importpart", "Print detailed DOF information"),
             'ToolTip'  : QT_TRANSLATE_NOOP("A2plus_importpart", "Toggle printing detailed DOF information"),

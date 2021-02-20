@@ -26,6 +26,7 @@ import Spreadsheet
 import os
 import string
 
+from a2p_translateUtils import *
 import a2plib
 #from a2p_fcdocumentreader import FCdocumentReader
 from a2p_simpleXMLreader import FCdocumentReader
