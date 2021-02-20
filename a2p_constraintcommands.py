@@ -52,9 +52,9 @@ class a2p_PointIdentityConstraintCommand:
 
     def GetResources(self):
         return {
-             'Pixmap' : path_a2p + '/icons/a2p_PointIdentity.svg',
-             'MenuText': 'Add pointIdentity constraint',
-             'ToolTip': a2p_constraints.PointIdentityConstraint.getToolTip()
+             'Pixmap'  : path_a2p + '/icons/a2p_PointIdentity.svg',
+             'MenuText': QT_TRANSLATE_NOOP("A2plus_constraintcommands", "Add pointIdentity constraint"),
+             'ToolTip' : a2p_constraints.PointIdentityConstraint.getToolTip()
              }
 
 FreeCADGui.addCommand('a2p_PointIdentityConstraintCommand', a2p_PointIdentityConstraintCommand())
@@ -78,9 +78,9 @@ class a2p_PointOnLineConstraintCommand:
 
     def GetResources(self): 
         return {
-             'Pixmap' : path_a2p + '/icons/a2p_PointOnLineConstraint.svg', 
-             'MenuText': 'Add pointOnLine constraint', 
-             'ToolTip': a2p_constraints.PointOnLineConstraint.getToolTip()
+             'Pixmap'  : path_a2p + '/icons/a2p_PointOnLineConstraint.svg', 
+             'MenuText': QT_TRANSLATE_NOOP("A2plus_constraintcommands", "Add pointOnLine constraint"), 
+             'ToolTip' : a2p_constraints.PointOnLineConstraint.getToolTip()
              } 
 
 FreeCADGui.addCommand('a2p_PointOnLineConstraintCommand', a2p_PointOnLineConstraintCommand())
@@ -104,9 +104,9 @@ class a2p_PointOnPlaneConstraintCommand:
 
     def GetResources(self):
         return {
-             'Pixmap' : path_a2p + '/icons/a2p_PointOnPlaneConstraint.svg',
-             'MenuText': 'Add pointOnPlane constraint',
-             'ToolTip': a2p_constraints.PointOnPlaneConstraint.getToolTip()
+             'Pixmap'  : path_a2p + '/icons/a2p_PointOnPlaneConstraint.svg',
+             'MenuText': QT_TRANSLATE_NOOP("A2plus_constraintcommands", "Add pointOnPlane constraint"),
+             'ToolTip' : a2p_constraints.PointOnPlaneConstraint.getToolTip()
              }
 
 FreeCADGui.addCommand('a2p_PointOnPlaneConstraintCommand', a2p_PointOnPlaneConstraintCommand())
@@ -130,7 +130,7 @@ class a2p_SphericalSurfaceConstraintCommand:
     def GetResources(self):
         return {
             'Pixmap' : path_a2p + '/icons/a2p_SphericalSurfaceConstraint.svg',
-            'MenuText': 'Add sphereCenterIdent constraint',
+            'MenuText': QT_TRANSLATE_NOOP("A2plus_constraintcommands", "Add sphereCenterIdent constraint"),
              'ToolTip': a2p_constraints.SphericalConstraint.getToolTip()
             }
 
@@ -154,9 +154,9 @@ class a2p_CircularEdgeConnectionCommand:
 
     def GetResources(self):
         return {
-            'Pixmap' : path_a2p + '/icons/a2p_CircularEdgeConstraint.svg' ,
-            'MenuText': 'Add circularEdge constraint',
-             'ToolTip': a2p_constraints.CircularEdgeConstraint.getToolTip()
+            'Pixmap'  : path_a2p + '/icons/a2p_CircularEdgeConstraint.svg' ,
+            'MenuText': QT_TRANSLATE_NOOP("A2plus_constraintcommands", "Add circularEdge constraint"),
+            'ToolTip' : a2p_constraints.CircularEdgeConstraint.getToolTip()
             }
 
 FreeCADGui.addCommand('a2p_CircularEdgeConnection', a2p_CircularEdgeConnectionCommand())
@@ -179,9 +179,9 @@ class a2p_AxialConstraintCommand:
 
     def GetResources(self):
         return {
-             'Pixmap' : path_a2p + '/icons/a2p_AxialConstraint.svg',
-             'MenuText': 'Add axis Coincident constraint',
-             'ToolTip': a2p_constraints.AxialConstraint.getToolTip()
+             'Pixmap'  : path_a2p + '/icons/a2p_AxialConstraint.svg',
+             'MenuText': QT_TRANSLATE_NOOP("A2plus_constraintcommands", "Add axis Coincident constraint"),
+             'ToolTip' : a2p_constraints.AxialConstraint.getToolTip()
              }
 
 FreeCADGui.addCommand('a2p_AxialConstraintCommand', a2p_AxialConstraintCommand())
@@ -204,9 +204,9 @@ class a2p_AxisParallelConstraintCommand:
 
     def GetResources(self):
         return {
-             'Pixmap' : ':/icons/a2p_AxisParallelConstraint.svg',
-             'MenuText': 'Add axisParallel constraint',
-             'ToolTip': a2p_constraints.AxisParallelConstraint.getToolTip()
+             'Pixmap'  : ':/icons/a2p_AxisParallelConstraint.svg',
+             'MenuText': QT_TRANSLATE_NOOP("A2plus_constraintcommands", "Add axisParallel constraint"),
+             'ToolTip' : a2p_constraints.AxisParallelConstraint.getToolTip()
              }
 
 FreeCADGui.addCommand('a2p_AxisParallelConstraintCommand', a2p_AxisParallelConstraintCommand())
@@ -229,9 +229,9 @@ class a2p_AxisPlaneParallelCommand:
 
     def GetResources(self):
         return {
-             'Pixmap' : ':/icons/a2p_AxisPlaneParallelConstraint.svg',
-             'MenuText': 'Add axisPlaneParallel constraint',
-             'ToolTip': a2p_constraints.AxisPlaneParallelConstraint.getToolTip()
+             'Pixmap'  : ':/icons/a2p_AxisPlaneParallelConstraint.svg',
+             'MenuText': QT_TRANSLATE_NOOP("A2plus_constraintcommands", "Add axisPlaneParallel constraint"),
+             'ToolTip' : a2p_constraints.AxisPlaneParallelConstraint.getToolTip()
              }
 
 FreeCADGui.addCommand('a2p_AxisPlaneParallelCommand', a2p_AxisPlaneParallelCommand())
@@ -254,9 +254,9 @@ class a2p_AxisPlaneAngleCommand:
 
     def GetResources(self):
         return {
-             'Pixmap' : ':/icons/a2p_AxisPlaneAngleConstraint.svg',
-             'MenuText': 'Add axisPlaneAngle constraint',
-             'ToolTip': a2p_constraints.AxisPlaneAngleConstraint.getToolTip()
+             'Pixmap'  : ':/icons/a2p_AxisPlaneAngleConstraint.svg',
+             'MenuText': QT_TRANSLATE_NOOP("A2plus_constraintcommands", "Add axisPlaneAngle constraint"),
+             'ToolTip' : a2p_constraints.AxisPlaneAngleConstraint.getToolTip()
              }
 
 FreeCADGui.addCommand('a2p_AxisPlaneAngleCommand', a2p_AxisPlaneAngleCommand())
@@ -279,9 +279,9 @@ class a2p_AxisPlaneNormalCommand:
 
     def GetResources(self):
         return {
-             'Pixmap' : ':/icons/a2p_AxisPlaneNormalConstraint.svg',
-             'MenuText': 'Add axisPlaneNormal constraint',
-             'ToolTip': a2p_constraints.AxisPlaneNormalConstraint.getToolTip()
+             'Pixmap'  : ':/icons/a2p_AxisPlaneNormalConstraint.svg',
+             'MenuText': QT_TRANSLATE_NOOP("A2plus_constraintcommands", "Add axisPlaneNormal constraint"),
+             'ToolTip' : a2p_constraints.AxisPlaneNormalConstraint.getToolTip()
              }
 
 FreeCADGui.addCommand('a2p_AxisPlaneNormalCommand', a2p_AxisPlaneNormalCommand())
@@ -304,9 +304,9 @@ class a2p_PlanesParallelConstraintCommand:
 
     def GetResources(self):
         return {
-             'Pixmap' : path_a2p + '/icons/a2p_PlanesParallelConstraint.svg',
-             'MenuText': 'Add planesParallel constraint',
-             'ToolTip': a2p_constraints.PlanesParallelConstraint.getToolTip()
+             'Pixmap'  : path_a2p + '/icons/a2p_PlanesParallelConstraint.svg',
+             'MenuText': QT_TRANSLATE_NOOP("A2plus_constraintcommands", "Add planesParallel constraint"),
+             'ToolTip' : a2p_constraints.PlanesParallelConstraint.getToolTip()
              }
 
 FreeCADGui.addCommand('a2p_PlanesParallelConstraintCommand', a2p_PlanesParallelConstraintCommand())
@@ -329,9 +329,9 @@ class a2p_PlaneCoincidentConstraintCommand:
 
     def GetResources(self):
         return {
-             'Pixmap' : path_a2p + '/icons/a2p_PlaneCoincidentConstraint.svg',
-             'MenuText': 'Add planeCoincident constraint',
-             'ToolTip': a2p_constraints.PlaneConstraint.getToolTip()
+             'Pixmap'  : path_a2p + '/icons/a2p_PlaneCoincidentConstraint.svg',
+             'MenuText': QT_TRANSLATE_NOOP("A2plus_constraintcommands", "Add planeCoincident constraint"),
+             'ToolTip' : a2p_constraints.PlaneConstraint.getToolTip()
              }
 
 FreeCADGui.addCommand('a2p_PlaneCoincidentConstraintCommand', a2p_PlaneCoincidentConstraintCommand())
@@ -355,9 +355,9 @@ class a2p_AngledPlanesConstraintCommand:
 
     def GetResources(self):
         return {
-             'Pixmap' : path_a2p + '/icons/a2p_AngleConstraint.svg',
-             'MenuText': 'Add angledPlanes constraint',
-             'ToolTip': a2p_constraints.AngledPlanesConstraint.getToolTip()
+             'Pixmap'  : path_a2p + '/icons/a2p_AngleConstraint.svg',
+             'MenuText': QT_TRANSLATE_NOOP("A2plus_constraintcommands", "Add angledPlanes constraint"),
+             'ToolTip' : a2p_constraints.AngledPlanesConstraint.getToolTip()
              }
 
 FreeCADGui.addCommand('a2p_AngledPlanesConstraintCommand', a2p_AngledPlanesConstraintCommand())
@@ -382,9 +382,9 @@ class a2p_CenterOfMassConstraintCommand:
 
     def GetResources(self):
         return {
-             'Pixmap' : path_a2p + '/icons/a2p_CenterOfMassConstraint.svg',
-             'MenuText': 'Add centerOfMass constraint',
-             'ToolTip': a2p_constraints.CenterOfMassConstraint.getToolTip()
+             'Pixmap'  : path_a2p + '/icons/a2p_CenterOfMassConstraint.svg',
+             'MenuText': QT_TRANSLATE_NOOP("A2plus_constraintcommands", "Add centerOfMass constraint"),
+             'ToolTip' : a2p_constraints.CenterOfMassConstraint.getToolTip()
              }
 
 FreeCADGui.addCommand('a2p_CenterOfMassConstraintCommand', a2p_CenterOfMassConstraintCommand())
