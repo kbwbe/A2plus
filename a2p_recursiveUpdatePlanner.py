@@ -205,9 +205,9 @@ class a2p_recursiveUpdateImportedPartsCommand:
 
     def GetResources(self):
         return {
-            'Pixmap' : ':/icons/a2p_RecursiveUpdate.svg',
-            'MenuText': 'Update imports recursively',
-            'ToolTip': toolTip
+            'Pixmap'  : ':/icons/a2p_RecursiveUpdate.svg',
+            'MenuText': QT_TRANSLATE_NOOP("A2plus_recursiveUpdatePlanner", "Update imports recursively"),
+            'ToolTip' : toolTip
             }
 
 FreeCADGui.addCommand('a2p_recursiveUpdateImportedPartsCommand', a2p_recursiveUpdateImportedPartsCommand())

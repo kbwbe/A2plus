@@ -1039,9 +1039,9 @@ class a2p_ConstraintDialogCommand:
 
     def GetResources(self):
         return {
-             'Pixmap' : ':/icons/a2p_DefineConstraints.svg',
-             'MenuText': 'Define constraints',
-             'ToolTip': toolTipText
+             'Pixmap'  : ':/icons/a2p_DefineConstraints.svg',
+             'MenuText': QT_TRANSLATE_NOOP("A2plus_constraintDialog", "Define constraints"),
+             'ToolTip' : toolTipText
              }
 
 FreeCADGui.addCommand('a2p_ConstraintDialogCommand', a2p_ConstraintDialogCommand())
@@ -1090,9 +1090,9 @@ class a2p_EditConstraintCommand:
 
     def GetResources(self):
         return {
-             'Pixmap' : ':/icons/a2p_EditConstraint.svg',
-             'MenuText': 'Edit selected constraint',
-             'ToolTip': toolTipText
+             'Pixmap'  : ':/icons/a2p_EditConstraint.svg',
+             'MenuText': QT_TRANSLATE_NOOP("A2plus_constraintDialog", "Edit selected constraint"),
+             'ToolTip' : toolTipText
              }
 
 FreeCADGui.addCommand('a2p_EditConstraintCommand', a2p_EditConstraintCommand())
