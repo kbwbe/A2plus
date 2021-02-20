@@ -25,6 +25,7 @@
 import FreeCAD
 import FreeCADGui
 from PySide import QtGui
+from a2p_translateUtils import *
 import a2plib
 import a2p_constraints
 

@@ -21,6 +21,7 @@
 #***************************************************************************
 
 import FreeCAD, FreeCADGui, os
+from a2p_translateUtils import *
 
 import zipfile
 try:

@@ -29,6 +29,7 @@ import os, copy, numpy
 from random import random, choice
 from FreeCAD import  Base
 import time
+from a2p_translateUtils import *
 import a2plib
 from PySide import QtGui
 

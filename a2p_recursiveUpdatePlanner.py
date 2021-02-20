@@ -25,6 +25,7 @@ import FreeCAD
 from PySide import QtGui
 import os
 
+from a2p_translateUtils import *
 import a2plib
 from a2p_importpart import updateImportedParts
 from a2p_simpleXMLreader import FCdocumentReader

@@ -28,6 +28,7 @@ import os
 import copy
 import sys
 import platform
+from a2p_translateUtils import *
 import a2plib
 from a2p_MuxAssembly import muxAssemblyWithTopoNames
 from a2p_versionmanagement import A2P_VERSION

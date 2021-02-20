@@ -1,6 +1,10 @@
+# -*- coding: utf8 -*-
+
 #***************************************************************************
 #*                                                                         *
-#*   Copyright (c) 2018 kbwbe                                              *
+#*   Copyright (c) 2020 kbwbe                                              *
+#*                                                                         *
+#*   Code taken from BIM-Workbench of Yorik van Havre <yorik@uncreated.net>*
 #*                                                                         *
 #*   This program is free software; you can redistribute it and/or modify  *
 #*   it under the terms of the GNU Lesser General Public License (LGPL)    *
@@ -20,18 +24,16 @@
 #*                                                                         *
 #***************************************************************************
 
+"""Locate the translation utils"""
 
-import FreeCADGui,FreeCAD
-from PySide import QtGui, QtCore
-import os, copy, time
-from a2p_translateUtils import *
-import a2plib
+import FreeCAD
 
+# dummy function for the QT translator
+def QT_TRANSLATE_NOOP(ctx,txt): 
+    return txt
 
-class RedoUndoObserver(object):
-    def slotRedoDocument(self,doc):
-        a2plib.a2p_repairTreeView()
-    def slotUndoDocument(self,doc):
-        a2plib.a2p_repairTreeView()
-
-redoUndoObserver = RedoUndoObserver()
+# use latest available translate function
+if hasattr(FreeCAD,"Qt"):
+    translate = FreeCAD.Qt.translate
+else:
+    from DraftTools import translate

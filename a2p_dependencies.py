@@ -24,6 +24,7 @@ import random
 import math
 import FreeCAD, FreeCADGui, Part
 from  FreeCAD import Base
+from a2p_translateUtils import *
 import a2plib
 from a2plib import (
     getObjectEdgeFromName,

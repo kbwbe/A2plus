@@ -22,6 +22,7 @@
 
 import FreeCAD, FreeCADGui
 from PySide import QtGui
+from a2p_translateUtils import *
 import a2plib
 from a2plib import (
     path_a2p,

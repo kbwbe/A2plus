@@ -94,6 +94,7 @@ parts are been edited.
 import FreeCAD
 import Part
 from FreeCAD import Base
+from a2p_translateUtils import *
 import a2plib
 
 class TopoMapper(object):

@@ -27,6 +27,7 @@ from PySide import QtGui, QtCore
 import os, sys, math, copy
 #from a2p_viewProviderProxies import *
 from  FreeCAD import Base
+from a2p_translateUtils import *
 
 import a2plib
 from a2plib import *

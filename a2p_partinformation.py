@@ -24,6 +24,7 @@ import FreeCADGui,FreeCAD
 import Spreadsheet
 from PySide import QtGui, QtCore
 import os, copy, time, sys, platform
+from a2p_translateUtils import *
 import a2plib
 from a2p_partlistglobals import PARTLIST_COLUMN_NAMES
 

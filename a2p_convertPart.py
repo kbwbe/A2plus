@@ -27,6 +27,7 @@ import FreeCAD
 from PySide import QtGui
 import copy
 import time
+from a2p_translateUtils import *
 import a2plib
 from a2p_MuxAssembly import createTopoInfo
 from a2p_versionmanagement import A2P_VERSION

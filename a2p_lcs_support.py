@@ -22,6 +22,7 @@
 
 import FreeCAD
 import FreeCADGui
+from a2p_translateUtils import *
 
 
 #==============================================================================

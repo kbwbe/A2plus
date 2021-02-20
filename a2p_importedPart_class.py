@@ -30,6 +30,7 @@ import copy
 import numpy
 from FreeCAD import  Base
 from PySide import QtGui
+from a2p_translateUtils import *
 import a2plib
 from a2p_versionmanagement import A2P_VERSION
 #==============================================================================

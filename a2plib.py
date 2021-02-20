@@ -34,6 +34,8 @@ import copy
 import platform
 import numpy
 from pivy import coin
+from a2p_translateUtils import *
+
 
 PYVERSION =  sys.version_info[0]
 

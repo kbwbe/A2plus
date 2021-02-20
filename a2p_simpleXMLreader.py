@@ -37,6 +37,7 @@ import os
 import zipfile
 import xml.sax.saxutils as saxutils
 
+from a2p_translateUtils import *
 import a2plib
 
 #===========================================================================
