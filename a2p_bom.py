@@ -134,7 +134,7 @@ def createPartList(
 
 
 #------------------------------------------------------------------------------
-toolTip = tr_(
+toolTip = translate("A2plus",
 '''
 Create a spreadsheet with a
 parts list of this file.

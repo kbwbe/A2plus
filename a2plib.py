@@ -463,7 +463,7 @@ def fit_plane_to_surface1( surface, n_u=3, n_v=3 ):
     uv = sum( [ [ (u,v) for u in numpy.linspace(0,1,n_u)] for v in numpy.linspace(0,1,n_v) ], [] )
     P = [ surface.value(u,v) for u,v in uv ] #positions at u,v points
     N = [ numpy.cross( *surface.tangent(u,v) ) for u,v in uv ] 
-    plane_norm = sum(N) / len(N) #plane's normal, averaging done to reduce error
+    plane_norm = sum(N) / len(N) #planes normal, averaging done to reduce error
     plane_pos = P[0]
     error = sum([ abs( numpy.dot(p - plane_pos, plane_norm) ) for p in P ])
     return numpyVecToFC(plane_norm), numpyVecToFC(plane_pos), error
@@ -503,7 +503,7 @@ def pathToOS(path):
 #------------------------------------------------------------------------------
 def findFile(_name, _path):
     '''
-    Searches a file within a directory and it's subdirectories
+    Searches a file within a directory and its subdirectories
     '''
     name = to_str(_name)
     path = to_str(_path)
@@ -1019,7 +1019,7 @@ def isA2pPart(obj):
         if 'importPart' in obj.Content:
             result = True
     elif hasattr(obj,"a2p_Version"):          # keep old assembly item identification in,
-        result = True                         #  -> otherwise toggle transparency won't work
+        result = True                         #  -> otherwise toggle transparency wont work
     elif hasattr(obj,"subassemblyImport"):    # another possible assembly item
         result = True
     elif hasattr(obj,"assembly2Version"):    # another possible assembly item (very old a2p versions)

@@ -60,6 +60,15 @@ os.system(
         )
     )
 
+os.system(
+    'pyside-lupdate *.py -ts translations/A2plus.ts -verbose'
+    )
+'''
+os.system(
+    'lrelease "translations/A2plus.ts"'
+    )
+'''
+
 os.remove(qrc_filename)
 
 '''NOTES: (adding Translations...)

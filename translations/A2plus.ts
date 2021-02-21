@@ -1,12 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="de_DE" sourcelanguage="en_GB">
+<TS version="2.1" language="de_DE">
+<context>
+    <name>A2plus</name>
+    <message>
+        <location filename="a2p_bom.py" line="164"/>
+        <source>
+Create a spreadsheet with a
+parts list of this file.
+
+This function will read out
+the #PARTINFO# spreadsheet of
+all involved parts of the
+assembly and create a new
+spreadsheet containing the
+parts list.
+
+This button will open a dialog
+with the Question:
+- Iterate recursively over
+     all subassenblies?
+
+Answer Yes:
+All parts of all subassemblies are
+collected to the partlist
+
+Answer No:
+Only the parts within the
+recent assembly are collected.
+</source>
+        <translation>
+Erstelle eine Stücklistentabelle für diese Datei
+
+This function will read out
+the #PARTINFO# spreadsheet of
+all involved parts of the
+assembly and create a new
+spreadsheet containing the
+parts list.
+
+This button will open a dialog
+with the Question:
+- Iterate recursively over
+     all subassenblies?
+
+Answer Yes:
+All parts of all subassemblies are
+collected to the partlist
+
+Answer No:
+Only the parts within the
+recent assembly are collected.
+</translation>
+    </message>
+</context>
 <context>
     <name>A2plus_CreatePartlist</name>
     <message>
         <location filename="a2p_bom.py" line="263"/>
         <source>Create a spreadsheet with a parts list of this file</source>
-        <translation type="unfinished">Erzeuge ein Stücklisten-Tabellenblatt für diese Datei</translation>
+        <translation>Erstelle eine Stücklistentabelle für diese Datei</translation>
     </message>
 </context>
 <context>
@@ -289,6 +342,11 @@
 <context>
     <name>A2plus_solversystem</name>
     <message>
+        <location filename="InitGui.py" line="53"/>
+        <source>An other assembly workbench for FreeCAD.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="a2p_solversystem.py" line="711"/>
         <source>Solve constraints</source>
         <translation type="unfinished"></translation>
@@ -296,11 +354,6 @@
     <message>
         <location filename="a2p_solversystem.py" line="715"/>
         <source>Solves constraints</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="InitGui.py" line="53"/>
-        <source>An other assembly workbench for FreeCAD.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
