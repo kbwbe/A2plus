@@ -4,7 +4,6 @@
 #*                                                                         *
 #*   Copyright (c) 2020 kbwbe                                              *
 #*                                                                         *
-#*   Code taken from BIM-Workbench of Yorik van Havre <yorik@uncreated.net>*
 #*                                                                         *
 #*   This program is free software; you can redistribute it and/or modify  *
 #*   it under the terms of the GNU Lesser General Public License (LGPL)    *
@@ -24,16 +23,18 @@
 #*                                                                         *
 #***************************************************************************
 
-"""Locate the translation utils"""
-
 import FreeCAD
 
-# dummy function for the QT translator
-def QT_TRANSLATE_NOOP(ctx,txt): 
-    return txt
 
-# use latest available translate function
-if hasattr(FreeCAD,"Qt"):
-    translate = FreeCAD.Qt.translate
+if FreeCAD.GuiUp:
+    from PySide.QtCore import QT_TRANSLATE_NOOP
+    from DraftGui import translate
 else:
-    from DraftTools import translate
+    def QT_TRANSLATE_NOOP(context, text):
+        return text
+
+    def translate(context, text):
+        return text
+    
+def _tr(text):
+    return translate("A2plus", text)    
