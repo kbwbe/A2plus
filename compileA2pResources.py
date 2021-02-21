@@ -61,3 +61,16 @@ os.system(
     )
 
 os.remove(qrc_filename)
+
+'''NOTES: (adding Translations...)
+# gather the strings from the .py files of the WB
+pyside-lupdate *.py -ts translations/pyfiles.ts -verbose
+
+# merge ts files if there is more then one...
+# lconvert is not found on my system without path ???
+/usr/lib/x86_64-linux-gnu/qt5/bin/lconvert -i translations/pyfiles.ts another.ts -o translations/A2plus
+
+# convert .ts files to .qm files (compiled translations)
+lrelease "translations/A2plus.ts"
+
+'''
