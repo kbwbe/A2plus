@@ -134,7 +134,7 @@ def createPartList(
 
 
 #------------------------------------------------------------------------------
-toolTip = \
+toolTip = tr_(
 '''
 Create a spreadsheet with a
 parts list of this file.
@@ -158,8 +158,8 @@ collected to the partlist
 Answer No:
 Only the parts within the
 recent assembly are collected.
-
 '''
+)
 
 class a2p_CreatePartlist():
     

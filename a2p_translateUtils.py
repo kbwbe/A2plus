@@ -36,5 +36,5 @@ else:
     def translate(context, text):
         return text
     
-def _tr(text):
+def tr_(text):
     return translate("A2plus", text)    

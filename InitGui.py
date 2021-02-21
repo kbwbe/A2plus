@@ -51,6 +51,10 @@ class A2plusWorkbench (Workbench):
         self.__class__.ToolTip  = QT_TRANSLATE_NOOP("A2plus_solversystem", "An other assembly workbench for FreeCAD.")
 
     def Initialize(self):
+        from a2p_translateUtils import QT_TRANSLATE_NOOP
+        from a2p_translateUtils import translate
+        from a2p_translateUtils import tr_
+        
         import sys
         PyVersion = sys.version_info[0]
         if PyVersion == 2:
@@ -58,6 +62,11 @@ class A2plusWorkbench (Workbench):
         else:
             import a2p_Resources3
         import a2plib
+        
+        # add translations path
+        FreeCADGui.addLanguagePath(a2plib.getLanguagePath())
+        print("languagePath of A2plus Workbench is: {}".format(a2plib.getLanguagePath()))
+        
         import a2p_importpart
         import a2p_recursiveUpdatePlanner
         import a2p_convertPart

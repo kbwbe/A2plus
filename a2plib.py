@@ -135,7 +135,9 @@ else:
     OPERATING_SYSTEM = "OTHER"
 
 
-
+#------------------------------------------------------------------------------
+def getLanguagePath():
+    return os.path.join(os.path.dirname(__file__),"translations")
 #------------------------------------------------------------------------------
 def drawDebugVectorAt(position,direction,rgbColor):
     '''
