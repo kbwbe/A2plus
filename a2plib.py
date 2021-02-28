@@ -541,7 +541,7 @@ def filterShapeObs(_list, allowSketches=False):
             continue
         if (
             #Following object now have App::GeoFeatureGroupExtension in FC0.19
-            #prevent them from beeing filtered out.
+            #prevent them from being filtered out.
             ob.Name.startswith("Boolean") or 
             ob.Name.startswith("Body")
             ):
@@ -641,7 +641,7 @@ def fit_rotation_axis_to_surface1( surface, n_u=3, n_v=3 ):
         for j in range(i+1,len(N)):
             # based on the distance_between_axes( p1, u1, p2, u2) function,
             if 1 - abs(numpy.dot( N[i], N[j])) < 10**-6:
-                continue #ignore parrallel case
+                continue #ignore parallel case
             p1_x, p1_y, p1_z = P[i]
             u1_x, u1_y, u1_z = N[i]
             p2_x, p2_y, p2_z = P[j]
