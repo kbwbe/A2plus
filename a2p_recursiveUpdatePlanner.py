@@ -25,6 +25,7 @@ import FreeCAD
 from PySide import QtGui
 import os
 
+from a2p_translateUtils import *
 import a2plib
 from a2p_importpart import updateImportedParts
 from a2p_simpleXMLreader import FCdocumentReader
@@ -204,9 +205,9 @@ class a2p_recursiveUpdateImportedPartsCommand:
 
     def GetResources(self):
         return {
-            'Pixmap' : ':/icons/a2p_RecursiveUpdate.svg',
-            'MenuText': 'Update imports recursively',
-            'ToolTip': toolTip
+            'Pixmap'  : ':/icons/a2p_RecursiveUpdate.svg',
+            'MenuText': QT_TRANSLATE_NOOP("A2plus_recursiveUpdatePlanner", "Update imports recursively"),
+            'ToolTip' : toolTip
             }
 
 FreeCADGui.addCommand('a2p_recursiveUpdateImportedPartsCommand', a2p_recursiveUpdateImportedPartsCommand())

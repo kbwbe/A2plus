@@ -24,6 +24,7 @@
 
 import FreeCAD
 import  Part
+from a2p_translateUtils import *
 import a2plib
 from a2plib import (
     path_a2p,

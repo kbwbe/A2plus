@@ -1,10 +1,9 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+# -*- coding: utf8 -*-
+
 #***************************************************************************
 #*                                                                         *
-#*   Copyright (c) 2019 kbwbe                                              *
+#*   Copyright (c) 2020 kbwbe                                              *
 #*                                                                         *
-#*   Portions of code based on hamish's assembly 2                         *
 #*                                                                         *
 #*   This program is free software; you can redistribute it and/or modify  *
 #*   it under the terms of the GNU Lesser General Public License (LGPL)    *
@@ -24,62 +23,18 @@
 #*                                                                         *
 #***************************************************************************
 
-# This script compiles the A2plus icons for py2 and py3
-# For Linux only
-# Start this file in A2plus main directory
-# Make sure pyside-rcc is installed
+import FreeCAD
 
-import os, glob
 
-qrc_filename = 'temp.qrc'
-if os.path.exists(qrc_filename):
-    os.remove(qrc_filename)
+if FreeCAD.GuiUp:
+    from PySide.QtCore import QT_TRANSLATE_NOOP
+    from DraftGui import translate
+else:
+    def QT_TRANSLATE_NOOP(context, text):
+        return text
+
+    def translate(context, text):
+        return text
     
-
-qrc = '''<RCC>
-\t<qresource prefix="/">'''
-for fn in glob.glob('./icons/*.svg'):
-    qrc = qrc + '\n\t\t<file>%s</file>' % fn
-qrc = qrc + '''\n\t</qresource>
-</RCC>'''
-
-print(qrc)
-
-f = open(qrc_filename,'w')
-f.write(qrc)
-f.close()
-
-os.system(
-    'pyside-rcc -o a2p_Resources2.py {}'.format(
-        qrc_filename
-        )
-    )
-os.system(
-    'pyside-rcc -py3 -o a2p_Resources3.py {}'.format(
-        qrc_filename
-        )
-    )
-
-os.system(
-    'pyside-lupdate *.py -ts translations/A2plus.ts -verbose'
-    )
-'''
-os.system(
-    'lrelease "translations/A2plus.ts"'
-    )
-'''
-
-os.remove(qrc_filename)
-
-'''NOTES: (adding Translations...)
-# gather the strings from the .py files of the WB
-pyside-lupdate *.py -ts translations/pyfiles.ts -verbose
-
-# merge ts files if there is more then one...
-# lconvert is not found on my system without path ???
-/usr/lib/x86_64-linux-gnu/qt5/bin/lconvert -i translations/pyfiles.ts another.ts -o translations/A2plus
-
-# convert .ts files to .qm files (compiled translations)
-lrelease "translations/A2plus.ts"
-
-'''
+def tr_(text):
+    return translate("A2plus", text)    

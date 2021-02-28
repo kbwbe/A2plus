@@ -26,6 +26,7 @@ import Spreadsheet
 import os
 import string
 
+from a2p_translateUtils import *
 import a2plib
 #from a2p_fcdocumentreader import FCdocumentReader
 from a2p_simpleXMLreader import FCdocumentReader
@@ -133,7 +134,7 @@ def createPartList(
 
 
 #------------------------------------------------------------------------------
-toolTip = \
+toolTip = translate("A2plus",
 '''
 Create a spreadsheet with a
 parts list of this file.
@@ -157,8 +158,8 @@ collected to the partlist
 Answer No:
 Only the parts within the
 recent assembly are collected.
-
 '''
+)
 
 class a2p_CreatePartlist():
     
@@ -258,9 +259,9 @@ class a2p_CreatePartlist():
 
     def GetResources(self):
         return {
-            'Pixmap'  :     ':/icons/a2p_PartsList.svg',
-            'MenuText':     'Create a spreadsheet with a parts list of this file',
-            'ToolTip':      toolTip
+            'Pixmap'  : ':/icons/a2p_PartsList.svg',
+            'MenuText': QT_TRANSLATE_NOOP("A2plus_CreatePartlist", "Create a spreadsheet with a parts list of this file"),
+            'ToolTip' : toolTip
             }
         
 FreeCADGui.addCommand('a2p_CreatePartlist', a2p_CreatePartlist())

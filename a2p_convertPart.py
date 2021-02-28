@@ -27,6 +27,7 @@ import FreeCAD
 from PySide import QtGui
 import copy
 import time
+from a2p_translateUtils import *
 import a2plib
 from a2p_MuxAssembly import createTopoInfo
 from a2p_versionmanagement import A2P_VERSION
@@ -161,8 +162,8 @@ class a2p_ConvertPartCommand():
 
     def GetResources(self):
         return {'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_ConvertPart.svg',
-#                'Accel' : "Shift+C", # a default shortcut (optional)
-                'MenuText': "Convert a part to A2plus",
+#                'Accel'  : "Shift+C", # a default shortcut (optional)
+                'MenuText': QT_TRANSLATE_NOOP("A2plus_convertPart", "Convert a part to A2plus"),
                 'ToolTip' : toolTip
                 }
 

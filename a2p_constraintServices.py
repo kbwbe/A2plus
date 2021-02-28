@@ -25,6 +25,7 @@
 import FreeCAD
 import FreeCADGui
 from PySide import QtGui
+from a2p_translateUtils import *
 import a2plib
 import a2p_constraints
 
@@ -100,8 +101,8 @@ class a2p_reAdjustConstraintDirectionsCommand:
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_ReAdjustConstraints.svg',
-            'MenuText': 'Readjust directions of all constraints',
-            'ToolTip': 'Readjust directions of all constraints to fit best'
+            'MenuText': QT_TRANSLATE_NOOP("A2plus_constraintServices", "Re-adjust directions of all constraints"),
+            'ToolTip' : QT_TRANSLATE_NOOP("A2plus_constraintServices", "Re-adjust directions of all constraints to fit best")
             }
 FreeCADGui.addCommand('a2p_reAdjustConstraintDirectionsCommand', a2p_reAdjustConstraintDirectionsCommand())
 #==============================================================================

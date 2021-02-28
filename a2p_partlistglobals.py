@@ -20,6 +20,8 @@
 #*                                                                         *
 #***************************************************************************
 
+from a2p_translateUtils import *
+
 PARTINFORMATION_SHEET_NAME = '_PARTINFO_'
 PARTINFORMATION_SHEET_LABEL = '#PARTINFO#'
 

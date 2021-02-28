@@ -26,6 +26,7 @@ import FreeCAD, FreeCADGui, Part
 from  FreeCAD import Base
 from PySide import QtGui, QtCore
 
+from a2p_translateUtils import *
 
 
 

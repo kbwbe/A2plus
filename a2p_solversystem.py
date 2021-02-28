@@ -22,6 +22,7 @@
 
 import FreeCAD, FreeCADGui
 from PySide import QtGui
+from a2p_translateUtils import *
 import a2plib
 from a2plib import (
     path_a2p,
@@ -706,9 +707,9 @@ class a2p_SolverCommand:
 
     def GetResources(self):
         return {
-            'Pixmap' : path_a2p + '/icons/a2p_Solver.svg',
-            'MenuText': 'Solve constraints',
-            'ToolTip': 'Solves constraints'
+            'Pixmap'  : path_a2p + '/icons/a2p_Solver.svg',
+            'MenuText': QT_TRANSLATE_NOOP("A2plus_solversystem", "Solve constraints"),
+            'ToolTip' : QT_TRANSLATE_NOOP("A2plus_solversystem", "Solves constraints")
             }
 
 FreeCADGui.addCommand('a2p_SolverCommand', a2p_SolverCommand())

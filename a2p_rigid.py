@@ -28,6 +28,7 @@ import copy
 import FreeCAD, FreeCADGui, Part
 from PySide import QtGui, QtCore
 from  FreeCAD import Base
+from a2p_translateUtils import *
 import a2plib
 from a2plib import (
     drawVector,

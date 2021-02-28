@@ -26,6 +26,7 @@ import FreeCAD
 import FreeCADGui
 from PySide import QtGui
 
+from a2p_translateUtils import *
 import a2plib
 import a2p_solversystem
 
@@ -105,8 +106,8 @@ Do you want to delete this constraint-pair?
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_SearchConstraintConflicts.svg',
-            'MenuText': 'Identify conflicting constraints',
-            'ToolTip': toolTipMessage
+            'MenuText': QT_TRANSLATE_NOOP("A2plus_searchConstraintConflicts", "Identify conflicting constraints"),
+            'ToolTip' : toolTipMessage
             }
 FreeCADGui.addCommand('a2p_SearchConstraintConflictsCommand', a2p_SearchConstraintConflictsCommand())
 #==============================================================================

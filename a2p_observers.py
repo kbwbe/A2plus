@@ -24,6 +24,7 @@
 import FreeCADGui,FreeCAD
 from PySide import QtGui, QtCore
 import os, copy, time
+from a2p_translateUtils import *
 import a2plib
 
 

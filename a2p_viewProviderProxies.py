@@ -25,6 +25,7 @@
 import FreeCAD, FreeCADGui
 from pivy import coin
 import traceback
+from a2p_translateUtils import *
 import a2plib
 
 #==============================================================================
