@@ -1,3 +1,6 @@
+#special a2p-files to ignore
+a2p_partlistglobals_user.py
+
 # file types to ignore
 
 *.pyc

@@ -49,6 +49,17 @@ by the parts list function of A2plus.
 '''
 
 class a2p_CreatePartInformationSheet_Command:
+    
+    def countLines(self,ss):
+        count = 1
+        try:
+            while True:
+                cellAdress = 'A{}'.format(count)
+                ss.get(cellAdress)
+                count+=1
+        except:
+            count = count -1
+        return count
 
     def Activated(self):
         doc = FreeCAD.activeDocument()
@@ -61,10 +72,32 @@ class a2p_CreatePartInformationSheet_Command:
         
         try:
             found = doc.getObject(PARTINFORMATION_SHEET_NAME)
-            if found != None: # object already exists 
+            if found != None: # object already exists
+                numLines = self.countLines(found)
+                if numLines != len(PARTLIST_COLUMN_NAMES):
+                    flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
+                    msg = u"Do you want to update the field names ?"
+                    response = QtGui.QMessageBox.information(
+                        QtGui.QApplication.activeWindow(),
+                        u"field configuration has changed",
+                        msg,
+                        flags
+                        )
+                    if response == QtGui.QMessageBox.Yes:
+                        for idx,name in enumerate(PARTLIST_COLUMN_NAMES):
+                            found.set('A'+str(idx+1),name)
+                            found.setBackground(
+                                'A1:A'+str(len(PARTLIST_COLUMN_NAMES)),
+                                (0.000000,1.000000,0.000000,1.000000)
+                                )
+                            found.setBackground(
+                                'B1:B'+str(len(PARTLIST_COLUMN_NAMES)),
+                                (0.85,0.85,0.85,1.000000)
+                                )
+                        doc.recompute()
                 return
         except:
-            pass # proceed and create the shett
+            pass # proceed and create the sheat
         
         # create a spreadsheet with a special reserved name...
         ss = doc.addObject('Spreadsheet::Sheet',PARTINFORMATION_SHEET_NAME)
