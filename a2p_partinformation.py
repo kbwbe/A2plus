@@ -61,7 +61,8 @@ class a2p_CreatePartInformationSheet_Command:
         
         try:
             found = doc.getObject(PARTINFORMATION_SHEET_NAME)
-            if found != None: return # object already exists
+            if found != None: # object already exists 
+                return
         except:
             pass # proceed and create the shett
         

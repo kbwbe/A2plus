@@ -20,30 +20,24 @@
 #*                                                                         *
 #***************************************************************************
 
+PARTINFORMATION_SHEET_NAME = '_PARTINFO_'
+PARTINFORMATION_SHEET_LABEL = '#PARTINFO#'
 
-try:
-    '''
-    use a special setup if user defined a a2p_partlistglobals_user.py file
-    '''
-    from a2p_partlistglobals_user import *
-except:
-    '''
-    The standard field setup of a2p_partlist (BoM)
-    '''
-    PARTINFORMATION_SHEET_NAME = '_PARTINFO_'
-    PARTINFORMATION_SHEET_LABEL = '#PARTINFO#'
-    
-    BOM_SHEET_NAME  = '_PARTSLIST_'  #BOM = BillOfMaterials...
-    BOM_SHEET_LABEL = '#PARTSLIST#'
-    BOM_MAX_COLS = 10
-    BOM_MAX_LENGTH = 150
-    
-    
-    PARTLIST_COLUMN_NAMES = [
-        u'IDENTNO',
-        u'DESCRIPTION',
-        u'SUPPLIER',
-        u'SUPP.IDENTNO',
-        u'SUPP.DESCRIPTION',
-        u'(FILENAME)'
-        ]
+BOM_SHEET_NAME  = '_PARTSLIST_'  #BOM = BillOfMaterials...
+BOM_SHEET_LABEL = '#PARTSLIST#'
+BOM_MAX_COLS = 20
+BOM_MAX_LENGTH = 1000
+
+
+PARTLIST_COLUMN_NAMES = [
+    u'IDENTNO',
+    u'BESCHREIBUNG',
+    u'LIEFERANT',
+    u'BESTELLNUMMER',
+    u'BESCHREIBUNG/LIEFERANT',
+    u'DXF',
+    u'PDF',
+    u'BESTELLT',
+    u'BEMERKUNG',
+    u'(FILENAME)'
+    ]
