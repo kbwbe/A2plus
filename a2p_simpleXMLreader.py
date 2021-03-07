@@ -73,6 +73,7 @@ class simpleXMLObject(object):
         sourceFileFound = False
         a2pVersionFound = False
         subAssemblyImportFound = False
+        collectToPartlistFound = False
         timeLastImportFound = False
         spreadSheetCellsFound = False
         a2pObjectTypeFound = False
@@ -122,6 +123,17 @@ class simpleXMLObject(object):
                     val = False
                 self.propertyDict[b'subassemblyImport'] = val
                 subAssemblyImportFound = True
+                
+            elif not collectToPartlistFound and line.startswith(b'<Property name="collectToPartlist"'):
+                idx+=1
+                line = self.xmlDefs[idx]
+                segments = line.split(b'"')
+                tmp = segments[1]
+                val = True
+                if tmp == b"false":
+                    val = False
+                self.propertyDict[b'collectToPartlist'] = val
+                collectToPartlistFound = True
                 
             elif not timeLastImportFound and line.startswith(b'<Property name="timeLastImport"'):
                 idx+=1
@@ -189,6 +201,15 @@ class simpleXMLObject(object):
             propFound = self.propertyDict.get(b'subassemblyImport',None)
             if propFound:
                 return self.propertyDict[b'subassemblyImport']
+            else:
+                return False
+        return False
+    
+    def collectToPartlist(self):
+        if self.isA2pObject:
+            propFound = self.propertyDict.get(b'collectToPartlist',None)
+            if propFound:
+                return self.propertyDict[b'collectToPartlist']
             else:
                 return False
         return False

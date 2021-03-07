@@ -65,6 +65,9 @@ class Proxy_importPart:
         if not "subassemblyImport" in propList:
             obj.addProperty("App::PropertyBool","subassemblyImport","importPart")
             obj.subassemblyImport = False
+        if not "collectToPartlist" in propList:
+            obj.addProperty("App::PropertyBool","collectToPartlist","importPart")
+            obj.collectToPartlist = True
         if not "updateColors" in propList:
             obj.addProperty("App::PropertyBool","updateColors","importPart")
             obj.updateColors = True

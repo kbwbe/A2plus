@@ -67,6 +67,7 @@ def createPartList(
     for ob in docReader1.getA2pObjects():
         # skip converted parts...
         if a2plib.to_str(ob.getA2pSource()) == a2plib.to_str('converted'): continue
+        if ob.collectToPartlist() == False: continue
         
         #if ob.isSubassembly() and recursive:
         if recursive:
