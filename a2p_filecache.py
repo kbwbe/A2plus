@@ -63,6 +63,7 @@ def muxAssemblyWithTopoNames(doc):
 
     visibleObjects = [ obj for obj in doc.Objects
                        if hasattr(obj,'ViewObject') and obj.ViewObject.isVisible()
+                       and hasattr(obj,'enableExport') and obj.enableExport == True #Visible objects need extra Flag now..
                        and hasattr(obj,'Shape') and len(obj.Shape.Faces) > 0
                        and hasattr(obj,'muxInfo')
                        and a2plib.isGlobalVisible(obj)

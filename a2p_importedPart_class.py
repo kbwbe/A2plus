@@ -68,6 +68,9 @@ class Proxy_importPart:
         if not "collectToPartlist" in propList:
             obj.addProperty("App::PropertyBool","collectToPartlist","importPart")
             obj.collectToPartlist = True
+        if not "enableExport" in propList:
+            obj.addProperty("App::PropertyBool","enableExport","importPart")
+            obj.enableExport = True
         if not "updateColors" in propList:
             obj.addProperty("App::PropertyBool","updateColors","importPart")
             obj.updateColors = True
@@ -76,7 +79,6 @@ class Proxy_importPart:
             obj.debugmode = False
         if a2plib.GRAPHICALDEBUG==False and "debugmode" in propList:
             obj.removeProperty("debugmode")
-            
 
         self.type = "a2p_importPart"
 
