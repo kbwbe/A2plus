@@ -211,7 +211,7 @@ class simpleXMLObject(object):
             if propFound:
                 return self.propertyDict[b'collectToPartlist']
             else:
-                return False
+                return True
         return False
     
     def getTimeLastImport(self):
