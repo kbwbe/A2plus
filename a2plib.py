@@ -37,6 +37,8 @@ import zipfile
 
 from a2p_viewProviderProxies import *
 
+#test ssh/github
+
 PYVERSION =  sys.version_info[0]
 
 preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
