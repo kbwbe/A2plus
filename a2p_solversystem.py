@@ -115,11 +115,35 @@ class SolverSystem():
         if len(rigs) > 0: return rigs[0]
         return None
 
+    def removeFaultyConstraints(self, doc):
+        '''
+        remove constraints where referenced objects do not exist anymore
+        '''
+        constraints = [ obj for obj in doc.Objects if 'ConstraintInfo' in obj.Content]
+        
+        faultyConstraintList = []
+        for c in constraints:
+            constraintOK = True
+            for attr in ['Object1','Object2']:
+                objectName = getattr(c, attr, None)
+                o = doc.getObject(objectName)
+                if o is None:
+                    constraintOK = False
+            if not constraintOK:
+                faultyConstraintList.append(c)
+
+        if len(faultyConstraintList) > 0:
+            for fc in faultyConstraintList:
+                print(u"remove faulty constraint '{}'".format(fc.Label))
+                doc.removeObject(fc.Name)
+
     def loadSystem(self,doc, matelist=None):
         self.clear()
         self.doc = doc
         self.status = "loading"
-        #
+        
+        self.removeFaultyConstraints(doc) 
+        
         self.convergencyCounter = 0
         self.lastPositionError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
         self.lastAxisError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
