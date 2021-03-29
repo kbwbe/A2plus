@@ -199,7 +199,7 @@ class simpleXMLObject(object):
     def isSubassembly(self):
         if self.isA2pObject:
             propFound = self.propertyDict.get(b'subassemblyImport',None)
-            if propFound:
+            if propFound is not None:
                 return self.propertyDict[b'subassemblyImport']
             else:
                 return False
@@ -208,7 +208,7 @@ class simpleXMLObject(object):
     def collectToPartlist(self):
         if self.isA2pObject:
             propFound = self.propertyDict.get(b'collectToPartlist',None)
-            if propFound:
+            if propFound is not None:
                 return self.propertyDict[b'collectToPartlist']
             else:
                 return True
