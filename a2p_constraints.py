@@ -187,13 +187,13 @@ class PointIdentityConstraint(BasicConstraint):
     def getToolTip():
         return \
 '''
-Add a pointIdentity Constraint:
-selection:
-1.) select a vertex, circle or sphere on a part
-2.) select a vertex, circle or sphere on another part
+Create the point-to-point constraint (pointIdentity)
 
-Button gets active after
-correct selection.
+Select:
+1) A vertex, a circle, or a sphere (on a part)
+2) A vertex, a circle, or a sphere (on another part)
+
+Button gets active after correct selection.
 '''
 
     @staticmethod
@@ -235,15 +235,16 @@ class PointOnLineConstraint(BasicConstraint):
     def getToolTip():
         return \
 '''
-Add a pointOnLine constraint between two objects
-1.) select a vertex, a sphere or a circle from a part
-2.) select a linear edge or a cylindrical face on another part
+Create the point-on-line constraint (pointOnLine)
 
-For second selection you also can use a circular edge. Then
-it's axis will be taken as line definition
+Select:
+1) A vertex, a sphere, or a circle (on a part)
+2) A linear/circular edge, or a cylindrical face (on another part)
 
-Button gets active after
-correct selection.
+If the circular edge is selected, 
+it's axis will be taken as line definition.
+
+Button gets active after correct selection.
 '''
 
     @staticmethod
@@ -290,12 +291,13 @@ class PointOnPlaneConstraint(BasicConstraint):
     def getToolTip():
         return \
 '''
-Add a pointOnPlane constraint between two objects
-1.) select a vertex or a center of a circle or sphere
-2.) select a plane on other part
+Create the point-on-plane constraint (pointOnPlane)
 
-Button gets active after
-correct selection.
+Select:
+1) A vertex, a center of a circle, or a sphere (on a part)
+2) A plane (on another part)
+
+Button gets active after correct selection.
 '''
 
     @staticmethod
@@ -367,13 +369,13 @@ class CircularEdgeConstraint(BasicConstraint):
     def getToolTip():
         return \
 '''
-Add a circularEdge constraint between two parts
-selection-hint:
-1.) select circular edge on first importPart
-2.) select circular edge on other importPart
+Create the circular-edge constraint (circularEdge)
 
-Button gets active after
-correct selection.
+Select:
+1) A circular edge (on a part)
+2) A circular edge (on another part)
+
+Button gets active after correct selection.
 '''
 
     @staticmethod
@@ -422,17 +424,15 @@ class AxialConstraint(BasicConstraint):
     def getToolTip():
         return \
 '''
-Add an axisCoincident constraint between two parts
+Create the axis-to-axis constraint (axisCoincident)
 
-2 axis are aligned and be moved
-to be coincident
+2 axis are aligned and will be moved to be coincident.
 
-Selection:
-1.) Select cylindrical face or linear edge on a part
-2.) Select cylindrical face or linear edge on another part
+Select:
+1) A cylindrical face or linear edge (on a part)
+2) A cylindrical face or linear edge (on another part)
 
-Button gets active after
-correct selection.
+Button gets active after correct selection.
 '''
 
     @staticmethod
@@ -486,20 +486,18 @@ class AxisParallelConstraint(BasicConstraint):
     def getToolTip():
         return \
 '''
-Add an axisParallel constraint between two objects
+Create the parallel-axis constraint (axisParallel)
 
-Axis' will only rotate to be parallel, but not be
-moved to be coincident
+Axis' will only rotate to be parallel, but will not 
+be moved to be coincident.
 
-select:
-1.) linear edge or cylindrical face from a part
-2.) linear edge or cylindrical face from another part
+Select:
+1) A linear/circular edge, or cylindrical face (on a part)
+2) A linear/circular edge, or cylindrical face (on another part)
 
-You can use also a circular edge. It's axis will
-be taken as line
+If using circular edge, it's axis will be taken as line.
 
-Button gets active after
-correct selection.
+Button gets active after correct selection.
 '''
 
     @staticmethod
@@ -535,17 +533,16 @@ class AxisPlaneParallelConstraint(BasicConstraint):
     def getToolTip():
         return \
 '''
-Add an axisPlaneParallel constraint
+Create the axis-to-plane parallelism constraint (axisPlaneParallel)
 
-1) select a linear edge or cylinder axis
-2) select a plane face on another part
+Select:
+1) A linear edge, or cylinder axis (on a part)
+2) A plane face (on another part)
 
-This constraint adjusts an axis parallel
-to a selected plane. The parts are not
-moved to be coincident.
+This constraint adjusts an axis parallel to a 
+selected plane. The parts are not moved to be coincident.
 
-Button gets active after
-correct selection.
+Button gets active after correct selection.
 '''
 
     @staticmethod
@@ -605,20 +602,19 @@ class AxisPlaneAngleConstraint(BasicConstraint):
     def getToolTip():
         return \
 '''
-Add an axisPlaneAngle constraint
+Create the angular axis-to-plane constraint (axisPlaneAngle)
 
-1) select a linear edge or cylinder axis
-2) select a plane face on another part
+Select:
+1) A linear edge, or cylinder axis (on a part)
+2) A plane face (on another part)
 
-At first this constraint adjusts an axis parallel
-to a selected plane. Within the following popUp dialog
-you can define an angle.
+At first this constraint adjusts an axis parallel to a 
+selected plane. Within the following popUp dialog you 
+can define an angle.
 
-The parts are not
-moved to be coincident.
+The parts are not moved to be coincident.
 
-Button gets active after
-correct selection.
+Button gets active after correct selection.
 '''
 
     @staticmethod
@@ -673,17 +669,17 @@ class AxisPlaneNormalConstraint(BasicConstraint):
     def getToolTip():
         return \
 '''
-Add an axisPlaneNormal constraint
+Create the axis-plane-normal constraint (axisPlaneNormal)
 
-1) select a linear edge or cylinder axis
-2) select a plane face on another part
+Select:
+1) A linear edge, or cylinder axis (on a part)
+2) A plane face (on another part)
 
-This constraint adjusts an axis vertical
-to a selected plane. The parts are not
-moved to be coincident.
+This constraint adjusts an axis vertical to a 
+selected plane. The parts are not moved to be 
+coincident.
 
-Button gets active after
-correct selection.
+Button gets active after correct selection.
 '''
 
     @staticmethod
@@ -742,17 +738,16 @@ class PlanesParallelConstraint(BasicConstraint):
     def getToolTip():
         return \
 '''
-Add a planesParallel constraint between two objects
+Create the planes-parallelism constraint (planesParallel)
 
 Planes will only rotate to be parallel, but not
-moved to be coincident
+moved to be coincident.
 
-select:
-1.) select a plane on a part
-2.) select a plane from another part
+Select:
+1) A plane (on a part)
+2) A plane (on another part)
 
-Button gets active after
-correct selection.
+Button gets active after correct selection.
 '''
 
     @staticmethod
@@ -814,15 +809,13 @@ class PlaneConstraint(BasicConstraint):
     def getToolTip():
         return \
 '''
-Add a planeCoincident constraint between two objects
-(An offset can be given)
+Create the coincident-plane constraint (planeCoincident)
 
-select:
-1.) select a plane on a part
-2.) select a plane from another part
+Select:
+1) A plane (on a part)
+2) A plane (on another part)
 
-Button gets active after
-correct selection.
+Button gets active after correct selection.
 '''
 
     @staticmethod
@@ -861,26 +854,23 @@ class AngledPlanesConstraint(BasicConstraint):
     def getToolTip():
         return \
 '''
-Add an angledPlanes constraint
+Create the angled-planes constraint (angledPlanes)
 
-1) select first plane object
-2) select second plane object on another part
+Select:
+1) A plane (on a part)
+2) A plane (on another part)
 
-After setting this constraint at first
-the actual angle between both planes is
-been calculated and stored to entry "angle" in
-object editor.
+After setting this constraint at first the actual 
+angle between both planes is been calculated and 
+stored to entry "angle" in object editor.
 
-After creating this constraint you can change
-entry "angle" in object editor to desired value.
+The angle can be changed in the object editor
 
-Avoid use of angle 0 degrees and 180 degrees.
+Avoid using angles equals to 0 and 180 degrees.
 You could get strange results.
+For that, is better to use planesParallel constraint.
 
-Better for that is using planesParallelConstraint.
-
-Button gets active after
-correct selection.
+Button gets active after correct selection.
 '''
 
     @staticmethod
@@ -913,16 +903,15 @@ class SphericalConstraint(BasicConstraint):
     def getToolTip():
         return \
 '''
-Add a sphereCenterIdent constraint between to objects
+Create the sphere-to-sphere constraint (sphereCenterIdent)
 
-Selection options:
-- spherical surface or vertex on a part
-- spherical surface or vertex on another part
+Select:
+1) A spherical surface, or a vertex (on a part)
+2) A spherical surface, or a vertex (on another part)
 
-Also when selecting a circle, it's center is used as a vertex.
+When selecting a circle, it's center is used as a vertex.
 
-Button gets active after
-correct selection.
+Button gets active after correct selection.
 '''
     
     @staticmethod
@@ -1000,19 +989,15 @@ class CenterOfMassConstraint(BasicConstraint):
     def getToolTip():
         return \
 '''
-Add a centerOfMass constraint
+Create the center-of-mass constraint (centerOfMass)
 
-(Join centerOfMass of \'face1\' or \'closed edge1\' to 
-centerOfMass of \'face2\' or \'closed edge2\') 
+Select:
+1) A face, or a closed edge (on a part)
+2) A face, or a closed edge (on another part)
 
-1) select first \'face\' or \'closed edge\' object
-2) select second \'face\' or \'closed edge\' object on another part
+It is possible to change the offset in object editor.
 
-After creating this constraint you can change
-entry "offset" in object editor to desired value.
-
-Button gets active after
-correct selection.
+Button gets active after correct selection.
 '''
 
     @staticmethod
