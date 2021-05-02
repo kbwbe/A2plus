@@ -587,7 +587,8 @@ Check your settings of A2plus preferences.
 
         for io in importedObjectsList:
             if io and a2plib.isA2pSketch(io):
-                io.fixedPosition = True
+                if not any([i.fixedPosition for i in doc.Objects if hasattr(i, 'fixedPosition') ]):
+                    io.fixedPosition = True
 
         for io in importedObjectsList:
             if io and not a2plib.isA2pSketch(io) and not io.fixedPosition:
