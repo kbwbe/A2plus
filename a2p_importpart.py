@@ -538,8 +538,6 @@ Check your settings of A2plus preferences.
                 )
             return
 
-        print("External opened", ntpath.basename(filename))
-
         #==========================================================================================
         # create a dialog for selection the parts
         #==========================================================================================
@@ -555,6 +553,9 @@ Check your settings of A2plus preferences.
                 )
         dialog.exec_()
 
+        if dialog.rejected:
+            FreeCAD.closeDocument(importDoc.Name)
+
         if dc.tx is None or len(dc.tx)==0:
             return
 
@@ -569,7 +570,10 @@ Check your settings of A2plus preferences.
 
             importedObjectsList.append(importedObject)
 
-        FreeCAD.closeDocument(importDoc.Name)
+        try:
+            FreeCAD.closeDocument(importDoc.Name)
+        except:
+            pass
 
         mw = FreeCADGui.getMainWindow()
         mdi = mw.findChild(QtGui.QMdiArea)
