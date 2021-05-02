@@ -586,11 +586,10 @@ Check your settings of A2plus preferences.
         self.timer.start( 200 ) #0.2 seconds
 
         for io in importedObjectsList:
-            if io  and a2plib.isA2pSketch(io):
+            if io and a2plib.isA2pSketch(io):
                 io.fixedPosition = True
 
-        if len(importedObjectsList) == 1:
-            io = importedObjectsList[0]
+        for io in importedObjectsList:
             if io and not a2plib.isA2pSketch(io) and not io.fixedPosition:
                 PartMover( view, io, deleteOnEscape = True )
 
