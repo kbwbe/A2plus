@@ -554,30 +554,39 @@ Check your settings of A2plus preferences.
             return
 
         selectedObjects = dc.tx
+        importedObjectsList = []
         for so in selectedObjects:
             importedObject = importPartFromFile(doc, filename, extractSingleShape=True, desiredShapeLabel = so)
     
             if not importedObject:
                 a2plib.Msg("imported Object is empty/none\n")
                 continue
-    
-            mw = FreeCADGui.getMainWindow()
-            mdi = mw.findChild(QtGui.QMdiArea)
-            sub = mdi.activeSubWindow()
-            if sub != None:
-                sub.showMaximized()
-    
-            # WF: how will this work for multiple imported objects?
-            #     only A2p AI's will have property "fixedPosition"
-            if importedObject  and a2plib.isA2pSketch(importedObject):
-                importedObject.fixedPosition = True
-            if importedObject and not a2plib.isA2pSketch(importedObject) and not importedObject.fixedPosition:
-                PartMover( view, importedObject, deleteOnEscape = True )
-            else:
-                self.timer = QtCore.QTimer()
-                QtCore.QObject.connect(self.timer, QtCore.SIGNAL("timeout()"), self.GuiViewFit)
-                self.timer.start( 200 ) #0.2 seconds
             
+            importedObjectsList.append(importedObject)
+
+        try:            
+            FreeCAD.closeDocument(importDoc.Label) #maybe already closed
+        except:
+            pass
+        
+        mw = FreeCADGui.getMainWindow()
+        mdi = mw.findChild(QtGui.QMdiArea)
+        sub = mdi.activeSubWindow()
+        if sub != None:
+            sub.showMaximized()
+    
+        self.timer = QtCore.QTimer()
+        QtCore.QObject.connect(self.timer, QtCore.SIGNAL("timeout()"), self.GuiViewFit)
+        self.timer.start( 200 ) #0.2 seconds
+    
+        for io in importedObjectsList:
+            if io  and a2plib.isA2pSketch(io):
+                io.fixedPosition = True
+                
+        if len(importedObjectsList) == 1:
+            io = importedObjectsList[0]
+            if io and not a2plib.isA2pSketch(io) and not io.fixedPosition:
+                PartMover( view, io, deleteOnEscape = True )
             
         return
 
