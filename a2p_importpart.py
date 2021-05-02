@@ -88,6 +88,68 @@ class ObjectCache:
 objectCache = ObjectCache()
 
 #==============================================================================
+class a2p_multiShapeExtractDialog(QtGui.QDialog):
+    '''
+    select a label from shape which has to be imported from a file
+    '''
+    Deleted = QtCore.Signal()
+    Accepted = QtCore.Signal()
+
+    def __init__(self, parent, labelList = [], data = None):
+        super(a2p_multiShapeExtractDialog,self).__init__(parent=parent)
+        self.labelList = labelList
+        self.data = data
+        self.initUI()
+
+    def initUI(self):
+        self.setWindowTitle('Import Objects')
+        self.mainLayout = QtGui.QGridLayout() # a VBoxLayout for the whole form
+
+        l = sorted(self.labelList)
+
+        self.label = QtGui.QLabel(self)
+        self.label.setText("Select objects to import")
+
+        self.listView = QtGui.QListWidget()
+        for item in l:
+            item = QtGui.QListWidgetItem(item)
+            item.setFlags(item.flags() | QtCore.Qt.ItemIsUserCheckable)
+            item.setCheckState(QtCore.Qt.Unchecked)
+            self.listView.addItem(item)
+
+        self.buttons = QtGui.QDialogButtonBox(self)
+        self.buttons.setOrientation(QtCore.Qt.Horizontal)
+        self.buttons.addButton("Cancel", QtGui.QDialogButtonBox.RejectRole)
+        self.buttons.addButton("Import", QtGui.QDialogButtonBox.AcceptRole)
+        self.connect(self.buttons, QtCore.SIGNAL("accepted()"), self, QtCore.SLOT("accept()"))
+        self.connect(self.buttons, QtCore.SIGNAL("rejected()"), self, QtCore.SLOT("reject()"))
+
+        self.mainLayout.addWidget(self.label)
+        self.mainLayout.addWidget(self.listView)
+        self.mainLayout.addWidget(self.buttons)
+        self.setLayout(self.mainLayout)
+
+    def accept(self):
+        if self.data != None:
+
+            checked_items = []
+            for index in range(self.listView.count()):
+                if self.listView.item(index).checkState() == QtCore.Qt.Checked:
+                    checked_items.append(self.listView.item(index).text())
+
+            if checked_items:
+                for i in checked_items:
+                    print("Importing", i)
+
+            self.data.tx = checked_items
+
+        self.deleteLater()
+
+    def reject(self):
+        self.deleteLater()
+
+
+#==============================================================================
 class a2p_shapeExtractDialog(QtGui.QDialog):
     '''
     select a label from shape which has to be imported from a file
@@ -426,29 +488,97 @@ Check your settings of A2plus preferences.
                 )
             return
 
-        #TODO: change for multi separate part import
-        importedObject = importPartFromFile(doc, filename, extractSingleShape=True)
 
-        if not importedObject:
-            a2plib.Msg("imported Object is empty/none\n")
+
+        #==========================================================================================
+        # for multiple part import: first open the importDoc, if possible
+        #==========================================================================================
+        # look only for filenames, not paths, as there are problems on WIN10 (Address-translation??)
+        #==========================================================================================
+        importDoc = None
+        importDocIsOpen = False
+        requestedFile = os.path.split(filename)[1]
+        for d in FreeCAD.listDocuments().values():
+            recentFile = os.path.split(d.FileName)[1]
+            if requestedFile == recentFile:
+                importDoc = d # file is already open...
+                importDocIsOpen = True
+                break
+    
+        if not importDocIsOpen:
+            if filename.lower().endswith('.fcstd'):
+                importDoc = FreeCAD.openDocument(filename)
+            elif filename.lower().endswith('.stp') or filename.lower().endswith('.step'):
+                import ImportGui
+                fname =  os.path.splitext(os.path.basename(filename))[0]
+                FreeCAD.newDocument(fname)
+                newname = FreeCAD.ActiveDocument.Name
+                FreeCAD.setActiveDocument(newname)
+                ImportGui.insert(filename,newname)
+                importDoc = FreeCAD.ActiveDocument
+            else:
+                msg = "A part can only be imported from a FreeCAD '*.FCStd' file"
+                QtGui.QMessageBox.information( QtGui.QApplication.activeWindow(), "Value Error", msg )
+                return
+        #==========================================================================================
+        # file seems to be open....
+        # detect the importable objects...
+        #==========================================================================================
+        topoMapper = TopoMapper(importDoc)
+        importableObjects = topoMapper.getTopLevelObjects(allowSketches=True)
+        
+        if len(importableObjects) == 0:
+            msg = "No visible Part to import found. Aborting operation"
+            QtGui.QMessageBox.information(
+                QtGui.QApplication.activeWindow(),
+                "Import Error",
+                msg
+                )
+            return
+        #==========================================================================================
+        # create a dialog for selection the parts
+        #==========================================================================================
+        labelList = []
+        dc = DataContainer()
+
+        for io in importableObjects:
+            labelList.append(io.Label)
+        dialog = a2p_multiShapeExtractDialog(
+                QtGui.QApplication.activeWindow(),
+                labelList,
+                dc
+                )
+        dialog.exec_()
+    
+        if dc.tx is None or len(dc.tx)==0:
             return
 
-        mw = FreeCADGui.getMainWindow()
-        mdi = mw.findChild(QtGui.QMdiArea)
-        sub = mdi.activeSubWindow()
-        if sub != None:
-            sub.showMaximized()
-
-        # WF: how will this work for multiple imported objects?
-        #     only A2p AI's will have property "fixedPosition"
-        if importedObject  and a2plib.isA2pSketch(importedObject):
-            importedObject.fixedPosition = True
-        if importedObject and not a2plib.isA2pSketch(importedObject) and not importedObject.fixedPosition:
-            PartMover( view, importedObject, deleteOnEscape = True )
-        else:
-            self.timer = QtCore.QTimer()
-            QtCore.QObject.connect(self.timer, QtCore.SIGNAL("timeout()"), self.GuiViewFit)
-            self.timer.start( 200 ) #0.2 seconds
+        selectedObjects = dc.tx
+        for so in selectedObjects:
+            importedObject = importPartFromFile(doc, filename, extractSingleShape=True, desiredShapeLabel = so)
+    
+            if not importedObject:
+                a2plib.Msg("imported Object is empty/none\n")
+                continue
+    
+            mw = FreeCADGui.getMainWindow()
+            mdi = mw.findChild(QtGui.QMdiArea)
+            sub = mdi.activeSubWindow()
+            if sub != None:
+                sub.showMaximized()
+    
+            # WF: how will this work for multiple imported objects?
+            #     only A2p AI's will have property "fixedPosition"
+            if importedObject  and a2plib.isA2pSketch(importedObject):
+                importedObject.fixedPosition = True
+            if importedObject and not a2plib.isA2pSketch(importedObject) and not importedObject.fixedPosition:
+                PartMover( view, importedObject, deleteOnEscape = True )
+            else:
+                self.timer = QtCore.QTimer()
+                QtCore.QObject.connect(self.timer, QtCore.SIGNAL("timeout()"), self.GuiViewFit)
+                self.timer.start( 200 ) #0.2 seconds
+            
+            
         return
 
     def IsActive(self):
