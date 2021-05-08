@@ -597,11 +597,8 @@ Check your settings of A2plus preferences.
             if io and not a2plib.isA2pSketch(io) and not io.fixedPosition:
                 pm = PartMover( view, io, deleteOnEscape = True )
                 while pm.isActive:
-                    if io not in FreeCADGui.Selection.getSelection():
-                        FreeCADGui.Selection.addSelection(io) #also highlight the part which is being moved..
                     FreeCADGui.updateGui() # keeping the UI responsible
                 del pm
-                FreeCADGui.Selection.clearSelection()
 
         return
 
