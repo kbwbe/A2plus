@@ -37,8 +37,6 @@ from a2plib import getRelativePathesEnabled
 import a2p_importedPart_class
 import a2p_convertPart
 
-import ntpath
-
 from a2p_topomapper import TopoMapper
 
 import a2p_lcs_support
@@ -569,9 +567,8 @@ Check your settings of A2plus preferences.
                 continue
 
             importedObjectsList.append(importedObject)
-
         try:
-            FreeCAD.closeDocument(importDoc.Name)
+            FreeCAD.closeDocument(importDoc.Name) #avoid errormessage if doc already closed...
         except:
             pass
 
@@ -590,9 +587,21 @@ Check your settings of A2plus preferences.
                 if not any([i.fixedPosition for i in doc.Objects if hasattr(i, 'fixedPosition') ]):
                     io.fixedPosition = True
 
+        # At first, make all imported Objects invisible,
         for io in importedObjectsList:
+            io.ViewObject.Visibility = False
+
+        for io in importedObjectsList:
+            io.ViewObject.Visibility = True # make imported objects visible step by step,
+                                            # in order to see, which one is recently being placed..
             if io and not a2plib.isA2pSketch(io) and not io.fixedPosition:
-                PartMover( view, io, deleteOnEscape = True )
+                pm = PartMover( view, io, deleteOnEscape = True )
+                while pm.isActive:
+                    if io not in FreeCADGui.Selection.getSelection():
+                        FreeCADGui.Selection.addSelection(io) #also highlight the part which is being moved..
+                    FreeCADGui.updateGui() # keeping the UI responsible
+                del pm
+                FreeCADGui.Selection.clearSelection()
 
         return
 
@@ -1164,6 +1173,7 @@ class PartMover:
         self.callbackClick = self.view.addEventCallback("SoMouseButtonEvent",self.clickMouse)
         self.callbackKey = self.view.addEventCallback("SoKeyboardEvent",self.KeyboardEvent)
         self.objectToDelete = None # object reference when pressing the escape key
+        self.isActive = True
 
     def moveMouse(self, info):
         newPos = self.view.getPoint( *info['Position'] )
@@ -1173,6 +1183,7 @@ class PartMover:
         self.view.removeEventCallback("SoLocation2Event",self.callbackMove)
         self.view.removeEventCallback("SoMouseButtonEvent",self.callbackClick)
         self.view.removeEventCallback("SoKeyboardEvent",self.callbackKey)
+        self.isActive = False
 
     def clickMouse(self, info):
         if info['Button'] == 'BUTTON1' and info['State'] == 'DOWN':
