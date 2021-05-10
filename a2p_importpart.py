@@ -95,9 +95,10 @@ class a2p_multiShapeExtractDialog(QtGui.QDialog):
     Deleted = QtCore.Signal()
     Accepted = QtCore.Signal()
 
-    def __init__(self, parent, labelList = [], data = None):
+    def __init__(self, parent, labelList = [], iconList = [], data = None):
         super(a2p_multiShapeExtractDialog,self).__init__(parent=parent)
         self.labelList = labelList
+        self.iconList = iconList
         self.data = data
         self.initUI()
 
@@ -105,14 +106,19 @@ class a2p_multiShapeExtractDialog(QtGui.QDialog):
         self.setWindowTitle('Import Objects')
         self.mainLayout = QtGui.QGridLayout() # a VBoxLayout for the whole form
 
-        l = sorted(self.labelList)
+        lzip = sorted(zip(self.labelList, self.iconList))
+        self.labelList = [li[0] for li in lzip]
+        self.iconList = [li[1] for li in lzip]
+        l = self.labelList
 
         self.label = QtGui.QLabel(self)
         self.label.setText("Select objects to import")
 
         self.listView = QtGui.QListWidget()
-        for item in l:
+        for i, item in enumerate(l):
+            icon = self.iconList[i]
             item = QtGui.QListWidgetItem(item)
+            item.setIcon(icon)
             item.setFlags(item.flags() | QtCore.Qt.ItemIsUserCheckable)
             item.setCheckState(QtCore.Qt.Unchecked)
             self.listView.addItem(item)
@@ -420,7 +426,7 @@ def importPartFromFile(
 #==============================================================================
 toolTip = \
 '''
-Add shapes form an external file
+Add shapes from an external file
 to the assembly
 '''
 
@@ -429,7 +435,7 @@ class a2p_ImportShapeReferenceCommand():
     def GetResources(self):
         return {'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_ShapeReference.svg',
                 'Accel' : "Ctrl+Shift+A", # a default shortcut (optional)
-                'MenuText': "Add shapes form an external file",
+                'MenuText': "Add shapes from an external file",
                 'ToolTip' : toolTip
                 }
 
@@ -537,16 +543,19 @@ Check your settings of A2plus preferences.
             return
 
         #==========================================================================================
-        # create a dialog for selection the parts
+        # creates a dialog for selecting the parts
         #==========================================================================================
         labelList = []
+        iconList = []
         dc = DataContainer()
 
         for io in importableObjects:
             labelList.append(io.Label)
+            iconList.append(io.ViewObject.Icon)
+
         dialog = a2p_multiShapeExtractDialog(
                 QtGui.QApplication.activeWindow(),
-                labelList,
+                labelList, iconList,
                 dc
                 )
         dialog.exec_()
