@@ -32,6 +32,7 @@ from a2plib import *
 from a2p_solversystem import solveConstraints
 import a2p_constraints
 
+from FreeCAD import Units
 
 CONSTRAINT_DIALOG_STORED_POSITION = QtCore.QPoint(-1,-1)
 
@@ -64,6 +65,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         self.winModified = False
         self.lineNo = 0
         self.position = None # Window position
+        self.recentUnit = "mm"
         self.initUI()
 
     def initUI(self):
@@ -127,16 +129,24 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             self.mainLayout.addWidget(lbl4,self.lineNo,0)
 
             self.offsetEdit = QtGui.QDoubleSpinBox(self)
-            # get the length unit as string
-            self.offsetEdit.setSuffix(" " + str(FreeCAD.Units.Quantity(1, FreeCAD.Units.Length))[3:])
             # the maximum is by default 99.99 and we can allow more
             self.offsetEdit.setMaximum(1e7) # allow up to 1 km
             # set minimum to negative of maximum
             self.offsetEdit.setMinimum(-1*self.offsetEdit.maximum())
+
+            
             # use the number of decimals defined by thew user in FC
             params = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Units")
             self.offsetEdit.setDecimals(params.GetInt('Decimals'))
-            self.offsetEdit.setValue(offs.Value)
+            
+            userPreferred = Units.Quantity(offs).getUserPreferred()[0] #offs is string with value and unit
+            user_qty, user_unit = userPreferred.split(' ')
+            user_qty = float(user_qty.replace(",","."))
+            
+            self.offsetEdit.setSuffix(" " + user_unit)
+            self.offsetEdit.setValue(user_qty)
+            self.recentUnit = user_unit
+            
             self.offsetEdit.setFixedHeight(32)
             QtCore.QObject.connect(self.offsetEdit, QtCore.SIGNAL("valueChanged(double)"), self.handleOffsetChanged)
             self.mainLayout.addWidget(self.offsetEdit,self.lineNo,1)
@@ -276,8 +286,11 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
                 self.constraintObject.directionConstraint = "opposed"
             else:
                 self.constraintObject.directionConstraint = "none"
+                
         if hasattr(self.constraintObject,"offset"):
-            self.constraintObject.offset = self.offsetEdit.value()
+            userValueStr = str(self.offsetEdit.value()) + " " + self.recentUnit
+            self.constraintObject.offset = Units.Quantity(userValueStr).Value
+            
         if hasattr(self.constraintObject,"angle"):
             self.constraintObject.angle = self.angleEdit.value()
         if hasattr(self.constraintObject,"lockRotation"):
