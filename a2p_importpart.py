@@ -425,17 +425,19 @@ def importPartFromFile(
 
 #==============================================================================
 toolTip = \
+translate("A2plus_importpart",
 '''
 Add shapes from an external file
 to the assembly
 '''
+)
 
 class a2p_ImportShapeReferenceCommand():
 
     def GetResources(self):
         return {'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_ShapeReference.svg',
                 'Accel' : "Ctrl+Shift+A", # a default shortcut (optional)
-                'MenuText': "Add shapes from an external file",
+                'MenuText': translate("A2plus_importpart","Add shapes from an external file"),
                 'ToolTip' : toolTip
                 }
 
@@ -625,17 +627,19 @@ FreeCADGui.addCommand('a2p_ImportShapeReferenceCommand',a2p_ImportShapeReference
 
 #==============================================================================
 toolTip = \
+translate("A2plus_importpart",
 '''
 Restore transparency to
 active document objects
 '''
+)
 
 class a2p_Restore_Transparency_Command():
 
     def GetResources(self):
         return {'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_Restore_Transparency.svg',
                 'Accel'   : "Shift+T", # a default shortcut (optional)
-                'MenuText': QT_TRANSLATE_NOOP("A2plus_importpart", "Restore transparency to active document objects"),
+                'MenuText': translate("A2plus_importpart", "Restore transparency to active document objects"),
                 'ToolTip' : toolTip
                 }
 
@@ -663,17 +667,19 @@ FreeCADGui.addCommand('a2p_Restore_Transparency',a2p_Restore_Transparency_Comman
 
 #==============================================================================
 toolTip = \
+translate("A2plus_importpart",
 '''
 Add a part from an external file
 to the assembly
 '''
+)
 
 class a2p_ImportPartCommand():
 
     def GetResources(self):
         return {'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_ImportPart.svg',
                 'Accel'   : "Shift+A", # a default shortcut (optional)
-                'MenuText': QT_TRANSLATE_NOOP("A2plus_importpart", "Add a part from an external file"),
+                'MenuText': translate("A2plus_importpart", "Add a part from an external file"),
                 'ToolTip' : toolTip
                 }
 
@@ -905,6 +911,7 @@ def updateImportedParts(doc, partial=False):
 
 
 toolTip = \
+translate("A2plus_importpart",
 '''
 Update parts, which have been
 imported to the assembly.
@@ -914,7 +921,7 @@ external file, the new shape
 is taken to the assembly by
 this function.)
 '''
-
+)
 class a2p_UpdateImportedPartsCommand:
 
     def Activated(self):
@@ -924,7 +931,7 @@ class a2p_UpdateImportedPartsCommand:
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.path_a2p + '/icons/a2p_ImportPart_Update.svg',
-            'MenuText': QT_TRANSLATE_NOOP("A2plus_importpart", "Update parts imported into the assembly"),
+            'MenuText': translate("A2plus_importpart", "Update parts imported into the assembly"),
             'ToolTip' : toolTip
             }
 
@@ -974,6 +981,7 @@ def duplicateImportedPart( part ):
 
 
 toolTip = \
+translate("A2plus_importpart",
 '''
 Make a duplicate of a
 part, which is already
@@ -987,7 +995,7 @@ placed somewhere by mouse.
 Hold "Shift" for doing this
 multiple times.
 '''
-
+)
 class a2p_DuplicatePartCommand:
 
     def __init__(self):
@@ -1027,7 +1035,7 @@ class a2p_DuplicatePartCommand:
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_DuplicatePart.svg',
-            'MenuText': QT_TRANSLATE_NOOP("A2plus_importpart", "Create duplicate of a part"),
+            'MenuText': translate("A2plus_importpart", "Create duplicate of a part"),
             'ToolTip' : toolTip
             }
 
@@ -1036,6 +1044,7 @@ FreeCADGui.addCommand('a2p_duplicatePart', a2p_DuplicatePartCommand())
 
 
 toolTip = \
+translate("A2plus_importpart",
 '''
 Edit an imported part.
 
@@ -1053,6 +1062,7 @@ you have to use the function
 order to see the new shape
 within the assembly.
 '''
+)
 
 class a2p_EditPartCommand:
     def Activated(self):
@@ -1159,7 +1169,7 @@ This is not allowed when using preference
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_EditPart.svg',
-            'MenuText': QT_TRANSLATE_NOOP("A2plus_importpart", "Edit an imported part (open linked FCStd file)"),
+            'MenuText': translate("A2plus_importpart", "Edit an imported part (open linked FCStd file)"),
             'ToolTip' : toolTip
             }
 
@@ -1212,6 +1222,7 @@ class PartMover:
                 #FreeCAD.activeDocument().removeObject(self.obj.Name)
 #===============================================================================
 toolTip = \
+translate("A2plus_importpart",
 '''
 Move the selected part.
 
@@ -1223,6 +1234,7 @@ If the part is constrained, it
 will jump back by next solving
 of the assembly.
 '''
+)
 
 class a2p_MovePartCommand:
 
@@ -1250,7 +1262,7 @@ class a2p_MovePartCommand:
         return {
             #'Pixmap' : ':/assembly2/icons/MovePart.svg',
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_MovePart.svg',
-            'MenuText': QT_TRANSLATE_NOOP("A2plus_importpart", "Move the selected part"),
+            'MenuText': translate("A2plus_importpart", "Move the selected part"),
             'ToolTip' : toolTip
             }
 
@@ -1332,6 +1344,7 @@ class ConstrainedPartsMover:
             self.removeCallbacks()
 #===============================================================================
 toolTip = \
+translate("A2plus_importpart",
 '''
 Move the a part under rule of constraints.
 
@@ -1339,6 +1352,7 @@ Move the a part under rule of constraints.
 2) Click a part and it is glued to the cursor and can be moved
 3) Click again (or press ESC) and the command terminates
 '''
+)
 
 class a2p_MovePartUnderConstraints:
 
@@ -1367,7 +1381,7 @@ class a2p_MovePartUnderConstraints:
         return {
             #'Pixmap' : ':/assembly2/icons/MovePart.svg',
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_MovePartUnderConstraints.svg',
-            'MenuText': QT_TRANSLATE_NOOP("A2plus_importpart", "Move the selected part under constraints"),
+            'MenuText': translate("A2plus_importpart", "Move the selected part under constraints"),
             'ToolTip' : toolTip
             }
 
@@ -1378,6 +1392,7 @@ FreeCADGui.addCommand('a2p_MovePartUnderConstraints', a2p_MovePartUnderConstrain
 
 
 toolTipText = \
+translate("A2plus_importpart",
 '''
 Delete all constraints
 of a selected part.
@@ -1393,6 +1408,7 @@ After confirmation all related
 constraints are deleted
 at once.
 '''
+)
 
 class DeleteConnectionsCommand:
     def Activated(self):
@@ -1446,12 +1462,13 @@ class DeleteConnectionsCommand:
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_DeleteConnections.svg',
-            'MenuText': QT_TRANSLATE_NOOP("A2plus_importpart", "Delete all constraints of selected parts"),
+            'MenuText': translate("A2plus_importpart", "Delete all constraints of selected parts"),
             'ToolTip' : toolTipText
             }
 FreeCADGui.addCommand('a2p_DeleteConnectionsCommand', DeleteConnectionsCommand())
 
 toolTip = \
+translate("A2plus_importpart",
 '''
 Highlight both parts, which are
 related to a selected constraint.
@@ -1463,6 +1480,7 @@ The whole assembly is switched to
 transparent mode and you can inspect
 the desired constraint.
 '''
+)
 
 class ViewConnectionsCommand:
     def Activated(self):
@@ -1493,7 +1511,7 @@ class ViewConnectionsCommand:
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_ViewConnection.svg',
-            'MenuText': QT_TRANSLATE_NOOP("A2plus_importpart", "Highlight both constrained parts"),
+            'MenuText': translate("A2plus_importpart", "Highlight both constrained parts"),
             'ToolTip' : toolTip
             }
 
@@ -1528,6 +1546,7 @@ class ViewConnectionsObserver:
                 FreeCAD.ActiveDocument.getObject(selected.Object2), selected.SubElement2)
 
 toolTip = \
+translate("A2plus_importpart",
 '''
 Show only selected elements,
 or all if none is selected.
@@ -1543,6 +1562,7 @@ If you select nothing and hit
 this button, all invisible parts
 will be made visible again.
 '''
+)
 
 class a2p_isolateCommand:
 
@@ -1587,7 +1607,7 @@ class a2p_isolateCommand:
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_Isolate_Element.svg',
-            'MenuText': QT_TRANSLATE_NOOP("A2plus_importpart", "Show only selected elements or all if none is selected"),
+            'MenuText': translate("A2plus_importpart", "Show only selected elements or all if none is selected"),
             'ToolTip' : toolTip
             }
 
@@ -1619,8 +1639,8 @@ class a2p_ToggleTransparencyCommand:
     def GetResources(self):
         return {
             'Pixmap'   : a2plib.pathOfModule()+'/icons/a2p_ToggleTransparency.svg',
-            'MenuText' : QT_TRANSLATE_NOOP("A2plus_importpart", "Toggle transparency of assembly"),
-            'ToolTip'  : QT_TRANSLATE_NOOP("A2plus_importpart", "Toggles transparency of assembly"),
+            'MenuText' : translate("A2plus_importpart", "Toggle transparency of assembly"),
+            'ToolTip'  : translate("A2plus_importpart", "Toggles transparency of assembly"),
             'Checkable': self.IsChecked()
         }
 FreeCADGui.addCommand('a2p_ToggleTransparencyCommand', a2p_ToggleTransparencyCommand())
@@ -1628,18 +1648,23 @@ FreeCADGui.addCommand('a2p_ToggleTransparencyCommand', a2p_ToggleTransparencyCom
 
 
 toolTipMessage = \
+translate("A2plus_importpart",
 '''
-Toggle AutoSolve
+Show only selected elements,
+or all if none is selected.
 
-By pressing this button you can
-enable or disable automatic solving
-after a constraint has been edited
+Select one or more parts,
+which are the only ones you
+want to see in a big assembly.
 
-If automatic solving is disabled
-you have to start it manually
-by hitting the solvebutton
+Hit this button, and all other
+parts will be made invisible.
 
+If you select nothing and hit
+this button, all invisible parts
+will be made visible again.
 '''
+)
 
 class a2p_ToggleAutoSolveCommand:
 
@@ -1652,7 +1677,7 @@ class a2p_ToggleAutoSolveCommand:
     def GetResources(self):
         return {
             'Pixmap'   : a2plib.pathOfModule()+'/icons/a2p_ToggleAutoSolve.svg',
-            'MenuText' : QT_TRANSLATE_NOOP("A2plus_importpart", "Toggle auto solve"),
+            'MenuText' : translate("A2plus_importpart", "Toggle auto solve"),
             'ToolTip'  : toolTipMessage,
             'Checkable': self.IsChecked()
             }
@@ -1671,8 +1696,8 @@ class a2p_TogglePartialProcessingCommand:
     def GetResources(self):
         return {
             'Pixmap'   : a2plib.pathOfModule()+'/icons/a2p_TogglePartial.svg',
-            'MenuText' : QT_TRANSLATE_NOOP("A2plus_importpart", "Toggle partial processing"),
-            'ToolTip'  : QT_TRANSLATE_NOOP("A2plus_importpart", "Toggle partial processing"),
+            'MenuText' : translate("A2plus_importpart", "Toggle partial processing"),
+            'ToolTip'  : translate("A2plus_importpart", "Toggle partial processing"),
             'Checkable': self.IsChecked()
             }
 FreeCADGui.addCommand('a2p_TogglePartialProcessingCommand', a2p_TogglePartialProcessingCommand())
@@ -1703,12 +1728,13 @@ class a2p_repairTreeViewCommand:
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_RepairTree.svg',
-            'MenuText': QT_TRANSLATE_NOOP("A2plus_importpart", "Repair the tree view if it is somehow damaged"),
+            'MenuText': translate("A2plus_importpart", "Repair the tree view if it is somehow damaged"),
             'ToolTip' : toolTipMessage
             }
 FreeCADGui.addCommand('a2p_repairTreeViewCommand', a2p_repairTreeViewCommand())
 
 toolTip = \
+translate("A2plus_importpart",
 '''
 Flip direction of last constraint.
 
@@ -1718,6 +1744,7 @@ been defined, has a property
 toggled between 'aligned' and
 'opposed' (alignment of axis)
 '''
+)
 
 
 class a2p_FlipConstraintDirectionCommand:
@@ -1734,7 +1761,7 @@ class a2p_FlipConstraintDirectionCommand:
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_FlipConstraint.svg',
-            'MenuText': QT_TRANSLATE_NOOP("A2plus_importpart", "Flip direction of last constraint"),
+            'MenuText': translate("A2plus_importpart", "Flip direction of last constraint"),
             'ToolTip' : toolTip
             }
 FreeCADGui.addCommand('a2p_FlipConstraintDirectionCommand', a2p_FlipConstraintDirectionCommand())
@@ -1781,8 +1808,8 @@ class a2p_Show_Hierarchy_Command:
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_Treeview.svg',
-            'MenuText': QT_TRANSLATE_NOOP("A2plus_importpart", "Generate HTML file with detailed constraining structure"),
-            'ToolTip' : QT_TRANSLATE_NOOP("A2plus_importpart", "Generates HTML file with detailed constraining structure")
+            'MenuText': translate("A2plus_importpart", "Generate HTML file with detailed constraining structure"),
+            'ToolTip' : translate("A2plus_importpart", "Generates HTML file with detailed constraining structure")
             }
 FreeCADGui.addCommand('a2p_Show_Hierarchy_Command', a2p_Show_Hierarchy_Command())
 
@@ -1847,8 +1874,8 @@ class a2p_Show_PartLabels_Command:
     def GetResources(self):
         return {
             'Pixmap'   : a2plib.pathOfModule()+'/icons/a2p_PartLabel.svg',
-            'MenuText' : QT_TRANSLATE_NOOP("A2plus_importpart", "Show part labels in 3D view"),
-            'ToolTip'  : QT_TRANSLATE_NOOP("A2plus_importpart", "Toggle showing part labels in 3D view"),
+            'MenuText' : translate("A2plus_importpart", "Show part labels in 3D view"),
+            'ToolTip'  : translate("A2plus_importpart", "Toggle showing part labels in 3D view"),
             'Checkable': False
             }
 FreeCADGui.addCommand('a2p_Show_PartLabels_Command', a2p_Show_PartLabels_Command())
@@ -1882,8 +1909,8 @@ class a2p_Show_DOF_info_Command:
     def GetResources(self):
         return {
             'Pixmap'   : a2plib.pathOfModule()+'/icons/a2p_DOFs.svg',
-            'MenuText' : QT_TRANSLATE_NOOP("A2plus_importpart", "Print detailed DOF information"),
-            'ToolTip'  : QT_TRANSLATE_NOOP("A2plus_importpart", "Toggle printing detailed DOF information"),
+            'MenuText' : translate("A2plus_importpart", "Print detailed DOF information"),
+            'ToolTip'  : translate("A2plus_importpart", "Toggle printing detailed DOF information"),
             'Checkable': False
             }
 FreeCADGui.addCommand('a2p_Show_DOF_info_Command', a2p_Show_DOF_info_Command())
@@ -1918,8 +1945,8 @@ class a2p_absPath_to_relPath_Command:
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_SetRelativePathes.svg',
-            'MenuText': QT_TRANSLATE_NOOP("A2plus_importpart", "Convert absolute paths of imported parts to relative ones"),
-            'ToolTip' : QT_TRANSLATE_NOOP("A2plus_importpart", "Converts absolute paths of imported parts to relative ones")
+            'MenuText': translate("A2plus_importpart", "Convert absolute paths of imported parts to relative ones"),
+            'ToolTip' : translate("A2plus_importpart", "Converts absolute paths of imported parts to relative ones")
             }
 FreeCADGui.addCommand('a2p_absPath_to_relPath_Command', a2p_absPath_to_relPath_Command())
 
@@ -1950,13 +1977,14 @@ class a2p_SaveAndExit_Command:
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_Save_and_exit.svg',
-            'MenuText': QT_TRANSLATE_NOOP("A2plus_importpart", "Save and exit the active document"),
-            'ToolTip' : QT_TRANSLATE_NOOP("A2plus_importpart", "Save and exit the active document")
+            'MenuText': translate("A2plus_importpart", "Save and exit the active document"),
+            'ToolTip' : translate("A2plus_importpart", "Save and exit the active document")
             }
 FreeCADGui.addCommand('a2p_SaveAndExit_Command', a2p_SaveAndExit_Command())
 
 #==============================================================================
 toolTip = \
+translate("A2plus_importpart",
 '''
 Migrate proxies of imported parts
 
@@ -1972,6 +2000,7 @@ After running this function, you
 should save and reopen your
 assembly file.
 '''
+)
 
 class a2p_MigrateProxiesCommand():
 
@@ -2011,7 +2040,7 @@ class a2p_MigrateProxiesCommand():
     def GetResources(self):
         return {
             'Pixmap' : ':/icons/a2p_Upgrade.svg',
-            'MenuText': QT_TRANSLATE_NOOP("A2plus_importpart", "Migrate proxies of imported parts"),
+            'MenuText': translate("A2plus_importpart", "Migrate proxies of imported parts"),
             'ToolTip': toolTip
             }
 
@@ -2159,7 +2188,7 @@ class a2p_cleanUpDebug3dCommand():
     def GetResources(self):
         return {
             'Pixmap'  : ':/icons/a2p_RemoveDebug3D.svg',
-            'MenuText': QT_TRANSLATE_NOOP("A2plus_importpart", "Clean up solver debug output from 3D view"),
+            'MenuText': translate("A2plus_importpart", "Clean up solver debug output from 3D view"),
             'ToolTip' : toolTip
             }
 

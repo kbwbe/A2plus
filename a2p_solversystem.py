@@ -732,8 +732,8 @@ class a2p_SolverCommand:
     def GetResources(self):
         return {
             'Pixmap'  : path_a2p + '/icons/a2p_Solver.svg',
-            'MenuText': QT_TRANSLATE_NOOP("A2plus_solversystem", "Solve constraints"),
-            'ToolTip' : QT_TRANSLATE_NOOP("A2plus_solversystem", "Solves constraints")
+            'MenuText': translate("A2plus_solversystem", "Solve constraints"),
+            'ToolTip' : translate("A2plus_solversystem", "Solves constraints")
             }
 
 FreeCADGui.addCommand('a2p_SolverCommand', a2p_SolverCommand())

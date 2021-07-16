@@ -99,6 +99,7 @@ def createUpdateFileList(
     return needToUpdate, filesToUpdate
 #==============================================================================
 toolTip = \
+translate("A2plus_recursiveUpdatePlanner",
 '''
 Update parts, which have been
 imported to the assembly.
@@ -114,7 +115,7 @@ over all involved subassemblies.
 Subassemblies are updated,
 if necessary, too.
 '''
-
+)
 
 class a2p_recursiveUpdateImportedPartsCommand:
 
@@ -206,7 +207,7 @@ class a2p_recursiveUpdateImportedPartsCommand:
     def GetResources(self):
         return {
             'Pixmap'  : ':/icons/a2p_RecursiveUpdate.svg',
-            'MenuText': QT_TRANSLATE_NOOP("A2plus_recursiveUpdatePlanner", "Update imports recursively"),
+            'MenuText': translate("A2plus_recursiveUpdatePlanner", "Update imports recursively"),
             'ToolTip' : toolTip
             }
 

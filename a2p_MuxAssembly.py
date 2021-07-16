@@ -232,6 +232,7 @@ class ViewProviderSimpleAssemblyShape:
         return mode
 
 toolTip = \
+translate("A2plus_MuxAssembly",
 '''
 Create or refresh a simple shape
 of the complete Assembly.
@@ -245,6 +246,7 @@ The created shape can be found
 in the treeview. By default it
 is invisible at first time.
 '''
+)
 
 def createOrUpdateSimpleAssemblyShape(doc):
     visibleImportObjects = [ obj for obj in doc.Objects
@@ -303,7 +305,7 @@ class a2p_SimpleAssemblyShapeCommand():
     def GetResources(self):
         import a2plib
         return {'Pixmap'  : a2plib.path_a2p +'/icons/a2p_SimpleAssemblyShape.svg',
-                'MenuText': QT_TRANSLATE_NOOP("A2plus_MuxAssembly", "Create or refresh simple shape of complete assembly"),
+                'MenuText': translate("A2plus_MuxAssembly", "Create or refresh simple shape of complete assembly"),
                 'ToolTip' : toolTip
                 }
 
