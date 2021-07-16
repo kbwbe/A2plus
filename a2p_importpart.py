@@ -2170,9 +2170,11 @@ def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
 
 #==============================================================================
 toolTip = \
+translate("A2plus_importpart",
 '''
 Clean up solver debug output from 3D view
 '''
+)
 
 class a2p_cleanUpDebug3dCommand():
 
