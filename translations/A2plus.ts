@@ -220,7 +220,24 @@ recent assembly are collected.
 <context>
     <name>A2plus_MuxAssembly</name>
     <message>
-        <location filename="a2p_MuxAssembly.py" line="306"/>
+        <location filename="a2p_MuxAssembly.py" line="251"/>
+        <source>
+Create or refresh a simple shape
+of the complete Assembly.
+
+All parts within the assembly
+are combined to a single shape.
+This shape can be used e.g. for the
+techdraw module or 3D printing.
+
+The created shape can be found
+in the treeview. By default it
+is invisible at first time.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="a2p_MuxAssembly.py" line="308"/>
         <source>Create or refresh simple shape of complete assembly</source>
         <translation type="unfinished"></translation>
     </message>
@@ -327,7 +344,28 @@ recent assembly are collected.
 <context>
     <name>A2plus_convertPart</name>
     <message>
-        <location filename="a2p_convertPart.py" line="166"/>
+        <location filename="a2p_convertPart.py" line="163"/>
+        <source>
+Convert a part, created with
+another WB, to a full functional
+A2plus part.
+
+After converting, constraints
+can be applied. Also you can
+duplicate the converted part.
+
+For editing a converted part,
+hit the edit button and follow
+the instructions shown on screen.
+
+This function is useful, if
+you want to use e.g. fasteners
+within this workbench.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="a2p_convertPart.py" line="168"/>
         <source>Convert a part to A2plus</source>
         <translation type="unfinished"></translation>
     </message>
@@ -335,137 +373,328 @@ recent assembly are collected.
 <context>
     <name>A2plus_importpart</name>
     <message>
-        <location filename="a2p_importpart.py" line="638"/>
+        <location filename="a2p_importpart.py" line="435"/>
+        <source>
+Add shapes from an external file
+to the assembly
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="a2p_importpart.py" line="440"/>
+        <source>Add shapes from an external file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="a2p_importpart.py" line="637"/>
+        <source>
+Restore transparency to
+active document objects
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="a2p_importpart.py" line="642"/>
         <source>Restore transparency to active document objects</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="a2p_importpart.py" line="676"/>
+        <location filename="a2p_importpart.py" line="677"/>
+        <source>
+Add a part from an external file
+to the assembly
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="a2p_importpart.py" line="682"/>
         <source>Add a part from an external file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="a2p_importpart.py" line="927"/>
+        <location filename="a2p_importpart.py" line="925"/>
+        <source>
+Update parts, which have been
+imported to the assembly.
+
+(If you modify a part in an
+external file, the new shape
+is taken to the assembly by
+this function.)
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="a2p_importpart.py" line="934"/>
         <source>Update parts imported into the assembly</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="a2p_importpart.py" line="1030"/>
+        <location filename="a2p_importpart.py" line="999"/>
+        <source>
+Make a duplicate of a
+part, which is already
+imported to the assembly.
+
+Select a imported part and hit
+this button. A duplicate
+will be created and can be
+placed somewhere by mouse.
+
+Hold &quot;Shift&quot; for doing this
+multiple times.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="a2p_importpart.py" line="1038"/>
         <source>Create duplicate of a part</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="a2p_importpart.py" line="1162"/>
+        <location filename="a2p_importpart.py" line="1067"/>
+        <source>
+Edit an imported part.
+
+Select an imported part
+and hit this button.
+
+The appropriate FCStd file,
+linked to this part will
+be opened and you can modify
+this part at this place.
+
+After editing and saving,
+you have to use the function
+&apos;update imported parts&apos; in
+order to see the new shape
+within the assembly.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="a2p_importpart.py" line="1172"/>
         <source>Edit an imported part (open linked FCStd file)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="a2p_importpart.py" line="1253"/>
+        <location filename="a2p_importpart.py" line="1239"/>
+        <source>
+Move the selected part.
+
+Select a part and hit this
+button. The part can be moved
+around by mouse.
+
+If the part is constrained, it
+will jump back by next solving
+of the assembly.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="a2p_importpart.py" line="1265"/>
         <source>Move the selected part</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="a2p_importpart.py" line="1370"/>
+        <location filename="a2p_importpart.py" line="1357"/>
+        <source>
+Move the a part under rule of constraints.
+
+1) Hit this button
+2) Click a part and it is glued to the cursor and can be moved
+3) Click again (or press ESC) and the command terminates
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="a2p_importpart.py" line="1384"/>
         <source>Move the selected part under constraints</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="a2p_importpart.py" line="1449"/>
+        <location filename="a2p_importpart.py" line="1413"/>
+        <source>
+Delete all constraints
+of a selected part.
+
+Select exact one part
+and hit this button.
+
+A confirmation dialog pops
+up, showing all constraints
+related to the selected part.
+
+After confirmation all related
+constraints are deleted
+at once.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="a2p_importpart.py" line="1465"/>
         <source>Delete all constraints of selected parts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="a2p_importpart.py" line="1496"/>
+        <location filename="a2p_importpart.py" line="1485"/>
+        <source>
+Highlight both parts, which are
+related to a selected constraint.
+
+Select a constraint within
+the treeview and hit this button.
+
+The whole assembly is switched to
+transparent mode and you can inspect
+the desired constraint.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="a2p_importpart.py" line="1514"/>
         <source>Highlight both constrained parts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="a2p_importpart.py" line="1590"/>
+        <location filename="a2p_importpart.py" line="1610"/>
         <source>Show only selected elements or all if none is selected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="a2p_importpart.py" line="1622"/>
+        <location filename="a2p_importpart.py" line="1642"/>
         <source>Toggle transparency of assembly</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="a2p_importpart.py" line="1623"/>
+        <location filename="a2p_importpart.py" line="1643"/>
         <source>Toggles transparency of assembly</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="a2p_importpart.py" line="1655"/>
+        <location filename="a2p_importpart.py" line="1669"/>
+        <source>
+Show only selected elements,
+or all if none is selected.
+
+Select one or more parts,
+which are the only ones you
+want to see in a big assembly.
+
+Hit this button, and all other
+parts will be made invisible.
+
+If you select nothing and hit
+this button, all invisible parts
+will be made visible again.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="a2p_importpart.py" line="1680"/>
         <source>Toggle auto solve</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="a2p_importpart.py" line="1675"/>
+        <location filename="a2p_importpart.py" line="1700"/>
         <source>Toggle partial processing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="a2p_importpart.py" line="1706"/>
+        <location filename="a2p_importpart.py" line="1731"/>
         <source>Repair the tree view if it is somehow damaged</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="a2p_importpart.py" line="1737"/>
+        <location filename="a2p_importpart.py" line="1750"/>
+        <source>
+Flip direction of last constraint.
+
+If the last constraint, which has
+been defined, has a property
+&apos;direction&apos;, its value will be
+toggled between &apos;aligned&apos; and
+&apos;opposed&apos; (alignment of axis)
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="a2p_importpart.py" line="1764"/>
         <source>Flip direction of last constraint</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="a2p_importpart.py" line="1784"/>
+        <location filename="a2p_importpart.py" line="1811"/>
         <source>Generate HTML file with detailed constraining structure</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="a2p_importpart.py" line="1787"/>
+        <location filename="a2p_importpart.py" line="1814"/>
         <source>Generates HTML file with detailed constraining structure</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="a2p_importpart.py" line="1850"/>
+        <location filename="a2p_importpart.py" line="1877"/>
         <source>Show part labels in 3D view</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="a2p_importpart.py" line="1851"/>
+        <location filename="a2p_importpart.py" line="1878"/>
         <source>Toggle showing part labels in 3D view</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="a2p_importpart.py" line="1885"/>
+        <location filename="a2p_importpart.py" line="1912"/>
         <source>Print detailed DOF information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="a2p_importpart.py" line="1886"/>
+        <location filename="a2p_importpart.py" line="1913"/>
         <source>Toggle printing detailed DOF information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="a2p_importpart.py" line="1921"/>
+        <location filename="a2p_importpart.py" line="1948"/>
         <source>Convert absolute paths of imported parts to relative ones</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="a2p_importpart.py" line="1924"/>
+        <location filename="a2p_importpart.py" line="1951"/>
         <source>Converts absolute paths of imported parts to relative ones</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="a2p_importpart.py" line="1956"/>
+        <location filename="a2p_importpart.py" line="1983"/>
         <source>Save and exit the active document</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="a2p_importpart.py" line="2014"/>
+        <location filename="a2p_importpart.py" line="2005"/>
+        <source>
+Migrate proxies of imported parts
+
+Very old A2plus assemblies do not
+show the correct icons for imported
+parts and have obsolete properties.
+
+With this function, you can migrate
+the viewProviders of old imported parts
+to the recent state.
+
+After running this function, you
+should save and reopen your
+assembly file.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="a2p_importpart.py" line="2043"/>
         <source>Migrate proxies of imported parts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="a2p_importpart.py" line="2162"/>
+        <location filename="a2p_importpart.py" line="2191"/>
         <source>Clean up solver debug output from 3D view</source>
         <translation type="unfinished"></translation>
     </message>
@@ -473,7 +702,22 @@ recent assembly are collected.
 <context>
     <name>A2plus_partinformation</name>
     <message>
-        <location filename="a2p_partinformation.py" line="86"/>
+        <location filename="a2p_partinformation.py" line="54"/>
+        <source>
+Create a spreadsheet for ordering or
+logistics information.
+
+The created spreadsheet can be found
+within the tree view.
+
+Please fill in your information.
+This spreadsheet will be read out
+by the parts list function of A2plus.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="a2p_partinformation.py" line="88"/>
         <source>Create a spreadsheet for ordering or logistics information</source>
         <translation type="unfinished"></translation>
     </message>
@@ -481,7 +725,26 @@ recent assembly are collected.
 <context>
     <name>A2plus_recursiveUpdatePlanner</name>
     <message>
-        <location filename="a2p_recursiveUpdatePlanner.py" line="209"/>
+        <location filename="a2p_recursiveUpdatePlanner.py" line="120"/>
+        <source>
+Update parts, which have been
+imported to the assembly.
+
+(If you modify a part in an
+external file, the new shape
+is taken to the assembly by
+this function.)
+
+This command does this recursively
+over all involved subassemblies.
+
+Subassemblies are updated,
+if necessary, too.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="a2p_recursiveUpdatePlanner.py" line="210"/>
         <source>Update imports recursively</source>
         <translation type="unfinished"></translation>
     </message>
@@ -497,6 +760,11 @@ recent assembly are collected.
 <context>
     <name>A2plus_solversystem</name>
     <message>
+        <location filename="InitGui.py" line="53"/>
+        <source>An other assembly workbench for FreeCAD.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="a2p_solversystem.py" line="735"/>
         <source>Solve constraints</source>
         <translation type="unfinished"></translation>
@@ -504,11 +772,6 @@ recent assembly are collected.
     <message>
         <location filename="a2p_solversystem.py" line="739"/>
         <source>Solves constraints</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="InitGui.py" line="53"/>
-        <source>An other assembly workbench for FreeCAD.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
