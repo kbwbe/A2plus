@@ -11,7 +11,7 @@
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="38"/>
         <source>User interface settings</source>
-        <translation type="unfinished">Configurações de interface</translation>
+        <translation>Configurações de interface</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="53"/>
@@ -140,7 +140,7 @@ subassemblies. Otherwise you can break the assembly.</source>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="398"/>
         <source>Default solving method</source>
-        <translation type="unfinished"></translation>
+        <translation>Método de solução padrão</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="413"/>
@@ -273,7 +273,7 @@ is invisible at first time.
     <message>
         <location filename="a2p_constraintcommands.py" line="56"/>
         <source>Add pointIdentity constraint</source>
-        <translation type="unfinished"></translation>
+        <translation>Adicionar restrição ponto|entidade</translation>
     </message>
     <message>
         <location filename="a2p_constraintcommands.py" line="82"/>
@@ -338,7 +338,7 @@ is invisible at first time.
     <message>
         <location filename="a2p_constraintcommands.py" line="386"/>
         <source>Add centerOfMass constraint</source>
-        <translation type="unfinished"></translation>
+        <translation>Adicionar uma restrição de centro de massa</translation>
     </message>
 </context>
 <context>
@@ -367,7 +367,7 @@ within this workbench.
     <message>
         <location filename="a2p_convertPart.py" line="168"/>
         <source>Convert a part to A2plus</source>
-        <translation type="unfinished"></translation>
+        <translation>Converter para peça de montagem</translation>
     </message>
 </context>
 <context>
@@ -502,7 +502,7 @@ within the assembly.
     <message>
         <location filename="a2p_importpart.py" line="1172"/>
         <source>Edit an imported part (open linked FCStd file)</source>
-        <translation type="unfinished"></translation>
+        <translation>Editar uma peça importada (abrir arquivo FCStd vinculado)</translation>
     </message>
     <message>
         <location filename="a2p_importpart.py" line="1239"/>
@@ -522,7 +522,7 @@ of the assembly.
     <message>
         <location filename="a2p_importpart.py" line="1265"/>
         <source>Move the selected part</source>
-        <translation type="unfinished"></translation>
+        <translation>Mover a peça selecionada</translation>
     </message>
     <message>
         <location filename="a2p_importpart.py" line="1357"/>
@@ -538,7 +538,7 @@ Move the a part under rule of constraints.
     <message>
         <location filename="a2p_importpart.py" line="1384"/>
         <source>Move the selected part under constraints</source>
-        <translation type="unfinished"></translation>
+        <translation>Mover a peça selecionada seguindo as restrições</translation>
     </message>
     <message>
         <location filename="a2p_importpart.py" line="1413"/>
@@ -562,7 +562,7 @@ at once.
     <message>
         <location filename="a2p_importpart.py" line="1465"/>
         <source>Delete all constraints of selected parts</source>
-        <translation type="unfinished"></translation>
+        <translation>Deletar todas as restrições das peças selecionadas</translation>
     </message>
     <message>
         <location filename="a2p_importpart.py" line="1485"/>
@@ -582,22 +582,22 @@ the desired constraint.
     <message>
         <location filename="a2p_importpart.py" line="1514"/>
         <source>Highlight both constrained parts</source>
-        <translation type="unfinished"></translation>
+        <translation>Destacar ambas as peças restritas</translation>
     </message>
     <message>
         <location filename="a2p_importpart.py" line="1610"/>
         <source>Show only selected elements or all if none is selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar apenas os elementos selecionados ou todos se nenhum estiver selecionado</translation>
     </message>
     <message>
         <location filename="a2p_importpart.py" line="1642"/>
         <source>Toggle transparency of assembly</source>
-        <translation type="unfinished"></translation>
+        <translation>Alterar transparência da montagem</translation>
     </message>
     <message>
         <location filename="a2p_importpart.py" line="1643"/>
         <source>Toggles transparency of assembly</source>
-        <translation type="unfinished"></translation>
+        <translation>Altera transparência da montagem</translation>
     </message>
     <message>
         <location filename="a2p_importpart.py" line="1669"/>
@@ -621,7 +621,7 @@ will be made visible again.
     <message>
         <location filename="a2p_importpart.py" line="1680"/>
         <source>Toggle auto solve</source>
-        <translation type="unfinished"></translation>
+        <translation>Alternar resolução automática</translation>
     </message>
     <message>
         <location filename="a2p_importpart.py" line="1700"/>
@@ -649,7 +649,7 @@ toggled between &apos;aligned&apos; and
     <message>
         <location filename="a2p_importpart.py" line="1764"/>
         <source>Flip direction of last constraint</source>
-        <translation type="unfinished"></translation>
+        <translation>Inverter direção da última restrição</translation>
     </message>
     <message>
         <location filename="a2p_importpart.py" line="1811"/>
@@ -664,7 +664,7 @@ toggled between &apos;aligned&apos; and
     <message>
         <location filename="a2p_importpart.py" line="1877"/>
         <source>Show part labels in 3D view</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar rótulos de peças na vista 3D</translation>
     </message>
     <message>
         <location filename="a2p_importpart.py" line="1878"/>
@@ -694,7 +694,7 @@ toggled between &apos;aligned&apos; and
     <message>
         <location filename="a2p_importpart.py" line="1983"/>
         <source>Save and exit the active document</source>
-        <translation type="unfinished"></translation>
+        <translation>Salvar e sair do documento ativo</translation>
     </message>
     <message>
         <location filename="a2p_importpart.py" line="2005"/>
@@ -746,7 +746,7 @@ by the parts list function of A2plus.
     <message>
         <location filename="a2p_partinformation.py" line="88"/>
         <source>Create a spreadsheet for ordering or logistics information</source>
-        <translation type="unfinished"></translation>
+        <translation>Criar uma planilha para pedidos ou informações de logística</translation>
     </message>
 </context>
 <context>
