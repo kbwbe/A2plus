@@ -186,6 +186,7 @@ class PointIdentityConstraint(BasicConstraint):
     @staticmethod
     def getToolTip():
         return \
+translate("A2plus_constraints",
 '''
 Create the point-to-point constraint (pointIdentity)
 
@@ -195,6 +196,7 @@ Select:
 
 Button gets active after correct selection.
 '''
+)
 
     @staticmethod
     def isValidSelection(selection):
@@ -234,6 +236,7 @@ class PointOnLineConstraint(BasicConstraint):
     @staticmethod
     def getToolTip():
         return \
+translate("A2plus_constraints",
 '''
 Create the point-on-line constraint (pointOnLine)
 
@@ -246,6 +249,7 @@ it's axis will be taken as line definition.
 
 Button gets active after correct selection.
 '''
+)
 
     @staticmethod
     def isValidSelection(selection):
@@ -290,6 +294,7 @@ class PointOnPlaneConstraint(BasicConstraint):
     @staticmethod
     def getToolTip():
         return \
+translate("A2plus_constraints",
 '''
 Create the point-on-plane constraint (pointOnPlane)
 
@@ -299,6 +304,7 @@ Select:
 
 Button gets active after correct selection.
 '''
+)
 
     @staticmethod
     def isValidSelection(selection):
@@ -368,6 +374,7 @@ class CircularEdgeConstraint(BasicConstraint):
     @staticmethod
     def getToolTip():
         return \
+translate("A2plus_constraints",
 '''
 Create the circular-edge constraint (circularEdge)
 
@@ -377,6 +384,7 @@ Select:
 
 Button gets active after correct selection.
 '''
+)
 
     @staticmethod
     def isValidSelection(selection):
@@ -423,6 +431,7 @@ class AxialConstraint(BasicConstraint):
     @staticmethod
     def getToolTip():
         return \
+translate("A2plus_constraints",
 '''
 Create the axis-to-axis constraint (axisCoincident)
 
@@ -434,6 +443,7 @@ Select:
 
 Button gets active after correct selection.
 '''
+)
 
     @staticmethod
     def isValidSelection(selection):
@@ -485,6 +495,7 @@ class AxisParallelConstraint(BasicConstraint):
     @staticmethod
     def getToolTip():
         return \
+translate("A2plus_constraints",
 '''
 Create the parallel-axis constraint (axisParallel)
 
@@ -499,6 +510,7 @@ If using circular edge, it's axis will be taken as line.
 
 Button gets active after correct selection.
 '''
+)
 
     @staticmethod
     def isValidSelection(selection):
@@ -532,6 +544,7 @@ class AxisPlaneParallelConstraint(BasicConstraint):
     @staticmethod
     def getToolTip():
         return \
+translate("A2plus_constraints",
 '''
 Create the axis-to-plane parallelism constraint (axisPlaneParallel)
 
@@ -544,6 +557,7 @@ selected plane. The parts are not moved to be coincident.
 
 Button gets active after correct selection.
 '''
+)
 
     @staticmethod
     def isValidSelection(selection):
@@ -601,6 +615,7 @@ class AxisPlaneAngleConstraint(BasicConstraint):
     @staticmethod
     def getToolTip():
         return \
+translate("A2plus_constraints",
 '''
 Create the angular axis-to-plane constraint (axisPlaneAngle)
 
@@ -616,6 +631,7 @@ The parts are not moved to be coincident.
 
 Button gets active after correct selection.
 '''
+)
 
     @staticmethod
     def isValidSelection(selection):
@@ -668,6 +684,7 @@ class AxisPlaneNormalConstraint(BasicConstraint):
     @staticmethod
     def getToolTip():
         return \
+translate("A2plus_constraints",
 '''
 Create the axis-plane-normal constraint (axisPlaneNormal)
 
@@ -681,6 +698,7 @@ coincident.
 
 Button gets active after correct selection.
 '''
+)
 
     @staticmethod
     def isValidSelection(selection):
@@ -737,6 +755,7 @@ class PlanesParallelConstraint(BasicConstraint):
     @staticmethod
     def getToolTip():
         return \
+translate("A2plus_constraints",
 '''
 Create the planes-parallelism constraint (planesParallel)
 
@@ -749,6 +768,7 @@ Select:
 
 Button gets active after correct selection.
 '''
+)
 
     @staticmethod
     def isValidSelection(selection):
@@ -808,6 +828,7 @@ class PlaneConstraint(BasicConstraint):
     @staticmethod
     def getToolTip():
         return \
+translate("A2plus_constraints",
 '''
 Create the coincident-plane constraint (planeCoincident)
 
@@ -817,6 +838,7 @@ Select:
 
 Button gets active after correct selection.
 '''
+)
 
     @staticmethod
     def isValidSelection(selection):
@@ -853,6 +875,7 @@ class AngledPlanesConstraint(BasicConstraint):
     @staticmethod
     def getToolTip():
         return \
+translate("A2plus_constraints",
 '''
 Create the angled-planes constraint (angledPlanes)
 
@@ -872,6 +895,7 @@ For that, is better to use planesParallel constraint.
 
 Button gets active after correct selection.
 '''
+)
 
     @staticmethod
     def isValidSelection(selection):
@@ -902,6 +926,7 @@ class SphericalConstraint(BasicConstraint):
     @staticmethod
     def getToolTip():
         return \
+translate("A2plus_constraints",
 '''
 Create the sphere-to-sphere constraint (sphereCenterIdent)
 
@@ -913,6 +938,7 @@ When selecting a circle, it's center is used as a vertex.
 
 Button gets active after correct selection.
 '''
+)
     
     @staticmethod
     def isValidSelection(selection):
@@ -988,6 +1014,7 @@ class CenterOfMassConstraint(BasicConstraint):
     @staticmethod
     def getToolTip():
         return \
+translate("A2plus_constraints",
 '''
 Create the center-of-mass constraint (centerOfMass)
 
@@ -999,6 +1026,7 @@ It is possible to change the offset in object editor.
 
 Button gets active after correct selection.
 '''
+)
 
     @staticmethod
     def isValidSelection(selection):

@@ -522,6 +522,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
 
 #==============================================================================
 toolTipText = \
+translate("A2plus_constraintDialog",
 '''
 Select geometry to be constrained
 within 3D View !
@@ -532,6 +533,7 @@ get activated.
 Please also read tooltips of each
 button.
 '''
+)
 
 class a2p_ConstraintCollection(QtGui.QWidget):
     def __init__(self,parent):
@@ -1039,11 +1041,12 @@ class a2p_ConstraintPanel(QtGui.QDockWidget):
 
 #==============================================================================
 toolTipText = \
+translate("A2plus_constraintDialog",
 '''
 Opens a dialog to
 define constraints
 '''
-
+)
 class a2p_ConstraintDialogCommand:
 
     def Activated(self):
@@ -1065,12 +1068,14 @@ class a2p_ConstraintDialogCommand:
 FreeCADGui.addCommand('a2p_ConstraintDialogCommand', a2p_ConstraintDialogCommand())
 #==============================================================================
 toolTipText = \
+translate("A2plus_constraintDialog",
 '''
 Edit selected constraint
 
 Select a constraint in the
 treeview and hit this button
 '''
+)
 
 class a2p_EditConstraintCommand:
 

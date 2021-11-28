@@ -1650,19 +1650,15 @@ FreeCADGui.addCommand('a2p_ToggleTransparencyCommand', a2p_ToggleTransparencyCom
 toolTipMessage = \
 translate("A2plus_importpart",
 '''
-Show only selected elements,
-or all if none is selected.
+Toggle AutoSolve
 
-Select one or more parts,
-which are the only ones you
-want to see in a big assembly.
+By pressing this button you can
+enable or disable automatic solving
+after a constraint has been edited
 
-Hit this button, and all other
-parts will be made invisible.
-
-If you select nothing and hit
-this button, all invisible parts
-will be made visible again.
+If automatic solving is disabled
+you have to start it manually
+by hitting the solvebutton
 '''
 )
 
