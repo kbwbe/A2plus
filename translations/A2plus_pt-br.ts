@@ -297,6 +297,50 @@ invisível na primeira vez.
         <translation>Definir restrições</translation>
     </message>
     <message>
+        <location filename="a2p_constraintDialog.py" line="524"/>
+        <source>
+Select geometry to be constrained
+within 3D View !
+
+Suitable Constraint buttons will
+get activated.
+
+Please also read tooltips of each
+button.
+</source>
+        <translation>
+Selecione a geometria a ser restringida na vista 3D!
+
+Os botões de restrição adequados serão ativados.
+
+Leia também as dicas de cada botão.
+</translation>
+    </message>
+    <message>
+        <location filename="a2p_constraintDialog.py" line="1071"/>
+        <source>
+Edit selected constraint
+
+Select a constraint in the
+treeview and hit this button
+</source>
+        <translation>
+Editar restrição selecionada
+
+Selecione uma restrição na visualização em árvore e aperte este botão
+</translation>
+    </message>
+    <message>
+        <location filename="a2p_constraintDialog.py" line="1042"/>
+        <source>
+Opens a dialog to
+define constraints
+</source>
+        <translation>
+Abre uma janela para definir as restrições
+</translation>
+    </message>
+    <message>
         <location filename="a2p_constraintDialog.py" line="1112"/>
         <source>Edit selected constraint</source>
         <translation>Editar restrições selecionadas</translation>
@@ -386,6 +430,375 @@ invisível na primeira vez.
         <location filename="a2p_constraintcommands.py" line="386"/>
         <source>Add centerOfMass constraint</source>
         <translation>Adicionar uma restrição de centro de massa</translation>
+    </message>
+</context>
+<context>
+    <name>A2plus_constraints</name>
+    <message>
+        <location filename="a2p_constraints.py" line="163"/>
+        <source>
+Create the point-to-point constraint (pointIdentity)
+
+Select:
+1) A vertex, a circle, or a sphere (on a part)
+2) A vertex, a circle, or a sphere (on another part)
+
+Button gets active after correct selection.
+</source>
+        <translation>
+Crie a restrição ponto a ponto (pointIdentity)
+
+Selecione:
+1) Um vértice, um círculo ou uma esfera (em uma peça)
+2) Um vértice, um círculo ou uma esfera (em outra peça)
+
+O botão fica ativo após a seleção correta.
+</translation>
+    </message>
+    <message>
+        <location filename="a2p_constraints.py" line="163"/>
+        <source>
+Create the point-on-line constraint (pointOnLine)
+
+Select:
+1) A vertex, a sphere, or a circle (on a part)
+2) A linear/circular edge, or a cylindrical face (on another part)
+
+If the circular edge is selected, 
+it&apos;s axis will be taken as line definition.
+
+Button gets active after correct selection.
+</source>
+        <translation>
+Crie a restrição ponto sobre linha (pointOnLine)
+
+Selecione:
+1) Um vértice, uma esfera ou um círculo (em uma peça)
+2) Uma aresta linear / circular ou uma face cilíndrica (em outra peça)
+
+Se a aresta circular for selecionada, seu eixo será considerado como definição de linha.
+
+O botão fica ativo após a seleção correta.
+</translation>
+    </message>
+    <message>
+        <location filename="a2p_constraints.py" line="163"/>
+        <source>
+Create the point-on-plane constraint (pointOnPlane)
+
+Select:
+1) A vertex, a center of a circle, or a sphere (on a part)
+2) A plane (on another part)
+
+Button gets active after correct selection.
+</source>
+        <translation>
+Crie a restrição de ponto no plano (pointOnPlane)
+
+Selecione:
+1) Um vértice, um centro de um círculo ou uma esfera (em uma peça)
+2) Um plano (em outra peça)
+
+O botão fica ativo após a seleção correta.
+</translation>
+    </message>
+    <message>
+        <location filename="a2p_constraints.py" line="163"/>
+        <source>
+Create the circular-edge constraint (circularEdge)
+
+Select:
+1) A circular edge (on a part)
+2) A circular edge (on another part)
+
+Button gets active after correct selection.
+</source>
+        <translation>
+Crie a restrição de borda circular (circularEdge)
+
+Selecione:
+1) Uma aresta circular (em uma peça)
+2) Uma aresta circular (em outra peça)
+
+O botão fica ativo após a seleção correta.
+</translation>
+    </message>
+    <message>
+        <location filename="a2p_constraints.py" line="163"/>
+        <source>
+Create the axis-to-axis constraint (axisCoincident)
+
+2 axis are aligned and will be moved to be coincident.
+
+Select:
+1) A cylindrical face or linear edge (on a part)
+2) A cylindrical face or linear edge (on another part)
+
+Button gets active after correct selection.
+</source>
+        <translation>
+Crie a restrição de coicidência entre eixos (axisCoincident)
+
+2 eixos estão alinhados e serão movidos para serem coincidentes.
+
+Selecione:
+1) Uma face cilíndrica ou aresta linear (em uma peça)
+2) Uma face cilíndrica ou aresta linear (em outra peça)
+
+O botão fica ativo após a seleção correta.
+</translation>
+    </message>
+    <message>
+        <location filename="a2p_constraints.py" line="163"/>
+        <source>
+Create the parallel-axis constraint (axisParallel)
+
+Axis&apos; will only rotate to be parallel, but will not 
+be moved to be coincident.
+
+Select:
+1) A linear/circular edge, or cylindrical face (on a part)
+2) A linear/circular edge, or cylindrical face (on another part)
+
+If using circular edge, it&apos;s axis will be taken as line.
+
+Button gets active after correct selection.
+</source>
+        <translation>
+Crie a restrição de eixo paralelo (axisParallel)
+
+Os eixos irão girar apenas para ficarem paralelos, mas não
+serão movidos para serem coincidentes.
+
+Selecione:
+1) Uma aresta linear / circular ou face cilíndrica (em uma peça)
+2) Uma aresta linear / circular ou face cilíndrica (em outra peça)
+
+Se estiver usando uma aresta circular, seu eixo será considerado uma linha.
+
+O botão fica ativo após a seleção correta.
+</translation>
+    </message>
+    <message>
+        <location filename="a2p_constraints.py" line="163"/>
+        <source>
+Create the axis-to-plane parallelism constraint (axisPlaneParallel)
+
+Select:
+1) A linear edge, or cylinder axis (on a part)
+2) A plane face (on another part)
+
+This constraint adjusts an axis parallel to a 
+selected plane. The parts are not moved to be coincident.
+
+Button gets active after correct selection.
+</source>
+        <translation>
+Crie a restrição de paralelismo entre eixo e plano (axisPlaneParallel)
+
+Selecione:
+1) Uma borda linear ou eixo do cilindro (em uma peça)
+2) Uma face plana (em outra peça)
+
+Esta restrição ajusta um eixo paralelo a um
+plano selecionado. As peças não são movidas para serem coincidentes.
+
+O botão fica ativo após a seleção correta.
+</translation>
+    </message>
+    <message>
+        <location filename="a2p_constraints.py" line="163"/>
+        <source>
+Create the angular axis-to-plane constraint (axisPlaneAngle)
+
+Select:
+1) A linear edge, or cylinder axis (on a part)
+2) A plane face (on another part)
+
+At first this constraint adjusts an axis parallel to a 
+selected plane. Within the following popUp dialog you 
+can define an angle.
+
+The parts are not moved to be coincident.
+
+Button gets active after correct selection.
+</source>
+        <translation>
+Crie a restrição angular de eixo e plano (axisPlaneAngle)
+
+Selecione:
+1) Uma borda linear ou eixo do cilindro (em uma peça)
+2) Uma face plana (em outra peça)
+
+A princípio, essa restrição ajusta um eixo paralelo a um plano selecionado. Na caixa de diálogo a seguir, você pode definir um ângulo.
+
+As peças não são movidas para serem coincidentes.
+
+O botão fica ativo após a seleção correta.
+</translation>
+    </message>
+    <message>
+        <location filename="a2p_constraints.py" line="163"/>
+        <source>
+Create the axis-plane-normal constraint (axisPlaneNormal)
+
+Select:
+1) A linear edge, or cylinder axis (on a part)
+2) A plane face (on another part)
+
+This constraint adjusts an axis vertical to a 
+selected plane. The parts are not moved to be 
+coincident.
+
+Button gets active after correct selection.
+</source>
+        <translation>
+Crie a restrição normal entre plano e eixo (axisPlaneNormal)
+
+Selecione:
+1) Uma borda linear ou eixo do cilindro (em uma peça)
+2) Uma face plana (em outra peça)
+
+Esta restrição ajusta um eixo vertical a um plano selecionado. As peças não são movidas para serem coincidentes.
+
+O botão fica ativo após a seleção correta.
+</translation>
+    </message>
+    <message>
+        <location filename="a2p_constraints.py" line="163"/>
+        <source>
+Create the planes-parallelism constraint (planesParallel)
+
+Planes will only rotate to be parallel, but not
+moved to be coincident.
+
+Select:
+1) A plane (on a part)
+2) A plane (on another part)
+
+Button gets active after correct selection.
+</source>
+        <translation>
+Crie a restrição de paralelismo entre planos (planesParallel)
+
+Os planos irão girar apenas para serem paralelos, mas não serão movidos para serem coincidentes.
+
+Selecione:
+1) Um plano (em uma peça)
+2) Um plano (em outra peça)
+
+O botão fica ativo após a seleção correta.
+</translation>
+    </message>
+    <message>
+        <location filename="a2p_constraints.py" line="163"/>
+        <source>
+Create the coincident-plane constraint (planeCoincident)
+
+Select:
+1) A plane (on a part)
+2) A plane (on another part)
+
+Button gets active after correct selection.
+</source>
+        <translation>
+Crie a restrição de plano coincidente (planeCoincident)
+
+Selecione:
+1) Um plano (em uma peça)
+2) Um plano (em outra peça)
+
+O botão fica ativo após a seleção correta.
+</translation>
+    </message>
+    <message>
+        <location filename="a2p_constraints.py" line="163"/>
+        <source>
+Create the angled-planes constraint (angledPlanes)
+
+Select:
+1) A plane (on a part)
+2) A plane (on another part)
+
+After setting this constraint at first the actual 
+angle between both planes is been calculated and 
+stored to entry &quot;angle&quot; in object editor.
+
+The angle can be changed in the object editor
+
+Avoid using angles equals to 0 and 180 degrees.
+You could get strange results.
+For that, is better to use planesParallel constraint.
+
+Button gets active after correct selection.
+</source>
+        <translation>
+Crie a restrição de ângulo entre planos (angledPlanes)
+
+Selecione:
+1) Um plano (em uma peça)
+2) Um plano (em outra peça)
+
+Depois de definir esta restrição, o ângulo real entre os dois planos é calculado e armazenado na entrada &quot;ângulo&quot; no editor de objetos.
+
+O ângulo pode ser alterado no editor de objetos
+
+Evite usar ângulos iguais a 0 e 180 graus.
+Você pode obter resultados estranhos.
+Para isso, é melhor usar a restrição de planos paralelos.
+
+O botão fica ativo após a seleção correta.
+</translation>
+    </message>
+    <message>
+        <location filename="a2p_constraints.py" line="163"/>
+        <source>
+Create the sphere-to-sphere constraint (sphereCenterIdent)
+
+Select:
+1) A spherical surface, or a vertex (on a part)
+2) A spherical surface, or a vertex (on another part)
+
+When selecting a circle, it&apos;s center is used as a vertex.
+
+Button gets active after correct selection.
+</source>
+        <translation>
+Crie a restrição entre esferas (sphereCenterIdent)
+
+Selecione:
+1) Uma superfície esférica ou um vértice (em uma peça)
+2) Uma superfície esférica, ou um vértice (em outra peça)
+
+Ao selecionar um círculo, seu centro é usado como um vértice.
+
+O botão fica ativo após a seleção correta.
+</translation>
+    </message>
+    <message>
+        <location filename="a2p_constraints.py" line="163"/>
+        <source>
+Create the center-of-mass constraint (centerOfMass)
+
+Select:
+1) A face, or a closed edge (on a part)
+2) A face, or a closed edge (on another part)
+
+It is possible to change the offset in object editor.
+
+Button gets active after correct selection.
+</source>
+        <translation>
+Crie a restrição de centro de massa (centerOfMass)
+
+Selecione:
+1) Uma face ou uma aresta fechada (em uma peça)
+2) Uma face ou uma aresta fechada (em outra peça)
+
+É possível alterar o deslocamento no editor de objetos.
+
+O botão fica ativo após a seleção correta.
+</translation>
     </message>
 </context>
 <context>
@@ -487,13 +900,9 @@ is taken to the assembly by
 this function.)
 </source>
         <translation>
-Atualizar as peças que foram
-importadas para a montagem.
+Atualizar as peças que foram importadas para a montagem.
 
-(Se você modificar uma peça em
-um arquivo externo, o novo formato
-é levado para a montagem
-por esta função.)
+(Se você modificar uma peça em um arquivo externo, o novo formato é levado para a montagem por esta função.)
 </translation>
     </message>
     <message>
@@ -517,13 +926,9 @@ Hold &quot;Shift&quot; for doing this
 multiple times.
 </source>
         <translation>
-Duplicar uma peça que já foi
-importada para a montagem.
+Duplicar uma peça que já foi importada para a montagem.
 
-Selecione uma peça importada
-e clique neste botão. Uma cópia
-será criada e pode ser colocada em
-qualquer lugar com o mouse.
+Selecione uma peça importada e clique neste botão. Uma cópia será criada e pode ser colocada em qualquer lugar com o mouse.
 
 Segure &quot;Shift&quot; para fazer isso várias vezes.
 </translation>
@@ -719,6 +1124,27 @@ Se você não selecionar nada e clicar neste botão, todas as partes invisíveis
         <location filename="a2p_importpart.py" line="1680"/>
         <source>Toggle auto solve</source>
         <translation>Alternar resolução automática</translation>
+    </message>
+    <message>
+        <location filename="a2p_importpart.py" line="1650"/>
+        <source>
+Toggle AutoSolve
+
+By pressing this button you can
+enable or disable automatic solving
+after a constraint has been edited
+
+If automatic solving is disabled
+you have to start it manually
+by hitting the solvebutton
+</source>
+        <translation>
+Alternar resolução automática.
+
+Ao pressionar este botão, você pode habilitar ou desabilitar a resolução automática após a edição de uma restrição.
+
+Se a solução automática estiver desabilitada, você deve iniciá-la manualmente pressionando o botão resolver
+</translation>
     </message>
     <message>
         <location filename="a2p_importpart.py" line="1700"/>
