@@ -16,44 +16,46 @@
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="53"/>
         <source>Adds a creation button for every constraint type to the toolbar</source>
-        <translation type="unfinished"></translation>
+        <translation>Adicionar um botão de criação para cada tipo de restrição na barra de ferramentas</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="56"/>
         <source>Show constraints in toolbar</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar restrições na barra de ferramentas</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="72"/>
         <source>Use native file manager of your OS</source>
-        <translation type="unfinished"></translation>
+        <translation>Use o gerenciador de arquivos nativo do seu sistema operacional</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="107"/>
         <source>Behavior when updating imported parts</source>
-        <translation type="unfinished"></translation>
+        <translation>Comportamento ao atualizar peças importadas</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="122"/>
         <source>All parts of the assembly will be opened in FreeCAD to be
 reconstructed using values from spreadsheets</source>
-        <translation type="unfinished"></translation>
+        <translation>Todas as peças da montagem serão abertas no FreeCAD para
+serem reconstruídas usando os valores das tabelas</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="126"/>
         <source>Recalculate imported parts before updating them (experimental)</source>
-        <translation type="unfinished"></translation>
+        <translation>Recalcular as peças importadas antes de atualizá-las (experimental)</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="139"/>
         <source>Opens all subassemblies recursively
 to update them</source>
-        <translation type="unfinished"></translation>
+        <translation>Abre todas as submontagens recursivamente
+para atualizá-las</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="143"/>
         <source>Enable recursive update of imported parts</source>
-        <translation type="unfinished"></translation>
+        <translation>Ativar atualização recursiva de peças importadas</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="156"/>
@@ -61,23 +63,27 @@ to update them</source>
 are written into &quot;mux Info&quot; property. When the parts are
 later updated the properties &quot;Sub Elementx&quot; of the constraints
 will be updated according to the &quot;mux Info&quot; topology.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ao importar peças para a montagem, os nomes topológicos são 
+gravados na propriedade &quot;mux Info&quot;. Quando as peças forem atualizadas
+posteriormente, as propriedades &quot;Sub Elementx&quot; das restrições serão
+atualizadas de acordo com a topologia &quot;mux Info&quot;.</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="162"/>
         <source>Use experimental topological naming</source>
-        <translation type="unfinished"></translation>
+        <translation>Use nomenclatura topológica experimental</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="175"/>
         <source>Use color and transparency settings
 from imported parts</source>
-        <translation type="unfinished"></translation>
+        <translation>Use as configurações de cor e transparência
+de peças importadas</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="179"/>
         <source>Inherit per face transparency from parts and subassemblies (experimental)</source>
-        <translation type="unfinished"></translation>
+        <translation>Herdar transparência por face de peças e subconjuntos (experimental)</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="192"/>
@@ -85,57 +91,60 @@ from imported parts</source>
 Note: No constraints must be connected to
 datum/construction shapes in higher or other
 subassemblies. Otherwise you can break the assembly.</source>
-        <translation type="unfinished"></translation>
+        <translation>Formas de datum / construção invisíveis serão ocultadas.
+Nota: Nenhuma restrição deve ser conectada a
+formas de datum / construção superiores ou outras
+submontagens. Caso contrário, você pode quebrar a montagem.</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="198"/>
         <source>All imported parts will directly be put together as union.</source>
-        <translation type="unfinished"></translation>
+        <translation>Todas as peças importadas serão reunidas diretamente como união.</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="201"/>
         <source>Do not import invisible shapes (for expert users)</source>
-        <translation type="unfinished"></translation>
+        <translation>Não importe formas invisíveis (para usuários experientes)</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="214"/>
         <source>Use solid union for importing parts and subassemblies (experimental)</source>
-        <translation type="unfinished"></translation>
+        <translation>Use união sólida para importar peças e submontagens (experimental)</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="243"/>
         <source>Storage of files</source>
-        <translation type="unfinished"></translation>
+        <translation>Armazenamento de arquivos</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="258"/>
         <source>Use relative paths for imported parts</source>
-        <translation type="unfinished"></translation>
+        <translation>Use caminhos relativos para peças importadas</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="274"/>
         <source>Use absolute paths for imported parts</source>
-        <translation type="unfinished"></translation>
+        <translation>Use caminhos absolutos para peças importadas</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="287"/>
         <source>Specify the project folder in the field below</source>
-        <translation type="unfinished"></translation>
+        <translation>Especifique a pasta do projeto no campo abaixo</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="290"/>
         <source>All files are in this project folder:</source>
-        <translation type="unfinished"></translation>
+        <translation>Todos os arquivos estão nesta pasta de projeto:</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="357"/>
         <source>Default solver behavior</source>
-        <translation type="unfinished"></translation>
+        <translation>Comportamento do solucionador padrão</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="369"/>
         <source>Solve automatically if a constraint property is changed</source>
-        <translation type="unfinished"></translation>
+        <translation>Resolução automaticamente se uma propriedade de restrição for alterada</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="398"/>
@@ -148,34 +157,39 @@ subassemblies. Otherwise you can break the assembly.</source>
 All other parts are not calculated. If a solution could be
 found, the next constrained part is added for the
 calculation and so on.</source>
-        <translation type="unfinished"></translation>
+        <translation>O solucionador começa com uma peça fixa e outra restrita a ela.
+Todas as outras peças não são calculadas. Se uma solução puder ser
+encontrada, a próxima peça restrita é adicionada para o
+cálculo e assim por diante.</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="419"/>
         <source>Use solving of partial systems (recommended for static assemblies)</source>
-        <translation type="unfinished"></translation>
+        <translation>Use a resolução de sistemas parciais (recomendado para montagens estáticas)</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="435"/>
         <source>Solver tries to move all parts at once
 in direction to a fixed part</source>
-        <translation type="unfinished"></translation>
+        <translation>O solucionador tenta mover todas as peças
+de uma vez em direção a uma parte fixa</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="439"/>
         <source>Use &quot;magnetic&quot; solver, solving all parts at once (for dynamical assemblies)</source>
-        <translation type="unfinished"></translation>
+        <translation>Use o solucionador &quot;magnético&quot;, resolvendo todas as peças de uma vez (para montagens dinâmicas)</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="452"/>
         <source>All parts will be fixed to the positions
 where they were created</source>
-        <translation type="unfinished"></translation>
+        <translation>Todas as peças serão fixadas nas posições
+onde elas foram criadas</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="456"/>
         <source>Force fixed position to all imports</source>
-        <translation type="unfinished"></translation>
+        <translation>Forçar posição fixa para todas as importações</translation>
     </message>
 </context>
 <context>
@@ -206,7 +220,28 @@ Answer No:
 Only the parts within the
 recent assembly are collected.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>
+Criar uma planilha com uma
+lista de peças deste arquivo.
+
+Esta função irá ler a planilha
+#PARTINFO# de todas as peças
+presentes na montagem e criar uma
+nova planilha contendo a lista de peças.
+
+Este botão irá abrir uma caixa de diálogo
+com a pergunta:
+- Repitir recursivamente
+      todos os subconjuntos?
+
+Resposta Sim:
+Todas as peças de todos os subconjuntos são
+listadas para a lista de peças
+
+Resposta Não:
+Apenas as partes dentro da
+montagem principal são listadas.
+</translation>
     </message>
 </context>
 <context>
@@ -234,12 +269,24 @@ The created shape can be found
 in the treeview. By default it
 is invisible at first time.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>
+Crie ou atualize uma forma simples
+da montagem completa.
+
+Todas as peças da montagem são
+combinadas em uma única forma.
+Esta forma pode ser usada, por exemplo
+ para outros módulos ou impressão 3D.
+
+A forma criada pode ser encontrada na
+visualização em árvore. Por padrão, ela fica
+invisível na primeira vez.
+</translation>
     </message>
     <message>
         <location filename="a2p_MuxAssembly.py" line="308"/>
         <source>Create or refresh simple shape of complete assembly</source>
-        <translation type="unfinished"></translation>
+        <translation>Crie ou atualize formas simples de montagem completa</translation>
     </message>
 </context>
 <context>
@@ -273,67 +320,67 @@ is invisible at first time.
     <message>
         <location filename="a2p_constraintcommands.py" line="56"/>
         <source>Add pointIdentity constraint</source>
-        <translation>Adicionar restrição ponto|entidade</translation>
+        <translation>Adicionar restrição de coincidência entre pontos</translation>
     </message>
     <message>
         <location filename="a2p_constraintcommands.py" line="82"/>
         <source>Add pointOnLine constraint</source>
-        <translation type="unfinished"></translation>
+        <translation>Adicionar restrição ponto na linha</translation>
     </message>
     <message>
         <location filename="a2p_constraintcommands.py" line="108"/>
         <source>Add pointOnPlane constraint</source>
-        <translation type="unfinished"></translation>
+        <translation>Adicionar restrição ponto no plano</translation>
     </message>
     <message>
         <location filename="a2p_constraintcommands.py" line="133"/>
         <source>Add sphereCenterIdent constraint</source>
-        <translation type="unfinished"></translation>
+        <translation>Adicionar restrição centro de esfera</translation>
     </message>
     <message>
         <location filename="a2p_constraintcommands.py" line="158"/>
         <source>Add circularEdge constraint</source>
-        <translation type="unfinished"></translation>
+        <translation>Adicionar restrição de borda circular</translation>
     </message>
     <message>
         <location filename="a2p_constraintcommands.py" line="183"/>
         <source>Add axis Coincident constraint</source>
-        <translation type="unfinished"></translation>
+        <translation>Adicionar restrição de coincidência de eixo</translation>
     </message>
     <message>
         <location filename="a2p_constraintcommands.py" line="208"/>
         <source>Add axisParallel constraint</source>
-        <translation type="unfinished"></translation>
+        <translation>Adicionar restrição de eixo paralelo</translation>
     </message>
     <message>
         <location filename="a2p_constraintcommands.py" line="233"/>
         <source>Add axisPlaneParallel constraint</source>
-        <translation type="unfinished"></translation>
+        <translation>Adicionar restrição de plano paralelo</translation>
     </message>
     <message>
         <location filename="a2p_constraintcommands.py" line="258"/>
         <source>Add axisPlaneAngle constraint</source>
-        <translation type="unfinished"></translation>
+        <translation>Adicionar restrição angular de plano</translation>
     </message>
     <message>
         <location filename="a2p_constraintcommands.py" line="283"/>
         <source>Add axisPlaneNormal constraint</source>
-        <translation type="unfinished"></translation>
+        <translation>Adicionar restrição de eixo normal ao plano</translation>
     </message>
     <message>
         <location filename="a2p_constraintcommands.py" line="308"/>
         <source>Add planesParallel constraint</source>
-        <translation type="unfinished"></translation>
+        <translation>Adicionar restrição de planos paralelos</translation>
     </message>
     <message>
         <location filename="a2p_constraintcommands.py" line="333"/>
         <source>Add planeCoincident constraint</source>
-        <translation type="unfinished"></translation>
+        <translation>Adicionar restrição de coincidência de planos</translation>
     </message>
     <message>
         <location filename="a2p_constraintcommands.py" line="359"/>
         <source>Add angledPlanes constraint</source>
-        <translation type="unfinished"></translation>
+        <translation>Adicionar restrição angular entre planos</translation>
     </message>
     <message>
         <location filename="a2p_constraintcommands.py" line="386"/>
@@ -362,7 +409,15 @@ This function is useful, if
 you want to use e.g. fasteners
 within this workbench.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>
+Converta uma peça, criada com outra bancada, em uma peça de montagem totalmente funcional.
+
+Após a conversão, as restrições podem ser aplicadas. Além disso, você pode duplicar a peça convertida.
+
+Para editar uma peça convertida, aperte o botão editar e siga as instruções mostradas na tela.
+
+Esta função é útil se você quiser usar, por exemplo, parafusos dentro desta bancada.
+</translation>
     </message>
     <message>
         <location filename="a2p_convertPart.py" line="168"/>
@@ -432,12 +487,12 @@ is taken to the assembly by
 this function.)
 </source>
         <translation>
-Atualize as peças que foram
+Atualizar as peças que foram
 importadas para a montagem.
 
 (Se você modificar uma peça em
-um arquivo externo, a nova forma
-é levada para a montagem
+um arquivo externo, o novo formato
+é levado para a montagem
 por esta função.)
 </translation>
     </message>
@@ -497,7 +552,15 @@ you have to use the function
 order to see the new shape
 within the assembly.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>
+Edite uma peça importada.
+
+Selecione uma peça importada e clique neste botão.
+
+O arquivo FCStd apropriado, vinculado a esta peça será aberto e você pode modificar a peça aqui.
+
+Após editar e salvar, você deve usar a função &apos;atualizar peças importadas&apos; para ver o novo formato da peça dentro da montagem.
+</translation>
     </message>
     <message>
         <location filename="a2p_importpart.py" line="1172"/>
@@ -517,7 +580,13 @@ If the part is constrained, it
 will jump back by next solving
 of the assembly.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>
+Mover a peça selecionada.
+
+Selecione uma peça e aperte este botão. A peça pode ser movida com o mouse.
+
+Se a peça estiver restrita, ela voltará a posição original na próxima resolução da montagem.
+</translation>
     </message>
     <message>
         <location filename="a2p_importpart.py" line="1265"/>
@@ -533,7 +602,13 @@ Move the a part under rule of constraints.
 2) Click a part and it is glued to the cursor and can be moved
 3) Click again (or press ESC) and the command terminates
 </source>
-        <translation type="unfinished"></translation>
+        <translation>
+Mover a peça obedecendo as regras de restrições.
+
+1) Clique neste botão
+2) Clique em uma peça e ela ficará colada ao cursor e pode ser movida
+3) Clique novamente (ou pressione ESC) e o comando termina
+</translation>
     </message>
     <message>
         <location filename="a2p_importpart.py" line="1384"/>
@@ -557,7 +632,15 @@ After confirmation all related
 constraints are deleted
 at once.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>
+Excluir todas as restrições de uma peça selecionada.
+
+Selecione extamente uma peça e aperte este botão.
+
+Uma caixa de diálogo de confirmação é exibida, mostrando todas as restrições relacionadas à peça selecionada.
+
+Após a confirmação, todas as restrições relacionadas são excluídas de uma só vez.
+</translation>
     </message>
     <message>
         <location filename="a2p_importpart.py" line="1465"/>
@@ -577,7 +660,13 @@ The whole assembly is switched to
 transparent mode and you can inspect
 the desired constraint.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>
+Destacar todas as peças que estão relacionadas a uma restrição selecionada.
+
+Selecione uma restrição na visualização em árvore e clique neste botão.
+
+A montagem inteira é alternada para o modo transparente e você pode inspecionar a restrição desejada.
+</translation>
     </message>
     <message>
         <location filename="a2p_importpart.py" line="1514"/>
@@ -616,7 +705,15 @@ If you select nothing and hit
 this button, all invisible parts
 will be made visible again.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>
+Mostra apenas os elementos selecionados ou todos, se nenhum estiver selecionado.
+
+Selecione uma ou mais peças, que são as únicas que você deseja ver em uma grande montagem.
+
+Aperte este botão e todas as outras peças ficarão invisíveis.
+
+Se você não selecionar nada e clicar neste botão, todas as partes invisíveis ficarão visíveis novamente.
+</translation>
     </message>
     <message>
         <location filename="a2p_importpart.py" line="1680"/>
@@ -626,12 +723,12 @@ will be made visible again.
     <message>
         <location filename="a2p_importpart.py" line="1700"/>
         <source>Toggle partial processing</source>
-        <translation type="unfinished"></translation>
+        <translation>Alternar processamento parcial</translation>
     </message>
     <message>
         <location filename="a2p_importpart.py" line="1731"/>
         <source>Repair the tree view if it is somehow damaged</source>
-        <translation type="unfinished"></translation>
+        <translation>Repare a visualização em árvore se estiver danificada de alguma forma</translation>
     </message>
     <message>
         <location filename="a2p_importpart.py" line="1750"/>
@@ -644,7 +741,11 @@ been defined, has a property
 toggled between &apos;aligned&apos; and
 &apos;opposed&apos; (alignment of axis)
 </source>
-        <translation type="unfinished"></translation>
+        <translation>
+Inverta a direção da última restrição.
+
+Se a última restrição que foi definida tem uma propriedade &apos;direção&apos;, seu valor será alternado entre &apos;alinhado&apos; e &apos;oposto&apos; (alinhamento do eixo)
+</translation>
     </message>
     <message>
         <location filename="a2p_importpart.py" line="1764"/>
@@ -654,12 +755,12 @@ toggled between &apos;aligned&apos; and
     <message>
         <location filename="a2p_importpart.py" line="1811"/>
         <source>Generate HTML file with detailed constraining structure</source>
-        <translation type="unfinished"></translation>
+        <translation>Gerar arquivo HTML com estrutura de restrição detalhada</translation>
     </message>
     <message>
         <location filename="a2p_importpart.py" line="1814"/>
         <source>Generates HTML file with detailed constraining structure</source>
-        <translation type="unfinished"></translation>
+        <translation>Gera arquivo HTML com estrutura de restrição detalhada</translation>
     </message>
     <message>
         <location filename="a2p_importpart.py" line="1877"/>
@@ -669,27 +770,27 @@ toggled between &apos;aligned&apos; and
     <message>
         <location filename="a2p_importpart.py" line="1878"/>
         <source>Toggle showing part labels in 3D view</source>
-        <translation type="unfinished"></translation>
+        <translation>Alternar para mostrar/ocultar os rótulos das peças na vista 3D</translation>
     </message>
     <message>
         <location filename="a2p_importpart.py" line="1912"/>
         <source>Print detailed DOF information</source>
-        <translation type="unfinished"></translation>
+        <translation>Imprima informações detalhadas sobre os graus de liberdade</translation>
     </message>
     <message>
         <location filename="a2p_importpart.py" line="1913"/>
         <source>Toggle printing detailed DOF information</source>
-        <translation type="unfinished"></translation>
+        <translation>Alterna a impressão de informações detalhadas sobre os graus de liberdade</translation>
     </message>
     <message>
         <location filename="a2p_importpart.py" line="1948"/>
         <source>Convert absolute paths of imported parts to relative ones</source>
-        <translation type="unfinished"></translation>
+        <translation>Converter caminhos absolutos de peças importadas em relativos</translation>
     </message>
     <message>
         <location filename="a2p_importpart.py" line="1951"/>
         <source>Converts absolute paths of imported parts to relative ones</source>
-        <translation type="unfinished"></translation>
+        <translation>Converte caminhos absolutos de peças importadas em relativos</translation>
     </message>
     <message>
         <location filename="a2p_importpart.py" line="1983"/>
@@ -713,17 +814,25 @@ After running this function, you
 should save and reopen your
 assembly file.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>
+Migrar proxies de peças importadas
+
+Montagens muito antigas feitas com a bancada A2plus não mostram os ícones corretos para peças importadas e têm propriedades obsoletas.
+
+Com esta função, você pode migrar os viewProviders de peças importadas antigas para o estado recente.
+
+Depois de executar esta função, você deve salvar e reabrir o arquivo de montagem.
+</translation>
     </message>
     <message>
         <location filename="a2p_importpart.py" line="2043"/>
         <source>Migrate proxies of imported parts</source>
-        <translation type="unfinished"></translation>
+        <translation>Migrar proxies de peças importadas</translation>
     </message>
     <message>
         <location filename="a2p_importpart.py" line="2191"/>
         <source>Clean up solver debug output from 3D view</source>
-        <translation type="unfinished"></translation>
+        <translation>Limpe a saída de depuração do solucionador da visualização 3D</translation>
     </message>
 </context>
 <context>
@@ -741,7 +850,13 @@ Please fill in your information.
 This spreadsheet will be read out
 by the parts list function of A2plus.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>
+Crie uma planilha para pedidos ou informações de logística.
+
+A planilha criada pode ser encontrada na visualização em árvore.
+
+Por favor, preencha suas informações. Esta planilha será lida pela função de lista de peças do A2plus.
+</translation>
     </message>
     <message>
         <location filename="a2p_partinformation.py" line="88"/>
@@ -768,12 +883,20 @@ over all involved subassemblies.
 Subassemblies are updated,
 if necessary, too.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>
+Atualizar as peças que foram importadas para a montagem.
+
+(Se você modificar uma peça em um arquivo externo, a nova forma é levada para a montagem por esta função.)
+
+Este comando faz isso recursivamente em todas as submontagens envolvidas.
+
+As submontagens também são atualizadas, se necessário.
+</translation>
     </message>
     <message>
         <location filename="a2p_recursiveUpdatePlanner.py" line="210"/>
         <source>Update imports recursively</source>
-        <translation type="unfinished"></translation>
+        <translation>Atualizar as importações recursivamente</translation>
     </message>
 </context>
 <context>
