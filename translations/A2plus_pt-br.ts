@@ -319,17 +319,77 @@ invisível na primeira vez.
 </translation>
     </message>
     <message>
+        <location filename="a2p_MuxAssembly.py" line="261"/>
+        <source>Cannot create SimpleAssemblyShape</source>
+        <translation>SimpleAssemblyShape não pode ser criado</translation>
+    </message>
+    <message>
+        <location filename="a2p_MuxAssembly.py" line="262"/>
+        <source>No visible ImportParts found</source>
+        <translation>Nenhuma peça importada visível foi encontrada</translation>
+    </message>
+    <message>
         <location filename="a2p_MuxAssembly.py" line="308"/>
         <source>Create or refresh simple shape of complete assembly</source>
         <translation>Crie ou atualize formas simples de montagem completa</translation>
+    </message>
+    <message>
+        <location filename="a2p_MuxAssembly.py" line="315"/>
+        <source>No active document found!</source>
+        <translation>Nenhum documento ativo encontrado!</translation>
+    </message>
+    <message>
+        <location filename="a2p_MuxAssembly.py" line="316"/>
+        <source>You have to open an assembly file first.</source>
+        <translation>Você deve abrir um arquivo de montagem primeiro.</translation>
     </message>
 </context>
 <context>
     <name>A2plus_constraintDialog</name>
     <message>
-        <location filename="a2p_constraintDialog.py" line="1061"/>
-        <source>Define constraints</source>
-        <translation>Definir restrições</translation>
+        <location filename="a2p_constraintDialog.py" line="78"/>
+        <source>Constraint properties</source>
+        <translation>Propriedades de restrição</translation>
+    </message>
+    <message>
+        <location filename="a2p_constraintDialog.py" line="317"/>
+        <source>Constraint does not exist anymore</source>
+        <translation>A restrição não existe mais</translation>
+    </message>
+    <message>
+        <location filename="a2p_constraintDialog.py" line="318"/>
+        <source>Constraint has already been deleted</source>
+        <translation>A restrição já foi excluída</translation>
+    </message>
+    <message>
+        <location filename="a2p_constraintDialog.py" line="444"/>
+        <source>Confirmation required</source>
+        <translation>Confirmação necessária</translation>
+    </message>
+    <message>
+        <location filename="a2p_constraintDialog.py" line="447"/>
+        <source>Constraint Tools</source>
+        <translation>Ferramentas de restrição</translation>
+    </message>
+    <message>
+        <location filename="a2p_constraintDialog.py" line="445"/>
+        <source>Really delete this constraint?</source>
+        <translation>Deseja realmente excluir esta restrição?</translation>
+    </message>
+    <message>
+        <location filename="a2p_constraintDialog.py" line="494"/>
+        <source>Exit and delete new constraint?</source>
+        <translation>Sair e excluir a nova restrição?</translation>
+    </message>
+    <message>
+        <location filename="a2p_constraintDialog.py" line="507"/>
+        <source>Information</source>
+        <translation>Informação</translation>
+    </message>
+    <message>
+        <location filename="a2p_constraintDialog.py" line="508"/>
+        <source>Values changed! Accept Constraint?</source>
+        <translation>Valores alterados! Aceita a restrição?</translation>
     </message>
     <message>
         <location filename="a2p_constraintDialog.py" line="524"/>
@@ -350,6 +410,26 @@ Os botões de restrição adequados serão ativados.
 
 Leia também as dicas de cada botão.
 </translation>
+    </message>
+    <message>
+        <location filename="a2p_constraintDialog.py" line="755"/>
+        <source>Constraint tools help</source>
+        <translation>Ajuda da ferramenta de restrição</translation>
+    </message>
+    <message>
+        <location filename="a2p_constraintDialog.py" line="1061"/>
+        <source>Define constraints</source>
+        <translation>Definir restrições</translation>
+    </message>
+    <message>
+        <location filename="a2p_constraintDialog.py" line="1087"/>
+        <source>Selection Error !</source>
+        <translation>Erro de seleção!</translation>
+    </message>
+    <message>
+        <location filename="a2p_constraintDialog.py" line="1088"/>
+        <source>Please select exact one constraint first.</source>
+        <translation>Primeiro selecione exatamente uma restrição.</translation>
     </message>
     <message>
         <location filename="a2p_constraintDialog.py" line="1071"/>
@@ -383,6 +463,16 @@ Abre uma janela para definir as restrições
 </context>
 <context>
     <name>A2plus_constraintServices</name>
+    <message>
+        <location filename="a2p_constraintServices.py" line="87"/>
+        <source>Recalculate direction of constraints</source>
+        <translation>Recalcular a direção das restrições</translation>
+    </message>
+    <message>
+        <location filename="a2p_constraintServices.py" line="88"/>
+        <source>Do you really want to recalculate the directions of all constraints?</source>
+        <translation>Você realmente deseja recalcular as direções de todas as restrições?</translation>
+    </message>
     <message>
         <location filename="a2p_constraintServices.py" line="104"/>
         <source>Re-adjust directions of all constraints</source>
@@ -873,6 +963,16 @@ Esta função é útil se você quiser usar, por exemplo, parafusos dentro desta
         <translation>Converter para peça de montagem</translation>
     </message>
     <message>
+        <location filename="a2p_convertPart.py" line="177"/>
+        <source>Please select only visible parts!</source>
+        <translation>Selecione apenas peças visíveis!</translation>
+    </message>
+    <message>
+        <location filename="a2p_convertPart.py" line="180"/>
+        <source>Conversion Aborted</source>
+        <translation>Conversão cancelada</translation>
+    </message>
+    <message>
         <location filename="a2p_convertPart.py" line="240"/>
         <source>A part can only be imported from a FreeCAD &apos;*.FCStd&apos; file</source>
         <translation>Uma peça só pode ser importada de um arquivo FreeCAD &apos;* .FCStd&apos;</translation>
@@ -891,22 +991,6 @@ Esta função é útil se você quiser usar, por exemplo, parafusos dentro desta
         <location filename="a2p_convertPart.py" line="268"/>
         <source>Import Error</source>
         <translation>Erro de importação</translation>
-    </message>
-    <message>
-        <location filename="a2p_importpart.py" line="435"/>
-        <source>
-Add shapes from an external file
-to the assembly
-</source>
-        <translation>
-Adicionar formas de um arquivo 
-externo à montagem
-</translation>
-    </message>
-    <message>
-        <location filename="a2p_importpart.py" line="440"/>
-        <source>Add shapes from an external file</source>
-        <translation>Adicionar formas de um arquivo externo</translation>
     </message>
     <message>
         <location filename="a2p_convertPart.py" line="449"/>
@@ -946,6 +1030,22 @@ externo à montagem
 </context>
 <context>
     <name>A2plus_importpart</name>
+    <message>
+        <location filename="a2p_importpart.py" line="428"/>
+        <source>
+Add shapes from an external file
+to the assembly
+</source>
+        <translation>
+Adicionar formas de um arquivo 
+externo à montagem
+</translation>
+    </message>
+    <message>
+        <location filename="a2p_importpart.py" line="440"/>
+        <source>Add shapes from an external file</source>
+        <translation>Adicionar formas de um arquivo externo</translation>
+    </message>
     <message>
         <location filename="a2p_importpart.py" line="637"/>
         <source>
@@ -1016,7 +1116,7 @@ externo à montagem
     <message>
         <location filename="a2p_importpart.py" line="1092"/>
         <source>File error ! </source>
-        <translation>Erro de arquivo!</translation>
+        <translation>Erro de arquivo! </translation>
     </message>
     <message>
         <location filename="a2p_importpart.py" line="1093"/>
@@ -1369,11 +1469,7 @@ Se a solução automática estiver desabilitada, você deve iniciá-la manualmen
     <message>
         <location filename="a2p_importpart.py" line="1704"/>
         <source>Repair the treeview, if it is damaged somehow. After pressing this button, constraints will grouped under corresponding parts again.</source>
-        <translation>
-Repare a visualização em árvore, se estiver danificada de alguma forma.
-
-Depois de pressionar este botão, as restrições serão agrupadas nas peças correspondentes novamente.
-        </translation>
+        <translation>Repare a visualização em árvore, se estiver danificada de alguma forma. Depois de pressionar este botão, as restrições serão agrupadas nas peças correspondentes novamente.</translation>
     </message>
     <message>
         <location filename="a2p_importpart.py" line="1728"/>
@@ -1514,6 +1610,16 @@ Por favor, preencha suas informações. Esta planilha será lida pela função d
 </translation>
     </message>
     <message>
+        <location filename="a2p_partinformation.py" line="60"/>
+        <source>No active document found!</source>
+        <translation>Nenhum documento ativo encontrado!</translation>
+    </message>
+    <message>
+        <location filename="a2p_partinformation.py" line="61"/>
+        <source>You have to open a FCStd file first.</source>
+        <translation>Você deve abrir um arquivo FCStd primeiro.</translation>
+    </message>
+    <message>
         <location filename="a2p_partinformation.py" line="88"/>
         <source>Create a spreadsheet for ordering or logistics information</source>
         <translation>Criar uma planilha para pedidos ou informações de logística</translation>
@@ -1552,6 +1658,21 @@ As submontagens também são atualizadas, se necessário.
         <location filename="a2p_recursiveUpdatePlanner.py" line="210"/>
         <source>Update imports recursively</source>
         <translation>Atualizar as importações recursivamente</translation>
+    </message>
+    <message>
+        <location filename="a2p_recursiveUpdatePlanner.py" line="136"/>
+        <source>Do you want to update only the selected parts?</source>
+        <translation>Quer atualizar apenas as peças selecionadas?</translation>
+    </message>
+    <message>
+        <location filename="a2p_recursiveUpdatePlanner.py" line="139"/>
+        <source>RECURSIVE UPDATE</source>
+        <translation>ATUALIZAÇÃO RECURSIVA</translation>
+    </message>
+    <message>
+        <location filename="a2p_recursiveUpdatePlanner.py" line="186"/>
+        <source>A part can only be imported from a FreeCAD &apos;*.fcstd&apos; file</source>
+        <translation>Uma peça só pode ser importada de um arquivo FreeCAD &apos;* .fcstd&apos;</translation>
     </message>
 </context>
 <context>
@@ -1624,6 +1745,53 @@ Você deseja excluir este par de restrição?
         <translation>Uma outra bancada de montagem para o FreeCAD.</translation>
     </message>
     <message>
+        <location filename="a2p_solversystem.py" line="218"/>
+        <source>The following constraints are broken:</source>
+        <translation>As seguintes restrições foram quebradas:</translation>
+    </message>
+    <message>
+        <location filename="a2p_solversystem.py" line="221"/>
+        <source>Do you want to delete them ?</source>
+        <translation>Você deseja excluí-las?</translation>
+    </message>
+    <message>
+        <location filename="a2p_solversystem.py" line="226"/>
+        <source>Delete broken constraints?</source>
+        <translation>Excluir restrições quebradas?</translation>
+    </message>
+    <message>
+        <location filename="a2p_solversystem.py" line="523"/>
+        <source>
+Constraints inconsistent. Cannot solve System.
+Please run the conflict finder tool !
+</source>
+        <translation>
+Restrições inconsistentes. Não é possível resolver o sistema.
+Execute a ferramenta de localização de conflito!
+</translation>
+    </message>
+    <message>
+        <location filename="a2p_solversystem.py" line="531"/>
+        <source>Constraint mismatch</source>
+        <translation>Restrição incompatível</translation>
+    </message>
+    <message>
+        <location filename="a2p_solversystem.py" line="547"/>
+        <source>
+The highlighted parts were not moved. They are
+not constrained (also over constraint chains)
+to a fixed part!
+</source>
+        <translation>
+As peças destacadas não foram movidas. Elas não estão restritas (também nas cadeias de restrição) para uma peça fixa!
+</translation>
+    </message>
+    <message>
+        <location filename="a2p_solversystem.py" line="554"/>
+        <source>Could not move some parts</source>
+        <translation>Não foi possível mover algumas peças</translation>
+    </message>
+    <message>
         <location filename="a2p_solversystem.py" line="735"/>
         <source>Solve constraints</source>
         <translation>Resolver restrições</translation>
@@ -1632,6 +1800,19 @@ Você deseja excluir este par de restrição?
         <location filename="a2p_solversystem.py" line="739"/>
         <source>Solves constraints</source>
         <translation>Resolve restrições</translation>
+    </message>
+</context>
+<context>
+    <name>A2plus_lib</name>
+    <message>
+        <location filename="a2plib.py" line="1130"/>
+        <source>Not existing part(s):</source>
+        <translation>Peça(s) não existente(s):</translation>
+    </message>
+    <message>
+        <location filename="a2plib.py" line="1135"/>
+        <source>Constraints of missing parts removed!</source>
+        <translation>Restrições de peças ausentes removidas!</translation>
     </message>
 </context>
 </TS>
