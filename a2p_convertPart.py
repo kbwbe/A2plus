@@ -174,10 +174,10 @@ class a2p_ConvertPartCommand():
         selection = FreeCADGui.Selection.getSelection()
         for s in selection:
             if s.ViewObject.Visibility == False:
-                msg = u"Please select only visible parts!"
+                msg = translate("A2plus_convertPart","Please select only visible parts!")
                 QtGui.QMessageBox.information(
                     QtGui.QApplication.activeWindow(),
-                    u"Conversion Aborted",
+                    translate("A2plus_convertPart","Conversion Aborted"),
                     msg
                     )
                 return

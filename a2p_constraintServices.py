@@ -84,8 +84,8 @@ class a2p_reAdjustConstraintDirectionsCommand:
         flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
         response = QtGui.QMessageBox.information(
             QtGui.QApplication.activeWindow(), 
-            u'Recalculate direction of constraints', 
-            u'Do you really want to recalculate\nthe directions of all constraints?', 
+            translate("A2plus_constraintServices",'Recalculate direction of constraints'), 
+            translate("A2plus_constraintServices",'Do you really want to recalculate the directions of all constraints?'), 
             flags
             )
         if response == QtGui.QMessageBox.Yes:

@@ -1127,12 +1127,12 @@ def deleteConstraintsOfDeletedObjects():
 
         missingObjects = set(missingObjects)
     
-        msg = u"Not existing part(s):\n  - {}".format(
+        msg = translate("A2plus_lib","Not existing part(s):") + "\n  - {}".format(
             u'\n  - '.join( objName for objName in missingObjects)
             )
         QtGui.QMessageBox.information(
             QtGui.QApplication.activeWindow(), 
-            u"Constraints of missing parts removed!", 
+            translate("A2plus_lib","Constraints of missing parts removed!"), 
             msg 
             )
 #------------------------------------------------------------------------------

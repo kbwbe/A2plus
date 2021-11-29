@@ -176,8 +176,8 @@ class a2p_CreatePartlist():
         doc = FreeCAD.activeDocument()
         if doc == None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
-                                        "No active document found!",
-                                        "You have to open a FCStd file first."
+                                        translate("A2plus","No active document found!"),
+                                        translate("A2plus","You have to open a FCStd file first.")
                                     )
             return
         completeFilePath = doc.FileName

@@ -259,8 +259,8 @@ def createOrUpdateSimpleAssemblyShape(doc):
 
     if len(visibleImportObjects) == 0:
         QtGui.QMessageBox.critical(  QtGui.QApplication.activeWindow(),
-                                     "Cannot create SimpleAssemblyShape",
-                                     "No visible ImportParts found"
+                                     translate("A2plus_MuxAssembly","Cannot create SimpleAssemblyShape"),
+                                     translate("A2plus_MuxAssembly","No visible ImportParts found")
                                    )
         return
 
@@ -312,8 +312,8 @@ class a2p_SimpleAssemblyShapeCommand():
     def Activated(self):
         if FreeCAD.activeDocument() == None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
-                                        "No active document found!",
-                                        "You have to open an assembly file first."
+                                        translate("A2plus_MuxAssembly","No active document found!"),
+                                        translate("A2plus_MuxAssembly","You have to open an assembly file first.")
                                     )
             return
         doc = FreeCAD.ActiveDocument

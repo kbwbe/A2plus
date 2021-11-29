@@ -57,8 +57,8 @@ class a2p_CreatePartInformationSheet_Command:
         doc = FreeCAD.activeDocument()
         if doc == None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
-                                        "No active document found!",
-                                        "You have to open a FCStd file first."
+                                        translate("A2plus_partinformation","No active document found!"),
+                                        translate("A2plus_partinformation","You have to open a FCStd file first.")
                                     )
             return
         

@@ -215,15 +215,15 @@ class SolverSystem():
             rig.hierarchyLinkedRigids.extend(rig.linkedRigids)
                
         if len(deleteList) > 0:
-            msg = "The following constraints are broken:\n"
+            msg = translate("A2plus_solversystem","The following constraints are broken:") + "\n"
             for c in deleteList:
                 msg += "{}\n".format(c.Label)
-            msg += "Do you want to delete them ?"
+            msg += translate("A2plus_solversystem","Do you want to delete them ?")
 
             flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
             response = QtGui.QMessageBox.critical(
                 QtGui.QApplication.activeWindow(),
-                "Delete broken constraints?",
+                translate("A2plus_solversystem","Delete broken constraints?"),
                 msg,
                 flags
                 )
@@ -520,13 +520,15 @@ class SolverSystem():
                 if showFailMessage == True:
                     Msg( "===== Could not solve system ====== \n" )
                     msg = \
+translate("A2plus_solversystem",
 '''
 Constraints inconsistent. Cannot solve System.
 Please run the conflict finder tool !
 '''
+)
                     QtGui.QMessageBox.information(
                         QtGui.QApplication.activeWindow(),
-                        "Constraint mismatch",
+                        translate("A2plus_solversystem","Constraint mismatch"),
                         msg
                         )
                 return systemSolved
@@ -542,14 +544,14 @@ Please run the conflict finder tool !
             FreeCADGui.Selection.clearSelection()
             for obj in self.unmovedParts:
                 FreeCADGui.Selection.addSelection(obj)
-            msg = '''    
+            msg = translate("A2plus_solversystem",'''    
 The highlighted parts were not moved. They are
 not constrained (also over constraint chains)
 to a fixed part!
-'''
+''')
             QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
-                "Could not move some parts",
+                translate("A2plus_solversystem","Could not move some parts"),
                 msg
                 )
 
