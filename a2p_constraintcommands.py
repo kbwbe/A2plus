@@ -53,7 +53,7 @@ class a2p_PointIdentityConstraintCommand:
     def GetResources(self):
         return {
              'Pixmap'  : path_a2p + '/icons/a2p_PointIdentity.svg',
-             'MenuText': QT_TRANSLATE_NOOP("A2plus_constraintcommands", "Add pointIdentity constraint"),
+             'MenuText': translate("A2plus_constraintcommands", "Add pointIdentity constraint"),
              'ToolTip' : a2p_constraints.PointIdentityConstraint.getToolTip()
              }
 
@@ -79,7 +79,7 @@ class a2p_PointOnLineConstraintCommand:
     def GetResources(self): 
         return {
              'Pixmap'  : path_a2p + '/icons/a2p_PointOnLineConstraint.svg', 
-             'MenuText': QT_TRANSLATE_NOOP("A2plus_constraintcommands", "Add pointOnLine constraint"), 
+             'MenuText': translate("A2plus_constraintcommands", "Add pointOnLine constraint"), 
              'ToolTip' : a2p_constraints.PointOnLineConstraint.getToolTip()
              } 
 
@@ -105,7 +105,7 @@ class a2p_PointOnPlaneConstraintCommand:
     def GetResources(self):
         return {
              'Pixmap'  : path_a2p + '/icons/a2p_PointOnPlaneConstraint.svg',
-             'MenuText': QT_TRANSLATE_NOOP("A2plus_constraintcommands", "Add pointOnPlane constraint"),
+             'MenuText': translate("A2plus_constraintcommands", "Add pointOnPlane constraint"),
              'ToolTip' : a2p_constraints.PointOnPlaneConstraint.getToolTip()
              }
 
@@ -130,7 +130,7 @@ class a2p_SphericalSurfaceConstraintCommand:
     def GetResources(self):
         return {
             'Pixmap' : path_a2p + '/icons/a2p_SphericalSurfaceConstraint.svg',
-            'MenuText': QT_TRANSLATE_NOOP("A2plus_constraintcommands", "Add sphereCenterIdent constraint"),
+            'MenuText': translate("A2plus_constraintcommands", "Add sphereCenterIdent constraint"),
              'ToolTip': a2p_constraints.SphericalConstraint.getToolTip()
             }
 
@@ -155,7 +155,7 @@ class a2p_CircularEdgeConnectionCommand:
     def GetResources(self):
         return {
             'Pixmap'  : path_a2p + '/icons/a2p_CircularEdgeConstraint.svg' ,
-            'MenuText': QT_TRANSLATE_NOOP("A2plus_constraintcommands", "Add circularEdge constraint"),
+            'MenuText': translate("A2plus_constraintcommands", "Add circularEdge constraint"),
             'ToolTip' : a2p_constraints.CircularEdgeConstraint.getToolTip()
             }
 
@@ -180,7 +180,7 @@ class a2p_AxialConstraintCommand:
     def GetResources(self):
         return {
              'Pixmap'  : path_a2p + '/icons/a2p_AxialConstraint.svg',
-             'MenuText': QT_TRANSLATE_NOOP("A2plus_constraintcommands", "Add axis Coincident constraint"),
+             'MenuText': translate("A2plus_constraintcommands", "Add axis Coincident constraint"),
              'ToolTip' : a2p_constraints.AxialConstraint.getToolTip()
              }
 
@@ -205,7 +205,7 @@ class a2p_AxisParallelConstraintCommand:
     def GetResources(self):
         return {
              'Pixmap'  : ':/icons/a2p_AxisParallelConstraint.svg',
-             'MenuText': QT_TRANSLATE_NOOP("A2plus_constraintcommands", "Add axisParallel constraint"),
+             'MenuText': translate("A2plus_constraintcommands", "Add axisParallel constraint"),
              'ToolTip' : a2p_constraints.AxisParallelConstraint.getToolTip()
              }
 
@@ -230,7 +230,7 @@ class a2p_AxisPlaneParallelCommand:
     def GetResources(self):
         return {
              'Pixmap'  : ':/icons/a2p_AxisPlaneParallelConstraint.svg',
-             'MenuText': QT_TRANSLATE_NOOP("A2plus_constraintcommands", "Add axisPlaneParallel constraint"),
+             'MenuText': translate("A2plus_constraintcommands", "Add axisPlaneParallel constraint"),
              'ToolTip' : a2p_constraints.AxisPlaneParallelConstraint.getToolTip()
              }
 
@@ -255,7 +255,7 @@ class a2p_AxisPlaneAngleCommand:
     def GetResources(self):
         return {
              'Pixmap'  : ':/icons/a2p_AxisPlaneAngleConstraint.svg',
-             'MenuText': QT_TRANSLATE_NOOP("A2plus_constraintcommands", "Add axisPlaneAngle constraint"),
+             'MenuText': translate("A2plus_constraintcommands", "Add axisPlaneAngle constraint"),
              'ToolTip' : a2p_constraints.AxisPlaneAngleConstraint.getToolTip()
              }
 
@@ -280,7 +280,7 @@ class a2p_AxisPlaneNormalCommand:
     def GetResources(self):
         return {
              'Pixmap'  : ':/icons/a2p_AxisPlaneNormalConstraint.svg',
-             'MenuText': QT_TRANSLATE_NOOP("A2plus_constraintcommands", "Add axisPlaneNormal constraint"),
+             'MenuText': translate("A2plus_constraintcommands", "Add axisPlaneNormal constraint"),
              'ToolTip' : a2p_constraints.AxisPlaneNormalConstraint.getToolTip()
              }
 
@@ -305,7 +305,7 @@ class a2p_PlanesParallelConstraintCommand:
     def GetResources(self):
         return {
              'Pixmap'  : path_a2p + '/icons/a2p_PlanesParallelConstraint.svg',
-             'MenuText': QT_TRANSLATE_NOOP("A2plus_constraintcommands", "Add planesParallel constraint"),
+             'MenuText': translate("A2plus_constraintcommands", "Add planesParallel constraint"),
              'ToolTip' : a2p_constraints.PlanesParallelConstraint.getToolTip()
              }
 
@@ -330,7 +330,7 @@ class a2p_PlaneCoincidentConstraintCommand:
     def GetResources(self):
         return {
              'Pixmap'  : path_a2p + '/icons/a2p_PlaneCoincidentConstraint.svg',
-             'MenuText': QT_TRANSLATE_NOOP("A2plus_constraintcommands", "Add planeCoincident constraint"),
+             'MenuText': translate("A2plus_constraintcommands", "Add planeCoincident constraint"),
              'ToolTip' : a2p_constraints.PlaneConstraint.getToolTip()
              }
 
@@ -356,7 +356,7 @@ class a2p_AngledPlanesConstraintCommand:
     def GetResources(self):
         return {
              'Pixmap'  : path_a2p + '/icons/a2p_AngleConstraint.svg',
-             'MenuText': QT_TRANSLATE_NOOP("A2plus_constraintcommands", "Add angledPlanes constraint"),
+             'MenuText': translate("A2plus_constraintcommands", "Add angledPlanes constraint"),
              'ToolTip' : a2p_constraints.AngledPlanesConstraint.getToolTip()
              }
 
@@ -383,7 +383,7 @@ class a2p_CenterOfMassConstraintCommand:
     def GetResources(self):
         return {
              'Pixmap'  : path_a2p + '/icons/a2p_CenterOfMassConstraint.svg',
-             'MenuText': QT_TRANSLATE_NOOP("A2plus_constraintcommands", "Add centerOfMass constraint"),
+             'MenuText': translate("A2plus_constraintcommands", "Add centerOfMass constraint"),
              'ToolTip' : a2p_constraints.CenterOfMassConstraint.getToolTip()
              }
 

@@ -44,11 +44,11 @@ class A2plusWorkbench (Workbench):
 
     def __init__(self):
         global A2P_VERSION
-        from a2p_translateUtils import QT_TRANSLATE_NOOP
+        from a2p_translateUtils import translate
         import a2plib
         self.__class__.Icon = a2plib.pathOfModule() + "/icons/a2p_Workbench.svg"
         self.__class__.MenuText = 'A2plus '+A2P_VERSION
-        self.__class__.ToolTip  = QT_TRANSLATE_NOOP("A2plus_solversystem", "An other assembly workbench for FreeCAD.")
+        self.__class__.ToolTip  = translate("A2plus_solversystem", "An other assembly workbench for FreeCAD.")
 
     def Initialize(self):
         from a2p_translateUtils import QT_TRANSLATE_NOOP
@@ -193,19 +193,19 @@ class A2plusWorkbench (Workbench):
             partCommands
             )
         self.appendMenu(
-            ['A2plus', 'Constraint'],
+            ['A2plus', translate("A2plus_appendMenu",'Constraint')],
             constraintCommands
             )
         self.appendMenu(
-            ['A2plus', 'Solver'],
+            ['A2plus', translate("A2plus_appendMenu",'Solver')],
             solverCommands
             )
         self.appendMenu(
-            ['A2plus', 'View'],
+            ['A2plus', translate("A2plus_appendMenu",'View')],
             viewCommands
             )
         self.appendMenu(
-            ['A2plus', 'Misc'],
+            ['A2plus', translate("A2plus_appendMenu",'Misc')],
             miscCommands
             )            
             

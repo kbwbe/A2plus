@@ -84,8 +84,8 @@ class a2p_reAdjustConstraintDirectionsCommand:
         flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
         response = QtGui.QMessageBox.information(
             QtGui.QApplication.activeWindow(), 
-            u'Recalculate direction of constraints', 
-            u'Do you really want to recalculate\nthe directions of all constraints?', 
+            translate("A2plus_constraintServices",'Recalculate direction of constraints'), 
+            translate("A2plus_constraintServices",'Do you really want to recalculate the directions of all constraints?'), 
             flags
             )
         if response == QtGui.QMessageBox.Yes:
@@ -101,8 +101,8 @@ class a2p_reAdjustConstraintDirectionsCommand:
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_ReAdjustConstraints.svg',
-            'MenuText': QT_TRANSLATE_NOOP("A2plus_constraintServices", "Re-adjust directions of all constraints"),
-            'ToolTip' : QT_TRANSLATE_NOOP("A2plus_constraintServices", "Re-adjust directions of all constraints to fit best")
+            'MenuText': translate("A2plus_constraintServices", "Re-adjust directions of all constraints"),
+            'ToolTip' : translate("A2plus_constraintServices", "Re-adjust directions of all constraints to fit best")
             }
 FreeCADGui.addCommand('a2p_reAdjustConstraintDirectionsCommand', a2p_reAdjustConstraintDirectionsCommand())
 #==============================================================================

@@ -75,7 +75,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
 
     def initUI(self):
         #self.setMinimumHeight(self.minHeight)
-        self.setWindowTitle('Constraint properties')
+        self.setWindowTitle(translate("A2plus_constraintDialog",'Constraint properties'))
         #self.resize(300,600)
         
         self.mainLayout = QtGui.QGridLayout() # a VBoxLayout for the whole form
@@ -314,8 +314,8 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         if self.constraintObject not in doc.Objects:
             QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
-                "Constraint does not exist anymore",
-                "Constraint has already been deleted"
+                translate("A2plus_constraintDialog","Constraint does not exist anymore"),
+                translate("A2plus_constraintDialog","Constraint has already been deleted")
                 )
             a2plib.setConstraintEditorRef(None)
             self.Deleted.emit()
@@ -431,8 +431,8 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         if self.constraintObject not in doc.Objects:
             QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
-                "Constraint does not exist anymore",
-                "Constraint has been already deleted"
+                translate("A2plus_constraintDialog","Constraint does not exist anymore"),
+                translate("A2plus_constraintDialog","Constraint has already been deleted")
                 )
             a2plib.setConstraintEditorRef(None)
             self.Deleted.emit()
@@ -441,8 +441,8 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
         response = QtGui.QMessageBox.information(
             QtGui.QApplication.activeWindow(),
-            "Confirmation required",
-            "Really delete this constraint?",
+            translate("A2plus_constraintDialog","Confirmation required"),
+            translate("A2plus_constraintDialog","Really delete this constraint?"),
             flags
             )
         if response == QtGui.QMessageBox.Yes:
@@ -464,8 +464,8 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         if self.constraintObject not in doc.Objects:
             QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
-                "Constraint does not exist anymore",
-                "Constraint has already been deleted"
+                translate("A2plus_constraintDialog","Constraint does not exist anymore"),
+                translate("A2plus_constraintDialog","Constraint has already been deleted")
                 )
             a2plib.setConstraintEditorRef(None)
             self.Deleted.emit()
@@ -479,8 +479,8 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         if self.constraintObject not in doc.Objects:
             QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
-                "Constraint does not exist anymore",
-                "Constraint has already been deleted"
+                translate("A2plus_constraintDialog","Constraint does not exist anymore"),
+                translate("A2plus_constraintDialog","Constraint has already been deleted")
                 )
             a2plib.setConstraintEditorRef(None)
             self.Deleted.emit()
@@ -490,8 +490,8 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
             response = QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
-                "Confirmation required",
-                "Exit and delete new constraint?",
+                translate("A2plus_constraintDialog","Confirmation required"),
+                translate("A2plus_constraintDialog","Exit and delete new constraint?"),
                 flags
                 )
             if response == QtGui.QMessageBox.Yes:
@@ -504,8 +504,8 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
                 flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
                 response = QtGui.QMessageBox.information(
                     QtGui.QApplication.activeWindow(),
-                    "Information",
-                    "Values changed! Accept Constraint?",
+                    translate("A2plus_constraintDialog","Information"),
+                    translate("A2plus_constraintDialog","Values changed! Accept Constraint?"),
                     flags
                     )
                 if response == QtGui.QMessageBox.Yes:
@@ -522,6 +522,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
 
 #==============================================================================
 toolTipText = \
+translate("A2plus_constraintDialog",
 '''
 Select geometry to be constrained
 within 3D View !
@@ -532,6 +533,7 @@ get activated.
 Please also read tooltips of each
 button.
 '''
+)
 
 class a2p_ConstraintCollection(QtGui.QWidget):
     def __init__(self,parent):
@@ -542,7 +544,7 @@ class a2p_ConstraintCollection(QtGui.QWidget):
         self.initUI()
 
     def initUI(self):
-        self.setWindowTitle('Constraint Tools')
+        self.setWindowTitle(translate("A2plus_constraintDialog",'Constraint Tools'))
         #self.setMinimumHeight(self.baseHeight)
         self.mainLayout = QtGui.QVBoxLayout() # a VBoxLayout for the whole form
 
@@ -738,6 +740,7 @@ class a2p_ConstraintCollection(QtGui.QWidget):
 
     def showConstraintCollectionHelp(self):
         msg = \
+translate("A2plus_constraintDialog",
 '''
 Select geometry to be constrained
 within 3D View !
@@ -748,9 +751,10 @@ get activated.
 Please also read tooltips of each
 button.
 '''
+)
         QtGui.QMessageBox.information(
             QtGui.QApplication.activeWindow(),
-            "Constraint tools help",
+            translate("A2plus_constraintDialog","Constraint tools help"),
             msg
             )
 
@@ -935,7 +939,7 @@ class a2p_ConstraintValuePanel(QtGui.QDockWidget):
             mode
             )
         self.setWidget(self.cvw)
-        self.setWindowTitle("Constraint Properties")
+        self.setWindowTitle(translate("A2plus_constraintDialog",'Constraint properties'))
 
         #self.resize(300,500)
         
@@ -997,7 +1001,7 @@ class a2p_ConstraintPanel(QtGui.QDockWidget):
         self.resize(200,250)
         cc = a2p_ConstraintCollection(None)
         self.setWidget(cc)
-        self.setWindowTitle("Constraint Tools")
+        self.setWindowTitle(translate("A2plus_constraintDialog",'Constraint Tools'))
         #
         mw = FreeCADGui.getMainWindow()
         mw.addDockWidget(QtCore.Qt.RightDockWidgetArea,self)
@@ -1039,11 +1043,12 @@ class a2p_ConstraintPanel(QtGui.QDockWidget):
 
 #==============================================================================
 toolTipText = \
+translate("A2plus_constraintDialog",
 '''
 Opens a dialog to
 define constraints
 '''
-
+)
 class a2p_ConstraintDialogCommand:
 
     def Activated(self):
@@ -1058,19 +1063,21 @@ class a2p_ConstraintDialogCommand:
     def GetResources(self):
         return {
              'Pixmap'  : ':/icons/a2p_DefineConstraints.svg',
-             'MenuText': QT_TRANSLATE_NOOP("A2plus_constraintDialog", "Define constraints"),
+             'MenuText': translate("A2plus_constraintDialog", "Define constraints"),
              'ToolTip' : toolTipText
              }
 
 FreeCADGui.addCommand('a2p_ConstraintDialogCommand', a2p_ConstraintDialogCommand())
 #==============================================================================
 toolTipText = \
+translate("A2plus_constraintDialog",
 '''
 Edit selected constraint
 
 Select a constraint in the
 treeview and hit this button
 '''
+)
 
 class a2p_EditConstraintCommand:
 
@@ -1079,8 +1086,8 @@ class a2p_EditConstraintCommand:
         if self.selectedConstraint is None:
             QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
-                "Selection Error !",
-                "Please select exact one constraint first."
+                translate("A2plus_constraintDialog","Selection Error !"),
+                translate("A2plus_constraintDialog","Please select exact one constraint first.")
                 )
             return
 
@@ -1109,7 +1116,7 @@ class a2p_EditConstraintCommand:
     def GetResources(self):
         return {
              'Pixmap'  : ':/icons/a2p_EditConstraint.svg',
-             'MenuText': QT_TRANSLATE_NOOP("A2plus_constraintDialog", "Edit selected constraint"),
+             'MenuText': translate("A2plus_constraintDialog", "Edit selected constraint"),
              'ToolTip' : toolTipText
              }
 

@@ -176,27 +176,27 @@ class a2p_CreatePartlist():
         doc = FreeCAD.activeDocument()
         if doc == None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
-                                        u"No active document found!",
-                                        u"You have to open a FCStd file first."
+                                        translate("A2plus","No active document found!"),
+                                        translate("A2plus","You have to open a FCStd file first.")
                                     )
             return
         completeFilePath = doc.FileName
         p,f = os.path.split(completeFilePath)
         
         flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
-        msg = u"Please save before generating a parts list!\nSave now ?"
-        response = QtGui.QMessageBox.information(QtGui.QApplication.activeWindow(), u"Save document?", msg, flags )
+        msg = translate("A2plus","Please save before generating a parts list! Save now?")
+        response = QtGui.QMessageBox.information(QtGui.QApplication.activeWindow(), translate("A2plus","Save document?"), msg, flags )
         if response == QtGui.QMessageBox.No:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
-                                        u"Parts list generation aborted!",
-                                        u"You have to save the assembly file first."
+                                        translate("A2plus","Parts list generation aborted!"),
+                                        translate("A2plus","You have to save the assembly file first.")
                                     )
             return
         else:
             doc.save()
         
         flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
-        msg = u"Do you want to iterate recursively over all included subassemblies?"
+        msg = translate("A2plus","Do you want to iterate recursively over all included subassemblies?")
         response = QtGui.QMessageBox.information(QtGui.QApplication.activeWindow(), u"PARTSLIST", msg, flags )
         if response == QtGui.QMessageBox.Yes:
             subAssyRecursion = True
@@ -260,7 +260,7 @@ class a2p_CreatePartlist():
     def GetResources(self):
         return {
             'Pixmap'  : ':/icons/a2p_PartsList.svg',
-            'MenuText': QT_TRANSLATE_NOOP("A2plus_CreatePartlist", "Create a spreadsheet with a parts list of this file"),
+            'MenuText': translate("A2plus_CreatePartlist", "Create a spreadsheet with a parts list of this file"),
             'ToolTip' : toolTip
             }
         

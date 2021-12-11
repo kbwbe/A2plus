@@ -140,6 +140,7 @@ def convertToImportedPart(doc, obj):
 
 
 toolTip = \
+translate("A2plus_convertPart",
 '''
 Convert a part, created with
 another WB, to a full functional
@@ -157,13 +158,14 @@ This function is useful, if
 you want to use e.g. fasteners
 within this workbench.
 '''
+)
 
 class a2p_ConvertPartCommand():
 
     def GetResources(self):
         return {'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_ConvertPart.svg',
 #                'Accel'  : "Shift+C", # a default shortcut (optional)
-                'MenuText': QT_TRANSLATE_NOOP("A2plus_convertPart", "Convert a part to A2plus"),
+                'MenuText': translate("A2plus_convertPart", "Convert a part to A2plus"),
                 'ToolTip' : toolTip
                 }
 
@@ -172,10 +174,10 @@ class a2p_ConvertPartCommand():
         selection = FreeCADGui.Selection.getSelection()
         for s in selection:
             if s.ViewObject.Visibility == False:
-                msg = u"Please select only visible parts!"
+                msg = translate("A2plus_convertPart","Please select only visible parts!")
                 QtGui.QMessageBox.information(
                     QtGui.QApplication.activeWindow(),
-                    u"Conversion Aborted",
+                    translate("A2plus_convertPart","Conversion Aborted"),
                     msg
                     )
                 return

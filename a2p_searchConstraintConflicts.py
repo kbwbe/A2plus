@@ -33,12 +33,14 @@ import a2p_solversystem
 #==============================================================================
 
 toolTipMessage = \
+translate("A2plus_searchConstraintConflicts",
 '''
 Conflict finder tool:
 
 Resolves conflicting constraints by
 trying to solve them one after another
 '''
+)
 
 class a2p_SearchConstraintConflictsCommand:
     '''
@@ -54,8 +56,8 @@ class a2p_SearchConstraintConflictsCommand:
             flags = QtGui.QMessageBox.StandardButton.Yes
             QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(), 
-                u'Searching for conflicting constraints', 
-                u'There are no a2p constraints within this document.', 
+                translate("A2plus_searchConstraintConflicts",'Searching for conflicting constraints'), 
+                translate("A2plus_searchConstraintConflicts",'There are no a2p constraints within this document.'), 
                 flags
                 )
             return
@@ -69,6 +71,7 @@ class a2p_SearchConstraintConflictsCommand:
                 ob1 = doc.getObject(c.Object1)
                 ob2 = doc.getObject(c.Object2)
                 message = \
+translate("A2plus_searchConstraintConflicts",
 u'''
 The following constraint-pair is conflicting
 with previously defined constraints:
@@ -82,7 +85,7 @@ object1: {}
 object2: {}
 
 Do you want to delete this constraint-pair?
-'''.format(
+''').format(
     c.Label,
     cmirror.Label,
     ob1.Label,
@@ -91,7 +94,7 @@ Do you want to delete this constraint-pair?
                 flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
                 response = QtGui.QMessageBox.information(
                     QtGui.QApplication.activeWindow(), 
-                    u'Searching for conflicting constraints', 
+                    translate("A2plus_searchConstraintConflicts",'Searching for conflicting constraints'), 
                     message, 
                     flags
                     )
@@ -106,7 +109,7 @@ Do you want to delete this constraint-pair?
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_SearchConstraintConflicts.svg',
-            'MenuText': QT_TRANSLATE_NOOP("A2plus_searchConstraintConflicts", "Identify conflicting constraints"),
+            'MenuText': translate("A2plus_searchConstraintConflicts", "Identify conflicting constraints"),
             'ToolTip' : toolTipMessage
             }
 FreeCADGui.addCommand('a2p_SearchConstraintConflictsCommand', a2p_SearchConstraintConflictsCommand())

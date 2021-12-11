@@ -99,6 +99,7 @@ def createUpdateFileList(
     return needToUpdate, filesToUpdate
 #==============================================================================
 toolTip = \
+translate("A2plus_recursiveUpdatePlanner",
 '''
 Update parts, which have been
 imported to the assembly.
@@ -114,7 +115,7 @@ over all involved subassemblies.
 Subassemblies are updated,
 if necessary, too.
 '''
-
+)
 
 class a2p_recursiveUpdateImportedPartsCommand:
 
@@ -132,10 +133,10 @@ class a2p_recursiveUpdateImportedPartsCommand:
                      ]
         if selection and len(selection)>0:
             flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
-            msg = u"Do you want to update only the selected parts?"
+            msg = translate("A2plus_recursiveUpdatePlanner","Do you want to update only the selected parts?")
             response = QtGui.QMessageBox.information(
                             QtGui.QApplication.activeWindow(),
-                            u"RECURSIVE UPDATE",
+                            translate("A2plus_recursiveUpdatePlanner","RECURSIVE UPDATE"),
                             msg,
                             flags
                             )
@@ -182,7 +183,7 @@ class a2p_recursiveUpdateImportedPartsCommand:
                     ImportGui.insert(filename,newname)
                     importDoc = FreeCAD.ActiveDocument
                 else:
-                    msg = "A part can only be imported from a FreeCAD '*.fcstd' file"
+                    msg = translate("A2plus_recursiveUpdatePlanner","A part can only be imported from a FreeCAD '*.fcstd' file")
                     QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Value Error", msg )
                     return
             
@@ -206,7 +207,7 @@ class a2p_recursiveUpdateImportedPartsCommand:
     def GetResources(self):
         return {
             'Pixmap'  : ':/icons/a2p_RecursiveUpdate.svg',
-            'MenuText': QT_TRANSLATE_NOOP("A2plus_recursiveUpdatePlanner", "Update imports recursively"),
+            'MenuText': translate("A2plus_recursiveUpdatePlanner", "Update imports recursively"),
             'ToolTip' : toolTip
             }
 
