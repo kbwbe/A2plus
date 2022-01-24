@@ -2,10 +2,9 @@
 <package format="1" xmlns="https://wiki.freecad.org/Package_Metadata">
   <name>A2plus</name>
   <description>Another assembly workbench for FreeCAD, following and extending Hamish's Assembly 2 workbench hence Assembly2plus. The main goal of A2plus is to create a very simple, easy to use, and not over-featured workbench for FreeCAD assemblies. Using the KISS principle: KEEP IT SIMPLE, STUPID</description>
-  <version>1.0.0</version>
-  <date>2021-12-11</date>
-  <maintainer email="your_address@null.com">donovaly</maintainer>
-  <maintainer email="your_address@null.com">kbwbe</maintainer>
+  <version>0.4.54b</version>
+  <date>2022-01-24</date>
+  <maintainer email="kbwbe@gmx.de">kbwbe</maintainer>
   <license file="LICENSE">LGPLv2.1</license>
   <url type="repository" branch="master">https://github.com/kbwbe/A2plus</url>
   <url type="bugtracker">https://github.com/kbwbe/A2plus/issues</url>
