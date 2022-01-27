@@ -97,16 +97,16 @@ class a2p_CreatePartInformationSheet_Command:
                         doc.recompute()
                 return
         except:
-            pass # proceed and create the sheat
-        
+            pass # proceed and create the sheet
+
         # create a spreadsheet with a special reserved name...
         ss = doc.addObject('Spreadsheet::Sheet',PARTINFORMATION_SHEET_NAME)
         ss.Label = PARTINFORMATION_SHEET_LABEL
-        
+
         for idx,name in enumerate(PARTLIST_COLUMN_NAMES):
             ss.set('A'+str(idx+1),name)
             ss.set('B'+str(idx+1),'')
-        
+
         ss.setColumnWidth('A',220)
         ss.setColumnWidth('B',300)
         ss.setBackground('A1:A'+str(len(PARTLIST_COLUMN_NAMES)), (0.000000,1.000000,0.000000,1.000000))
