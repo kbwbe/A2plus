@@ -36,6 +36,7 @@ def redAdjustConstraintDirections(doc):
     a2p-constraints of a document, in order to reach a solvable state if 
     possible, especially used after updating of imported parts.
     '''
+    result = []  #added for CD
     unknown_constraints = []
     constraints = [ obj for obj in doc.Objects if 'ConstraintInfo' in obj.Content]
     for c in constraints:
@@ -72,12 +73,14 @@ def redAdjustConstraintDirections(doc):
                 unknown_constraints.append(c.Type)
         except:
             print("Errors occurred during processing of {}".format(c.Label))
+            result.append(c.Name)  #added for CD
         
     if len(unknown_constraints) > 0:
         print("redefineConstraintDirections(): Found unknown constraints: {}".format(
             set(unknown_constraints)
             )
         )
+    return(result)  #added for CD
 #==============================================================================
 class a2p_reAdjustConstraintDirectionsCommand:
     def Activated(self):
