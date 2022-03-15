@@ -79,7 +79,7 @@ class A2plusWorkbench (Workbench):
         import a2p_bom # bom == bill of materials == partslist
         import a2p_constraintServices
         import a2p_searchConstraintConflicts
-
+        import CD_A2plusupdater #for CD function
         if a2plib.getRecursiveUpdateEnabled():
             partCommands = [
                 'a2p_ImportPart',
@@ -224,6 +224,15 @@ class A2plusWorkbench (Workbench):
             '/GuiA2p/Resources/ui/a2p_prefs.ui','A2plus'
             )
 
+        DiagnosticCommands = [
+            'rnp_Constraint_Viewer',
+            'rnp_Update_A2pParts',
+            ]
+       
+        self.appendToolbar(
+           'A2Diagnostics',
+           DiagnosticCommands
+           )
 
     def Activated(self):
         import a2p_observers
