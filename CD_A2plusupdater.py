@@ -12,20 +12,12 @@ import FreeCAD
 from PySide import QtUiTools
 from PySide.QtGui import *
 from PySide import QtGui, QtCore
-import math
-import dirinfo
-import dirinfo
-a2path = dirinfo.geta2plusdir(None)
-sys.path.append(a2path)
 import a2plib 
 import a2p_solversystem
 from a2p_solversystem import solveConstraints
 import CD_importpart
-#import a2p_importpart as importpart
 import CD_checkconstraints
 import CD_ConstraintDiagnostics
-#import FreeCAD, FreeCADGui, Part
-##import draft
 class globaluseclass:
     def __init__(self,name):
         self.roundto = 5
@@ -35,7 +27,6 @@ class globaluseclass:
         self.foundfeatures =[]
         self.dictOldNew ={}
         self.alldicts = {}
-        #self.usedfeatures = []
         self.clist = []
         self.partobj = None
         self.test = []
@@ -160,7 +151,8 @@ class   classFuncs():
         else:
             mApp('Update complete. All surfaces found')
         print('update complete')
-        print('Repaired constraints = ' + (str(g.repaired - g.notfoundfeatures)))
+
+        print('Repaired constraints = ' + (str(g.repaired - len(g.notfoundfeatures))))
 
     def getfeatstomove(self):        
         doc = FreeCAD.activeDocument()

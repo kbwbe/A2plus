@@ -27,30 +27,12 @@
 import sys
 import os
 import FreeCAD
-#from FreeCAD import Console
 import FreeCADGui
-
-#import inspect
-
-
-#import a2p_solversystem
-#
-#import PySide
 from PySide import QtGui, QtCore
-#from PySide import QtUiTools
 from PySide.QtGui import *
-mypath = os.path.dirname(__file__)
-import dirinfo
-a2path = dirinfo.geta2plusdir(None)
-sys.path.append(a2path)
-#import a2p_rigid
 import  a2p_solversystem
 import a2p_constraintServices
-
-#from pivy import coin
 import CD_ConstraintDiagnostics
-import dirinfo
-#import solversystemMOD
 
 class globaluseclass:
     def __init__(self,name):
@@ -514,6 +496,7 @@ class rnp_Constraint_Checkeralone:
 
 
     def GetResources(self):
+        mypath = os.path.dirname(__file__)
         return {
              'Pixmap' : mypath + "/icons/ConflictCheckeralone.svg",
              'MenuText': 'checks constraints',

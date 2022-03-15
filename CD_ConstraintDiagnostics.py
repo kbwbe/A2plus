@@ -35,22 +35,11 @@ import math
 from PySide import QtGui, QtCore
 from PySide import QtUiTools
 from PySide.QtGui import *
-
-import dirinfo
-mypath = os.path.dirname(__file__)
-mypath = mypath.replace('\\','/')
-a2path = dirinfo.geta2plusdir(None)
-sys.path.append(a2path)
-
 import a2plib
-
 import CD_checkconstraints
 import  a2p_solversystem
-
-#RR from a2p_solversystem import solveConstraints
 import CD_featurelabels
-#rr import constraintServices
-#rr import a2p_constraintDialog
+
 
 
 class globaluseclass:
@@ -1361,8 +1350,7 @@ class rnp_Constraint_Viewer:
 
 
     def GetResources(self):
-#        mypath = os.path.dirname(__file__)
-
+        mypath = os.path.dirname(__file__)
         return {
              'Pixmap' : mypath + "/icons/ConstraintDiagnostics.svg",
              'MenuText': 'Edit selected constraint',
