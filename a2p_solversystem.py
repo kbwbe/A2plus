@@ -151,7 +151,7 @@ class SolverSystem():
         #
         self.constraints = []
         constraints =[]             #temporary list
-        if matelist != None:        #Transfer matelist to the temp list
+        if matelist is not None:        #Transfer matelist to the temp list
             for obj in matelist:
                 if 'ConstraintInfo' in obj.Content:
                     constraints.append(obj)
@@ -170,7 +170,7 @@ class SolverSystem():
         for c in self.constraints:
             for attr in ['Object1','Object2']:
                 objectName = getattr(c, attr, None)
-                if objectName != None and not objectName in self.objectNames:
+                if objectName is not None and not objectName in self.objectNames:
                     self.objectNames.append( objectName )
         #
         # create a Rigid() dataStructure for each of these objectnames...
@@ -201,8 +201,8 @@ class SolverSystem():
             rigid2 = self.getRigid(c.Object2)
             
             #create and update list of constrained rigids
-            if rigid2 != None and not rigid2 in rigid1.linkedRigids: rigid1.linkedRigids.append(rigid2);
-            if rigid1 != None and not rigid1 in rigid2.linkedRigids: rigid2.linkedRigids.append(rigid1);
+            if rigid2 is not None and not rigid2 in rigid1.linkedRigids: rigid1.linkedRigids.append(rigid2);
+            if rigid1 is not None and not rigid1 in rigid2.linkedRigids: rigid2.linkedRigids.append(rigid1);
             
             try:
                 Dependency.Create(doc, c, self, rigid1, rigid2)
@@ -717,7 +717,7 @@ def solveConstraints( doc, cache=None, useTransaction = True, matelist=None, sho
 def autoSolveConstraints( doc, callingFuncName, cache=None, useTransaction=True, matelist=None):
     if not a2plib.getAutoSolveState():
         return
-    if callingFuncName != None:
+    if callingFuncName is not None:
         '''
         print (
             "autoSolveConstraints called from '{}'".format(

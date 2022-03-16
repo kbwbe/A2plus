@@ -265,7 +265,7 @@ def createOrUpdateSimpleAssemblyShape(doc):
         return
 
     sas = doc.getObject('SimpleAssemblyShape')
-    if sas == None:
+    if sas is None:
         sas = doc.addObject("Part::FeaturePython","SimpleAssemblyShape")
         SimpleAssemblyShape(sas)
         #sas.ViewObject.Proxy = 0
@@ -310,7 +310,7 @@ class a2p_SimpleAssemblyShapeCommand():
                 }
 
     def Activated(self):
-        if FreeCAD.activeDocument() == None:
+        if FreeCAD.activeDocument() is None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
                                         translate("A2plus_MuxAssembly","No active document found!"),
                                         translate("A2plus_MuxAssembly","You have to open an assembly file first.")

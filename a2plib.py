@@ -693,7 +693,7 @@ class ConstraintSelectionObserver:
         if len(self.selections) == 2:
             self.stopSelectionObservation()
             self.parseSelectionFunction( self.selections)
-        elif self.secondSelectionGate != None and len(self.selections) == 1:
+        elif self.secondSelectionGate is not None and len(self.selections) == 1:
             FreeCADGui.Selection.removeSelectionGate()
             FreeCADGui.Selection.addSelectionGate( self.secondSelectionGate )
 
@@ -717,7 +717,7 @@ class SelectionTaskDialog:
     def __init__(self, title, iconPath, textLines ):
         self.form = SelectionTaskDialogForm( textLines )
         self.form.setWindowTitle( title )
-        if iconPath != None:
+        if iconPath is not None:
             self.form.setWindowIcon( QtGui.QIcon( iconPath ) )
 
     def reject(self):
@@ -888,7 +888,7 @@ def getObjectVertexFromName( obj, name ):
 def removeConstraint( constraint ):
     'required as constraint.Proxy.onDelete only called when deleted through GUI'
     doc = constraint.Document
-    if constraint.ViewObject != None:
+    if constraint.ViewObject is not None:
         constraint.ViewObject.Proxy.onDelete( constraint.ViewObject, None ) # also removes mirror...
     doc.removeObject( constraint.Name )
 #------------------------------------------------------------------------------
@@ -914,7 +914,7 @@ def getPos(obj, subElementName):
             if error_normalized < 10**-6: #then good plane fit
                 pos = pos1
             axis, center, error = fit_rotation_axis_to_surface1(face.Surface)
-            if axis != None:
+            if axis is not None:
                 error_normalized = error / face.BoundBox.DiagonalLength
                 if error_normalized < 10**-6: #then good rotation_axis fix
                     pos = center
@@ -1103,7 +1103,7 @@ def objectExists(name):
     doc = FreeCAD.activeDocument()
     try:
         ob = doc.getObject(name)
-        if ob != None: return True
+        if ob is not None: return True
     except:
         pass
     return False
@@ -1144,7 +1144,7 @@ def a2p_repairTreeView():
 
     constraints = [ obj for obj in doc.Objects if 'ConstraintInfo' in obj.Content]
     for c in constraints:
-        if c.Proxy != None:
+        if c.Proxy is not None:
             c.Proxy.disable_onChanged = True
         if not hasattr(c,"ParentTreeObject"):
             c.addProperty("App::PropertyLink","ParentTreeObject","ConstraintInfo")
@@ -1152,12 +1152,12 @@ def a2p_repairTreeView():
         parent = doc.getObject(c.Object1)
         c.ParentTreeObject = parent
         if parent is not None: parent.touch()
-        if c.Proxy != None:
+        if c.Proxy is not None:
             c.Proxy.disable_onChanged = False
     #
     mirrors = [ obj for obj in doc.Objects if 'ConstraintNfo' in obj.Content]
     for m in mirrors:
-        if m.Proxy != None:
+        if m.Proxy is not None:
             m.Proxy.disable_onChanged = True
         if not hasattr(m,"ParentTreeObject"):
             m.addProperty("App::PropertyLink","ParentTreeObject","ConstraintNfo")
@@ -1165,7 +1165,7 @@ def a2p_repairTreeView():
         parent = doc.getObject(m.Object2)
         m.ParentTreeObject = parent
         if parent is not None: parent.touch()
-        if m.Proxy != None:
+        if m.Proxy is not None:
             m.Proxy.disable_onChanged = False
             
     unTouchA2pObjects()

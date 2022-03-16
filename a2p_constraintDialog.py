@@ -324,7 +324,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         self.winModified = True
         self.setConstraintEditorData()
         doc = FreeCAD.activeDocument()
-        if doc != None:
+        if doc is not None:
             solveConstraints(doc)
             doc.recompute()
 
@@ -417,13 +417,13 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
                 self.solve()
 
     def restoreConstraintValues(self):
-        if self.savedOffset != None:
+        if self.savedOffset is not None:
             self.constraintObject.offset = self.savedOffset
-        if self.savedDirectionConstraint != None:
+        if self.savedDirectionConstraint is not None:
             self.constraintObject.directionConstraint = self.savedDirectionConstraint
-        if self.savedAngle != None:
+        if self.savedAngle is not None:
             self.constraintObject.angle = self.savedAngle
-        if self.savedLockRotation != None:
+        if self.savedLockRotation is not None:
             self.constraintObject.lockRotation = self.savedLockRotation
 
     def delete(self):
@@ -769,7 +769,7 @@ button.
         if len(selection) != 2:
             for btn in self.constraintButtons:
                 btn.setEnabled(False)
-        elif self.activeConstraint != None:
+        elif self.activeConstraint is not None:
             for btn in self.constraintButtons:
                 btn.setEnabled(False)
         else:
@@ -961,13 +961,13 @@ class a2p_ConstraintValuePanel(QtGui.QDockWidget):
         if mode == 'createConstraint':
             if a2plib.getAutoSolveState():
                 doc = FreeCAD.activeDocument()
-                if doc != None:
+                if doc is not None:
                     solveConstraints(doc)
         self.cvw.activateWindow()
 
     def storeWindowPosition(self):
         # ConstraintDialog has Priority on storing its position
-        if a2plib.getConstraintDialogRef() != None:
+        if a2plib.getConstraintDialogRef() is not None:
             return
         frame = QtGui.QDockWidget.frameGeometry(self)
         x = frame.x()
@@ -1018,7 +1018,7 @@ class a2p_ConstraintPanel(QtGui.QDockWidget):
         self.timer.start(100)
 
     def onTimer(self):
-        if a2plib.getConstraintEditorRef(): # != None
+        if a2plib.getConstraintEditorRef(): # is not None
             # the editor box is active, do not show self
             self.hide()
         else:

@@ -55,7 +55,7 @@ class a2p_CreatePartInformationSheet_Command:
 
     def Activated(self):
         doc = FreeCAD.activeDocument()
-        if doc == None:
+        if doc is None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
                                         translate("A2plus_partinformation","No active document found!"),
                                         translate("A2plus_partinformation","You have to open a FCStd file first.")
@@ -64,7 +64,7 @@ class a2p_CreatePartInformationSheet_Command:
         
         try:
             found = doc.getObject(PARTINFORMATION_SHEET_NAME)
-            if found != None: return # object already exists
+            if found is not None: return # object already exists
         except:
             pass # proceed and create the shett
         

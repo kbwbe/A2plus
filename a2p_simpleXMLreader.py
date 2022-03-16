@@ -171,20 +171,20 @@ class simpleXMLObject(object):
         return cellAdress, cellContent
     
     def isA2pObject(self):
-        if self.propertyDict.get(b'a2p_Version',None) != None: return True
+        if self.propertyDict.get(b'a2p_Version',None) is not None: return True
         return False
     
     def isA2pSketch(self):
         if self.isA2pObject:
             value = self.propertyDict.get(b'objectType',None)
-            if value != None:
+            if value is not None:
                 if value == b'a2pSketch':
                     #print("Sketch detected")
                     return True
         return False
 
     def isSpreadSheet(self):
-        if self.propertyDict.get(b'cells',None) != None: return True
+        if self.propertyDict.get(b'cells',None) is not None: return True
         return False
     
     def getA2pSource(self):
@@ -241,7 +241,7 @@ class FCdocumentReader(object):
         
         self.clear()
         
-        # got a fileName != None ?
+        # got a fileName is not None ?
         if fileName is None:
             print (u"fcDocumentReader: failed to open file with None name!")
             return
@@ -295,10 +295,10 @@ class FCdocumentReader(object):
         out = []
         for ob in self.objects:
             value = ob.propertyDict.get(b'objectType',None)
-            if value != None:
+            if value is not None:
                 if value == b'a2pSketch':
                     continue
-            if ob.propertyDict.get(b'a2p_Version',None) != None:
+            if ob.propertyDict.get(b'a2p_Version',None) is not None:
                 out.append(ob)
                 continue
         return out
@@ -307,7 +307,7 @@ class FCdocumentReader(object):
         if not self.successfulOpened: return []
         out = []
         for ob in self.objects:
-            if ob.propertyDict.get(b'cells',None) != None:
+            if ob.propertyDict.get(b'cells',None) is not None:
                 out.append(ob)
         return out
             

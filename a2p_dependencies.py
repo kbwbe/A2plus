@@ -389,9 +389,9 @@ class Dependency():
         
 
     def applyPlacement(self, placement):
-        if self.refPoint != None:
+        if self.refPoint is not None:
             self.refPoint = placement.multVec(self.refPoint)
-        if self.refAxisEnd != None:
+        if self.refAxisEnd is not None:
             self.refAxisEnd = placement.multVec(self.refAxisEnd)
 
     def enable(self, workList):
