@@ -160,7 +160,7 @@ class A2p_xmldoc_SpreadSheet(A2p_xmldoc_Object):
 class A2p_xmldoc_FeaturePython(A2p_xmldoc_Object):
     
     def isA2pObject(self):
-        if self.propertyDict.get('a2p_Version',None) != None: return True
+        if self.propertyDict.get('a2p_Version',None) is not None: return True
         return False
     
     def getA2pSource(self):
@@ -244,10 +244,10 @@ class FCdocumentReader(object):
     def getA2pObjects(self):
         out = []
         for ob in self.objects:
-            if ob.propertyDict.get('a2p_Version',None) != None:
+            if ob.propertyDict.get('a2p_Version',None) is not None:
                 out.append(ob)
                 continue
-            elif ob.propertyDict.get('assembly2Version',None) != None: # for very old a2p projects...
+            elif ob.propertyDict.get('assembly2Version',None) is not None: # for very old a2p projects...
                 out.append(ob)
                 continue
             

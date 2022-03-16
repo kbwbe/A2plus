@@ -225,7 +225,7 @@ class Rigid():
         countRefPoints = 0
         for dep in self.dependencies:
             if dep.Enabled:
-                if dep.refPoint != None:
+                if dep.refPoint is not None:
                     newSpinCenter = newSpinCenter.add(dep.refPoint)
                     countRefPoints += 1
         if countRefPoints > 0:
@@ -236,7 +236,7 @@ class Rigid():
         newSpinCenter = Base.Vector(0,0,0)
         countRefPoints = 0
         for dep in self.dependencies:
-            if dep.refPoint != None:
+            if dep.refPoint is not None:
                 newSpinCenter = newSpinCenter.add(dep.refPoint)
                 countRefPoints += 1
         if countRefPoints > 0:
@@ -379,7 +379,7 @@ class Rigid():
 
         #compute rotation caused by axis' of the dependencies //FIXME (align,opposed,none)
         if len(self.dependencies) > 0:
-            if self.spin == None: self.spin = Base.Vector(0,0,0)
+            if self.spin is None: self.spin = Base.Vector(0,0,0)
             
             for dep in self.dependencies:
                 rotation = dep.getRotation(solver)
@@ -393,7 +393,7 @@ class Rigid():
                 self.countSpinVectors += 1
 
         # Calculate max rotation error
-        if self.spin != None:
+        if self.spin is not None:
             axisErr = self.spin.Length
             if axisErr > self.maxAxisError : self.maxAxisError = axisErr
 
@@ -404,7 +404,7 @@ class Rigid():
         #
         #Linear moving of a rigid
         moveDist = Base.Vector(0,0,0)
-        if self.moveVectorSum != None:
+        if self.moveVectorSum is not None:
             moveDist = Base.Vector(self.moveVectorSum)
             moveDist.multiply(WEIGHT_LINEAR_MOVE) # stabilize computation, adjust if needed...
             if self.debugMode == True:
@@ -413,7 +413,7 @@ class Rigid():
         #Rotate the rigid...
         center = None
         rotation = None
-        if (self.spin != None and self.spin.Length != 0.0 and self.countSpinVectors != 0):
+        if (self.spin is not None and self.spin.Length != 0.0 and self.countSpinVectors != 0):
             savedSpin = copy.copy(self.spin)
             spinAngle = self.spin.Length / self.countSpinVectors
             if spinAngle>15.0: spinAngle=15.0 # do not accept more degrees
@@ -428,7 +428,7 @@ class Rigid():
             except:
                 pass
 
-        if center != None and rotation != None:
+        if center is not None and rotation is not None:
             pl = FreeCAD.Placement(moveDist,rotation,center)
             self.applyPlacementStep(pl)
         else:

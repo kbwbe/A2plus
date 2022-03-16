@@ -85,12 +85,12 @@ def createPartList(
                             linkedSource1,
                             workingDir
                             )
-            if linkedSource == None:
+            if linkedSource is None:
                 print(u"BOM ERROR: Could not open sourcefile {}".format(linkedSource1))
                 continue
             # Is it already processed minimum one time ?
             entry = partListEntries.get(linkedSource,None)
-            if entry != None:
+            if entry is not None:
                 partListEntries.get(linkedSource)[0]+=1 #count sourcefile usage
                 continue # only needed to count imports of this file, information exists yet
 
@@ -122,7 +122,7 @@ def createPartList(
 
             # put information to dict and count usage of sourcefiles..
             entry = partListEntries.get(linkedSource,None)
-            if entry == None:
+            if entry is None:
                 partListEntries[linkedSource] = [
                     1,
                     partInformation
@@ -174,7 +174,7 @@ class a2p_CreatePartlist():
 
     def Activated(self):
         doc = FreeCAD.activeDocument()
-        if doc == None:
+        if doc is None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
                                         translate("A2plus","No active document found!"),
                                         translate("A2plus","You have to open a FCStd file first.")
@@ -215,7 +215,7 @@ class a2p_CreatePartlist():
             ss = doc.getObject(BOM_SHEET_NAME)
         except:
             pass
-        if ss == None:
+        if ss is None:
             ss = doc.addObject('Spreadsheet::Sheet',BOM_SHEET_NAME)
             ss.Label = BOM_SHEET_LABEL
         else:

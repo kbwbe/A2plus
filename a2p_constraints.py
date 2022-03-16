@@ -128,18 +128,18 @@ class BasicConstraint():
     
     def setInitialValues(self):
         c = self.constraintObject
-        if self.direction != None:
+        if self.direction is not None:
             c.addProperty("App::PropertyEnumeration","directionConstraint", "ConstraintInfo")
             c.directionConstraint = ["aligned","opposed"]
             c.directionConstraint = self.direction
             c.setEditorMode("directionConstraint", 0) # set not editable...
-        if self.offset != None:
+        if self.offset is not None:
             c.addProperty("App::PropertyDistance","offset","ConstraintInfo").offset = self.offset
             c.setEditorMode("offset", 0) # set not editable...
-        if self.angle != None:
+        if self.angle is not None:
             c.addProperty("App::PropertyAngle","angle","ConstraintInfo").angle = self.angle
             c.setEditorMode("angle", 0) # set not editable...
-        if self.lockRotation != None:
+        if self.lockRotation is not None:
             c.addProperty("App::PropertyBool","lockRotation","ConstraintInfo").lockRotation = self.lockRotation
             c.setEditorMode("lockRotation", 0) # set not editable...
     

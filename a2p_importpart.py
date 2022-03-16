@@ -136,7 +136,7 @@ class a2p_multiShapeExtractDialog(QtGui.QDialog):
         self.setLayout(self.mainLayout)
 
     def accept(self):
-        if self.data != None:
+        if self.data is not None:
 
             checked_items = []
             for index in range(self.listView.count()):
@@ -193,7 +193,7 @@ class a2p_shapeExtractDialog(QtGui.QDialog):
         self.setLayout(self.mainLayout)
 
     def accept(self):
-        if self.data != None:
+        if self.data is not None:
             self.data.tx = self.shapeCombo.currentText()
         self.deleteLater()
 
@@ -205,8 +205,8 @@ def importPartFromFile(
         _doc,
         filename,
         extractSingleShape = False, # load only a single user defined shape from file
-        desiredShapeLabel=None,
-        importToCache=False,
+        desiredShapeLabel = None,
+        importToCache = False,
         cacheKey = ""
         ):
     doc = _doc
@@ -581,7 +581,7 @@ class a2p_ImportShapeReferenceCommand():
         mw = FreeCADGui.getMainWindow()
         mdi = mw.findChild(QtGui.QMdiArea)
         sub = mdi.activeSubWindow()
-        if sub != None:
+        if sub is not None:
             sub.showMaximized()
 
         self.timer = QtCore.QTimer()
@@ -738,7 +738,7 @@ class a2p_ImportPartCommand():
         mw = FreeCADGui.getMainWindow()
         mdi = mw.findChild(QtGui.QMdiArea)
         sub = mdi.activeSubWindow()
-        if sub != None:
+        if sub is not None:
             sub.showMaximized()
 
 # WF: how will this work for multiple imported objects?
@@ -832,7 +832,7 @@ def updateImportedParts(doc, partial=False):
                                                 obj.sourceFile
                                                 )
                                         )
-            if absPath != None and os.path.exists( absPath ):
+            if absPath is not None and os.path.exists( absPath ):
                 newPartCreationTime = os.path.getmtime( absPath )
                 if (
                     newPartCreationTime > obj.timeLastImport or
@@ -887,7 +887,7 @@ def updateImportedParts(doc, partial=False):
     mw = FreeCADGui.getMainWindow()
     mdi = mw.findChild(QtGui.QMdiArea)
     sub = mdi.activeSubWindow()
-    if sub != None:
+    if sub is not None:
         sub.showMaximized()
     objectCache.cleanUp(doc)
     a2p_solversystem.autoSolveConstraints(
@@ -1004,8 +1004,8 @@ class a2p_DuplicatePartCommand:
         self.timer.start( 100 )
 
     def onTimer(self):
-        if self.partMover != None:
-            if self.partMover.objectToDelete != None:
+        if self.partMover is not None:
+            if self.partMover.objectToDelete is not None:
                 FreeCAD.activeDocument().removeObject(self.partMover.objectToDelete.Name)
                 self.partMover.objectToDelete = None
         self.timer.start(100)
@@ -1795,7 +1795,7 @@ class a2p_Show_PartLabels_Command:
         if index == 0:
             '''remove labels from 3D view'''
             dofGroup = doc.getObject("partLabels")
-            if dofGroup != None:
+            if dofGroup is not None:
                 for lbl in dofGroup.Group:
                     doc.removeObject(lbl.Name)
                 doc.removeObject("partLabels")
@@ -1838,11 +1838,11 @@ class a2p_Show_PartLabels_Command:
         doc = FreeCAD.activeDocument()
         if not doc: return False
         labelGroup = doc.getObject("partLabels")
-        return labelGroup != None
+        return labelGroup is not None
 
     def IsActive(self):
         doc = FreeCAD.activeDocument()
-        return doc != None
+        return doc is not None
 
     def GetResources(self):
         return {
@@ -1861,7 +1861,7 @@ class a2p_Show_DOF_info_Command:
             ''' Remove the existing labels from screen'''
             doc = FreeCAD.activeDocument()
             dofGroup = doc.getObject("dofLabels")
-            if dofGroup != None:
+            if dofGroup is not None:
                 for lbl in dofGroup.Group:
                     doc.removeObject(lbl.Name)
                 doc.removeObject("dofLabels")
@@ -1871,13 +1871,13 @@ class a2p_Show_DOF_info_Command:
 
     def IsActive(self):
         doc = FreeCAD.activeDocument()
-        return doc != None
+        return doc is not None
 
     def IsChecked(self):
         doc = FreeCAD.activeDocument()
         if not doc: return False
         dofGroup = doc.getObject("dofLabels")
-        return dofGroup != None
+        return dofGroup is not None
 
     def GetResources(self):
         return {
@@ -1941,11 +1941,11 @@ class a2p_SaveAndExit_Command:
         mw = FreeCADGui.getMainWindow()
         mdi = mw.findChild(QtGui.QMdiArea)
         sub = mdi.activeSubWindow()
-        if sub != None:
+        if sub is not None:
             sub.showMaximized()
 
     def IsActive(self):
-        return FreeCAD.activeDocument() != None
+        return FreeCAD.activeDocument() is not None
 
     def GetResources(self):
         return {
