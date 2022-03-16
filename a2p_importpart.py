@@ -43,18 +43,20 @@ import a2p_lcs_support
 from a2p_importedPart_class import Proxy_importPart, ImportedPartViewProviderProxy
 import a2p_constraintServices
 
-PYVERSION =  sys.version_info[0]
+PYVERSION = sys.version_info[0]
 
 #==============================================================================
+
 class DataContainer():
     def __init__(self):
         self.tx = None
 #==============================================================================
+
 class ObjectCache:
-    '''
+    """
     An assembly could use multiple instances of then same importPart.
     Cache them here so fileImports have to be executed only one time...
-    '''
+    """
     def __init__(self):
         self.objects = {} # dict, key=fileName, val=object
 
@@ -66,7 +68,7 @@ class ObjectCache:
                 pass
         self.objects = {} # dict, key=fileName
 
-    def add(self,fileName,obj): # pi_obj = PartInformation-Object
+    def add(self,fileName,obj):  # pi_obj = PartInformation-Object
         self.objects[fileName] = obj
 
     def get(self,fileName):
@@ -88,10 +90,11 @@ class ObjectCache:
 objectCache = ObjectCache()
 
 #==============================================================================
+
 class a2p_multiShapeExtractDialog(QtGui.QDialog):
-    '''
-    select a label from shape which has to be imported from a file
-    '''
+    """
+    Select a label from shape which has to be imported from a file.
+    """
     Deleted = QtCore.Signal()
     Accepted = QtCore.Signal()
 
@@ -156,10 +159,11 @@ class a2p_multiShapeExtractDialog(QtGui.QDialog):
 
 
 #==============================================================================
+
 class a2p_shapeExtractDialog(QtGui.QDialog):
-    '''
-    select a label from shape which has to be imported from a file
-    '''
+    """
+    Select a label from shape which has to be imported from a file.
+    """
     Deleted = QtCore.Signal()
     Accepted = QtCore.Signal()
 
@@ -1740,7 +1744,7 @@ class a2p_FlipConstraintDirectionCommand:
 FreeCADGui.addCommand('a2p_FlipConstraintDirectionCommand', a2p_FlipConstraintDirectionCommand())
 
 def a2p_FlipConstraintDirection():
-    ''' updating constraints, deactivated at moment'''
+    """Updating constraints, deactivated at moment."""
     constraints = [ obj for obj in FreeCAD.ActiveDocument.Objects
                         if 'ConstraintInfo' in obj.Content ]
     if len(constraints) == 0:
@@ -1793,14 +1797,14 @@ class a2p_Show_PartLabels_Command:
     def Activated(self, index):
         doc = FreeCAD.activeDocument()
         if index == 0:
-            '''remove labels from 3D view'''
+            """Remove labels from 3D view."""
             dofGroup = doc.getObject("partLabels")
             if dofGroup is not None:
                 for lbl in dofGroup.Group:
                     doc.removeObject(lbl.Name)
                 doc.removeObject("partLabels")
         else:
-            '''create or update labels within 3D view'''
+            """Create or update labels within 3D view."""
             a2pObjects = []
             for ob in doc.Objects:
                 if a2plib.isA2pPart(ob):
@@ -1858,7 +1862,7 @@ class a2p_Show_DOF_info_Command:
 
     def Activated(self, index):
         if index == 0:
-            ''' Remove the existing labels from screen'''
+            """Remove the existing labels from screen."""
             doc = FreeCAD.activeDocument()
             dofGroup = doc.getObject("dofLabels")
             if dofGroup is not None:
@@ -2020,12 +2024,6 @@ class a2p_MigrateProxiesCommand():
 FreeCADGui.addCommand('a2p_MigrateProxiesCommand', a2p_MigrateProxiesCommand())
 #==============================================================================
 
-
-
-
-
-
-
 def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
     if not a2plib.getUseTopoNaming(): return
 
@@ -2169,5 +2167,3 @@ class a2p_cleanUpDebug3dCommand():
 
 FreeCADGui.addCommand('a2p_cleanUpDebug3dCommand', a2p_cleanUpDebug3dCommand())
 #==============================================================================
-
-

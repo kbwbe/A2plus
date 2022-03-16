@@ -34,7 +34,7 @@ import os, glob
 qrc_filename = 'temp.qrc'
 if os.path.exists(qrc_filename):
     os.remove(qrc_filename)
-    
+
 
 qrc = '''<RCC>
 \t<qresource prefix="/">'''
@@ -71,7 +71,7 @@ os.system(
 
 os.remove(qrc_filename)
 
-'''NOTES: (adding Translations...)
+"""NOTES: (adding Translations...)
 # gather the strings from the .py files of the WB
 pyside-lupdate *.py -ts translations/pyfiles.ts -verbose
 
@@ -82,4 +82,4 @@ pyside-lupdate *.py -ts translations/pyfiles.ts -verbose
 # convert .ts files to .qm files (compiled translations)
 lrelease "translations/A2plus.ts"
 
-'''
+"""

@@ -50,7 +50,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
     def __init__(self,parent,constraintObject, mode):
         super(a2p_ConstraintValueWidget,self).__init__(parent=parent)
         self.mode = mode # either "editConstraint" or "createConstraint"
-        self.constraintObject = constraintObject # The documentObject of a constraint!
+        self.constraintObject = constraintObject  # The documentObject of a constraint!
 
         self.savedOffset = None
         self.savedDirectionConstraint = None
@@ -68,8 +68,8 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         self.winModified = False
         self.lineNo = 0
         self.neededHight = 0
-        self.isTopLevelWin = True  #Window management
-        self.position = None # Window position
+        self.isTopLevelWin = True  # Window management
+        self.position = None       # Window position
         self.recentUnit = "mm"
         self.initUI()
 
@@ -77,7 +77,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         #self.setMinimumHeight(self.minHeight)
         self.setWindowTitle(translate("A2plus_constraintDialog",'Constraint properties'))
         #self.resize(300,600)
-        
+
         self.mainLayout = QtGui.QGridLayout() # a VBoxLayout for the whole form
         #==============================
         lbl1 = QtGui.QLabel(self)
@@ -134,28 +134,28 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             self.mainLayout.addWidget(lbl4,self.lineNo,0)
 
             self.offsetEdit = QtGui.QDoubleSpinBox(self)
-            
+
             # get the length unit as string
             self.offsetEdit.setSuffix(" " + str(FreeCAD.Units.Quantity(1, FreeCAD.Units.Length))[3:])
             # the maximum is by default 99.99 and we can allow more
             self.offsetEdit.setMaximum(1e7) # allow up to 1 km
             # set minimum to negative of maximum
             self.offsetEdit.setMinimum(-1*self.offsetEdit.maximum())
-            
+
             # use the number of decimals defined by thew user in FC
             params = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Units")
             self.offsetEdit.setDecimals(params.GetInt('Decimals'))
-            
+
             userPreferred = Units.Quantity(offs).getUserPreferred()[0] #offs is string with value and unit
             user_qty, user_unit = userPreferred.split(' ')
             user_qty = float(user_qty.replace(",","."))
-            
+
             #self.offsetEdit.setValue(offs.Value)
             #self.offsetEdit.setSuffix(" " + str(FreeCAD.Units.Quantity(1, FreeCAD.Units.Length))[3:])
             self.offsetEdit.setSuffix(" " + user_unit)
             self.offsetEdit.setValue(user_qty)
             self.recentUnit = user_unit
-            
+
             self.offsetEdit.setFixedHeight(32)
             QtCore.QObject.connect(self.offsetEdit, QtCore.SIGNAL("valueChanged(double)"), self.handleOffsetChanged)
             self.mainLayout.addWidget(self.offsetEdit,self.lineNo,1)
@@ -185,7 +185,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             self.angleEdit = QtGui.QDoubleSpinBox(self)
             # get the angle unit as string
             self.angleEdit.setSuffix(" " + str(FreeCAD.Units.Quantity(1, FreeCAD.Units.Angle))[3:])
-            
+
             if self.constraintObject.Type == "axisPlaneAngle":
                 self.angleEdit.setMaximum(90.0)
                 self.angleEdit.setMinimum(0.0)  # the solver treats negative values as positive
@@ -201,21 +201,21 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             self.angleEdit.setToolTip("Angle in the range 0 - 180 degrees")
             QtCore.QObject.connect(self.angleEdit, QtCore.SIGNAL("valueChanged(double)"), self.handleAngleChanged)
             self.mainLayout.addWidget(self.angleEdit,self.lineNo,1)
-            
+
             self.roundAngleButton = QtGui.QPushButton(self)
             self.roundAngleButton.setText("Round")
             self.roundAngleButton.setFixedHeight(32)
             self.roundAngleButton.setToolTip("Round angle to multiples of 5")
             QtCore.QObject.connect(self.roundAngleButton, QtCore.SIGNAL("clicked()"), self.roundAngle)
             self.mainLayout.addWidget(self.roundAngleButton,self.lineNo,2)
-            
+
             self.perpendicularAngleButton = QtGui.QPushButton(self)
             self.perpendicularAngleButton.setText("Perpendicular")
             self.perpendicularAngleButton.setFixedHeight(32)
             self.perpendicularAngleButton.setToolTip("Adds/deletes 90 degrees")
             QtCore.QObject.connect(self.perpendicularAngleButton, QtCore.SIGNAL("clicked()"), self.perpendicularAngle)
             self.mainLayout.addWidget(self.perpendicularAngleButton,self.lineNo,3)
-            
+
             self.lineNo += 1
 
         #==============================
@@ -296,7 +296,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
                 self.constraintObject.directionConstraint = "opposed"
             else:
                 self.constraintObject.directionConstraint = "none"
-                
+
         if hasattr(self.constraintObject,"offset"):
             userValueStr = str(self.offsetEdit.value()) + " " + self.recentUnit
             self.constraintObject.offset = Units.Quantity(userValueStr).Value
@@ -334,7 +334,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             self.lockRotationCombo.setCurrentIndex(1)
         else:
             self.lockRotationCombo.setCurrentIndex(0)
-    
+
     def handleOffsetChanged(self):
         self.winModified = True
         # recalculate after every change
@@ -373,13 +373,13 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             self.directionCombo.setCurrentIndex(0)
         if a2plib.getAutoSolveState():
             self.solve()
-    
+
     def handleAngleChanged(self):
         self.winModified = True
         # recalculate after every change
         if a2plib.getAutoSolveState():
             self.solve()
-    
+
     def roundAngle(self):
         # rounds angle to 5 degrees
         self.winModified = True
@@ -389,7 +389,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         self.angleEdit.setValue(q)
         if a2plib.getAutoSolveState():
             self.solve()
-    
+
     def perpendicularAngle(self):
         if self.constraintObject.Type == "axisPlaneAngle":
             # we want to go this way: 0 -> 90 -> 0
@@ -801,7 +801,7 @@ button.
                 self.planeCoincidentButton.setEnabled(True)
             if a2p_constraints.CenterOfMassConstraint.isValidSelection(selection):
                 self.centerOfMassButton.setEnabled(True)
-            
+
     def onTimer(self):
         self.parseSelections()
         self.timer.start(100)
@@ -931,7 +931,7 @@ class a2p_ConstraintValuePanel(QtGui.QDockWidget):
     def __init__(self,constraintObject, mode):
         super(a2p_ConstraintValuePanel,self).__init__()
         self.constraintObject = constraintObject
-        
+
         #
         self.cvw = a2p_ConstraintValueWidget(
             None,
@@ -942,7 +942,7 @@ class a2p_ConstraintValuePanel(QtGui.QDockWidget):
         self.setWindowTitle(translate("A2plus_constraintDialog",'Constraint properties'))
 
         #self.resize(300,500)
-        
+
         QtCore.QObject.connect(self.cvw, QtCore.SIGNAL("Accepted()"), self.onAcceptConstraint)
         QtCore.QObject.connect(self.cvw, QtCore.SIGNAL("Deleted()"), self.onDeleteConstraint)
 
@@ -954,7 +954,7 @@ class a2p_ConstraintValuePanel(QtGui.QDockWidget):
         self.setAllowedAreas(QtCore.Qt.NoDockWidgetArea)
 
         #self.resize(300,500)
-        
+
         self.move(getMoveDistToStoredPosition(self))
 
         a2plib.setConstraintEditorRef(self)

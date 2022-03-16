@@ -46,12 +46,12 @@ class simpleXMLObject(object):
         self.xmlDefs = []
         self.name = None
         self.propertyDict = {}
-        
+
     def clear(self):
         self.xmlDefs = []
         self.name = None
         self.propertyDict = {}
-        
+
     def initialize(self,xmlDefs):
         remainingLines = []
         inputXML = xmlDefs
@@ -68,7 +68,7 @@ class simpleXMLObject(object):
                 break
         self.scanForProperties()
         return remainingLines
-            
+
     def scanForProperties(self):
         sourceFileFound = False
         a2pVersionFound = False
@@ -76,7 +76,7 @@ class simpleXMLObject(object):
         timeLastImportFound = False
         spreadSheetCellsFound = False
         a2pObjectTypeFound = False
-        
+
         numLines = len(self.xmlDefs)
         # Readout object's name and save it (1rst line)
         if numLines > 0:
@@ -86,7 +86,7 @@ class simpleXMLObject(object):
         idx = 0
         while idx<numLines:
             line = self.xmlDefs[idx]
-            
+
             if not sourceFileFound and line.startswith(b'<Property name="sourceFile"'):
                 idx+=1
                 line = self.xmlDefs[idx]
@@ -94,7 +94,7 @@ class simpleXMLObject(object):
                 fileName = segments[1]
                 self.propertyDict[b'sourceFile'] = a2plib.to_str(fileName)
                 sourceFileFound = True
-                
+
             elif not a2pVersionFound and line.startswith(b'<Property name="a2p_Version"'):
                 idx+=1
                 line = self.xmlDefs[idx]
@@ -102,7 +102,7 @@ class simpleXMLObject(object):
                 a2pVersion = segments[1]
                 self.propertyDict[b'a2p_Version'] = a2plib.to_str(a2pVersion)
                 a2pVersionFound = True
-                
+
             elif not a2pVersionFound and line.startswith(b'<Property name="assembly2Version"'):
                 idx+=1
                 line = self.xmlDefs[idx]
@@ -110,7 +110,7 @@ class simpleXMLObject(object):
                 a2pVersion = segments[1]
                 self.propertyDict[b'a2p_Version'] = a2plib.to_str(a2pVersion)
                 a2pVersionFound = True
-                
+
             # for very old a2p versions do additionally...
             elif not subAssemblyImportFound and line.startswith(b'<Property name="subassemblyImport"'):
                 idx+=1
@@ -122,7 +122,7 @@ class simpleXMLObject(object):
                     val = False
                 self.propertyDict[b'subassemblyImport'] = val
                 subAssemblyImportFound = True
-                
+
             elif not timeLastImportFound and line.startswith(b'<Property name="timeLastImport"'):
                 idx+=1
                 line = self.xmlDefs[idx]
@@ -131,7 +131,7 @@ class simpleXMLObject(object):
                 floatVal = float(tmp)
                 self.propertyDict[b'timeLastImport'] = floatVal
                 timeLastImportFound = True
-                
+
             elif not spreadSheetCellsFound and line.startswith(b'<Property name="cells" type="Spreadsheet::PropertySheet"'):
                 spreadSheetCellsFound = True
                 idx += 2
@@ -144,7 +144,7 @@ class simpleXMLObject(object):
                         cellDict[cellAdress] = saxutils.unescape(a2plib.to_str(cellContent)) #allow references in cell content
                     idx += 1
                 self.propertyDict[b'cells'] = cellDict
-                
+
             elif not a2pObjectTypeFound and line.startswith(b'<Property name="objectType"'):
                 idx+=1
                 line = self.xmlDefs[idx]
@@ -152,15 +152,15 @@ class simpleXMLObject(object):
                 objectType = segments[1]
                 self.propertyDict[b'objectType'] = a2plib.to_bytes(objectType)
                 a2pObjectTypeFound = True
-                
+
             idx+=1
         self.xmlDefs = [] # we are done, free memory...
-        
-    
+
+
     def parseCellLine(self,line):
-        '''
-        parse XML cell entries within an spreadsheet object
-        '''
+        """
+        Parse XML cell entries within a spreadsheet object.
+        """
         segments = line.split(b'"')
         cellAdress = segments[1]
         cellContent = ""
@@ -169,11 +169,11 @@ class simpleXMLObject(object):
                 if b"content" in segments[2]:
                     cellContent = segments[3]
         return cellAdress, cellContent
-    
+
     def isA2pObject(self):
         if self.propertyDict.get(b'a2p_Version',None) is not None: return True
         return False
-    
+
     def isA2pSketch(self):
         if self.isA2pObject:
             value = self.propertyDict.get(b'objectType',None)
@@ -186,12 +186,12 @@ class simpleXMLObject(object):
     def isSpreadSheet(self):
         if self.propertyDict.get(b'cells',None) is not None: return True
         return False
-    
+
     def getA2pSource(self):
         if self.isA2pObject:
             return self.propertyDict[b'sourceFile']
         return None
-    
+
     def isSubassembly(self):
         if self.isA2pObject:
             propFound = self.propertyDict.get(b'subassemblyImport',None)
@@ -200,7 +200,7 @@ class simpleXMLObject(object):
             else:
                 return False
         return False
-    
+
     def getTimeLastImport(self):
         if self.isA2pObject:
             propFound = self.propertyDict.get(b'timeLastImport',None)
@@ -209,17 +209,17 @@ class simpleXMLObject(object):
             else:
                 return 0.0
         return 0.0
-    
+
     def getCells(self):
         return self.propertyDict[b'cells']
-    
+
 #==============================================================================
 class FCdocumentReader(object):
     '''
     class for extracting the XML-Documentdata from a fcstd-file given by
     filepath. Some data can be extracted without opening the whole document
     within FreeCAD
-    
+
     As xml.etree.ElementTree is not working within FC due to broken libexpat.so
     (ATM), this file is a workaround as there is not much data to be extracted.
     '''
@@ -227,20 +227,20 @@ class FCdocumentReader(object):
         self.xmlLines = []
         self.objects = []
         self.successfulOpened = False
-        
+
     def clear(self):
         self.xmlLines = []
         self.objects = []
         self.successfulOpened = False
-        
+
     def openDocument(self,_fileName):
         fileName = _fileName
-        
+
         if a2plib.PYVERSION == 3:
             fileName = a2plib.to_str(fileName)
-        
+
         self.clear()
-        
+
         # got a fileName is not None ?
         if fileName is None:
             print (u"fcDocumentReader: failed to open file with None name!")
@@ -250,12 +250,12 @@ class FCdocumentReader(object):
         if not os.path.exists( fileName ):
             print (u"fcDocumentReader: file {} does not exist!".format(fileName))
             return
-        
+
         # check for fcstd file
         if not fileName.lower().endswith(a2plib.to_str('.fcstd')):
             print (u"fcDocumentReader: file {} is no FCStd file!".format(fileName))
             return
-        
+
         # decompress the file
         f = zipfile.ZipFile(fileName,'r')
         xml = f.read('Document.xml')
@@ -267,7 +267,7 @@ class FCdocumentReader(object):
         if len(self.xmlLines) <= 1:
             self.xmlLines = xml.split(b"\n") #Linux
         del(xml)
-        
+
         # remove not needed data above first section <objects name=...
         idx = 0
         for line in self.xmlLines:
@@ -276,20 +276,20 @@ class FCdocumentReader(object):
             else:
                 idx+=1
         self.xmlLines = self.xmlLines[idx:] #reduce list size instantly
-        
+
         while len(self.xmlLines) > 0:
             if not self.xmlLines[0].strip(b' ').startswith(b'<Object name'): break
             ob = simpleXMLObject()
             self.xmlLines = ob.initialize(self.xmlLines)
             self.objects.append(ob)
-        
+
         # remove not needed objects
         tmp = []
         for ob in self.objects:
             if ob.isA2pObject() or ob.isSpreadSheet():
                 tmp.append(ob)
         self.objects = tmp
-        
+
     def getA2pObjects(self):
         if not self.successfulOpened: return []
         out = []
@@ -302,7 +302,7 @@ class FCdocumentReader(object):
                 out.append(ob)
                 continue
         return out
-        
+
     def getSpreadsheetObjects(self):
         if not self.successfulOpened: return []
         out = []
@@ -310,7 +310,7 @@ class FCdocumentReader(object):
             if ob.propertyDict.get(b'cells',None) is not None:
                 out.append(ob)
         return out
-            
+
     def getObjectByName(self,name):
         if not self.successfulOpened: return None
         for ob in self.objects:
@@ -323,7 +323,7 @@ class FCdocumentReader(object):
 if __name__ == "__main__":
     doc = FreeCAD.activeDocument()
     fileName = doc.FileName
-    
+
     dr = FCdocumentReader()
     dr.openDocument(fileName)
 

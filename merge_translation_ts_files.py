@@ -29,7 +29,7 @@ import glob
 
 #==============================================================================
 # Script for merging different translations of A2plus Workbench
-# 
+#
 # The script has to be started within the main A2plus Folder
 #==============================================================================
 

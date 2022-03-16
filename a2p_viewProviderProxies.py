@@ -29,6 +29,8 @@ from a2p_translateUtils import *
 import a2plib
 
 #==============================================================================
+
+
 class PopUpMenuItem:
     def __init__( self, proxy, menu, label, Freecad_cmd ):
         self.Object = proxy.Object
@@ -45,6 +47,7 @@ class PopUpMenuItem:
 
 
 #==============================================================================
+
 class ConstraintViewProviderProxy:
     def __init__(
             self,
@@ -75,11 +78,11 @@ class ConstraintViewProviderProxy:
             return a2plib.A2P_CONSTRAINTS_ICON_MAP[
                 ob.Type
                 ]
-    
+
     def doubleClicked(self,vobj):
         FreeCADGui.activateWorkbench('A2plusWorkbench')
         FreeCADGui.runCommand("a2p_EditConstraintCommand")
-                
+
 #WF: next 3 methods not required
     def attach(self, vobj): #attach to what document?
         vobj.addDisplayMode( coin.SoGroup(),"Standard" )
@@ -162,7 +165,7 @@ class ConstraintMirrorViewProviderProxy:
         if not hasattr(viewObject.Proxy, "onChangedEnabled"):
             viewObject.Proxy.onChangedEnabled = True
         if viewObject.Proxy.onChangedEnabled == False: return
-         
+
         if prop == "Visibility":
             obj = viewObject.Object
             if hasattr(obj,"Suppressed"):
@@ -179,10 +182,10 @@ class ConstraintMirrorViewProviderProxy:
     def onDelete(self, viewObject, subelements): # subelements is a tuple of strings
         if FreeCAD.activeDocument() != viewObject.Object.Document:
             return False
-        
+
         if not hasattr(self,'enableDeleteCounterPart'):
             self.enableDeleteCounterPart = True
-            
+
         if not self.enableDeleteCounterPart: return True # nothing more to do...
 
         # First delete the original...
@@ -239,7 +242,7 @@ def create_constraint_mirror( constraintObj, iconPath, origLabel= '', mirrorLabe
     cMirror.setEditorMode('ParentTreeObject',1)
     # this is needed to trigger an update
     parent.touch()
-    
+
 
     ConstraintMirrorObjectProxy( cMirror, constraintObj )
     cMirror.ViewObject.Proxy = ConstraintMirrorViewProviderProxy( constraintObj, iconPath )
@@ -252,7 +255,7 @@ class ConstraintObjectProxy:
         if obj is not None:
             ConstraintObjectProxy.setProperties(self,obj)
         self.type = "a2p_constraint"
-        
+
     def setProperties(self,obj):
         propList = obj.PropertiesList
         if not "Toponame1" in propList:
@@ -298,9 +301,9 @@ class ConstraintObjectProxy:
 
     def callSolveConstraints(self):
         from a2p_solversystem import autoSolveConstraints
-        autoSolveConstraints( 
-            FreeCAD.activeDocument(), 
-            cache = None, 
+        autoSolveConstraints(
+            FreeCAD.activeDocument(),
+            cache = None,
             callingFuncName = "ConstraintObjectProxy::callSolveConstraints"
             )
 
@@ -315,7 +318,7 @@ class ConstraintMirrorObjectProxy:
         if obj is not None:
             ConstraintMirrorObjectProxy.setProperties(self,obj)
         self.type = "a2p_constraint_mirror"
-        
+
     def setProperties(self,obj):
         propList = obj.PropertiesList
         if not "Toponame1" in propList:

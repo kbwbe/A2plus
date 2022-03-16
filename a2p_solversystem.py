@@ -56,12 +56,14 @@ SOLVER_CONVERGENCY_FACTOR = 0.99
 SOLVER_CONVERGENCY_ERROR_INIT_VALUE = 1.0e+20
 
 #------------------------------------------------------------------------------
+
 class SolverSystem():
-    '''
+    """
     class Solversystem():
     A new iterative solver, inspired by physics.
     Using "attraction" of parts by constraints
-    '''
+    """
+
     def __init__(self):
         self.doc = None
         self.stepCount = 0
@@ -90,7 +92,7 @@ class SolverSystem():
         self.constraints = []
         self.objectNames = []
         self.partialSolverCurrentStage = PARTIAL_SOLVE_STAGE1
-        
+
     def getSolverControlData(self):
         if a2plib.SIMULATION_STATE:
             # do less accurate solving for simulations...
@@ -108,20 +110,20 @@ class SolverSystem():
                 5:(0.00001,0.00001,False)
                 }
         return solverControlData
-            
+
 
     def getRigid(self,objectName):
-        '''get a Rigid by objectName'''
+        """Get a Rigid by objectName."""
         rigs = [r for r in self.rigids if r.objectName == objectName]
         if len(rigs) > 0: return rigs[0]
         return None
 
     def removeFaultyConstraints(self, doc):
-        '''
-        remove constraints where referenced objects do not exist anymore
-        '''
+        """
+        Remove constraints where referenced objects do not exist anymore.
+        """
         constraints = [ obj for obj in doc.Objects if 'ConstraintInfo' in obj.Content]
-        
+
         faultyConstraintList = []
         for c in constraints:
             constraintOK = True
@@ -142,26 +144,26 @@ class SolverSystem():
         self.clear()
         self.doc = doc
         self.status = "loading"
-        
-        self.removeFaultyConstraints(doc) 
-        
+
+        self.removeFaultyConstraints(doc)
+
         self.convergencyCounter = 0
         self.lastPositionError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
         self.lastAxisError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
         #
         self.constraints = []
-        constraints =[]             #temporary list
-        if matelist is not None:        #Transfer matelist to the temp list
+        constraints =[]             # temporary list
+        if matelist is not None:        # Transfer matelist to the temp list
             for obj in matelist:
                 if 'ConstraintInfo' in obj.Content:
                     constraints.append(obj)
         else:
             # if there is not a list of my mates get the list from the doc
             constraints = [ obj for obj in doc.Objects if 'ConstraintInfo' in obj.Content]
-        #check for Suppressed mates here and transfer mates to self.constraints
+        # check for Suppressed mates here and transfer mates to self.constraints
         for obj in constraints:
             if hasattr(obj,'Suppressed'):
-                #if the mate is suppressed do not add it      
+                #if the mate is suppressed do not add it
                 if obj.Suppressed == False:
                     self.constraints.append(obj)
         #
@@ -194,26 +196,26 @@ class SolverSystem():
             rig.spinCenter = ob1.Shape.BoundBox.Center
             self.rigids.append(rig)
         #
-        #link constraints to rigids using dependencies
+        # link constraints to rigids using dependencies
         deleteList = [] # a list to collect broken constraints
         for c in self.constraints:
             rigid1 = self.getRigid(c.Object1)
             rigid2 = self.getRigid(c.Object2)
-            
-            #create and update list of constrained rigids
+
+            # create and update list of constrained rigids
             if rigid2 is not None and not rigid2 in rigid1.linkedRigids: rigid1.linkedRigids.append(rigid2);
             if rigid1 is not None and not rigid1 in rigid2.linkedRigids: rigid2.linkedRigids.append(rigid1);
-            
+
             try:
                 Dependency.Create(doc, c, self, rigid1, rigid2)
             except:
                 self.status = "loadingDependencyError"
                 deleteList.append(c)
-                
-                
+
+
         for rig in self.rigids:
             rig.hierarchyLinkedRigids.extend(rig.linkedRigids)
-               
+
         if len(deleteList) > 0:
             msg = translate("A2plus_solversystem","The following constraints are broken:") + "\n"
             for c in deleteList:
@@ -230,17 +232,17 @@ class SolverSystem():
             if response == QtGui.QMessageBox.Yes:
                 for c in deleteList:
                     a2plib.removeConstraint(c)
-        
+
         if self.status == "loadingDependencyError":
             return
-                
+
         for rig in self.rigids:
             rig.calcSpinCenter()
             rig.calcRefPointsBoundBoxSize()
-            
-        self.retrieveDOFInfo() #function only once used here at this place in whole program
+
+        self.retrieveDOFInfo() # function only once used here at this place in whole program
         self.status = "loaded"
-        
+
     def DOF_info_to_console(self):
         doc = FreeCAD.activeDocument()
 
@@ -252,10 +254,10 @@ class SolverSystem():
                 doc.removeObject(lbl.Name)
             doc.removeObject("dofLabels")
             dofGroup=doc.addObject("App::DocumentObjectGroup", "dofLabels")
-        
+
         self.loadSystem( doc )
-        
-        #look for unconstrained objects and label them
+
+        # look for unconstrained objects and label them
         solverObjectNames = []
         for rig in self.rigids:
             solverObjectNames.append(rig.objectName)
@@ -274,8 +276,8 @@ class SolverSystem():
                     dofLabel.ViewObject.BackgroundColor = a2plib.BLUE
                     dofLabel.ViewObject.TextColor = a2plib.WHITE
                     dofGroup.addObject(dofLabel)
-        
-        
+
+
         numdep = 0
         self.retrieveDOFInfo() #function only once used here at this place in whole program
         for rig in self.rigids:
@@ -291,7 +293,7 @@ class SolverSystem():
                 dofLabel.BasePosition.x = bbCenter.x
                 dofLabel.BasePosition.y = bbCenter.y
                 dofLabel.BasePosition.z = bbCenter.z
-                
+
                 if rig.fixed:
                     dofLabel.ViewObject.BackgroundColor = a2plib.RED
                     dofLabel.ViewObject.TextColor = a2plib.BLACK
@@ -302,22 +304,22 @@ class SolverSystem():
                     dofLabel.ViewObject.BackgroundColor = a2plib.YELLOW
                     dofLabel.ViewObject.TextColor = a2plib.BLACK
                 dofGroup.addObject(dofLabel)
-            
-            
+
+
             rig.beautyDOFPrint()
             numdep+=rig.countDependencies()
-        Msg( 'there are {} dependencies\n'.format(numdep/2))  
+        Msg( 'there are {} dependencies\n'.format(numdep/2))
 
     def retrieveDOFInfo(self):
-        '''
-        method used to retrieve all info related to DOF handling
+        """
+        Method used to retrieve all info related to DOF handling.
         the method scans each rigid, and on each not tempfixed rigid scans the list of linkedobjects
         then for each linked object compile a dict where each linked object has its dependencies
         then for each linked object compile a dict where each linked object has its dof position
         then for each linked object compile a dict where each linked object has its dof rotation
-        '''
-        for rig in self.rigids:   
-                     
+        """
+        for rig in self.rigids:
+
             #if not rig.tempfixed:  #skip already fixed objs
 
             for linkedRig in rig.linkedRigids:
@@ -331,10 +333,10 @@ class SolverSystem():
                         else:
                             tmplinkedDeps.append(dep)
                 #add at the end the point constraints
-                tmplinkedDeps.extend(tmpLinkedPointDeps) 
+                tmplinkedDeps.extend(tmpLinkedPointDeps)
                 rig.depsPerLinkedRigids[linkedRig] = tmplinkedDeps
-        
-            #dofPOSPerLinkedRigid is a dict where for each 
+
+            #dofPOSPerLinkedRigid is a dict where for each
             for linkedRig in rig.depsPerLinkedRigids.keys():
                 linkedRig.pointConstraints = []
                 _dofPos = linkedRig.posDOF
@@ -343,11 +345,11 @@ class SolverSystem():
                     _dofPos, _dofRot = dep.calcDOF(_dofPos,_dofRot, linkedRig.pointConstraints)
                 rig.dofPOSPerLinkedRigids[linkedRig] = _dofPos
                 rig.dofROTPerLinkedRigids[linkedRig] = _dofRot
-            
+
             #ok each rigid has a dict for each linked objects,
-            #so we now know the list of linked objects and which 
+            #so we now know the list of linked objects and which
             #dof rot and pos both limits.
-            
+
 
 
     # TODO: maybe instead of traversing from the root every time, save a list of objects on current distance
@@ -375,9 +377,9 @@ class SolverSystem():
 
     def visualizeHierarchy(self):
         '''
-        generate a html file with constraints structure.
-        
-        The html file is in the same folder 
+        Generate an html file with constraints structure.
+
+        The html file is in the same folder
         with the same filename of the assembly
         '''
         out_file = os.path.splitext(self.doc.FileName)[0] + '_asm_hierarchy.html'
@@ -449,7 +451,7 @@ class SolverSystem():
                 self.unmovedParts.append(
                     doc.getObject(rig.objectName)
                     )
-    
+
     def solveAccuracySteps(self,doc, matelist=None):
         self.level_of_accuracy=1
         self.mySOLVER_POS_ACCURACY = self.getSolverControlData()[self.level_of_accuracy][0]
@@ -489,17 +491,17 @@ class SolverSystem():
                 self.maxAxisError = rig.maxAxisError
             if rig.maxSingleAxisError > self.maxSingleAxisError:
                 self.maxSingleAxisError = rig.maxSingleAxisError
-        if not a2plib.SIMULATION_STATE:        
+        if not a2plib.SIMULATION_STATE:
             Msg( 'TARGET   POS-ACCURACY :{}\n'.format(self.mySOLVER_POS_ACCURACY) )
             Msg( 'REACHED  POS-ACCURACY :{}\n'.format(self.maxPosError) )
             Msg( 'TARGET  SPIN-ACCURACY :{}\n'.format(self.mySOLVER_SPIN_ACCURACY) )
             Msg( 'REACHED SPIN-ACCURACY :{}\n'.format(self.maxAxisError) )
             Msg( 'SA SPIN-ACCURACY      :{}\n'.format(self.maxSingleAxisError) )
-            
+
         return systemSolved
 
     def solveSystem(self,doc,matelist=None, showFailMessage=True):
-        if not a2plib.SIMULATION_STATE:        
+        if not a2plib.SIMULATION_STATE:
             Msg( "\n===== Start Solving System ====== \n" )
 
         systemSolved = self.solveAccuracySteps(doc,matelist)
@@ -534,17 +536,17 @@ Please run the conflict finder tool !
                 return systemSolved
 
     def checkForUnmovedParts(self):
-        '''
+        """
         If there are parts, which are constrained but have no
         constraint path to a fixed part, the solver will
         ignore them and they are not moved.
         This function detects this and signals it to the user.
-        '''
+        """
         if len(self.unmovedParts) != 0:
             FreeCADGui.Selection.clearSelection()
             for obj in self.unmovedParts:
                 FreeCADGui.Selection.addSelection(obj)
-            msg = translate("A2plus_solversystem",'''    
+            msg = translate("A2plus_solversystem",'''
 The highlighted parts were not moved. They are
 not constrained (also over constraint chains)
 to a fixed part!
@@ -584,7 +586,7 @@ to a fixed part!
                 if rig.fixed:
                     workList.append(rig);
             #self.printList("Initial-Worklist", workList)
-    
+
             while True:
                 addList = []
                 newRigFound = False
@@ -606,7 +608,7 @@ to a fixed part!
                     if not solutionFound: return False
                 else:
                     break
-                
+
                 if a2plib.SOLVER_ONESTEP > 2:
                     break
 
@@ -651,7 +653,7 @@ to a fixed part!
                 w.move(doc)
 
             # The accuracy is good, apply the solution to FreeCAD's objects
-            if (maxPosError <= reqPosAccuracy and # relevant check
+            if (maxPosError <= reqPosAccuracy and   # relevant check
                 maxAxisError <= reqSpinAccuracy and # relevant check
                 maxSingleAxisError <= reqSpinAccuracy * 10  # additional check for insolvable assemblies
                                                             # sometimes spin can be solved but singleAxis not..
@@ -679,18 +681,18 @@ to a fixed part!
                                     r.tempfixed = False
                                     #Msg("unfixed Rigid {}\n".format(r.label))
                                     foundRigidToUnfix = True
-                    
+
                     if foundRigidToUnfix:
                         self.lastPositionError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
                         self.lastAxisError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
                         self.convergencyCounter = 0
                         continue
-                    else:            
+                    else:
                         Msg('\n')
                         Msg('convergency-conter: {}\n'.format(self.convergencyCounter))
                         Msg( "Calculation stopped, no convergency anymore!\n" )
                         return False
-                
+
                 self.lastPositionError = maxPosError
                 self.lastAxisError = maxAxisError
                 self.maxSingleAxisError = maxSingleAxisError
@@ -718,13 +720,13 @@ def autoSolveConstraints( doc, callingFuncName, cache=None, useTransaction=True,
     if not a2plib.getAutoSolveState():
         return
     if callingFuncName is not None:
-        '''
+        """
         print (
             "autoSolveConstraints called from '{}'".format(
                 callingFuncName
                 )
                )
-        '''
+        """
     solveConstraints(doc, useTransaction)
 
 class a2p_SolverCommand:

@@ -37,9 +37,9 @@ def createUpdateFileList(
             parentAssemblyDir,
             filesToUpdate,
             recursive=False,
-            selectedFiles=[] #only update parts with these sourceFiles
+            selectedFiles=[]  # only update parts with these sourceFiles
             ):
-    
+
     # do not update converted parts
     print(
         "createUpdateFileList importPath = {}".format(
@@ -48,19 +48,19 @@ def createUpdateFileList(
         )
     if a2plib.to_bytes(importPath) == b'converted':
         return False, filesToUpdate
-    
+
     fileNameInProject = a2plib.findSourceFileInProject(
         importPath,
         parentAssemblyDir
         )
     workingDir,basicFileName = os.path.split(fileNameInProject)
     docReader1 = FCdocumentReader()
-    
+
     docReader1.openDocument(fileNameInProject)
     needToUpdate = False
     subAsmNeedsUpdate = False
     for ob in docReader1.getA2pObjects():
-        
+
         if a2plib.to_bytes(ob.getA2pSource()) == b'converted':
             print(
                 "Did not update converted part '{}'".format(
@@ -68,12 +68,12 @@ def createUpdateFileList(
                     )
                 )
             continue
-        
-        #Only update parts which are selected by the user...
+
+        # Only update parts which are selected by the user...
         fDir,fName = os.path.split(ob.getA2pSource())
-        if len(selectedFiles)>0 and fName not in selectedFiles:
+        if len(selectedFiles) > 0 and fName not in selectedFiles:
             continue
-        
+
         if ob.isSubassembly() and recursive:
             subAsmNeedsUpdate, filesToUpdate = createUpdateFileList(
                                                 ob.getA2pSource(),
@@ -83,24 +83,24 @@ def createUpdateFileList(
                                                 )
         if subAsmNeedsUpdate:
             needToUpdate = True
-            
+
         objFileNameInProject = a2plib.findSourceFileInProject(
             ob.getA2pSource(),
             workingDir
-            )         
-        mtime = os.path.getmtime(objFileNameInProject)   
+            )
+        mtime = os.path.getmtime(objFileNameInProject)
         if ob.getTimeLastImport() < mtime:
             needToUpdate = True
-            
+
     if needToUpdate:
         if fileNameInProject not in filesToUpdate:
             filesToUpdate.append(fileNameInProject)
-        
+
     return needToUpdate, filesToUpdate
 #==============================================================================
 toolTip = \
 translate("A2plus_recursiveUpdatePlanner",
-'''
+"""
 Update parts, which have been
 imported to the assembly.
 
@@ -114,20 +114,20 @@ over all involved subassemblies.
 
 Subassemblies are updated,
 if necessary, too.
-'''
+"""
 )
 
 class a2p_recursiveUpdateImportedPartsCommand:
 
     def Activated(self):
-        a2plib.setAutoSolve(True) # makes no sense without autosolve = ON
+        a2plib.setAutoSolve(True)  # makes no sense without autosolve = ON
         doc = FreeCAD.activeDocument()
         fileName = doc.FileName
         workingDir,basicFileName = os.path.split(fileName)
-        
+
         selectedFiles=[]
         partial = False
-        selection = [s for s in FreeCADGui.Selection.getSelection() 
+        selection = [s for s in FreeCADGui.Selection.getSelection()
                      if s.Document == FreeCAD.ActiveDocument and
                      (a2plib.isA2pPart(s) or a2plib.isA2pSketch(s))
                      ]
@@ -142,7 +142,7 @@ class a2p_recursiveUpdateImportedPartsCommand:
                             )
             if response == QtGui.QMessageBox.Yes:
                 for s in selection:
-                    fDir, fName = os.path.split(s.sourceFile) 
+                    fDir, fName = os.path.split(s.sourceFile)
                     selectedFiles.append(fName)
                     partial = True
 
@@ -154,12 +154,12 @@ class a2p_recursiveUpdateImportedPartsCommand:
                                             True,
                                             selectedFiles
                                             )
-        
+
         for f in filesToUpdate:
             #-------------------------------------------
             # update necessary documents
             #-------------------------------------------
-            
+
             # look only for filenames, not paths, as there are problems on WIN10 (Address-translation??)
             importDoc = None
             importDocIsOpen = False
@@ -170,7 +170,7 @@ class a2p_recursiveUpdateImportedPartsCommand:
                     importDoc = d # file is already open...
                     importDocIsOpen = True
                     break
-        
+
             if not importDocIsOpen:
                 if f.lower().endswith('.fcstd'):
                     importDoc = FreeCAD.openDocument(f)
@@ -186,12 +186,12 @@ class a2p_recursiveUpdateImportedPartsCommand:
                     msg = translate("A2plus_recursiveUpdatePlanner","A part can only be imported from a FreeCAD '*.fcstd' file")
                     QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Value Error", msg )
                     return
-            
+
             if importDoc==doc and partial==True:
                 updateImportedParts(importDoc,True)
             else:
                 updateImportedParts(importDoc)
-                
+
             FreeCADGui.updateGui()
             importDoc.save()
             print(
@@ -201,8 +201,6 @@ class a2p_recursiveUpdateImportedPartsCommand:
                 )
             if importDoc != doc:
                 FreeCAD.closeDocument(importDoc.Name)
-            
-        
 
     def GetResources(self):
         return {
@@ -212,7 +210,3 @@ class a2p_recursiveUpdateImportedPartsCommand:
             }
 
 FreeCADGui.addCommand('a2p_recursiveUpdateImportedPartsCommand', a2p_recursiveUpdateImportedPartsCommand())
-            
-    
-            
-            

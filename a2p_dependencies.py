@@ -42,10 +42,10 @@ from a2p_libDOF import (
     create_Axis,
     cleanAxis,
     create_Axis2Points
-    
     )
 
 #------------------------------------------------------------------------------
+
 class Dependency():
     def __init__(self, constraint, refType, axisRotation):
         self.Enabled = False
@@ -146,7 +146,7 @@ class Dependency():
             ob2 = doc.getObject(c.Object2)
 
             dep1.refPoint = getPos(ob1, c.SubElement1)
-            
+
             plane2 = getObjectFaceFromName(ob2, c.SubElement2)
             dep2.refPoint = plane2.Faces[0].BoundBox.Center
 
@@ -159,7 +159,7 @@ class Dependency():
             offsetVector = Base.Vector(normal2)
             offsetVector.multiply(offs)
             dep2.refPoint = dep2.refPoint.add(offsetVector)
-            
+
             dep2.refAxisEnd = dep2.refPoint.add(normal2)
 
         elif c.Type == "circularEdge":
@@ -168,13 +168,13 @@ class Dependency():
 
             ob1 = doc.getObject(c.Object1)
             ob2 = doc.getObject(c.Object2)
-            
+
             dep1.refPoint = getPos(ob1, c.SubElement1)
             dep2.refPoint = getPos(ob2, c.SubElement2)
-            
+
             axis1 = getAxis(ob1, c.SubElement1)
             axis2 = getAxis(ob2, c.SubElement2)
-            
+
             if dep2.direction == "opposed":
                 axis2.multiply(-1.0)
             dep1.refAxisEnd = dep1.refPoint.add(axis1)
@@ -257,13 +257,13 @@ class Dependency():
             axis2 = getAxis(ob2, c.SubElement2)
             if dep2.direction == "opposed":
                 axis2.multiply(-1.0)
-                
-            dep1.refPoint = dep1.adjustRefPoints(ob1,c.SubElement1,dep1.refPoint,axis1)    
-            dep2.refPoint = dep2.adjustRefPoints(ob2,c.SubElement2,dep2.refPoint,axis2)    
-                
+
+            dep1.refPoint = dep1.adjustRefPoints(ob1,c.SubElement1,dep1.refPoint,axis1)
+            dep2.refPoint = dep2.adjustRefPoints(ob2,c.SubElement2,dep2.refPoint,axis2)
+
             dep1.refAxisEnd = dep1.refPoint.add(axis1)
             dep2.refAxisEnd = dep2.refPoint.add(axis2)
-            
+
         elif c.Type == "axisParallel":
             dep1 = DependencyAxisParallel(c, "pointAxis")
             dep2 = DependencyAxisParallel(c, "pointAxis")
@@ -276,10 +276,10 @@ class Dependency():
             axis2 = getAxis(ob2, c.SubElement2)
             if dep2.direction == "opposed":
                 axis2.multiply(-1.0)
-                
+
             dep1.refAxisEnd = dep1.refPoint.add(axis1)
             dep2.refAxisEnd = dep2.refPoint.add(axis2)
-            
+
         elif c.Type == "axisPlaneParallel":
             dep1 = DependencyAxisPlaneParallel(c, "pointAxis")
             dep2 = DependencyAxisPlaneParallel(c, "pointNormal")
@@ -341,10 +341,10 @@ class Dependency():
         elif c.Type == "CenterOfMass":
             dep1 = DependencyCenterOfMass(c, "point")
             dep2 = DependencyCenterOfMass(c, "point")
-            
+
             ob1 = doc.getObject(c.Object1)
             ob2 = doc.getObject(c.Object2)
-            
+
             if c.SubElement1.startswith('Face'):
                 plane1 = getObjectFaceFromName(ob1, c.SubElement1)
                 dep1.refPoint = plane1.Faces[0].CenterOfMass
@@ -357,7 +357,7 @@ class Dependency():
             elif c.SubElement2.startswith('Edge'):
                 plane2 = Part.Face(Part.Wire(getObjectEdgeFromName(ob2, c.SubElement2)))
                 dep2.refPoint = plane2.CenterOfMass
-            
+
             normal1 = a2plib.getPlaneNormal(plane1.Surface)
             normal2 = a2plib.getPlaneNormal(plane2.Surface)
 
@@ -386,7 +386,7 @@ class Dependency():
 
         rigid1.dependencies.append(dep1)
         rigid2.dependencies.append(dep2)
-        
+
 
     def applyPlacement(self, placement):
         if self.refPoint is not None:
@@ -487,9 +487,9 @@ class DependencyPointIdentity(Dependency):
         #    PointIdentityRot()    needs to know the point constrained as vector, the dofrot array, and
         #                        the pointconstraints which stores all point constraints of the rigid
         # These constraint have to be the last evaluated in the chain of constraints.
-            
+
         tmpaxis = cleanAxis(create_Axis(self.refPoint, self.currentRigid.getRigidCenter()))
-        
+
         #dofpos = PointIdentityPos(tmpaxis,_dofPos,_pointconstraints)
         #dofrot = PointIdentityRot(tmpaxis,_dofRot,_pointconstraints)
         return PointIdentity(tmpaxis, _dofPos, _dofRot, _pointconstraints)
@@ -523,19 +523,19 @@ class DependencyPointOnLine(Dependency):
 
         else:
             raise NotImplementedError("Wrong refType for class {}".format(self.__class__.__name__))
-            
+
     def calcDOF(self, _dofPos, _dofRot, _pointconstraints=[]):
         #PointIdentity, PointOnLine, PointOnPlane, Spherical Constraints:
         #    PointIdentityPos()    needs to know the point constrained as vector, the dofpos array, the rigid center point as vector and
         #                        the pointconstraints which stores all point constraints of the rigid
         #    PointIdentityRot()    needs to know the point constrained as vector, the dofrot array, and
         #                        the pointconstraints which stores all point constraints of the rigid
-        # These constraint have to be the last evaluated in the chain of c    
+        # These constraint have to be the last evaluated in the chain of c
         tmpaxis = cleanAxis(create_Axis(self.refPoint, self.currentRigid.getRigidCenter()))
         #dofpos = PointIdentityPos(tmpaxis,_dofPos,_pointconstraints)
         #dofrot = PointIdentityRot(tmpaxis,_dofRot,_pointconstraints)
         return PointIdentity(tmpaxis, _dofPos, _dofRot, _pointconstraints)
-               
+
 
 
 class DependencyPointOnPlane(Dependency):
@@ -576,13 +576,13 @@ class DependencyPointOnPlane(Dependency):
         #    PointIdentityRot()    needs to know the point constrained as vector, the dofrot array, and
         #                        the pointconstraints which stores all point constraints of the rigid
         # These constraint have to be the last evaluated in the chain of constraints.
-               
+
         tmpaxis = cleanAxis(create_Axis(self.refPoint, self.currentRigid.getRigidCenter()))
-        
+
         #dofpos = PointIdentityPos(tmpaxis,_dofPos,_pointconstraints)
         #dofrot = PointIdentityRot(tmpaxis,_dofRot,_pointconstraints)
         return PointIdentity(tmpaxis, _dofPos, _dofRot, _pointconstraints)
-        
+
 class DependencyCircularEdge(Dependency):
     def __init__(self, constraint, refType):
         Dependency.__init__(self, constraint, refType, True)
@@ -594,7 +594,7 @@ class DependencyCircularEdge(Dependency):
 
         moveVector = self.foreignDependency.refPoint.sub(self.refPoint)
         return self.refPoint, moveVector
-      
+
     def calcDOF(self, _dofPos, _dofRot, _pointconstraints=[]):
         #function used to determine the dof lost due to this constraint
         #CircularEdgeConstraint:
@@ -626,7 +626,7 @@ class DependencyParallelPlanes(Dependency):
         if not self.Enabled: return None, None
 
         return self.refPoint, Base.Vector(0,0,0)
-            
+
     def calcDOF(self, _dofPos, _dofRot, _pointconstraints=[]):
         #PlanesParallelConstraint:
         #    AxisAlignment()    needs to know the axis normal to the plane constrained (stored in dep as refpoint and refAxisEnd) and the dofrot array
@@ -639,7 +639,7 @@ class DependencyAngledPlanes(Dependency):
         Dependency.__init__(self, constraint, refType, True)
         self.isPointConstraint = False
         self.useRefPointSpin = False
-        
+
     def getMovement(self):
         if not self.Enabled: return None, None
 
@@ -667,7 +667,7 @@ class DependencyAngledPlanes(Dependency):
             z = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
             axis = Base.Vector(x,y,z)
         return axis
-    
+
     def calcDOF(self, _dofPos, _dofRot, _pointconstraints=[]):
         #AngleBetweenPlanesConstraint
         #    AngleAlignment()   needs to know the axis normal to plane constrained (stored in dep as refpoint and refAxisEnd) and the dofrot array
@@ -697,7 +697,7 @@ class DependencyPlane(Dependency):
         #    AxisAlignment()    needs to know the axis normal to the plane constrained (stored in dep as refpoint and refAxisEnd) and the dofrot array
         #    PlaneOffset()      needs to know the axis normal to the plane constrained (stored in dep as refpoint and refAxisEnd) and the dofpos array
         tmpaxis = cleanAxis(create_Axis2Points(self.refPoint,self.refAxisEnd))
-        
+
         # the axis used on axisalignment isn't a real axis but a random axis normal to the plane
         #set it to length = 2 instead of normalize it
         pos = PlaneOffset(tmpaxis,_dofPos)
@@ -710,7 +710,7 @@ class DependencyAxial(Dependency):
         self.isPointConstraint = False
         self.useRefPointSpin = True
 
-    '''
+    """
     def getMovement1(self):
         if not self.Enabled: return None, None
 
@@ -720,8 +720,8 @@ class DependencyAxial(Dependency):
         parallelToAxisVec = destinationAxis.normalize().multiply(dot)
         moveVector = vec1.sub(parallelToAxisVec)
         return self.refPoint, moveVector
-    '''
-    
+    """
+
     def getMovement(self):
         if not self.Enabled: return None, None
 
@@ -731,7 +731,7 @@ class DependencyAxial(Dependency):
         parallelToAxisVec = ownAxis.normalize().multiply(dot)
         moveVector = vec1.sub(parallelToAxisVec)
         return self.refPoint.add(parallelToAxisVec), moveVector
-    
+
     def adjustRefPoints(self,obj,sub,refPoint,axis):
         if sub.startswith("Edge"): return refPoint
         face = getObjectFaceFromName(obj,sub)
@@ -745,19 +745,19 @@ class DependencyAxial(Dependency):
         v2.multiply(dot)
         refPoint = refPoint.add(v2)
         return refPoint
-    
+
     def calcDOF(self, _dofPos, _dofRot, _pointconstraints=[]):
     #AxialConstraint:
     #    AxisAlignment()    needs to know the axis normal to circle (stored in dep as refpoint and refAxisEnd) and the dofrot array
     #    AxisDistance()     needs to know the axis normal to circle (stored in dep as refpoint and refAxisEnd) and the dofpos array
     #    LockRotation()     need to know if LockRotation is True or False and the array dofrot
         tmpaxis = cleanAxis(create_Axis2Points(self.refPoint,self.refAxisEnd))
-        
+
         if self.lockRotation:
             return AxisDistance(tmpaxis,_dofPos), []
         else:
             return AxisDistance(tmpaxis,_dofPos), AxisAlignment(tmpaxis,_dofRot)
-    
+
 class DependencyAxisParallel(Dependency):
     def __init__(self, constraint, refType):
         Dependency.__init__(self, constraint, refType, True)
@@ -767,7 +767,7 @@ class DependencyAxisParallel(Dependency):
     def getMovement(self):
         if not self.Enabled: return None, None
         return self.refPoint, Base.Vector(0.0, 0.0, 0.0)
-    
+
     def calcDOF(self, _dofPos, _dofRot, _pointconstraints=[]):
     #AxialConstraint:
     #    AxisAlignment()    needs to know the axis normal to circle (stored in dep as refpoint and refAxisEnd) and the dofrot array
@@ -782,7 +782,7 @@ class DependencyAxisPlaneParallel(Dependency):
         Dependency.__init__(self, constraint, refType, True)
         self.isPointConstraint = False
         self.useRefPointSpin = False
-        
+
     def getMovement(self):
         if not self.Enabled: return None, None
         return self.refPoint, Base.Vector(0,0,0)
@@ -801,7 +801,7 @@ class DependencyAxisPlaneParallel(Dependency):
             axis = rigAxis.cross(foreignAxis)
             axis.normalize()
             axis.multiply(-deltaAngle)
-        except: 
+        except:
             #axis = Vector(0,0,0) and cannot be normalized...
             #axis and normal are parallel, do small random rotation
             x = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
@@ -809,7 +809,7 @@ class DependencyAxisPlaneParallel(Dependency):
             z = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
             axis = Base.Vector(x,y,z)
         return axis
-    
+
     def calcDOF(self, _dofPos, _dofRot, _pointconstraints=[]):
         #AngleBetweenPlanesConstraint
         #    AngleAlignment()   needs to know the axis normal to plane constrained (stored in dep as refpoint and refAxisEnd) and the dofrot array
@@ -822,7 +822,7 @@ class DependencyAxisPlaneAngle(Dependency):
         Dependency.__init__(self, constraint, refType, True)
         self.isPointConstraint = False
         self.useRefPointSpin = False
-        
+
     def getMovement(self):
         if not self.Enabled: return None, None
         return self.refPoint, Base.Vector(0,0,0)
@@ -841,7 +841,7 @@ class DependencyAxisPlaneAngle(Dependency):
             axis = rigAxis.cross(foreignAxis)
             axis.normalize()
             axis.multiply(-deltaAngle)
-        except: 
+        except:
             #axis = Vector(0,0,0) and cannot be normalized...
             #axis and normal are parallel, do small random rotation
             x = random.uniform(-solver.mySOLVER_SPIN_ACCURACY*1e-1,solver.mySOLVER_SPIN_ACCURACY*1e-1)
@@ -862,7 +862,7 @@ class DependencyAxisPlaneNormal(Dependency):
         Dependency.__init__(self, constraint, refType, True)
         self.isPointConstraint = False
         self.useRefPointSpin = False
-        
+
     def getMovement(self):
         if not self.Enabled: return None, None
         return self.refPoint, Base.Vector(0,0,0)
@@ -885,7 +885,7 @@ class DependencyCenterOfMass(Dependency):
 
         moveVector = self.foreignDependency.refPoint.sub(self.refPoint)
         return self.refPoint, moveVector
-      
+
     def calcDOF(self, _dofPos, _dofRot, _pointconstraints=[]):
         #function used to determine the dof lost due to this constraint
         #CircularEdgeConstraint:

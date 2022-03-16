@@ -29,7 +29,7 @@ import a2plib
 from a2p_partlistglobals import PARTLIST_COLUMN_NAMES
 
 from a2p_partlistglobals import (
-    PARTINFORMATION_SHEET_NAME, 
+    PARTINFORMATION_SHEET_NAME,
     PARTINFORMATION_SHEET_LABEL
     )
 
@@ -38,7 +38,7 @@ from a2p_partlistglobals import (
 #------------------------------------------------------------------------------
 toolTip = \
 translate("A2plus_partinformation",
-'''
+"""
 Create a spreadsheet for ordering or
 logistics information.
 
@@ -48,7 +48,7 @@ within the tree view.
 Please fill in your information.
 This spreadsheet will be read out
 by the parts list function of A2plus.
-'''
+"""
 )
 
 class a2p_CreatePartInformationSheet_Command:
@@ -61,23 +61,23 @@ class a2p_CreatePartInformationSheet_Command:
                                         translate("A2plus_partinformation","You have to open a FCStd file first.")
                                     )
             return
-        
+
         try:
             found = doc.getObject(PARTINFORMATION_SHEET_NAME)
             if found is not None: return # object already exists
         except:
             pass # proceed and create the shett
-        
+
         # create a spreadsheet with a special reserved name...
         ss = doc.addObject('Spreadsheet::Sheet',PARTINFORMATION_SHEET_NAME)
         ss.Label = PARTINFORMATION_SHEET_LABEL
-        
+
         for idx,name in enumerate(PARTLIST_COLUMN_NAMES):
-            ss.set('A'+str(idx+1),name)
-            ss.set('B'+str(idx+1),'')
-        
-        ss.setColumnWidth('A',220)
-        ss.setColumnWidth('B',300)
+            ss.set('A'+str(idx+1), name)
+            ss.set('B'+str(idx+1), '')
+
+        ss.setColumnWidth('A', 220)
+        ss.setColumnWidth('B', 300)
         ss.setBackground('A1:A'+str(len(PARTLIST_COLUMN_NAMES)), (0.000000,1.000000,0.000000,1.000000))
         ss.setBackground('B1:B'+str(len(PARTLIST_COLUMN_NAMES)), (0.85,0.85,0.85,1.000000))
         doc.recompute()
@@ -88,6 +88,6 @@ class a2p_CreatePartInformationSheet_Command:
             'MenuText': translate("A2plus_partinformation", "Create a spreadsheet for ordering or logistics information"),
             'ToolTip' : toolTip
             }
-        
+
 FreeCADGui.addCommand('a2p_CreatePartInformationSheet_Command', a2p_CreatePartInformationSheet_Command())
 #------------------------------------------------------------------------------
