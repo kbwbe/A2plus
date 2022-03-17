@@ -21,7 +21,7 @@
 #*   USA                                                                   *
 #*                                                                         *
 #***************************************************************************
-'''
+"""
 Experimental mapper for a2p related topological naming.
 
 It is used during first level import of fcstd documents to a2p
@@ -87,7 +87,7 @@ A List of names (same indexes as vertexes[n],edges[],faces[] is generated for ou
 
 All this helps A2plus to identify the correct subelements for constraints, if imported
 parts are been edited.
-'''
+"""
 
 
 
@@ -117,10 +117,10 @@ class TopoMapper(object):
             return "%014.3f;" % val
 
     def calcVertexKey(self,inOb):
-        '''
-        create a unique key defined by vertex-position,
+        """
+        Create a unique key defined by vertex-position,
         accepts also vectors as input
-        '''
+        """
         try:
             coords = (
                 inOb.Point.x,
@@ -141,9 +141,9 @@ class TopoMapper(object):
         return key
 
     def calcAxisKey(self,axis):
-        '''
-        create a unique key defined by axis-direction
-        '''
+        """
+        Create a unique key defined by axis-direction.
+        """
         coords = (
             axis.x,
             axis.y,
@@ -165,7 +165,7 @@ class TopoMapper(object):
                 curveAttributeExists = True
         except:
             pass
-        #circular edge #hasattr(edge,"Curve") because of spheres...
+        # circular edge #hasattr(edge,"Curve") because of spheres...
         if (
             curveAttributeExists and
             hasattr(edge.Curve,'Axis') and
@@ -346,10 +346,10 @@ class TopoMapper(object):
                 self.shapeDict[k] = faceName
 
     def processTopoData(self,objName,level=0):
-        '''
+        """
         Recursive function which populates the
         shapeDict with geometricKey/toponame entries
-        '''
+        """
         level+=1
         if not objName.startswith("Link"):
             inList, outList = self.treeNodes[objName]
@@ -362,9 +362,9 @@ class TopoMapper(object):
             self.populateShapeDict(objName)
 
     def makePlacedShape(self,obj):
-        '''
-        return a copy of obj.Shape with proper placement applied
-        '''
+        """
+        Return a copy of obj.Shape with proper placement applied.
+        """
         tempShape = obj.Shape.copy()
         plmGlobal = obj.Placement
         try:
@@ -375,12 +375,12 @@ class TopoMapper(object):
         return tempShape
 
     def addedByPathWB(self,obName):
-        '''
-        function detects, whether special object belongs to
+        """
+        Function detects, whether special object belongs to
         a milling job of Path WB
         
         It is looking for "Stock" and contents of Model-group
-        '''
+        """
         ob = self.doc.getObject(obName)
         if ob.Name.startswith('Stock'):
             for o in ob.InList:
@@ -540,11 +540,11 @@ class TopoMapper(object):
             return ob
 
     def createTopoNames(self, desiredShapeLabel = None):
-        '''
+        """
         creates a combined shell of all toplevel objects and
         assigns toponames to its geometry if toponaming is
         enabled.
-        '''
+        """
         if desiredShapeLabel is not None:
             allowSketches = True
         else:

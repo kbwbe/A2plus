@@ -31,7 +31,7 @@ from a2p_translateUtils import *
 
 
 
-'''
+"""
 Library that defines the DOF of a Rigid, each rigids has several dependencies which define a refPoint(cross point the the axis)
 and a refAxisEnd which is a vector that defines the direction, togeher we can define an axis used in the constraint.
 
@@ -39,7 +39,7 @@ This code was possible only after the reading of the Hamish's code on His wonder
 This code was possible only after the reading of the code of the wonderful WorkFeature Macro for FreeCAD
 This code was possible only after the reading of Wikipedia pages on vector math
 
-'''
+"""
 #define some reference axis
 SystemOrigin = FreeCAD.Vector(0.0,0.0,0.0)
 
@@ -109,9 +109,9 @@ def copynorm_AxisToOrigin(axisa, dbg=False):
     return cleanAxis(axisb)
 
 def normal_2Axis(axisa,axisb,dbg=False):
-    '''
+    """
     create an axis which is normal to the plane defined by given 2 axes as argument
-    '''
+    """
     #move vectors to origin and normalize
     axis1 = copynorm_AxisToOrigin(axisa)
     axis2 = copynorm_AxisToOrigin(axisb)
@@ -122,9 +122,9 @@ def normal_2Axis(axisa,axisb,dbg=False):
     return cleanAxis(axisN)
 
 def make_planeNormal(axisa,dbg=False):
-    '''
+    """
     create a plane normal to the given axis, return the 2 axis which define that plane
-    '''
+    """
     axis1 = copynorm_AxisToOrigin(axisa)
 
     planenormal = Part.makePlane(1.0,1.0, axis1.Base, axis1.Direction)
@@ -136,11 +136,11 @@ def make_planeNormal(axisa,dbg=False):
 
 
 def check_ifParallel(axisa,axisb,dbg=False):
-    '''
-    check if 2 axes are parallel
-    '''
-    #shift edges to the origin and normalize them
-    #move vectors to origin and normalize
+    """
+    Check if 2 axes are parallel.
+    """
+    # shift edges to the origin and normalize them
+    # move vectors to origin and normalize
     axis1 = copynorm_AxisToOrigin(axisa)
     axis2 = copynorm_AxisToOrigin(axisb)
 
@@ -151,11 +151,11 @@ def check_ifParallel(axisa,axisb,dbg=False):
 
 
 def check_ifPerpendicular(axisa,axisb,dbg=False):
-    '''
-    check if 2 axes are perpendicular
-    '''
-    #shift edges to the origin and normalize them
-    #move vectors to origin and normalize
+    """
+    Check if 2 axes are perpendicular.
+    """
+    # shift edges to the origin and normalize them
+    # move vectors to origin and normalize
     axis1 = copynorm_AxisToOrigin(axisa)
     axis2 = copynorm_AxisToOrigin(axisb)
 
@@ -165,9 +165,9 @@ def check_ifPerpendicular(axisa,axisb,dbg=False):
         return False
 
 def check_ifCollinear(axisa,axisb,dbg=False):
-    '''
-    check if 2 axes are collinear
-    '''
+    """
+    Check if 2 axes are collinear.
+    """
     #shift edges to the origin and normalize them
     #move vectors to origin and normalize
     axis1 = FreeCAD.Axis(axisa)
@@ -192,9 +192,9 @@ def check_ifCollinear(axisa,axisb,dbg=False):
         return False
 
 def check_ifCoincident(Vertex1, Vertex2, dbg=False):
-    '''
-    check if 2 vertexes are coincident
-    '''
+    """
+    Check if 2 vertexes are coincident.
+    """
     X1=Vertex1.x
     X2=Vertex2.x
     Y1=Vertex1.y
@@ -207,9 +207,9 @@ def check_ifCoincident(Vertex1, Vertex2, dbg=False):
         return False
 
 def check_ifPointOnAxis(vertexa, axisa, dbg=False):
-    '''
+    """
     check if a point is on an axis
-    '''
+    """
     #shift edges to the origin and normalize them
     #move vectors to origin and normalize
     axis1 = copynorm_AxisToOrigin(axisa)
@@ -512,7 +512,7 @@ def PointIdentity(axisa, dofpos, dofrot, pointconstraints, dbg=False):
 
 #some test for helper functions
 if __name__ == "__main__":
-    '''
+    """
     AXIS1=FreeCAD.Axis()
 
     AXIS1.Base = FreeCAD.Vector(2,10,12)
@@ -535,4 +535,4 @@ if __name__ == "__main__":
     dfdfdf = create_Axis(FreeCAD.Vector(12.0,33.5,12.7), FreeCAD.Vector(23.5,22.0,99.0))
     print copynorm_AxisToOrigin(dfdfdf)
     print create_Axis2Points(FreeCAD.Vector(1.0,1.0,1.0), FreeCAD.Vector(3,3,3))
-    '''
+    """

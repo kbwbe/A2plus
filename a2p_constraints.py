@@ -46,9 +46,9 @@ from a2p_viewProviderProxies import ConstraintObjectProxy, ConstraintViewProvide
 
 #==============================================================================
 class BasicConstraint():
-    '''
+    """
     Base class of all Constraints, only use inherited classes...
-    '''
+    """
     def __init__(self,selection):
         self.typeInfo = None # give the appropriate type string for A2plus solver
         self.constraintBaseName = None # <== give a base name here
@@ -70,21 +70,21 @@ class BasicConstraint():
         self.offset = None
         self.angle = None
         self.lockRotation = None
-        
-        
+
+
     def create(self,selection):
         cName = findUnusedObjectName(self.constraintBaseName)
         ob = FreeCAD.activeDocument().addObject("App::FeaturePython", cName)
         s1, s2 = selection
-        
+
         self.ob1Name = s1.ObjectName
         self.ob2Name = s2.ObjectName
         self.ob1Label = s1.Object.Label
         self.ob2Label = s2.Object.Label
-        
+
         self.ob1 = FreeCAD.activeDocument().getObject(s1.ObjectName)
         self.ob2 = FreeCAD.activeDocument().getObject(s2.ObjectName)
-        
+
         self.sub1 = s1.SubElementNames[0]
         self.sub2 = s2.SubElementNames[0]
 
@@ -96,17 +96,17 @@ class BasicConstraint():
         ob.addProperty("App::PropertyString","Toponame1","ConstraintInfo").Toponame1 = ''
         ob.addProperty("App::PropertyString","Toponame2","ConstraintInfo").Toponame2 = ''
         ob.addProperty("App::PropertyBool","Suppressed","ConstraintInfo").Suppressed = False
-        
+
         for prop in ["Object1","Object2","SubElement1","SubElement2","Type"]:
             ob.setEditorMode(prop, 1)
 
         self.constraintObject = ob
-        
+
         self.calcInitialValues() #override in subclass !
         self.setInitialValues()
         self.groupUnderParentTreeObject()
         self.setupProxies()
-        
+
     def setupProxies(self):
         c = self.constraintObject
         c.Proxy = ConstraintObjectProxy()
@@ -117,7 +117,7 @@ class BasicConstraint():
             self.ob2Label,
             self.ob1Label
             )
-    
+
     def groupUnderParentTreeObject(self):
         c = self.constraintObject
         parent = FreeCAD.ActiveDocument.getObject(c.Object1)
@@ -125,7 +125,7 @@ class BasicConstraint():
         c.setEditorMode('ParentTreeObject',1)
         # this is needed to trigger an update
         parent.touch()
-    
+
     def setInitialValues(self):
         c = self.constraintObject
         if self.direction is not None:
@@ -142,7 +142,7 @@ class BasicConstraint():
         if self.lockRotation is not None:
             c.addProperty("App::PropertyBool","lockRotation","ConstraintInfo").lockRotation = self.lockRotation
             c.setEditorMode("lockRotation", 0) # set not editable...
-    
+
     def calcInitialValues(self):
         raise NotImplementedError(
             "Class {} doesn't implement calcInitialValues(), use inherited classes instead!".format(
@@ -157,16 +157,16 @@ class BasicConstraint():
                 c.__class__.__name__
                 )
             )
-        
+
     @staticmethod
     def getToolTip(self):
         return 'Invalid Base Class BasicConstraint'
-    
+
     @staticmethod
     def isValidSelection(selection):
         return True
-    
-        
+
+
 #==============================================================================
 class PointIdentityConstraint(BasicConstraint):
     def __init__(self,selection):
@@ -175,7 +175,7 @@ class PointIdentityConstraint(BasicConstraint):
         self.constraintBaseName = 'pointIdentity'
         self.iconPath = ':/icons/a2p_PointIdentity.svg'
         self.create(selection)
-        
+
     def calcInitialValues(self):
         pass
 
@@ -204,19 +204,19 @@ Button gets active after correct selection.
         if len(selection) == 2:
             s1, s2 = selection
             if s1.ObjectName != s2.ObjectName:
-                if ( 
-                    (vertexSelected(s1) or 
+                if (
+                    (vertexSelected(s1) or
                      sphericalSurfaceSelected(s1) or
                      CircularEdgeSelected(s1)
                      ) and
-                    (vertexSelected(s2) or 
+                    (vertexSelected(s2) or
                      sphericalSurfaceSelected(s2) or
                      CircularEdgeSelected(s2)
                      )
                     ):
                     validSelection = True
         return validSelection
-    
+
 #==============================================================================
 class PointOnLineConstraint(BasicConstraint):
     def __init__(self,selection):
@@ -225,7 +225,7 @@ class PointOnLineConstraint(BasicConstraint):
         self.constraintBaseName = 'pointOnLine'
         self.iconPath = ':/icons/a2p_PointOnLineConstraint.svg'
         self.create(selection)
-        
+
     def calcInitialValues(self):
         pass
 
@@ -244,7 +244,7 @@ Select:
 1) A vertex, a sphere, or a circle (on a part)
 2) A linear/circular edge, or a cylindrical face (on another part)
 
-If the circular edge is selected, 
+If the circular edge is selected,
 it's axis will be taken as line definition.
 
 Button gets active after correct selection.
@@ -258,12 +258,12 @@ Button gets active after correct selection.
             s1, s2 = selection
             if s1.ObjectName != s2.ObjectName:
                 if (
-                    (vertexSelected(s1) or sphericalSurfaceSelected(s1) or CircularEdgeSelected(s1)) and 
+                    (vertexSelected(s1) or sphericalSurfaceSelected(s1) or CircularEdgeSelected(s1)) and
                     (LinearEdgeSelected(s2) or cylindricalFaceSelected(s2) or CircularEdgeSelected(s2))
                     ):
                     validSelection = True
         return validSelection
-    
+
 #==============================================================================
 class PointOnPlaneConstraint(BasicConstraint):
     def __init__(self,selection):
@@ -272,7 +272,7 @@ class PointOnPlaneConstraint(BasicConstraint):
         self.constraintBaseName = 'pointOnPlane'
         self.iconPath = ':/icons/a2p_PointOnPlaneConstraint.svg'
         self.create(selection)
-        
+
     def calcInitialValues(self):
         self.offset = 0.0
 
@@ -312,16 +312,16 @@ Button gets active after correct selection.
         if len(selection) == 2:
             s1, s2 = selection
             if s1.ObjectName != s2.ObjectName:
-                if ( 
-                     (vertexSelected(s1) or 
-                      CircularEdgeSelected(s1) or 
+                if (
+                     (vertexSelected(s1) or
+                      CircularEdgeSelected(s1) or
                       sphericalSurfaceSelected(s1)
-                      ) and 
+                      ) and
                      planeSelected(s2)
                     ):
                     validSelection = True
         return validSelection
-    
+
 #==============================================================================
 class CircularEdgeConstraint(BasicConstraint):
     def __init__(self,selection):
@@ -330,7 +330,7 @@ class CircularEdgeConstraint(BasicConstraint):
         self.constraintBaseName = 'circularEdge'
         self.iconPath = ':/icons/a2p_CircularEdgeConstraint.svg'
         self.create(selection)
-        
+
     def calcInitialValues(self):
         c = self.constraintObject
         #circleEdge1 = getObjectEdgeFromName(self.ob1, c.SubElement1)
@@ -339,8 +339,8 @@ class CircularEdgeConstraint(BasicConstraint):
         #axis2 = circleEdge2.Curve.Axis
         axis1 = getAxis(self.ob1, c.SubElement1)
         axis2 = getAxis(self.ob2, c.SubElement2)
-        
-        
+
+
         angle = math.degrees(axis1.getAngle(axis2))
         if angle <= 90.0:
             self.direction = "aligned"
@@ -357,11 +357,11 @@ class CircularEdgeConstraint(BasicConstraint):
         #circleEdge2 = getObjectEdgeFromName(ob2, c.SubElement2)
         #axis1 = circleEdge1.Curve.Axis
         #axis2 = circleEdge2.Curve.Axis
-        
+
         axis1 = getAxis(ob1, c.SubElement1)
         axis2 = getAxis(ob2, c.SubElement2)
-        
-        
+
+
         angle = math.degrees(axis1.getAngle(axis2))
         if angle <= 90.0:
             direction = "aligned"
@@ -369,7 +369,7 @@ class CircularEdgeConstraint(BasicConstraint):
             direction = "opposed"
         if c.directionConstraint != direction:
             c.offset = -c.offset
-        c.directionConstraint = direction    
+        c.directionConstraint = direction
 
     @staticmethod
     def getToolTip():
@@ -395,7 +395,7 @@ Button gets active after correct selection.
                 if CircularEdgeSelected(s1) and CircularEdgeSelected(s2):
                     validSelection = True
         return validSelection
-    
+
 #==============================================================================
 class AxialConstraint(BasicConstraint):
     def __init__(self,selection):
@@ -404,7 +404,7 @@ class AxialConstraint(BasicConstraint):
         self.constraintBaseName = 'axisCoincident'
         self.iconPath = ':/icons/a2p_AxialConstraint.svg'
         self.create(selection)
-        
+
     def calcInitialValues(self):
         c = self.constraintObject
         axis1 = getAxis(self.ob1, c.SubElement1)
@@ -447,12 +447,12 @@ Button gets active after correct selection.
 
     @staticmethod
     def isValidSelection(selection):
-        
+
         def ValidSelection(selectionExObj):
             return cylindricalFaceSelected(selectionExObj) \
                 or LinearEdgeSelected(selectionExObj) \
                 or CircularEdgeSelected(selectionExObj)
-        
+
         validSelection = False
         if len(selection) == 2:
             s1, s2 = selection
@@ -460,7 +460,7 @@ Button gets active after correct selection.
                 if ValidSelection(s1) and ValidSelection(s2):
                     validSelection = True
         return validSelection
-    
+
 #==============================================================================
 class AxisParallelConstraint(BasicConstraint):
     def __init__(self,selection):
@@ -469,7 +469,7 @@ class AxisParallelConstraint(BasicConstraint):
         self.constraintBaseName = 'axisParallel'
         self.iconPath = ':/icons/a2p_AxisParallelConstraint.svg'
         self.create(selection)
-        
+
     def calcInitialValues(self):
         c = self.constraintObject
         axis1 = getAxis(self.ob1, c.SubElement1)
@@ -499,7 +499,7 @@ translate("A2plus_constraints",
 '''
 Create the parallel-axis constraint (axisParallel)
 
-Axis' will only rotate to be parallel, but will not 
+Axis' will only rotate to be parallel, but will not
 be moved to be coincident.
 
 Select:
@@ -521,7 +521,7 @@ Button gets active after correct selection.
                 if (
                     (LinearEdgeSelected(s1) or cylindricalFaceSelected(s1) or CircularEdgeSelected(s1)) and
                     (LinearEdgeSelected(s2) or cylindricalFaceSelected(s2) or CircularEdgeSelected(s2))
-                    ): 
+                    ):
                     validSelection = True
         return validSelection
 
@@ -533,7 +533,7 @@ class AxisPlaneParallelConstraint(BasicConstraint):
         self.constraintBaseName = 'axisPlaneParallel'
         self.iconPath = ':/icons/a2p_AxisPlaneParallelConstraint.svg'
         self.create(selection)
-        
+
     def calcInitialValues(self):
         pass
 
@@ -552,7 +552,7 @@ Select:
 1) A linear edge, or cylinder axis (on a part)
 2) A plane face (on another part)
 
-This constraint adjusts an axis parallel to a 
+This constraint adjusts an axis parallel to a
 selected plane. The parts are not moved to be coincident.
 
 Button gets active after correct selection.
@@ -580,7 +580,7 @@ class AxisPlaneAngleConstraint(BasicConstraint):
         self.constraintBaseName = 'axisPlaneAngle'
         self.iconPath = ':/icons/a2p_AxisPlaneAngleConstraint.svg'
         self.create(selection)
-        
+
     def calcInitialValues(self):
         c = self.constraintObject
         axis1 = getAxis(self.ob1, c.SubElement1)
@@ -623,8 +623,8 @@ Select:
 1) A linear edge, or cylinder axis (on a part)
 2) A plane face (on another part)
 
-At first this constraint adjusts an axis parallel to a 
-selected plane. Within the following popUp dialog you 
+At first this constraint adjusts an axis parallel to a
+selected plane. Within the following popUp dialog you
 can define an angle.
 
 The parts are not moved to be coincident.
@@ -654,7 +654,7 @@ class AxisPlaneNormalConstraint(BasicConstraint):
         self.constraintBaseName = 'axisPlaneNormal'
         self.iconPath = ':/icons/a2p_AxisPlaneNormalConstraint.svg'
         self.create(selection)
-        
+
     def calcInitialValues(self):
         c = self.constraintObject
         axis1 = getAxis(self.ob1, c.SubElement1)
@@ -692,8 +692,8 @@ Select:
 1) A linear edge, or cylinder axis (on a part)
 2) A plane face (on another part)
 
-This constraint adjusts an axis vertical to a 
-selected plane. The parts are not moved to be 
+This constraint adjusts an axis vertical to a
+selected plane. The parts are not moved to be
 coincident.
 
 Button gets active after correct selection.
@@ -721,15 +721,15 @@ class PlanesParallelConstraint(BasicConstraint):
         self.constraintBaseName = 'planesParallel'
         self.iconPath = ':/icons/a2p_PlanesParallelConstraint.svg'
         self.create(selection)
-        
+
     def calcInitialValues(self):
         c = self.constraintObject
         plane1 = getObjectFaceFromName(self.ob1, c.SubElement1)
         plane2 = getObjectFaceFromName(self.ob2, c.SubElement2)
-        
+
         normal1 = a2plib.getPlaneNormal(plane1.Surface)
         normal2 = a2plib.getPlaneNormal(plane2.Surface)
-        
+
         angle = math.degrees(normal1.getAngle(normal2))
         if angle <= 90.0:
             self.direction = "aligned"
@@ -742,10 +742,10 @@ class PlanesParallelConstraint(BasicConstraint):
         ob2 = c.Document.getObject(c.Object2)
         plane1 = getObjectFaceFromName(ob1, c.SubElement1)
         plane2 = getObjectFaceFromName(ob2, c.SubElement2)
-        
+
         normal1 = a2plib.getPlaneNormal(plane1.Surface)
         normal2 = a2plib.getPlaneNormal(plane2.Surface)
-        
+
         angle = math.degrees(normal1.getAngle(normal2))
         if angle <= 90.0:
             c.directionConstraint = "aligned"
@@ -790,15 +790,15 @@ class PlaneConstraint(BasicConstraint):
         self.constraintBaseName = 'planeCoincident'
         self.iconPath = ':/icons/a2p_PlaneCoincidentConstraint.svg'
         self.create(selection)
-        
+
     def calcInitialValues(self):
         c = self.constraintObject
         plane1 = getObjectFaceFromName(self.ob1, c.SubElement1)
         plane2 = getObjectFaceFromName(self.ob2, c.SubElement2)
-        
+
         normal1 = a2plib.getPlaneNormal(plane1.Surface)
         normal2 = a2plib.getPlaneNormal(plane2.Surface)
-        
+
         angle = math.degrees(normal1.getAngle(normal2))
         if angle <= 90.0:
             self.direction = "aligned"
@@ -812,10 +812,10 @@ class PlaneConstraint(BasicConstraint):
         ob2 = c.Document.getObject(c.Object2)
         plane1 = getObjectFaceFromName(ob1, c.SubElement1)
         plane2 = getObjectFaceFromName(ob2, c.SubElement2)
-        
+
         normal1 = a2plib.getPlaneNormal(plane1.Surface)
         normal2 = a2plib.getPlaneNormal(plane2.Surface)
-        
+
         angle = math.degrees(normal1.getAngle(normal2))
         if angle <= 90.0:
             direction = "aligned"
@@ -860,7 +860,7 @@ class AngledPlanesConstraint(BasicConstraint):
         self.constraintBaseName = 'angledPlanes'
         self.iconPath = ':/icons/a2p_AngleConstraint.svg'
         self.create(selection)
-        
+
     def calcInitialValues(self):
         plane1 = getObjectFaceFromName(self.ob1, self.sub1)
         plane2 = getObjectFaceFromName(self.ob2, self.sub2)
@@ -883,8 +883,8 @@ Select:
 1) A plane (on a part)
 2) A plane (on another part)
 
-After setting this constraint at first the actual 
-angle between both planes is been calculated and 
+After setting this constraint at first the actual
+angle between both planes is been calculated and
 stored to entry "angle" in object editor.
 
 The angle can be changed in the object editor
@@ -906,7 +906,7 @@ Button gets active after correct selection.
                 if ( planeSelected(s1) and planeSelected(s2)):
                     validSelection = True
         return validSelection
-    
+
 #==============================================================================
 class SphericalConstraint(BasicConstraint):
     def __init__(self,selection):
@@ -915,7 +915,7 @@ class SphericalConstraint(BasicConstraint):
         self.constraintBaseName = 'sphereCenterIdent'
         self.iconPath = ':/icons/a2p_SphericalSurfaceConstraint.svg'
         self.create(selection)
-        
+
     def calcInitialValues(self):
         pass
 
@@ -939,19 +939,19 @@ When selecting a circle, it's center is used as a vertex.
 Button gets active after correct selection.
 '''
 )
-    
+
     @staticmethod
     def isValidSelection(selection):
         validSelection = False
         if len(selection) == 2:
             s1, s2 = selection
             if s1.ObjectName != s2.ObjectName:
-                if ( 
-                    (vertexSelected(s1) or 
+                if (
+                    (vertexSelected(s1) or
                      sphericalSurfaceSelected(s1) or
                      CircularEdgeSelected(s1)
                      ) and
-                    (vertexSelected(s2) or 
+                    (vertexSelected(s2) or
                      sphericalSurfaceSelected(s2) or
                      CircularEdgeSelected(s2)
                      )
@@ -968,7 +968,7 @@ class CenterOfMassConstraint(BasicConstraint):
         self.constraintBaseName = 'centerOfMass'
         self.iconPath = path_a2p + '/icons/a2p_CenterOfMassConstraint.svg'
         self.create(selection)
-        
+
     def calcInitialValues(self):
         if self.sub1.startswith('Face'):
             plane1 = getObjectFaceFromName(self.ob1, self.sub1)
@@ -1037,5 +1037,5 @@ Button gets active after correct selection.
                 if ( planeSelected(s1) or ClosedEdgeSelected(s1)) and (planeSelected(s2) or ClosedEdgeSelected(s2)):
                     validSelection = True
         return validSelection
-    
+
 #==============================================================================

@@ -58,7 +58,7 @@ def updateConvertedPart(doc, obj):
     baseObject.ViewObject.Visibility = False #set baseObject invisible again.
     obj.Placement = savedPlacement
 
-    for p in baseObject.ViewObject.PropertiesList: 
+    for p in baseObject.ViewObject.PropertiesList:
         if hasattr(baseObject.ViewObject, p) and p not in [
                 'DiffuseColor',
                 'Proxy',
@@ -68,26 +68,26 @@ def updateConvertedPart(doc, obj):
             try:
                 setattr(obj.ViewObject, p, getattr( baseObject.ViewObject, p))
             except:
-                pass #a lot of attributes related e.g. to sketcher
-            
+                pass  # a lot of attributes related e.g. to sketcher
+
     if not a2plib.getPerFaceTransparency():
         # switch of perFaceTransparency
         obj.ViewObject.Transparency = 1
         obj.ViewObject.Transparency = 0 # default = nontransparent
-        
+
     obj.recompute()
     obj.ViewObject.Visibility = True
 
 def convertToImportedPart(doc, obj):
-    '''
+    """
     convertToImportedPart(document, documentObject) - changes a regular FreeCAD object into an A2plus
-    importedPart, adds the importedPart to the document and hides the original object from the 
+    importedPart, adds the importedPart to the document and hides the original object from the
     document. Updating the assembly will also update the converted part
-    '''
+    """
     partName = a2plib.findUnusedObjectName( obj.Label, document=doc )
     partLabel = a2plib.findUnusedObjectLabel( obj.Label, document=doc )
     filename = "converted"   #or none? if obj is already in this doc, we don't know it's original filename
-    
+
     newObj = doc.addObject("Part::FeaturePython",partName)
     newObj.Label = partLabel
 
@@ -106,7 +106,7 @@ def convertToImportedPart(doc, obj):
     newObj.updateColors = True
 
     newObj.ViewObject.ShapeColor = obj.ViewObject.ShapeColor
-    
+
     #-------------------------------------------
     # Initialize the new TopoMapper
     #-------------------------------------------
@@ -114,7 +114,7 @@ def convertToImportedPart(doc, obj):
     newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = \
         topoMapper.createTopoNames(desiredShapeLabel = obj.Label)
 
-    for p in obj.ViewObject.PropertiesList: 
+    for p in obj.ViewObject.PropertiesList:
         if hasattr(obj.ViewObject, p) and p not in [
                 'DiffuseColor',
                 'Proxy',
@@ -125,12 +125,12 @@ def convertToImportedPart(doc, obj):
                 setattr(newObj.ViewObject, p, getattr( obj.ViewObject, p))
             except: #some sketcher attributes e.g.
                 pass
-    
+
     if not a2plib.getPerFaceTransparency():
         # switch of perFaceTransparency
         newObj.ViewObject.Transparency = 1
         newObj.ViewObject.Transparency = 0 # default = nontransparent
-        
+
 
     newObj.Placement.Base = obj.Placement.Base
     newObj.Placement.Rotation = obj.Placement.Rotation

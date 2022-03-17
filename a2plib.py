@@ -140,12 +140,12 @@ def getLanguagePath():
     return os.path.join(os.path.dirname(__file__),"translations")
 #------------------------------------------------------------------------------
 def drawDebugVectorAt(position,direction,rgbColor):
-    '''
-    function draws a vector directly to 3D view using pivy/Coin
-    
+    """
+    Function draws a vector directly to 3D view using pivy/Coin.
+
     expects position and direction as Base.vector type
     color as tuple like (1,0,0)
-    '''
+    """
     color = coin.SoBaseColor()
     color.rgb = rgbColor
 
@@ -154,39 +154,39 @@ def drawDebugVectorAt(position,direction,rgbColor):
     lineStyle.style = coin.SoDrawStyle.LINES
     lineStyle.lineWidth = 2
 
-    points=coin.SoCoordinate3()
-    lines=coin.SoLineSet()
+    points = coin.SoCoordinate3()
+    lines = coin.SoLineSet()
 
     startPoint = position.x,position.y,position.z
     ep = position.add(direction)
     endPoint = ep.x,ep.y,ep.z
-    
+
     points.point.values = (startPoint,endPoint)
-    
+
     #create and feed data to separator
     sep=coin.SoSeparator()
     sep.addChild(points)
     sep.addChild(color)
-    sep.addChild(lineStyle)    
-    sep.addChild(lines)    
-    
+    sep.addChild(lineStyle)
+    sep.addChild(lines)
+
     #add separator to sceneGraph
     sg = FreeCADGui.ActiveDocument.ActiveView.getSceneGraph()
     sg.addChild(sep)
-    
+
     solver_debug_objects.append(sep)
-    
+
 #------------------------------------------------------------------------------
 def isGlobalVisible(ob):
-    '''
+    """
     Part containers do not propagate visibility to all its childs.
-    
+
     This function checks, whether at least one Part container is invisible in tree
     upwards direction.
-    
+
     This function returns always true, except one Part- or Group-Container
     in tree-structure above is invisible
-    '''
+    """
     result = True
 
     #remove constraints from the InList
@@ -194,7 +194,7 @@ def isGlobalVisible(ob):
     for i in ob.InList:
         if isA2pConstraint(i): continue
         inList.append(i)
-    
+
     if len(inList) == 0:
         if (
                 ob.Name.startswith('Group') or
@@ -279,11 +279,11 @@ def setConstraintEditorRef(ref):
     CONSTRAINT_EDITOR__REF = ref
 #------------------------------------------------------------------------------
 def setConstraintViewMode(active):
-    global CONSTRAINT_VIEWMODE 
+    global CONSTRAINT_VIEWMODE
     CONSTRAINT_VIEWMODE = active
 #------------------------------------------------------------------------------
 def getConstraintViewMode():
-    global CONSTRAINT_VIEWMODE 
+    global CONSTRAINT_VIEWMODE
     return CONSTRAINT_VIEWMODE
 #------------------------------------------------------------------------------
 def getConstraintDialogRef():
@@ -326,7 +326,7 @@ def filterShapeObs(_list, allowSketches=False):
         if (
             #Following object now have App::GeoFeatureGroupExtension in FC0.19
             #prevent them from being filtered out.
-            ob.Name.startswith("Boolean") or 
+            ob.Name.startswith("Boolean") or
             ob.Name.startswith("Body")
             ):
             pass
@@ -419,7 +419,7 @@ def fit_rotation_axis_to_surface1( surface, n_u=3, n_v=3 ):
     'should work for cylinders and possibly cones (depending on the u,v mapping)'
     uv = sum( [ [ (u,v) for u in numpy.linspace(0,1,n_u)] for v in numpy.linspace(0,1,n_v) ], [] )
     P = [ numpy.array(surface.value(u,v)) for u,v in uv ] #positions at u,v points
-    N = [ numpy.cross( *surface.tangent(u,v) ) for u,v in uv ] 
+    N = [ numpy.cross( *surface.tangent(u,v) ) for u,v in uv ]
     intersections = []
     for i in range(len(N)-1):
         for j in range(i+1,len(N)):
@@ -462,7 +462,7 @@ def fit_rotation_axis_to_surface1( surface, n_u=3, n_v=3 ):
 def fit_plane_to_surface1( surface, n_u=3, n_v=3 ):
     uv = sum( [ [ (u,v) for u in numpy.linspace(0,1,n_u)] for v in numpy.linspace(0,1,n_v) ], [] )
     P = [ surface.value(u,v) for u,v in uv ] #positions at u,v points
-    N = [ numpy.cross( *surface.tangent(u,v) ) for u,v in uv ] 
+    N = [ numpy.cross( *surface.tangent(u,v) ) for u,v in uv ]
     plane_norm = sum(N) / len(N) #planes normal, averaging done to reduce error
     plane_pos = P[0]
     error = sum([ abs( numpy.dot(p - plane_pos, plane_norm) ) for p in P ])
@@ -480,12 +480,12 @@ def getObjectFaceFromName( obj, faceName ):
     return obj.Shape.Faces[ind]
 #------------------------------------------------------------------------------
 def getProjectFolder():
-    '''
+    """
     #------------------------------------------------------------------------------------
     # A new Parameter is required: projectFolder...
     # All Parts will be searched below this projectFolder-Value...
     #------------------------------------------------------------------------------------
-    '''
+    """
     preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
     if not preferences.GetBool('useProjectFolder', False): return ""
     return preferences.GetString('projectFolder', '~')
@@ -502,19 +502,19 @@ def pathToOS(path):
 
 #------------------------------------------------------------------------------
 def findFile(_name, _path):
-    '''
-    Searches a file within a directory and its subdirectories
-    '''
+    """
+    Searches a file within a directory and its subdirectories.
+    """
     name = to_str(_name)
     path = to_str(_path)
     for root, dirs, files in os.walk(path):
         if name in files:
             return os.path.join(root, name)
     return None
-            
+
 #------------------------------------------------------------------------------
 def findSourceFileInProject(_pathImportPart, _assemblyPath):
-    '''
+    """
     #------------------------------------------------------------------------------------
     # interpret the sourcefile name of imported part
     # if working with preference "useProjectFolder:
@@ -525,15 +525,15 @@ def findSourceFileInProject(_pathImportPart, _assemblyPath):
     # - path of sourcefile is checked for being relative to assembly or absolute
     # - path is interpreted in appropriate way
     #------------------------------------------------------------------------------------
-    '''
+    """
     pathImportPart = _pathImportPart
     assemblyPath = _assemblyPath
-    
+
     pathImportPart = to_bytes(pathImportPart)
     assemblyPath = to_bytes(assemblyPath)
-    
+
     preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
-    if not preferences.GetBool('useProjectFolder', False): 
+    if not preferences.GetBool('useProjectFolder', False):
         # not working with useProjectFolder preference,
         # check whether path is relative or absolute...
         if (
@@ -547,7 +547,7 @@ def findSourceFileInProject(_pathImportPart, _assemblyPath):
             p1 = to_str(assemblyPath)
             p2 = to_str(pathImportPart)
             joinedPath = os.path.join(p1,p2)
-            
+
             absolutePath = os.path.normpath(joinedPath)
             absolutePath = pathToOS(absolutePath)
             return to_str(absolutePath)
@@ -571,7 +571,7 @@ def checkFileIsInProjectFolder(path):
     projectFolder = os.path.abspath(getProjectFolder()) # get normalized path
     fileName = os.path.basename(path)
     nameInProject = findFile(fileName,projectFolder)
-    
+
     if nameInProject == path:
         return True
     else:
@@ -611,7 +611,7 @@ def drawVector(fromPoint,toPoint, color):
     line.ViewObject.LineColor = color
     line.ViewObject.LineWidth = 1
 
-    
+
     c = Part.makeCone(0,1,4)
     cone = doc.addObject("Part::Feature","ArrowHead")
     cone.Shape = c
@@ -661,7 +661,7 @@ def findUnusedObjectLabel(base, counterStart=1, fmt='%03i', document=None, exten
         except:
             pass
     base2 = base2 + '_'
-    
+
     if extension is None:
         base3 = base2
     else:
@@ -741,7 +741,7 @@ class SelectionTaskDialogForm(QtGui.QWidget):
 
 #------------------------------------------------------------------------------
 class SelectionExObject:
-    'allows for selection gate functions to interface with classification functions below'
+    """Allows for selection gate functions to interface with classification functions below."""
     def __init__(self, doc, Object, subElementName):
         self.doc = doc
         self.Object = Object
@@ -764,7 +764,7 @@ def CircularEdgeSelected( selection ):
                 return False
             if hasattr( edge.Curve, 'Radius' ):
                 return True
-            
+
             # the following section fails for linear edges, protect it
             # by try/except block
             try:
@@ -777,7 +777,7 @@ def CircularEdgeSelected( selection ):
                         return True
             except:
                 pass
-            
+
     return False
 #------------------------------------------------------------------------------
 def ClosedEdgeSelected( selection ):
@@ -894,7 +894,7 @@ def removeConstraint( constraint ):
 #------------------------------------------------------------------------------
 def getPos(obj, subElementName):
     pos = None
-    
+
     if subElementName.startswith('Face'):
         face = getObjectFaceFromName(obj, subElementName)
         surface = face.Surface
@@ -918,7 +918,7 @@ def getPos(obj, subElementName):
                 error_normalized = error / face.BoundBox.DiagonalLength
                 if error_normalized < 10**-6: #then good rotation_axis fix
                     pos = center
-            
+
     elif subElementName.startswith('Edge'):
         edge = getObjectEdgeFromName(obj, subElementName)
         if isLine(edge.Curve):
@@ -941,11 +941,11 @@ def getPos(obj, subElementName):
                 D = numpy.array([L.tangent(0)[0] for L in lines]) #D(irections)
                 if numpy.std( D, axis=0 ).max() < 10**-9: #then linear curve
                     pos = lines[0].value(0)
-            
-            
+
+
     elif subElementName.startswith('Vertex'):
         pos = getObjectVertexFromName(obj, subElementName).Point
-    
+
     return pos # maybe none !!
 #------------------------------------------------------------------------------
 def getPlaneNormal(surface):
@@ -975,7 +975,7 @@ def getAxis(obj, subElementName):
                 error_normalized = error / face.BoundBox.DiagonalLength
                 if error_normalized < 10**-6: #then good rotation_axis fix
                     axis = axis_fitted
-            
+
     elif subElementName.startswith('Edge'):
         edge = getObjectEdgeFromName(obj, subElementName)
         if isLine(edge.Curve):
@@ -995,7 +995,7 @@ def getAxis(obj, subElementName):
                 D = numpy.array([L.tangent(0)[0] for L in lines]) #D(irections)
                 if numpy.std( D, axis=0 ).max() < 10**-9: #then linear curve
                     axis = numpyVecToFC(D[0])
-            
+
     return axis # may be none!
 #------------------------------------------------------------------------------
 def unTouchA2pObjects():
@@ -1032,7 +1032,7 @@ def isEditableA2pPart(obj):
         if obj.sourceFile == "": return False
     return True
 #------------------------------------------------------------------------------
-def isA2pConstraint(obj): 
+def isA2pConstraint(obj):
     result = False
     if hasattr(obj,"Content"):
         if ('ConstraintInfo' in obj.Content) or ('ConstraintNfo'in obj.Content):
@@ -1046,9 +1046,9 @@ def isA2pObject(obj):
     return result
 #------------------------------------------------------------------------------
 def isFastenerObject(obj):
-    '''
-    recognize an object created by the fasteners WB
-    '''
+    """
+    Recognize an object created by the Fasteners WB.
+    """
     if hasattr(obj,'Proxy'):
         if str(obj.Proxy).startswith('<FastenersCmd.FSScrewObject'): return True
         if str(obj.Proxy).startswith('<FastenersCmd.FSWasherObject'): return True
@@ -1060,15 +1060,15 @@ def makeDiffuseElement(color,trans):
     return elem
 #------------------------------------------------------------------------------
 def copyObjectColors(ob1,ob2):
-    '''
-    copies colors from ob2 to ob1
+    """
+    Copies colors from ob2 to ob1.
     Transparency of updated object is not touched until
     user activates perFaceTransparency within preferences.
-    '''
+    """
     if ob1.updateColors != True:
         ob1.ViewObject.DiffuseColor = [ob1.ViewObject.ShapeColor] # set syncron
         return
-    
+
     # obj1.updateColors == True from now
     newDiffuseColor = copy.copy(ob2.ViewObject.DiffuseColor)
     ob1.ViewObject.ShapeColor = ob2.ViewObject.ShapeColor
@@ -1126,20 +1126,20 @@ def deleteConstraintsOfDeletedObjects():
             removeConstraint(c)
 
         missingObjects = set(missingObjects)
-    
+
         msg = translate("A2plus_lib","Not existing part(s):") + "\n  - {}".format(
             u'\n  - '.join( objName for objName in missingObjects)
             )
         QtGui.QMessageBox.information(
-            QtGui.QApplication.activeWindow(), 
-            translate("A2plus_lib","Constraints of missing parts removed!"), 
-            msg 
+            QtGui.QApplication.activeWindow(),
+            translate("A2plus_lib","Constraints of missing parts removed!"),
+            msg
             )
 #------------------------------------------------------------------------------
 def a2p_repairTreeView():
     doc = FreeCAD.activeDocument()
     if doc is None: return
-    
+
     deleteConstraintsOfDeletedObjects()
 
     constraints = [ obj for obj in doc.Objects if 'ConstraintInfo' in obj.Content]
@@ -1167,6 +1167,6 @@ def a2p_repairTreeView():
         if parent is not None: parent.touch()
         if m.Proxy is not None:
             m.Proxy.disable_onChanged = False
-            
+
     unTouchA2pObjects()
 #------------------------------------------------------------------------------

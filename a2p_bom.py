@@ -48,27 +48,27 @@ def createPartList(
         partListEntries,
         recursive=False
         ):
-    '''
+    """
     Extract quantities and descriptions of assembled parts from
     document.xml
     Is able to analyse subassemblies by recursion
-    
+
     It works with a dict. Structure of an entry is:
     filename: [Quantity,[information,information,....] ]
-    '''
+    """
     fileNameInProject = a2plib.findSourceFileInProject(
         importPath,
         parentAssemblyDir
         )
     workingDir,basicFileName = os.path.split(fileNameInProject)
-    
+
     docReader1 = FCdocumentReader()
     docReader1.openDocument(fileNameInProject)
-    
+
     for ob in docReader1.getA2pObjects():
         # skip converted parts...
         if a2plib.to_str(ob.getA2pSource()) == a2plib.to_str('converted'): continue
-        
+
         if ob.isSubassembly() and recursive:
             partListEntries = createPartList(
                                         ob.getA2pSource(),
@@ -76,7 +76,7 @@ def createPartList(
                                         partListEntries,
                                         recursive
                                         )
-            
+
         # Process information of this a2p object
         if not ob.isSubassembly() or not recursive:
             # Try to get spreadsheetdata _PARTINFO_ from linked source
@@ -102,14 +102,14 @@ def createPartList(
             partInformation = []
             for i in range(0,len(PARTLIST_COLUMN_NAMES)):
                 partInformation.append("*")
-                
+
             # if there is a proper spreadsheet, then read it...
             for ob in docReader2.getSpreadsheetObjects():
-                
+
                 sheetName = PARTINFORMATION_SHEET_NAME
                 if a2plib.PYVERSION > 2:
                     sheetName = a2plib.to_bytes(PARTINFORMATION_SHEET_NAME)
-                    
+
                 if ob.name == sheetName:
                     cells = ob.getCells()
                     for addr in cells.keys():
@@ -129,7 +129,7 @@ def createPartList(
                     ]
             else:
                 partListEntries.get(linkedSource)[0]+=1 #count sourcefile usage
-                
+
     return partListEntries
 
 
@@ -162,7 +162,7 @@ recent assembly are collected.
 )
 
 class a2p_CreatePartlist():
-    
+
     def clearPartList(self):
         alphabet_list = list(string.ascii_uppercase)
         doc = FreeCAD.activeDocument()
@@ -182,7 +182,7 @@ class a2p_CreatePartlist():
             return
         completeFilePath = doc.FileName
         p,f = os.path.split(completeFilePath)
-        
+
         flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
         msg = translate("A2plus","Please save before generating a parts list! Save now?")
         response = QtGui.QMessageBox.information(QtGui.QApplication.activeWindow(), translate("A2plus","Save document?"), msg, flags )
@@ -194,7 +194,7 @@ class a2p_CreatePartlist():
             return
         else:
             doc.save()
-        
+
         flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
         msg = translate("A2plus","Do you want to iterate recursively over all included subassemblies?")
         response = QtGui.QMessageBox.information(QtGui.QApplication.activeWindow(), u"PARTSLIST", msg, flags )
@@ -202,14 +202,14 @@ class a2p_CreatePartlist():
             subAssyRecursion = True
         else:
             subAssyRecursion = False
-        
+
         partListEntries = createPartList(
             doc.FileName,
             p,
             {},
             recursive=subAssyRecursion
             )
-        
+
         ss = None
         try:
             ss = doc.getObject(BOM_SHEET_NAME)
@@ -220,7 +220,7 @@ class a2p_CreatePartlist():
             ss.Label = BOM_SHEET_LABEL
         else:
             self.clearPartList()
-        
+
         # Write Column headers to spreadsheet
         ss.set('A1',u'POS')
         ss.set('B1',u'QTY')
@@ -251,11 +251,11 @@ class a2p_CreatePartlist():
                 else:
                     tx2 = a2plib.to_bytes(tx) # convert to utf-8
                 ss.set(chr(idx3+2+j)+str(idx+2),tx2)
-        
+
         # recompute to finish..
         doc.recompute()
         print("#PARTSLIST# spreadsheet has been created")
-        
+
 
     def GetResources(self):
         return {
@@ -263,6 +263,6 @@ class a2p_CreatePartlist():
             'MenuText': translate("A2plus_CreatePartlist", "Create a spreadsheet with a parts list of this file"),
             'ToolTip' : toolTip
             }
-        
+
 FreeCADGui.addCommand('a2p_CreatePartlist', a2p_CreatePartlist())
 #------------------------------------------------------------------------------

@@ -27,32 +27,34 @@ from a2p_translateUtils import *
 
 #==============================================================================
 def LCS_Group_deleteContent(_self,doc):
-    '''
+    """
     LCS_Group featurepython extending function deleteContent
-    '''
+    """
     if len(_self.Group) > 0:
         deleteList = []
         deleteList.extend(_self.Group)
         _self.Group = []
         for ob in deleteList:
-            doc.removeObject(ob.Name) # delete the imported LCS'
+            doc.removeObject(ob.Name)  # delete the imported LCS'
 
 #==============================================================================
+
 class LCS_Group(object):
     def __init__(self, obInstance):
         obInstance.addExtension('App::GeoFeatureGroupExtensionPython', self)
-        obInstance.addProperty("App::PropertyString","Owner").Owner = ''
+        obInstance.addProperty("App::PropertyString", "Owner").Owner = ''
         obInstance.setEditorMode('Owner', 1)
-        obInstance.setEditorMode('Placement', 1)  #read-only # KBWBE: does not work...
+        obInstance.setEditorMode('Placement', 1)  # read-only # KBWBE: does not work...
         obInstance.deleteContent = LCS_Group_deleteContent # add a function to this featurepython class
-        
+
     def execute(self, obj):
         pass
-    
+
     def onChanged(self, obj, prop):
         pass
-            
+
 #==============================================================================
+
 class VP_LCS_Group(object):
     def __init__(self,vobj):
         vobj.addExtension('Gui::ViewProviderGeoFeatureGroupExtensionPython', self)
@@ -61,7 +63,7 @@ class VP_LCS_Group(object):
     def attach(self, vobj):
         self.ViewObject = vobj
         self.Object = vobj.Object
-        
+
         # restore lost functions to featurePython object during reload
         if not hasattr(self.Object,'deleteContent'):
             self.Object.deleteContent = LCS_Group_deleteContent
@@ -90,6 +92,7 @@ class VP_LCS_Group(object):
         return None
 
 #==============================================================================
+
 def getListOfLCS(targetDoc,sourceDoc):
     lcsOut = []
     for sourceOb in sourceDoc.Objects:

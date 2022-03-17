@@ -35,6 +35,7 @@ else:
 
     def translate(context, text):
         return text
-    
+
+
 def tr_(text):
-    return translate("A2plus", text)    
+    return translate("A2plus", text)

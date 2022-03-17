@@ -64,13 +64,13 @@ def makePlacedShape(obj):
     return tempShape
 
 def muxAssemblyWithTopoNames(doc, desiredShapeLabel=None):
-    '''
-    Mux an a2p assembly
+    """
+    Mux an a2p assembly.
 
     combines all the a2p objects in the doc into one shape
     and populates muxinfo with a description of an edge or face.
     these descriptions are used later to retrieve the edges or faces...
-    '''
+    """
     faces = []
     faceColors = []
     muxInfo = [] # List of keys, not used at moment...
@@ -78,11 +78,11 @@ def muxAssemblyWithTopoNames(doc, desiredShapeLabel=None):
     visibleObjects = [ obj for obj in doc.Objects
                        if hasattr(obj,'ViewObject') and obj.ViewObject.isVisible()
                        and hasattr(obj,'Shape') and len(obj.Shape.Faces) > 0
-                       and hasattr(obj,'muxInfo') and 
+                       and hasattr(obj,'muxInfo') and
                        a2plib.isGlobalVisible(obj)
                        ]
-    
-    if desiredShapeLabel: # is not None..
+
+    if desiredShapeLabel:  # is not None..
         tmp = []
         for ob in visibleObjects:
             if ob.Label == desiredShapeLabel:
@@ -153,9 +153,9 @@ def muxAssemblyWithTopoNames(doc, desiredShapeLabel=None):
     #    shell = Part.makeShell([faces])
     #else:
     #    shell = Part.makeShell(faces)
-        
+
     shell = Part.makeShell(faces)
-        
+
     try:
         if a2plib.getUseSolidUnion():
             if len(shape_list) > 1:

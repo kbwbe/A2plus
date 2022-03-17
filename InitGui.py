@@ -54,7 +54,7 @@ class A2plusWorkbench (Workbench):
         from a2p_translateUtils import QT_TRANSLATE_NOOP
         from a2p_translateUtils import translate
         from a2p_translateUtils import tr_
-        
+
         import sys
         PyVersion = sys.version_info[0]
         if PyVersion == 2:
@@ -62,12 +62,12 @@ class A2plusWorkbench (Workbench):
         else:
             import a2p_Resources3
         import a2plib
-        
+
         # add translations path
         FreeCADGui.addLanguagePath(a2plib.getLanguagePath())
         FreeCADGui.updateLocale()
         print("languagePath of A2plus Workbench is: {}".format(a2plib.getLanguagePath()))
-        
+
         import a2p_importpart
         import a2p_recursiveUpdatePlanner
         import a2p_convertPart
@@ -105,7 +105,7 @@ class A2plusWorkbench (Workbench):
                 'a2p_editImportedPart',
                 'a2p_SaveAndExit_Command',
                 ]
-        
+
         if a2plib.SHOW_CONSTRAINTS_ON_TOOLBAR:
             constraintCommands = [
                 'a2p_ConstraintDialogCommand',
@@ -134,7 +134,7 @@ class A2plusWorkbench (Workbench):
                 'a2p_reAdjustConstraintDirectionsCommand',
                 'a2p_DeleteConnectionsCommand',
                 ]
-        
+
         if a2plib.GRAPHICALDEBUG:
             solverCommands = [
                 'a2p_SolverCommand',
@@ -156,7 +156,7 @@ class A2plusWorkbench (Workbench):
             'a2p_isolateCommand',
             'a2p_ViewConnectionsCommand',
             'a2p_Restore_Transparency',
-            'a2p_ToggleTransparencyCommand',            
+            'a2p_ToggleTransparencyCommand',
             'a2p_Show_PartLabels_Command',
             'a2p_Show_DOF_info_Command',
             ]
@@ -207,8 +207,8 @@ class A2plusWorkbench (Workbench):
         self.appendMenu(
             ['A2plus', translate("A2plus_appendMenu",'Misc')],
             miscCommands
-            )            
-            
+            )
+
         menuEntries = [
             'a2p_absPath_to_relPath_Command',
             'a2p_MigrateProxiesCommand'
@@ -218,7 +218,7 @@ class A2plusWorkbench (Workbench):
             menuEntries
             )
         FreeCADGui.addIconPath(':/icons')
-        
+
         FreeCADGui.addPreferencePage(
             a2plib.pathOfModule() +
             '/GuiA2p/Resources/ui/a2p_prefs.ui','A2plus'

@@ -31,11 +31,11 @@ import a2p_constraints
 
 #==============================================================================
 def redAdjustConstraintDirections(doc):
-    '''
-    recalculate value of property 'direction' and the sign of property 'offset' of all
-    a2p-constraints of a document, in order to reach a solvable state if 
+    """
+    Recalculate value of property 'direction' and the sign of property 'offset' of all
+    a2p-constraints of a document, in order to reach a solvable state if
     possible, especially used after updating of imported parts.
-    '''
+    """
     unknown_constraints = []
     constraints = [ obj for obj in doc.Objects if 'ConstraintInfo' in obj.Content]
     for c in constraints:
@@ -72,20 +72,21 @@ def redAdjustConstraintDirections(doc):
                 unknown_constraints.append(c.Type)
         except:
             print("Errors occurred during processing of {}".format(c.Label))
-        
+
     if len(unknown_constraints) > 0:
         print("redefineConstraintDirections(): Found unknown constraints: {}".format(
             set(unknown_constraints)
             )
         )
 #==============================================================================
+
 class a2p_reAdjustConstraintDirectionsCommand:
     def Activated(self):
         flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
         response = QtGui.QMessageBox.information(
-            QtGui.QApplication.activeWindow(), 
-            translate("A2plus_constraintServices",'Recalculate direction of constraints'), 
-            translate("A2plus_constraintServices",'Do you really want to recalculate the directions of all constraints?'), 
+            QtGui.QApplication.activeWindow(),
+            translate("A2plus_constraintServices",'Recalculate direction of constraints'),
+            translate("A2plus_constraintServices",'Do you really want to recalculate the directions of all constraints?'),
             flags
             )
         if response == QtGui.QMessageBox.Yes:
@@ -93,11 +94,11 @@ class a2p_reAdjustConstraintDirectionsCommand:
             doc.openTransaction("Readjust constraint's directions")
             redAdjustConstraintDirections(doc)
             doc.commitTransaction()
-                    
+
     def IsActive(self):
         if FreeCAD.activeDocument() is None: return False
         return True
-                    
+
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_ReAdjustConstraints.svg',
@@ -106,6 +107,3 @@ class a2p_reAdjustConstraintDirectionsCommand:
             }
 FreeCADGui.addCommand('a2p_reAdjustConstraintDirectionsCommand', a2p_reAdjustConstraintDirectionsCommand())
 #==============================================================================
-
-
-
