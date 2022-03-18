@@ -1,8 +1,25 @@
-
-
-
-
-
+#***************************************************************************
+#*                                                                         *
+#*   Copyright (c) 2020 Dan Miel                                           *
+#*                                                                         *
+#*   This program is free software; you can redistribute it and/or modify  *
+#*   it under the terms of the GNU Lesser General Public License (LGPL)    *
+#*   the License, or (at your option) any later version.                   *
+#*   for detail see the LICENCE text file.                                 *
+#*                                                                         *
+#*   This program is distributed in the hope that it will be useful,       *
+#*   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+#*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+#*   GNU Library General Public License for more details.                  *
+#*                                                                         *
+#*   You should have received a copy of the GNU Library General Public     *
+#*   License along with this program; if not, write to the Free Software   *
+#*   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  *
+#*   USA                                                                   *
+#*                                                                         *
+#***************************************************************************
+# This is to be used with A2plus Assembly WorkBench
+#
 
 import sys
 import os
@@ -17,22 +34,22 @@ import PySide
 
 
 class    formMain(QtGui.QMainWindow):
-    
-    def    __init__(self,name):
+
+    def __init__(self,name):
         self.name = name
         super(formMain,self).__init__()
         self.setWindowTitle('Create Labels')
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
-        self.setGeometry(300,100,200,300)#xy,wh
+        self.setGeometry(300,100,200,300)  # xy,wh
         self.setStyleSheet("font: 11pt arial MS")
 
-        self.btnLabels = [['Add Face Labels','Add labels to all of the faces on a selected part'],
-                          ['Add Edge Labels','Add labels to all of the edges on a selected part'],
-                          ['Add Vertex Labels','Add labels to all of the vertexes on a selected part'],
-                          ['Delete Labels','Delet all labels'],
-                          ['Attach to','Enter a name in the texbox and press to add a label'],
-                          ['Selected Labels','Labels added to selected features'],
-                          ['Close',''] #
+        self.btnLabels = [['Add Face Labels', 'Add labels to all of the faces on a selected part'],
+                          ['Add Edge Labels', 'Add labels to all of the edges on a selected part'],
+                          ['Add Vertex Labels', 'Add labels to all of the vertexes on a selected part'],
+                          ['Delete Labels',    'Delete all labels'],
+                          ['Attach to', 'Enter a name in the texbox and press to add a label'],
+                          ['Selected Labels', 'Labels added to selected features'],
+                          ['Close', '']  #
                           ]
 
 
@@ -103,20 +120,19 @@ class   classLabels():
     def __init__(self):
         self.labelGroup = None
         pass
-        #self.name = name
-
+        # self.name = name
 
     def checkselection(self):
-        #checks to see if labels already exist
+        """Checks to see if labels already exist."""
         doc = FreeCAD.activeDocument()
-        #loc = None
+        # loc = None
         print('checking for label')
         self.labelGroup = doc.getObject("partLabels")
         if self.labelGroup is None:
             self.labelGroup=doc.addObject("App::DocumentObjectGroup", "partLabels")
 
         if len(FreeCADGui.Selection.getSelection()) == 0:
-            #dlib.mApp('Please select One part.')
+            # dlib.mApp('Please select One part.')
             return(False)
         return(True)
 
@@ -129,11 +145,11 @@ class   classLabels():
         if feat == 'Face':
             features = sel[0].Shape.Faces
         if feat == 'Edge':
-            features = sel[0].Shape.Edges          
+            features = sel[0].Shape.Edges
         if feat == 'Vertex':
             features = sel[0].Shape.Vertexes
-           
-            
+
+
         for num in range(0,len(features)):
             ent = features[num]
             if feat == 'Vertex':
@@ -163,7 +179,7 @@ class   classLabels():
 
 
     def attachto(self,sel = None,featname = ''):
- 
+
         sel = self.checkselection()
         if not sel:
             return
@@ -191,8 +207,8 @@ class   classLabels():
         self.makelabel(ent,featname,loc)
 
 
-        #Create a label to find a part
     def labelForTable(self,ent, featname):
+        """Create a label to find a part."""
         sel = self.checkselection()
         self.getEntLoc(ent,featname)
 
