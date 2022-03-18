@@ -79,7 +79,7 @@ class A2plusWorkbench (Workbench):
         import a2p_bom # bom == bill of materials == partslist
         import a2p_constraintServices
         import a2p_searchConstraintConflicts
-        import CD_A2plusupdater #for CD function
+        import CD_A2plusupdater  # for Constraint Diagnostic function
         if a2plib.getRecursiveUpdateEnabled():
             partCommands = [
                 'a2p_ImportPart',
