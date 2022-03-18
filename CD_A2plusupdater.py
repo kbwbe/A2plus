@@ -138,7 +138,7 @@ class   classFuncs():
         doc = FreeCAD.activeDocument()
 
 
-        if newpart == False:
+        if newpart is False:
             newobj = None
             CD_importpart.updateImportedParts(doc, True)
         newobj = g.partobj
@@ -329,11 +329,11 @@ class   classFuncs():
                 newfeat = g.dictOldNew.get(featname)
             else:
                 if 'Face' in featname:
-                    newfeat = self.findnewface_attemt1(dict)
+                    newfeat = self.findnewface_attempt1(dict)
                 if 'Edge' in featname:
-                    newfeat = self.findnewedge_attemt1(dict)
+                    newfeat = self.findnewedge_attempt1(dict)
                 if 'Vertex' in featname:
-                    newfeat = self.findnewvertex_attemt1(dict)
+                    newfeat = self.findnewvertex_attempt1(dict)
                 if newfeat =='' or newfeat == 'No':
                     g.notfoundfeatures.append([dict.get('Name'),dict])
                     pass
@@ -388,10 +388,10 @@ class   classFuncs():
                 newfeat = g.dictOldNew.get(featname)
             else:
                 if 'Face' in featname:
-                    newfeat = self.findnewface_attemt2(dict)
+                    newfeat = self.findnewface_attempt2(dict)
                 if 'Edge' in featname:
-                    newfeat = self.findnewedge_attemt2(dict)
-                if newfeat =='No' or newfeat == '':
+                    newfeat = self.findnewedge_attempt2(dict)
+                if newfeat is 'No' or newfeat == '':
                     g.notfoundfeatures.append([dict.get('Name'),dict])
                     newfeat = 'None'
                 else:
@@ -401,13 +401,13 @@ class   classFuncs():
             self.swapfeature(newfeat,dict)
 
 
-    def findnewface_attemt1(self,dict):
-        #First attement to find a face. Perfect fit is area the same all points the ssame
+    def findnewface_attempt1(self,dict):
+        # First attempt to find a face. Perfect fit is area the same all points the same
         face = ''
         # newfeat = ''
         # surftype = dict.get('surftype')
         if dict.get('surftype') == 'Cylinder':
-                face = self.findCylinderattemt1(dict)
+                face = self.findCylinderattempt1(dict)
         else:
             for num in range(0,len(g.shape2.Faces)):
                 testdict = self.getfacebynum(num,g.shape2)
@@ -420,12 +420,12 @@ class   classFuncs():
 
 
 
-    def findnewface_attemt2(self,dict):
+    def findnewface_attempt2(self,dict):
         face = ''
-        #second attempt ignors area looks for points
+        # second attempt ignores area; looks for points
         face = ''
         if dict.get('surftype') == 'Cylinder':
-            face = self.findCylinderattemt2(dict)
+            face = self.findCylinderattempt2(dict)
 
 
         else:
@@ -480,8 +480,7 @@ class   classFuncs():
         return(face)
 
 
-
-    def findCylinderattemt1(self,dict):
+    def findCylinderattempt1(self,dict):
         face = ''
         for num in g.cylfaces:
             testdict = self.getfacebynum(num,g.shape2)
@@ -493,9 +492,8 @@ class   classFuncs():
         return(face)
 
 
-
-    def findCylinderattemt2(self,dict):
-        #First attement to find a face. Perfect fit is area the same all points the ssame
+    def findCylinderattempt2(self,dict):
+        #First attempt to find a face. Perfect fit is area the same all points the same
         face = ''
         ver1 = dict.get('center')
         for num in g.cylfaces:
@@ -507,10 +505,7 @@ class   classFuncs():
         return(face)
 
 
-
-
-
-    def findnewedge_attemt1(self,dict):
+    def findnewedge_attempt1(self,dict):
         edge = ''
         if dict.get('curvetype') == 'circle':
             center1 = dict.get('center')
@@ -527,7 +522,7 @@ class   classFuncs():
 
         else:
             for num in g.notcylfaces:
-                testdict = self.getfacebynum(num,g.shape2)  
+                testdict = self.getfacebynum(num,g.shape2)
                 if dict.get('length') == testdict.get('length')\
                    and dict.get('center') == testdict.get('center'):
                     edge ='Edge' + str(num +1)
@@ -536,7 +531,7 @@ class   classFuncs():
         return(edge)
 
 
-    def findnewedge_attemt2(self,dict):
+    def findnewedge_attempt2(self,dict):
         edge = ''
         if dict.get('curvetype') == 'circle':
             center1 = dict.get('center')
@@ -580,7 +575,7 @@ class   classFuncs():
 
 
 
-    def findnewvertex_attemt1(self,dict):
+    def findnewvertex_attempt1(self,dict):
         vertex = ''
         featname = dict.get('featname')
         for num in range(0,len(g.shape2.Vertexes)):
