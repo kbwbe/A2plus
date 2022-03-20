@@ -391,7 +391,7 @@ class   classFuncs():
                     newfeat = self.findnewface_attempt2(dict)
                 if 'Edge' in featname:
                     newfeat = self.findnewedge_attempt2(dict)
-                if newfeat is 'No' or newfeat == '':
+                if newfeat == 'No' or newfeat == '':
                     g.notfoundfeatures.append([dict.get('Name'),dict])
                     newfeat = 'None'
                 else:

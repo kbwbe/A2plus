@@ -468,7 +468,7 @@ more that one can be selected but 1 is recommended.
         if header == 'F2 Label':
             pass
 
-        if str(self.oldcell) is 'None':
+        if str(self.oldcell) == 'None':
             self.oldcell = self.tm.item(0, 0)
         if column >-1  and column < form1.tm.columnCount()-1:
             self.oldcell.setBackground(QBrush(QColor('white')))
@@ -892,7 +892,7 @@ class classsidefunctions():
         if lastclc.column < 4 or lastclc.column > 5:
             mApp('Surfaces can only be replaced in columns/nPart1 feat or Part2 feat')
             return
-        if len(FreeCADGui.Selection.getSelectionEx()) == 0 and lastclc.text is not 'None':
+        if len(FreeCADGui.Selection.getSelectionEx()) == 0 and lastclc.text != 'None':
             mApp('No feature has been selected')
             return
 
@@ -918,15 +918,15 @@ class classsidefunctions():
         if len(FreeCADGui.Selection.getSelectionEx()) == 0:
             return
         sel = FreeCADGui.Selection.getSelectionEx()[0]
-        if  lastclc.text is 'None':
+        if  lastclc.text == 'None':
             feat2name = sel.SubElementNames[0]
         else:
             feat2name = sel.SubElementNames[0]
         cname = lastclc.cname
 
         FreeCADGui.Selection.clearSelection()
-        dict = {'cname':cname,'SubElement':lastclc.SubElement,'dir':lastclc.dir,'newfeat':feat2name}
-        self.swapfeature(dict)
+        d = {'cname':cname,'SubElement':lastclc.SubElement,'dir':lastclc.dir,'newfeat':feat2name}
+        self.swapfeature(d)
         cobj =FreeCAD.ActiveDocument.getObject(cname)
 
 
@@ -944,17 +944,17 @@ class classsidefunctions():
 
         item = form1.tm.item(lastclc.row, lastclc.column).setText(feat2name)
 
-    def swapfeature(self,dict):
+    def swapfeature(self,dict_):
         print('In swapfeatuer')
         #changes a legs mating feature
-        newfeat = dict.get('newfeat')
+        newfeat = dict_.get('newfeat')
         leg = ''
         mleg = ''
-        cname = dict.get('cname')
+        cname = dict_.get('cname')
         cobj = FreeCAD.ActiveDocument.getObject(cname)
         mobj = FreeCAD.ActiveDocument.getObject(cname+'_mirror')
 
-        SubElement = dict.get('SubElement')
+        SubElement = dict_.get('SubElement')
 
         if SubElement == 'SubElement1':
             leg = cobj.SubElement1 = newfeat
@@ -962,7 +962,7 @@ class classsidefunctions():
         if SubElement == 'SubElement2':
             leg = cobj.SubElement2 = newfeat
             mleg = mobj.SubElement2 = newfeat
-        dir = dict.get('dir')
+        dir = dict_.get('dir')
         if hasattr(cobj,'directionConstraint'):
             cobj.directionConstraint = dir
         if hasattr(mobj,'directionConstraint'):
