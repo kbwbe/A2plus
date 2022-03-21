@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 #***************************************************************************
 #*                                                                         *
 #*   Copyright (c) 2020 Dan Miel                                           *
@@ -680,8 +682,8 @@ Updates the A2plus.assembly when parts are modified.
 To update the assembly, select the part that you have modified and press the icon.
 When the update has finished run the A2plus solver to vereify if there are broken constraints.
 This is an attempt to reduce the number of broken constraints caused
-when modifying a part from FreeCAD’s A2plus assembly program. This records the
-constraint’s mating surfaces immediately before the update and tries to
+when modifying a part from FreeCAD A2plus assembly program. This records the
+constraints mating surfaces immediately before the update and tries to
 reconnect them after the update.
 If this fails you can undo this update by using the undo button
 and running the standard A2plus updater.
@@ -693,7 +695,7 @@ class rnp_Update_A2pParts:
         #funcs.runinorder()
         funcs.selectfiles()
 
-    def Deactivated():
+    def Deactivated(self):
         """This function is executed when the workbench is deactivated"""
         FreeCADGui.Selection.clearSelection()
         return
