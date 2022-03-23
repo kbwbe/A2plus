@@ -20,27 +20,24 @@
 #*   USA                                                                   *
 #*                                                                         *
 #***************************************************************************
-# This is to be used with A2plus Assembly WorkBench
-#
+""" This is to be used with A2plus Assembly WorkBench. It records the features
+which are linked to the constraints and searches for mating features after the
+part is replaced in the assembly"""
 
-import sys
 import os
 import FreeCADGui
 import FreeCAD
 from PySide import QtUiTools
 from PySide.QtGui import *
 from PySide import QtGui, QtCore
-import a2plib
-import a2p_solversystem
 from a2p_solversystem import solveConstraints
 import CD_importpart
-import CD_checkconstraints
 import CD_ConstraintDiagnostics
 
 
 class globaluseclass:
 
-    def __init__(self, name):
+    def __init__(self):
         self.roundto = 5
         self.partlabel = ''
         self.partname = ''
@@ -61,14 +58,13 @@ class globaluseclass:
         self.foundfeatures = []
         self.dictOldNew = {}
         self.alldicts = {}
-        #self.usedfeatures = []
         self.clist = []
         self.partobj = None
         self.test = []
         self.cylfaces = []
         self.notcylfaces = []
         self.repaired = 0
-g = globaluseclass("g")
+g = globaluseclass()
 
 
 class sideFuncs1():
@@ -88,7 +84,7 @@ sideFuncs = sideFuncs1()
 
 
 
-class   classFuncs():
+class classFuncs():
     def __init__(self):
         pass
 
@@ -100,11 +96,11 @@ class   classFuncs():
             return
         if partname == 'fff':
             return
-        self.secondrun(partname,False)
+        self.secondrun(partname, False)
 
 
     def selectfiles(self):
-        ret =sideFuncs.opendoccheck()
+        ret = sideFuncs.opendoccheck()
         if ret == 'Nostart':
             return('No')
         doc = FreeCAD.activeDocument()
@@ -119,12 +115,12 @@ class   classFuncs():
         CD_ConstraintDiagnostics.statusform.txtboxstatus.setText('Updating Assembly.')
         CD_ConstraintDiagnostics.statusform.update()
 
-        for num in range(0,len(partslist)):
+        for num in range(0, len(partslist)):
             partobj = partslist[num]
             partname = self.firstrun(partobj)
             self.secondrun(False)
 
-    def firstrun(self,partobj):
+    def firstrun(self, partobj):
         g.resetvars()  # reset Variables
         partname = 'none'
         g.partobj = partobj
@@ -171,8 +167,9 @@ class   classFuncs():
         else:
             mApp('Update complete. All surfaces found')
         print('update complete')
-
-        print('Repaired constraints = ' + (str(g.repaired - len(g.notfoundfeatures))))
+        print('Total Constraints ' + str(len(g.clist)))
+        print('Repaired constraints ' + (str(g.repaired )))
+        print('Features not found ' + str(len(g.notfoundfeatures)))
 
     def getfeatstomove(self):
         doc = FreeCAD.activeDocument()
@@ -181,7 +178,7 @@ class   classFuncs():
         featname = ''
         di = {}
         for cobj in clist:
-            # get feature info before update
+            """ get feature info before update."""
             partname = g.partname
             featname = ''
             subElement = ""
@@ -189,7 +186,7 @@ class   classFuncs():
             subobj1 = doc.getObject(cobj.Object1)
             subobj2 = doc.getObject(cobj.Object2)
             frompart = [g.partlabel, g.partname]
-            for i in range(0,len(frompart)):
+            for i in range(0, len(frompart)):
                 partname = frompart[i]
                 if subobj1.Label == partname:
                     subElement = "SubElement1"
@@ -200,69 +197,64 @@ class   classFuncs():
                 if featname != '':
                     break
             dir = 'N'
-            if hasattr(cobj,'directionConstraint'):
+            if hasattr(cobj, 'directionConstraint'):
                 dir = cobj.directionConstraint
-            # dict is basic info for constraint
-            # these next functions adds info for the subelements
+            """ dict is basic info for constraint
+             these next functions adds info for the subelements"""
             if 'Face' in featname:
-                # add face info
+                """ add face info """
                 facenum = int(featname[4:])
-                di = self.getfacebynum(facenum-1,g.shape1)
+                di = self.getfacebynum(facenum-1, g.shape1)
             if 'Edge' in featname:
-                # add edge info
+                """ add edge info """
                 num = int(featname[4:])
                 num = num - 1
-                di = self.getedgebynum(num,g.shape1)
+                di = self.getedgebynum(num, g.shape1)
             if 'V' in featname:
-                # add Vertex info
+                """ add Vertex info """
                 num = int(featname[6:])
                 num = num - 1
                 di = self.getvertexbynum(num, g.shape1)
-            dict = {'Name':cobj.Name,'cname':cobj.Name,'featname':featname,'subElement':subElement,'dir':dir,'newname':''}
+            dict = {'Name':cobj.Name, 'cname':cobj.Name, 'featname':featname, 'subElement':subElement, 'dir':dir, 'newname':''}
             dict.update(di)
-
             g.alldicts[cobj.Name] = dict # Save the info to a larger dictionary
 
 
-    def getfacebynum (self,facenum,shape):
+    def getfacebynum (self, facenum, shape):
         """Get face info."""
         face = shape.Faces[facenum]
         area = rondnum(face.Area)
         surftype = face.Surface
         facepoints = []
-        points = []
+        #points = []
         center = -1
 
 
-        edge1 = face.Edges[0]
+        #edge1 = face.Edges[0]
 
         eeee = face.Edges
-        numofpoints = len(face.Vertexes)
+        #numofpoints = len(face.Vertexes)
         for f0 in face.Vertexes:         # Search the Vertexes of the face
-            point = FreeCAD.Vector(f0.Point.x,f0.Point.y,f0.Point.z)
-            x,y,z = point
-            loc = rondlist([x,y,z])
+            point = FreeCAD.Vector(f0.Point.x, f0.Point.y, f0.Point.z)
+            x, y, z = point
+            loc = rondlist([x, y, z])
             facepoints.append(loc)
-        volume = rondnum(face.Volume)
+        #volume = rondnum(face.Volume)
         radius = -1
-
         surftype = face.Surface
         surfstr = str(surftype)
-
         if'Cylinder' in surfstr:
             surfstr = 'Cylinder'
             radius = rondnum(surftype.Radius)
             center = rondlist(face.Edges[0].CenterOfMass)
-
         if'Plane' in surfstr:
             surfstr = 'Plane'
-        dict ={'surftype':surfstr,'area':area,'facepoints':facepoints,'center':center,'radius':radius,'edges':eeee}
-
+        dict = {'surftype':surfstr, 'area':area,'facepoints':facepoints, 'center':center, 'radius':radius, 'edges':eeee}
         return(dict)
 
 
 
-    def getedgebynum (self,num,shape):
+    def getedgebynum (self, num, shape):
 
         pnt1 = None
         pnt2 = None
@@ -271,23 +263,23 @@ class   classFuncs():
         length = rondnum(edge.Length)
         center = edge.CenterOfMass
         center = rondlist(center)
-        pnt1 = edge.Vertexes[0]         # Basepoints
+        pnt1 = edge.Vertexes[0] # Basepoints
         x1 = pnt1.Point.x
         y1 = pnt1.Point.y
         z1 = pnt1.Point.z
-        startpoint = rondlist([x1,y1,z1])
-        a = FreeCAD.Vector(x1,y1,z1)
+        startpoint = rondlist([x1, y1, z1])
+        a = FreeCAD.Vector(x1, y1, z1)
         b = FreeCAD.Vector()
         try:
             pnt2 = edge.Vertexes[1]     # Basepoints
             x2 = pnt2.Point.x
             y2 = pnt2.Point.y
             z2 = pnt2.Point.z
-            endpoint = [x2,y2,z2]
-            b=FreeCAD.Vector(x2,y2,z2)
-            endpoint = rondlist([x2,y2,z2])
+            endpoint = [x2, y2, z2]
+            b = FreeCAD.Vector(x2, y2, z2)
+            endpoint = rondlist([x2, y2, z2])
         except:
-            endpoint = ["-","-","-"]
+            endpoint = ["-", "-", "-"]
 
 
         radius = -1
@@ -303,19 +295,19 @@ class   classFuncs():
             center = rondlist(edge.CenterOfMass)
         if 'Spline' in tstr:
             curvetype ='spline'  # A2 is not using these
-        dict = {'curvetype':curvetype,'obj':edge,'length':length,'startpoint':startpoint,'center':center,'endpoint':endpoint,'radius':radius,'vector':vector}
+        dict = {'curvetype':curvetype, 'obj':edge, 'length':length, 'startpoint':startpoint, 'center':center, 'endpoint':endpoint,'radius':radius,'vector':vector}
 
         return(dict)
 
 
-    def getvertexbynum(self,num,shape):
-        v=shape.Vertexes[num]
-        x=v.Point.x
-        y=v.Point.y
-        z=v.Point.z
-        xyz = [x,y,z]
+    def getvertexbynum(self, num, shape):
+        v = shape.Vertexes[num]
+        x = v.Point.x
+        y = v.Point.y
+        z = v.Point.z
+        xyz = [x, y, z]
 
-        xyz= rondlist([x,y,z])
+        xyz = rondlist([x, y, z])
         return({'xyz':xyz})
 
         ## post functions***********************************
@@ -323,10 +315,10 @@ class   classFuncs():
     def findfeats_attempt1(self):
         """Try to find features after the update."""
         doc = FreeCAD.activeDocument()
-        for k,dict in g.alldicts.items():
+        for k, dict in g.alldicts.items():
             dict = dict
             newfeat = ''
-            featname =dict.get('featname')
+            featname = dict.get('featname')
             if featname in g.foundfeatures:
                 newfeat = g.dictOldNew.get(featname)
             else:
@@ -337,14 +329,14 @@ class   classFuncs():
                 if 'Vertex' in featname:
                     newfeat = self.findnewvertex_attempt1(dict)
                 if newfeat =='' or newfeat == 'No':
-                    g.notfoundfeatures.append([dict.get('Name'),dict])
+                    g.notfoundfeatures.append([dict.get('Name'), dict])
                     pass
                 else:
                     if newfeat in g.foundfeatures == False:
-                        g.foundfeatures.append(newfeat) #
+                        g.foundfeatures.append(newfeat)
                         g.dictOldNew[featname] = newfeat
 
-                    self.swapfeature(newfeat,dict)
+                    self.swapfeature(newfeat, dict)
             doc.recompute()
 
 
@@ -352,7 +344,7 @@ class   classFuncs():
             self.findfeats_attempt2()
 
 
-    def swapfeature(self,newfeat,dict):
+    def swapfeature(self, newfeat, dict):
         """Add the new feature to the constraint."""
         cname = dict.get('cname')
         g.partlog.append('Found ' + newfeat)
@@ -370,9 +362,9 @@ class   classFuncs():
                 mobj.SubElement2 = newfeat
                 g.repaired = g.repaired + 1
         dir = dict.get('dir')
-        if hasattr(cobj,'directionConstraint'):
+        if hasattr(cobj, 'directionConstraint'):
             cobj.directionConstraint = dir
-        if hasattr(mobj,'directionConstraint'):
+        if hasattr(mobj, 'directionConstraint'):
             mobj.directionConstraint = dir
         return
 
@@ -394,25 +386,23 @@ class   classFuncs():
                 if 'Edge' in featname:
                     newfeat = self.findnewedge_attempt2(dict)
                 if newfeat == 'No' or newfeat == '':
-                    g.notfoundfeatures.append([dict.get('Name'),dict])
+                    g.notfoundfeatures.append([dict.get('Name'), dict])
                     newfeat = 'None'
                 else:
                     if newfeat in g.foundfeatures == False:
                         g.foundfeatures.append(newfeat)
                         g.dictOldNew[featname] = newfeat
-            self.swapfeature(newfeat,dict)
+            self.swapfeature(newfeat, dict)
 
 
-    def findnewface_attempt1(self,dict):
+    def findnewface_attempt1(self, dict):
         # First attempt to find a face. Perfect fit is area the same all points the same
         face = ''
-        # newfeat = ''
-        # surftype = dict.get('surftype')
         if dict.get('surftype') == 'Cylinder':
                 face = self.findCylinderattempt1(dict)
         else:
-            for num in range(0,len(g.shape2.Faces)):
-                testdict = self.getfacebynum(num,g.shape2)
+            for num in range(0, len(g.shape2.Faces)):
+                testdict = self.getfacebynum(num, g.shape2)
                 if testdict.get('surftype') != 'Cylinder':
                     if dict.get('area') == testdict.get('area')\
                         and dict.get('facepoints') == testdict.get('facepoints'):
@@ -422,25 +412,19 @@ class   classFuncs():
 
 
 
-    def findnewface_attempt2(self,dict):
+    def findnewface_attempt2(self, dict):
         face = ''
-        # second attempt ignores area; looks for points
+        """ second attempt ignores area; looks for points(perhaps this should be first
+        if hholes are added area would change)"""
         face = ''
         if dict.get('surftype') == 'Cylinder':
             face = self.findCylinderattempt2(dict)
-
-
         else:
-
-            for num in range(0,len(g.shape2.Faces)):
-                testdict = self.getfacebynum(num,g.shape2)
+            for num in range(0, len(g.shape2.Faces)):
+                testdict = self.getfacebynum(num, g.shape2)
                 if dict.get('surftype') != 'Cylinder':
-
                     points = dict.get('facepoints')
                     testpoints = testdict.get('facepoints')
-
-                    # points = points[1]
-                    # testpoints =testpoints [1]
                     if len(points) < len(testpoints):
                         list1 = points
                         list2 = testpoints
@@ -456,50 +440,46 @@ class   classFuncs():
                                 break
 
             if face == '':
-
                 dedges = dict.get('edges')
                 edge = dedges[0]
-                pnt1 = edge.Vertexes[0]             # Basepoints
+                pnt1 = edge.Vertexes[0] # Basepoints
                 x = pnt1.Point.x
                 y = pnt1.Point.y
                 z = pnt1.Point.z
-                dlist = [rondnum(edge.Length),x,y,z]
-                for num in range(0,len(g.shape2.Faces)):
-
-                    testdict = self.getfacebynum(num,g.shape2)
+                dlist = [rondnum(edge.Length), x, y, z]
+                for num in range(0, len(g.shape2.Faces)):
+                    testdict = self.getfacebynum(num, g.shape2)
                     if dict.get('surftype') != 'Cylinder':
                         ed = testdict.get('edges')
                         ary = []
                         for e in ed:
-                            pnt1 = e.Vertexes[0]    # Basepoints
+                            pnt1 = e.Vertexes[0] # Basepoints
                             x = pnt1.Point.x
                             y = pnt1.Point.y
                             z = pnt1.Point.z
-                            tlist = [e.Length,x,y,z]
+                            tlist = [e.Length, x, y, z]
                             if dlist == tlist:
                                 face = 'Face' + str(num+1)
                                 break
         return(face)
 
 
-    def findCylinderattempt1(self,dict):
+    def findCylinderattempt1(self, dict):
         face = ''
         for num in g.cylfaces:
-            testdict = self.getfacebynum(num,g.shape2)
+            testdict = self.getfacebynum(num, g.shape2)
             if dict.get('facepoints') == testdict.get('facepoints') and\
                dict.get('radius') == testdict.get('radius'):
                 face = 'Face' + str(num +1)
-
                 break
         return(face)
 
-
-    def findCylinderattempt2(self,dict):
-        #First attempt to find a face. Perfect fit is area the same all points the same
+    def findCylinderattempt2(self, dict):
+        #First attempt to find a face. Perfect fit is area = same all points = same
         face = ''
         ver1 = dict.get('center')
         for num in g.cylfaces:
-            testdict = self.getfacebynum(num,g.shape2)
+            testdict = self.getfacebynum(num, g.shape2)
             ver2 = testdict.get('center')
             if ver1 == ver2:
                 face = 'Face' + str(num+1)
@@ -507,14 +487,14 @@ class   classFuncs():
         return(face)
 
 
-    def findnewedge_attempt1(self,dict):
+    def findnewedge_attempt1(self, dict):
         edge = ''
         if dict.get('curvetype') == 'circle':
             center1 = dict.get('center')
-            for num in range(0,len(g.shape2.Edges)):
-                testdict = self.getedgebynum(num,g.shape2)
+            for num in range(0, len(g.shape2.Edges)):
+                testdict = self.getedgebynum(num, g.shape2)
                 center2 = testdict.get('center')
-                if dict.get('radius') ==  testdict.get('radius')\
+                if dict.get('radius') == testdict.get('radius')\
                         and dict.get('center') == testdict.get('center'):
                         edge ='Edge' + str(num +1)
                         break
@@ -524,7 +504,7 @@ class   classFuncs():
 
         else:
             for num in g.notcylfaces:
-                testdict = self.getfacebynum(num,g.shape2)
+                testdict = self.getfacebynum(num, g.shape2)
                 if dict.get('length') == testdict.get('length')\
                    and dict.get('center') == testdict.get('center'):
                     edge ='Edge' + str(num +1)
@@ -533,66 +513,42 @@ class   classFuncs():
         return(edge)
 
 
-    def findnewedge_attempt2(self,dict):
+    def findnewedge_attempt2(self, dict):
         edge = ''
         if dict.get('curvetype') == 'circle':
             center1 = dict.get('center')
-            for num in range(0,len(g.shape2.Edges)):
-
-                testdict = self.getedgebynum(num,g.shape2)
-
+            for num in range(0, len(g.shape2.Edges)):
+                testdict = self.getedgebynum(num, g.shape2)
                 center2 = testdict.get('center')
                 if center1 == center2:
                         edge ='Edge' + str(num +1)
                         break
 
-
-        for num in range(0,len(g.shape2.Edges)):
-            testdict = self.getedgebynum(num,g.shape2)
+        for num in range(0, len(g.shape2.Edges)):
+            testdict = self.getedgebynum(num, g.shape2)
             if dict.get('curvetype') == 'circle':
                 if testdict.get('curvetype') == 'circle':
-
                     if dict.get('startpoint') == testdict.get('startpoint'):
                         edge ='Edge' + str(num +1)
                         break
 
         return(edge)
 
-
-        #pnts = g.shape2.Vertexes
-        #mypoint = dict.get('mypoint')
-        #ent = None
-        #for p in g.shape2.Vertexes:
-        #    if p.Point == mypoint.Point:
-        #        ent = p
-        #        break
-        #mApp('found mypoint')
-        #allegdes = []
-        #for e in g.shape2.edges:
-        #    if e.Vertex[0].isSame(ent) or e.Vertex[1].isSame(ent):
-        #        alledges.append(e)
-        #        FreeCADGui.Selection.addSelection(e)
-        #return(edge)
-
-
-
-
-    def findnewvertex_attempt1(self,dict):
+    def findnewvertex_attempt1(self, dict):
         vertex = ''
         featname = dict.get('featname')
-        for num in range(0,len(g.shape2.Vertexes)):
-            test = self.getvertexbynum(num,g.shape2)
+        for num in range(0, len(g.shape2.Vertexes)):
+            test = self.getvertexbynum(num, g.shape2)
             if dict.get('xyz') == test.get('xyz'):
-                vertex = Vertex + str(num +1)
+                vertex = 'Vertex' + str(num +1)
         return(vertex)
 
 funcs = classFuncs()
 
 def getfacelists():
     g.cylfaces = []
-    g.notcylfaces= []
-
-    for num in range(0,len(g.shape2.Faces)):
+    g.notcylfaces = []
+    for num in range(0, len(g.shape2.Faces)):
         if str(g.shape2.Faces[num].Surface) == '<Cylinder object>':
             g.cylfaces.append(num)
         elif str(g.shape2.Faces[num].Surface) == '<Plane object>':
@@ -600,11 +556,11 @@ def getfacelists():
 
 
 
-def selectforpart(partlabel,selectType = 'std'):
+def selectforpart(partlabel, selectType = 'std'):
     #find the constraints for the part selected
     doc = FreeCAD.activeDocument()
     clist = []
-    pnamelist =[]
+    pnamelist = []
     pnamelist.append(partlabel)
     for obj in FreeCAD.ActiveDocument.Objects: # Select constraints
         if 'ConstraintInfo' in obj.Content:
@@ -613,7 +569,6 @@ def selectforpart(partlabel,selectType = 'std'):
                 subobj2 = doc.getObject(obj.Object2)
                 part1name = subobj1.Label
                 part2name = subobj2.Label
-
                 if selectType == 'betweenonly':
                     clist.append(obj)
                 else:
@@ -622,17 +577,16 @@ def selectforpart(partlabel,selectType = 'std'):
     return(clist)
 
 
-def rondnum(num,rndto = g.roundto,mmorin='mm'):
+def rondnum(num, rndto = g.roundto, mmorin = 'mm'):
     # round a number to digits in global
     # left in mm for accuracy.
-    rn = round(num,rndto)
+    rn = round(num, rndto)
     if mmorin == 'in':
         rn = rn/25.4
-
     return(rn)
 
 
-def rondlist(list,inch = False):
+def rondlist(list, inch = False):
     x = list[0]
     y = list[1]
     z = list[2]
@@ -643,15 +597,13 @@ def rondlist(list,inch = False):
         x = x/25.4
         y = y/25.4
         z = z/25.4
-
-
-    return([x,y,z])
+    return([x, y, z])
 
 
 
-class mApp(QWidget):
+class mApp(QtGui.QWidget):
     # for error messages
-    def __init__(self,msg,msgtype = 'ok'):
+    def __init__(self, msg, msgtype = 'ok'):
         super().__init__()
         self.title = 'PyQt5 messagebox'
         self.left = 600
@@ -660,7 +612,7 @@ class mApp(QWidget):
         self.height = 200
         self.initUI(msg)
 
-    def initUI(self,msg,msgtype = 'ok'):
+    def initUI(self, msg, msgtype = 'ok'):
         self.setWindowTitle(self.title)
         self.setGeometry(800, 300, 300, 400)
         if msgtype == 'ok':
@@ -690,7 +642,6 @@ and running the standard A2plus updater.
 '''
 
 class rnp_Update_A2pParts:
-
     def Activated(self):
         #funcs.runinorder()
         funcs.selectfiles()
@@ -700,8 +651,6 @@ class rnp_Update_A2pParts:
         FreeCADGui.Selection.clearSelection()
         return
 
-
-
     def GetResources(self):
         mypath = os.path.dirname(__file__)
         return {
@@ -710,9 +659,9 @@ class rnp_Update_A2pParts:
              'ToolTip': 'Updates modifed parts.'
              }
 
-FreeCADGui.addCommand('rnp_Update_A2pParts',rnp_Update_A2pParts())
+FreeCADGui.addCommand('rnp_Update_A2pParts', rnp_Update_A2pParts())
 #==============================================================================
 
-#2020-08-06 Changed Lines 162 to 172 to open the viewer if the are missing features.
+#2020-08-06 Changed Lines 162 to 172 to open the viewer if there are missing features.
 
 
