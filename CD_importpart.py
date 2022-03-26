@@ -57,7 +57,7 @@ class ObjectCache:
     Cache them here so fileImports have to be executed only one time...
     '''
     def __init__(self):
-        self.objects = {} # dict, key=fileName, val=object
+        self.objects = {} # dict, key = fileName, val = object
 
     def cleanUp(self,doc):
         for key in self.objects.keys():
@@ -65,7 +65,7 @@ class ObjectCache:
                 doc.removeObject(self.objects[key].Name) #remove temporaryParts from doc
             except:
                 pass
-        self.objects = {} # dict, key=fileName
+        self.objects = {} # dict, key = fileName
 
     def add(self,fileName,obj): # pi_obj = PartInformation-Object
         self.objects[fileName] = obj
@@ -98,7 +98,7 @@ class a2p_shapeExtractDialog(QtGui.QDialog):
 
 
     def __init__(self,parent,labelList = [], data = None):
-        super(a2p_shapeExtractDialog,self).__init__(parent=parent)
+        super(a2p_shapeExtractDialog,self).__init__(parent = parent)
         #super(a2p_shapeExtractDialog,self).__init__()
         self.labelList = labelList
         self.data = data
@@ -138,8 +138,8 @@ def importPartFromFile(
         _doc,
         filename,
         extractSingleShape = False, # load only a single user defined shape from file
-        desiredShapeLabel=None,
-        importToCache=False,
+        desiredShapeLabel = None,
+        importToCache = False,
         cacheKey = ""
         ):
     doc = _doc
@@ -167,7 +167,7 @@ def importPartFromFile(
             FreeCAD.newDocument(fname)
             newname = FreeCAD.ActiveDocument.Name
             FreeCAD.setActiveDocument(newname)
-            ImportGui.insert(filename,newname)
+            ImportGui.insert(filename, newname)
             importDoc = FreeCAD.ActiveDocument
         else:
             msg = "A part can only be imported from a FreeCAD '*.FCStd' file"
@@ -192,7 +192,7 @@ def importPartFromFile(
     #-------------------------------------------
     # Get a list of the importable Objects
     #-------------------------------------------
-    importableObjects = topoMapper.getTopLevelObjects(allowSketches=True)
+    importableObjects = topoMapper.getTopLevelObjects(allowSketches = True)
     
     if len(importableObjects) == 0:
         msg = "No visible Part to import found. Aborting operation"
@@ -241,7 +241,7 @@ def importPartFromFile(
     #-------------------------------------------
     if importToCache:
         partName = 'CachedObject_'+str(objectCache.len())
-        newObj = doc.addObject("Part::FeaturePython",partName)
+        newObj = doc.addObject("Part::FeaturePython", partName)
         newObj.Label = partName
     else:
         partName = a2plib.findUnusedObjectName( importDoc.Label, document=doc )
@@ -250,8 +250,8 @@ def importPartFromFile(
         else:
             partLabel = a2plib.findUnusedObjectLabel(
                 importDoc.Label,
-                document=doc,
-                extension=dc.tx
+                document = doc,
+                extension = dc.tx
                 )
         if PYVERSION < 3:
             newObj = doc.addObject( "Part::FeaturePython", partName.encode('utf-8') )
@@ -279,14 +279,14 @@ def importPartFromFile(
     if dc.tx is not None:
         newObj.sourcePart = dc.tx
     
-    newObj.setEditorMode("timeLastImport",1)
+    newObj.setEditorMode("timeLastImport", 1)
     newObj.timeLastImport = os.path.getmtime( filename )
     if a2plib.getForceFixedPosition():
         newObj.fixedPosition = True
     else:
         newObj.fixedPosition = not any([i.fixedPosition for i in doc.Objects if hasattr(i, 'fixedPosition') ])
     newObj.subassemblyImport = subAssemblyImport
-    newObj.setEditorMode("subassemblyImport",1)
+    newObj.setEditorMode("subassemblyImport", 1)
 
     if subAssemblyImport:
         if extractSingleShape:
@@ -308,12 +308,12 @@ def importPartFromFile(
     if extractSingleShape == True:
         if a2plib.isA2pSketch(newObj):
             newObj.objectType = 'a2pSketch'
-    newObj.setEditorMode("objectType",1)
+    newObj.setEditorMode("objectType", 1)
 
     doc.recompute()
 
     if importToCache: # this import is used to update already imported parts
-        objectCache.add(cacheKey, newObj)
+        objectCache.add(cacheKey , newObj)
     else: # this is a first time import of a part
         if not a2plib.getPerFaceTransparency():
             # turn of perFaceTransparency by accessing ViewObject.Transparency and set to zero (non transparent)
@@ -321,7 +321,7 @@ def importPartFromFile(
             newObj.ViewObject.Transparency = 0 # import assembly first time as non transparent.
 
 
-    lcsList = a2p_lcs_support.getListOfLCS(doc,importDoc)
+    lcsList = a2p_lcs_support.getListOfLCS(doc, importDoc)
     
 
     if not importDocIsOpen:
@@ -347,7 +347,7 @@ def importPartFromFile(
         
         lcsGroup.Owner = newObj.Name
         
-        newObj.addProperty("App::PropertyLinkList","lcsLink","importPart").lcsLink = lcsGroup
+        newObj.addProperty("App::PropertyLinkList", "lcsLink", "importPart").lcsLink = lcsGroup
         newObj.Label = newObj.Label # this is needed to trigger an update
         lcsGroup.Label = lcsGroup.Label
     
@@ -462,7 +462,7 @@ Check your settings of A2plus preferences.
         self.timer.stop()
 
 
-FreeCADGui.addCommand('a2p_ImportShapeReferenceCommand',a2p_ImportShapeReferenceCommand())
+FreeCADGui.addCommand('a2p_ImportShapeReferenceCommand', a2p_ImportShapeReferenceCommand())
 
 #==============================================================================
 toolTip = \
@@ -500,7 +500,7 @@ class a2p_Restore_Transparency_Command():
         if doc is None: return False
         return True
 
-FreeCADGui.addCommand('a2p_Restore_Transparency',a2p_Restore_Transparency_Command())
+FreeCADGui.addCommand('a2p_Restore_Transparency', a2p_Restore_Transparency_Command())
 
 #==============================================================================
 toolTip = \
@@ -606,7 +606,7 @@ Check your settings of A2plus preferences.
         self.timer.stop()
 
 
-FreeCADGui.addCommand('a2p_ImportPart',a2p_ImportPartCommand())
+FreeCADGui.addCommand('a2p_ImportPart', a2p_ImportPartCommand())
 #==============================================================================
 
 
@@ -656,7 +656,7 @@ def updateImportedParts(doc, partial=False):  #changed to true Dan
 
             
             #repair data structures (perhaps an old Assembly2 import was found)
-            if hasattr(obj,"Content") and 'importPart' in obj.Content: # be sure to have an assembly object
+            if hasattr(obj, "Content") and 'importPart' in obj.Content: # be sure to have an assembly object
                 if obj.Proxy is None:
                     #print (u"Repair Proxy of: {}, Proxy: {}".format(obj.Label, obj.Proxy))
                     Proxy_importPart(obj)
@@ -719,7 +719,7 @@ def updateImportedParts(doc, partial=False):  #changed to true Dan
                         pass
                     else:
                         obj.Placement = savedPlacement # restore the old placement
-                    a2plib.copyObjectColors(obj,newObject)
+                    a2plib.copyObjectColors(obj, newObject)
 
     #repair constraint directions if for e.g. face-normals flipped around during updating of parts.
     a2p_constraintServices.redAdjustConstraintDirections(doc)
@@ -772,8 +772,8 @@ def duplicateImportedPart( part ):
     doc = FreeCAD.ActiveDocument
 
     nameBase = part.Label
-    partName = a2plib.findUnusedObjectName(nameBase,document=doc)
-    partLabel = a2plib.findUnusedObjectLabel(nameBase,document=doc)
+    partName = a2plib.findUnusedObjectName(nameBase,document = doc)
+    partLabel = a2plib.findUnusedObjectLabel(nameBase,document = doc)
     if PYVERSION >= 3:
         newObj = doc.addObject("Part::FeaturePython", str(partName.encode("utf-8")) )
     else:
@@ -789,15 +789,15 @@ def duplicateImportedPart( part ):
     newObj.sourceFile = part.sourceFile
     newObj.sourcePart = part.sourcePart
     newObj.timeLastImport =  part.timeLastImport
-    newObj.setEditorMode("timeLastImport",1)
+    newObj.setEditorMode("timeLastImport", 1)
     newObj.fixedPosition = False
-    newObj.updateColors = getattr(part,'updateColors',True)
+    newObj.updateColors = getattr(part, 'updateColors', True)
     newObj.muxInfo = part.muxInfo
     newObj.subassemblyImport = part.subassemblyImport
     newObj.Shape = part.Shape.copy()
 
     for p in part.ViewObject.PropertiesList: #assuming that the user may change the appearance of parts differently depending on their role in the assembly.
-        if hasattr(part.ViewObject, p) and p not in ['DiffuseColor','Proxy','MappedColors']:
+        if hasattr(part.ViewObject, p) and p not in ['DiffuseColor', 'Proxy', 'MappedColors']:
             setattr(newObj.ViewObject, p, getattr( part.ViewObject, p))
 
     newObj.ViewObject.DiffuseColor = copy.copy( part.ViewObject.DiffuseColor )
@@ -977,9 +977,9 @@ This is not allowed when using preference
         else:
             name = importDoc.Name
             # Search and activate the corresponding document window..
-            mw=FreeCADGui.getMainWindow()
-            mdi=mw.findChild(QtGui.QMdiArea)
-            sub=mdi.subWindowList()
+            mw = FreeCADGui.getMainWindow()
+            mdi = mw.findChild(QtGui.QMdiArea)
+            sub = mdi.subWindowList()
             for s in sub:
                 mdi.setActiveSubWindow(s)
                 if FreeCAD.activeDocument().Name == name: break
@@ -1004,9 +1004,9 @@ class PartMover:
         self.initialPosition = self.obj.Placement.Base
         self.view = view
         self.deleteOnEscape = deleteOnEscape
-        self.callbackMove = self.view.addEventCallback("SoLocation2Event",self.moveMouse)
-        self.callbackClick = self.view.addEventCallback("SoMouseButtonEvent",self.clickMouse)
-        self.callbackKey = self.view.addEventCallback("SoKeyboardEvent",self.KeyboardEvent)
+        self.callbackMove = self.view.addEventCallback("SoLocation2Event", self.moveMouse)
+        self.callbackClick = self.view.addEventCallback("SoMouseButtonEvent", self.clickMouse)
+        self.callbackKey = self.view.addEventCallback("SoKeyboardEvent", self.KeyboardEvent)
         self.objectToDelete = None # object reference when pressing the escape key
         
     def moveMouse(self, info):
@@ -1014,9 +1014,9 @@ class PartMover:
         self.obj.Placement.Base = newPos
         
     def removeCallbacks(self):
-        self.view.removeEventCallback("SoLocation2Event",self.callbackMove)
-        self.view.removeEventCallback("SoMouseButtonEvent",self.callbackClick)
-        self.view.removeEventCallback("SoKeyboardEvent",self.callbackKey)
+        self.view.removeEventCallback("SoLocation2Event", self.callbackMove)
+        self.view.removeEventCallback("SoMouseButtonEvent", self.callbackClick)
+        self.view.removeEventCallback("SoKeyboardEvent", self.callbackKey)
         
     def clickMouse(self, info):
         if info['Button'] == 'BUTTON1' and info['State'] == 'DOWN':
@@ -1088,23 +1088,23 @@ class ConstrainedPartsMover:
         self.obj = None
         self.view = view
         self.doc = FreeCAD.activeDocument()
-        self.callbackMove = self.view.addEventCallback("SoLocation2Event",self.onMouseMove)
-        self.callbackClick = self.view.addEventCallback("SoMouseButtonEvent",self.onMouseClicked)
-        self.callbackKey = self.view.addEventCallback("SoKeyboardEvent",self.KeyboardEvent)
+        self.callbackMove = self.view.addEventCallback("SoLocation2Event", self.onMouseMove)
+        self.callbackClick = self.view.addEventCallback("SoMouseButtonEvent", self.onMouseClicked)
+        self.callbackKey = self.view.addEventCallback("SoKeyboardEvent", self.KeyboardEvent)
         self.motionActivated = False
         
-    def setPreselection(self,doc,obj,sub):
+    def setPreselection(self, doc, obj, sub):
         if not self.motionActivated:
             doc = FreeCAD.activeDocument()
             self.obj = doc.getObject(obj)
     
-    def addSelection(self,doc,obj,sub,pnt):
+    def addSelection(self, doc, obj, sub, pnt):
         pass
         
-    def removeSelection(self,doc,obj,sub):
+    def removeSelection(self, doc, obj, sub):
         pass
     
-    def clearSelection(self,doc):
+    def clearSelection(self, doc):
         pass
     
     def onMouseMove(self, info):
@@ -1125,9 +1125,9 @@ class ConstrainedPartsMover:
                 self.removeCallbacks()
         
     def removeCallbacks(self):
-        self.view.removeEventCallback("SoLocation2Event",self.callbackMove)
-        self.view.removeEventCallback("SoMouseButtonEvent",self.callbackClick)
-        self.view.removeEventCallback("SoKeyboardEvent",self.callbackKey)
+        self.view.removeEventCallback("SoLocation2Event", self.callbackMove)
+        self.view.removeEventCallback("SoMouseButtonEvent", self.callbackClick)
+        self.view.removeEventCallback("SoKeyboardEvent", self.callbackKey)
         FreeCADGui.Selection.removeObserver(self)
         
     def onMouseClicked(self, info):
@@ -1374,7 +1374,7 @@ will be made visible again.
 class a2p_isolateCommand:
 
     def hasFaces(self,ob):
-        if hasattr(ob,"Shape") and hasattr(ob.Shape,"Faces") and len(ob.Shape.Faces)>0:
+        if hasattr(ob,"Shape") and hasattr(ob.Shape, "Faces") and len(ob.Shape.Faces)>0:
             return True
         return False
 
@@ -1395,8 +1395,8 @@ class a2p_isolateCommand:
                 if obj.Name[:4] == 'Page': continue
                 if obj.Name == 'SimpleAssemblyShape': continue
                 if not self.hasFaces(obj): continue
-                if hasattr(obj,'ViewObject'):
-                    if hasattr(obj.ViewObject,'Visibility'):
+                if hasattr(obj, 'ViewObject'):
+                    if hasattr(obj.ViewObject, 'Visibility'):
                         obj.ViewObject.Visibility = True
         else:                   # Show only selected elements
             for obj in doc.Objects:
@@ -1404,8 +1404,8 @@ class a2p_isolateCommand:
                 if obj.Name[:4] == 'Page': continue
                 if obj.Name == 'SimpleAssemblyShape': continue
                 if a2plib.isA2pConstraint(obj): continue
-                if hasattr(obj,'ViewObject'):
-                    if hasattr(obj.ViewObject,'Visibility'):
+                if hasattr(obj, 'ViewObject'):
+                    if hasattr(obj.ViewObject, 'Visibility'):
                         if obj in selection:
                             obj.ViewObject.Visibility = True
                         else:
@@ -1633,7 +1633,7 @@ class a2p_Show_PartLabels_Command:
                 if a2plib.isA2pPart(ob):
                     a2pObjects.append(ob)
             if len(a2pObjects) == 0:
-                QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
+                QtGui.QMessageBox.information(QtGui.QApplication.activeWindow(),
                                             "Nothing found to be labeled!",
                                             "This document does not contain A2p-objects"
                                         )
@@ -1641,12 +1641,12 @@ class a2p_Show_PartLabels_Command:
             
             labelGroup = doc.getObject("partLabels")
             if labelGroup is None:
-                labelGroup=doc.addObject("App::DocumentObjectGroup", "partLabels")
+                labelGroup = doc.addObject("App::DocumentObjectGroup", "partLabels")
             else:
                 for lbl in labelGroup.Group:
                     doc.removeObject(lbl.Name)
                 doc.removeObject("partLabels")
-                labelGroup=doc.addObject("App::DocumentObjectGroup", "partLabels")
+                labelGroup = doc.addObject("App::DocumentObjectGroup", "partLabels")
             
             for ob in a2pObjects:
                 if ob.ViewObject.Visibility == True:
@@ -1721,12 +1721,12 @@ class a2p_absPath_to_relPath_Command:
     def Activated(self):
         doc = FreeCAD.activeDocument()
         if doc is None:
-            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
+            QtGui.QMessageBox.information(QtGui.QApplication.activeWindow(),
                                         "No active document found!",
                                         "You have to open an assembly file first."
                                     )
             return
-        assemblyPath = os.path.normpath(  os.path.split( os.path.normpath(doc.FileName) )[0])
+        assemblyPath = os.path.normpath(os.path.split( os.path.normpath(doc.FileName) )[0])
         importParts = [ob for ob in doc.Objects if "mportPart" in ob.Content]
         for iPart in importParts:
             if (
@@ -1762,7 +1762,7 @@ class a2p_SaveAndExit_Command:
             FreeCAD.closeDocument(doc.Name)
         except:
             FreeCADGui.SendMsgToActiveView("Save")
-            if not FreeCADGui.activeDocument().Modified: # user really saved the file           
+            if not FreeCADGui.activeDocument().Modified: # user really saved the file 
                 FreeCAD.closeDocument(doc.Name)
         #
         mw = FreeCADGui.getMainWindow()
@@ -1776,7 +1776,7 @@ class a2p_SaveAndExit_Command:
             
     def GetResources(self):
         return {
-            'Pixmap'  :     a2plib.pathOfModule()+'/icons/a2p_Save_and_exit.svg',
+            'Pixmap' :     a2plib.pathOfModule()+'/icons/a2p_Save_and_exit.svg',
             'MenuText':     'Save and exit the active document',
             'ToolTip':      'Save and exit the active document'
             }
@@ -1855,7 +1855,7 @@ def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
     if not a2plib.getUseTopoNaming(): return
     
     # return if there are no constraints linked to the object 
-    if len([c for c in doc.Objects if  'ConstraintInfo' in c.Content and oldObject.Name in [c.Object1, c.Object2] ]) == 0:
+    if len([c for c in doc.Objects if 'ConstraintInfo' in c.Content and oldObject.Name in [c.Object1, c.Object2] ]) == 0:
         return
 
 
@@ -1942,7 +1942,7 @@ def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
                                     )
                                    )
                             print ("Updating by SubElement-Map: {} => {} ".format(
-                                       subElementName,newSubElementName
+                                       subElementName, newSubElementName
                                        )
                                    )
                             continue
