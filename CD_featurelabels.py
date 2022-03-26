@@ -9,66 +9,47 @@
 #*                                                                         *
 #*   This program is distributed in the hope that it will be useful,       *
 #*   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
-#*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+#*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the          *
 #*   GNU Library General Public License for more details.                  *
 #*                                                                         *
 #*   You should have received a copy of the GNU Library General Public     *
 #*   License along with this program; if not, write to the Free Software   *
-#*   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  *
+#*   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307   *
 #*   USA                                                                   *
 #*                                                                         *
 #***************************************************************************
 # This is to be used with A2plus Assembly WorkBench
 #
 
-import sys
-import os
-from FreeCAD import Console
 import FreeCADGui
 import FreeCAD
-from PySide import QtUiTools
 from PySide.QtGui import *
 from PySide import QtGui, QtCore
+import CD_ConstraintDiagnostics
 
-import PySide
+class formMain(QtGui.QMainWindow):
 
-
-class    formMain(QtGui.QMainWindow):
-
-    def __init__(self,name):
+    def __init__(self, name):
         self.name = name
-        super(formMain,self).__init__()
+        super(formMain, self).__init__()
         self.setWindowTitle('Create Labels')
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
-        self.setGeometry(300,100,200,300)  # xy,wh
+        self.setGeometry(300, 200, 200, 200)
         self.setStyleSheet("font: 11pt arial MS")
 
         self.btnLabels = [['Add Face Labels', 'Add labels to all of the faces on a selected part'],
                           ['Add Edge Labels', 'Add labels to all of the edges on a selected part'],
                           ['Add Vertex Labels', 'Add labels to all of the vertexes on a selected part'],
-                          ['Delete Labels',    'Delete all labels'],
-                          ['Attach to', 'Enter a name in the texbox and press to add a label'],
-                          ['Selected Labels', 'Labels added to selected features'],
-                          ['Close', '']  #
+                          ['Delete Labels', 'Delete all labels'],
+                          ['Close', '']
                           ]
-
-
-
-        self.txtboxaddlabel = QtGui.QLineEdit(self)
-        self.txtboxaddlabel.move(10, 25)
-        self.txtboxaddlabel.setFixedHeight(25)
-        self.txtboxaddlabel.setFixedWidth(180)
-        self.txtboxaddlabel.setText('Feature name')
-
-
 
         self.btns=[]
         BtnNum = 0
-        for row in range(0,len(self.btnLabels)) :
-            btny = 70 +(28*row)
-
-            self.btn= QtGui.QPushButton( str(self.btnLabels[row][0]), self)
-            self.btn.move(5,btny)
+        for row in range(0, len(self.btnLabels)) :
+            btny = 20 +(28*row)
+            self.btn = QtGui.QPushButton( str(self.btnLabels[row][0]), self)
+            self.btn.move(5, btny)
             self.btn.setFixedWidth(190)
             self.btn.setFixedHeight(25)
             self.btn.setToolTip(self.btnLabels[row][1])
@@ -79,8 +60,7 @@ class    formMain(QtGui.QMainWindow):
 
     def button_pushed(self):
         index = self.btns.index(self.sender())
-        btext=self.btns[index].text()
-        print(btext)
+        btext = self.btns[index].text()
         if btext == 'Add Face Labels':
             labels.addlabels('Face')
         if btext == 'Add Edge Labels':
@@ -100,7 +80,7 @@ class    formMain(QtGui.QMainWindow):
 
 
     def hideMe(self):
-        Gui.Selection.clearSelection()
+        QtGui.Selection.clearSelection()
         self.close()
 
 
@@ -116,32 +96,27 @@ class    formMain(QtGui.QMainWindow):
 
 form1 = formMain('form1')
 
-class   classLabels():
+class classLabels():
     def __init__(self):
         self.labelGroup = None
-        pass
-        # self.name = name
 
     def checkselection(self):
         """Checks to see if labels already exist."""
         doc = FreeCAD.activeDocument()
-        # loc = None
-        print('checking for label')
         self.labelGroup = doc.getObject("partLabels")
         if self.labelGroup is None:
-            self.labelGroup=doc.addObject("App::DocumentObjectGroup", "partLabels")
-
+            self.labelGroup = doc.addObject("App::DocumentObjectGroup", "partLabels")
         if len(FreeCADGui.Selection.getSelection()) == 0:
-            # dlib.mApp('Please select One part.')
+            CD_ConstraintDiagnostics.mApp('One part must be selected.\nPlease select One part and try again')
             return(False)
         return(True)
 
 
-    def addlabels(self,feat):
+    def addlabels(self, feat):
         sel = self.checkselection()
         if not sel:
             return
-        sel = FreeCADGui.Selection.getSelection()   # Select an object
+        sel = FreeCADGui.Selection.getSelection() # Select an object
         if feat == 'Face':
             features = sel[0].Shape.Faces
         if feat == 'Edge':
@@ -149,25 +124,24 @@ class   classLabels():
         if feat == 'Vertex':
             features = sel[0].Shape.Vertexes
 
-
-        for num in range(0,len(features)):
+        for num in range(0, len(features)):
             ent = features[num]
             if feat == 'Vertex':
                 loc = ent.Point
             else:
                 loc = ent.CenterOfMass
-            partLabel = self.makelabel(ent,feat+str(num+1),loc)
+            partLabel = self.makelabel(ent, feat+str(num+1), loc)
             self.labelGroup.addObject(partLabel)
 
 
-    def makelabel(self,ent,name,loc):
+    def makelabel(self, ent, name, loc):
         partLabel = FreeCAD.ActiveDocument.addObject("App::AnnotationLabel","partLabel")
         partLabel.LabelText = name
         partLabel.BasePosition.x = loc[0]
         partLabel.BasePosition.y = loc[1]
         partLabel.BasePosition.z = loc[2]
-        partLabel.ViewObject.BackgroundColor = (1.0,1.0,0.0)
-        partLabel.ViewObject.TextColor = (0.0,0.0,0.0)
+        partLabel.ViewObject.BackgroundColor = (1.0, 1.0, 0.0)
+        partLabel.ViewObject.TextColor = (0.0, 0.0, 0.0)
         return(partLabel)
 
 
@@ -178,7 +152,7 @@ class   classLabels():
                 FreeCAD.ActiveDocument.removeObject(obj.Name)
 
 
-    def attachto(self,sel = None,featname = ''):
+    def attachto(self, sel = None, featname = ''):
 
         sel = self.checkselection()
         if not sel:
@@ -188,29 +162,29 @@ class   classLabels():
         if sel is None:
             sel = FreeCADGui.Selection.getSelection()[0]
         FreeCADGui.Selection.clearSelection()
-        FreeCADGui.Selection.addSelection(sel,featname)
-        s= FreeCADGui.Selection.getSelectionEx()[0]
+        FreeCADGui.Selection.addSelection(sel, featname)
+        s = FreeCADGui.Selection.getSelectionEx()[0]
         ent = s.SubObjects[0]
-        self.makelabel(ent,name,loc)
+        self.makelabel(ent, name, loc)
 
 
 
 
 
-    def getEntLoc(self,ent,featname):
+    def getEntLoc(self, ent, featname):
         if 'V' in featname:
             loc = ent.Point
         else:
             loc = ent.CenterOfMass
-        partLabel = self.makelabel(ent,featname,loc)
+        partLabel = self.makelabel(ent, featname, loc)
         self.labelGroup.addObject(partLabel)
-        self.makelabel(ent,featname,loc)
+        self.makelabel(ent, featname, loc)
 
 
-    def labelForTable(self,ent, featname):
+    def labelForTable(self, ent, featname):
         """Create a label to find a part."""
         sel = self.checkselection()
-        self.getEntLoc(ent,featname)
+        self.getEntLoc(ent, featname)
 
 
 
@@ -218,16 +192,12 @@ class   classLabels():
         sel = self.checkselection()
         if not sel:
             return
-        sels = FreeCADGui.Selection.getSelectionEx()   # Select an object
+        sels = FreeCADGui.Selection.getSelectionEx() # Select an object
         for sel in sels:
-            featname= sel.SubElementNames[0]
-            ent =  sel.SubObjects[0]
-            self.getentloc(ent,featname)
-
-
+            featname = sel.SubElementNames[0]
+            ent = sel.SubObjects[0]
+            self.getentloc(ent, featname)
 
 labels=classLabels()
 
-
-#form1.showme()
 

@@ -21,9 +21,7 @@
 # This is to be used with A2plus Assembly WorkBench
 # Tries to find constraints that are conflicting with each other.
 
-__version__ = 0.1
 
-import sys
 import os
 import FreeCAD
 import FreeCADGui
@@ -34,37 +32,37 @@ import a2p_constraintServices
 import CD_ConstraintDiagnostics
 
 class globaluseclass:
-    def __init__(self,name):
-        self.checkingnum =0
+    def __init__(self):
+        self.checkingnum = 0
         self.roundto = 6
-        self.labelexist =False
-        self.movedconsts =[]
-        self.test =[]
+        self.labelexist = False
+        self.movedconsts = []
+        self.test = []
         self.allErrors = {}
-g = globaluseclass("g")
+g = globaluseclass()
 
 
-class mApp(QWidget):
+class mApp(QtGui.QWidget):
 
     # for error messages
-    def __init__(self,msg):
+    def __init__(self, msg):
         super().__init__()
-        self.title = 'PyQt5 messagebox - pythonspot.com'
+        self.title = 'PyQt5 messagebox'
         self.left = 100
         self.top = 100
         self.width = 320
         self.height = 200
         self.initUI(msg)
 
-    def initUI(self,msg,msgtype = 'ok'):
+    def initUI(self, msg, msgtype = 'ok'):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
         if msgtype == 'ok':
-            buttonReply = QMessageBox.question(self, 'PyQt5 message', msg, QMessageBox.Ok | QMessageBox.Ok)
+            buttonReply = QtGui.QMessageBox.question(self, 'PyQt5 message', msg, QtGui.QMessageBox.Ok | QtGui.QMessageBox.Ok)
         if msgtype == 'yn':
-            buttonReply = QMessageBox.question(self, 'PyQt5 message', msg, QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        if buttonReply == QMessageBox.Yes:
+            buttonReply = QtGui.QMessageBox.question(self, 'PyQt5 message', msg, QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No)
+        if buttonReply == QtGui.QMessageBox.Yes:
             pass
             #print('Yes clicked.')
         else:
@@ -73,33 +71,30 @@ class mApp(QWidget):
 
         self.show()
 
-    def clearvector():
-        o.pointlist = []
-
 class formMain(QtGui.QMainWindow):
 
-    def __init__(self,name):
+    def __init__(self, name):
         self.name = name
-        super(formMain,self).__init__()
+        super(formMain, self).__init__()
         self.setWindowTitle('Constraint Checker')
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
-        self.setGeometry(300,100,600,140)                   # xy,wh
-        self.setStyleSheet("font: 11pt arial MS")
+        self.setGeometry(300, 100, 600, 140)
+        self.setStyleSheet("font:11pt arial MS")
 
         self.txtboxReport = QtGui.QTextEdit(self)
-        self.txtboxReport.move(5,5)
+        self.txtboxReport.move(5, 5)
         self.txtboxReport.setFixedWidth(600)
         self.txtboxReport.setFixedHeight(75)
 
         self.lblviewlabel = QtGui.QLabel(self)
         self.lblviewlabel.setText('To view the constraints, press "Open Viewer"')
-        self.lblviewlabel.move(5,90)
+        self.lblviewlabel.move(5, 90)
         self.lblviewlabel.setFixedWidth(250)
         self.lblviewlabel.setFixedHeight(20)
         self.lblviewlabel.setStyleSheet("font: 13pt arial MS")
 
         self.btnOpenViewer = QtGui.QPushButton(self)
-        self.btnOpenViewer.move(365,90)
+        self.btnOpenViewer.move(365, 90)
         self.btnOpenViewer.setFixedWidth(100)
         self.btnOpenViewer.setFixedHeight(28)
         self.btnOpenViewer.setIcon(QtGui.QIcon('./icons/ConstraintDiagnostics.svg'))
@@ -108,7 +103,7 @@ class formMain(QtGui.QMainWindow):
         self.btnOpenViewer.clicked.connect(lambda:self.openViewer())
 
         self.btnCloseForm = QtGui.QPushButton(self)
-        self.btnCloseForm.move(475,90)
+        self.btnCloseForm.move(475, 90)
         self.btnCloseForm.setFixedWidth(100)
         self.btnCloseForm.setFixedHeight(28)
         self.btnCloseForm.setToolTip("Close this form.")
@@ -118,7 +113,7 @@ class formMain(QtGui.QMainWindow):
     def openViewer(self):
         clist = []
         doc = FreeCAD.activeDocument()
-        for (k,v) in g.allErrors.items():
+        for (k, v) in g.allErrors.items():
             cobj = doc.getObject(k)
             clist.append(cobj)
 
@@ -130,9 +125,9 @@ class formMain(QtGui.QMainWindow):
         #resize table
         formx = self.width()
         formy = self.height()
-        self.txtboxReport.resize(formx -20, formy -120)
+        self.txtboxReport.resize(formx - 20, formy - 120)
 
-    def showme(self,msg):
+    def showme(self, msg):
         self.txtboxReport.setText(msg)
         self.show()
 
@@ -147,7 +142,7 @@ class formMain(QtGui.QMainWindow):
 form1 = formMain('form1')
 
 
-class   classfilecheck():
+class classfilecheck():
     def __init__(self):
         pass
     def opendoccheck(self):
@@ -174,15 +169,15 @@ class   classCheckConstraints():
         self.Listofallparts = []
         self.worklist = []
         self.test = []
-        self.dir_errors =  []
+        self.dir_errors = []
         self.rigids = []
 
 
-    def startcheck(self,constraints= 'all'):
+    def startcheck(self, constraints = 'all'):
         if filecheck.opendoccheck() == 'Nostart':
             return
         doc = FreeCAD.activeDocument()
-        #g.allErrors = {}
+       
         if constraints == 'all':
             constraints = self.getallconstraints()
         if len(constraints) == 0:
@@ -199,7 +194,7 @@ class   classCheckConstraints():
 
         ss.loadSystem(doc)
         ss.assignParentship(doc)
-        rigids=ss.rigids
+        rigids = ss.rigids
 
         for e in rigids: # get rigid parts
             self.rigids.append(e.objectName)
@@ -210,7 +205,7 @@ class   classCheckConstraints():
         self.dir_errors = a2p_constraintServices.redAdjustConstraintDirections(doc, constraints)
         self.checkformovement(constraints, True)
         if len(g.allErrors) != 0:
-            msg  = ''
+            msg = ''
             for e in g.allErrors:
                 line = str(g.allErrors.get(e))
                 msg = msg + line + '\n'
@@ -220,14 +215,14 @@ class   classCheckConstraints():
         CD_ConstraintDiagnostics.statusform.Closeme()
 
 
-    def checkformovement(self,constraintlist,putPartBack = True):
+    def checkformovement(self, constraintlist, putPartBack = True):
         doc = FreeCAD.activeDocument()
         partmoved = ''
         partsmoved = []
         typemoved = ''
         Bothpartsfixed = False
 
-        for checkingnum in range(0,len(constraintlist)):
+        for checkingnum in range(0, len(constraintlist)):
             cobj = constraintlist[checkingnum]
 
             if cobj.Name in self.dir_errors:
@@ -241,23 +236,23 @@ class   classCheckConstraints():
                     errortype = 'Feat 2 missing'
                 if errortype == '':
                     errortype = 'Direction'
-                self.addError(cobj,errortype,'')
+                self.addError(cobj, errortype, '')
                 continue
             subobj1 = cobj.getPropertyByName('Object1')
             subobj2 = cobj.getPropertyByName('Object2')
-            part1 = doc.getObject(subobj1)  # Save Position and fixed
+            part1 = doc.getObject(subobj1) # Save Position and fixed
             part2 = doc.getObject(subobj2)
             p1fix = False
             p2fix = False
-            if hasattr(part1,"fixedPosition"):
-                p1fix =part1.fixedPosition
-            if hasattr(part2,"fixedPosition"):
+            if hasattr(part1, "fixedPosition"):
+                p1fix = part1.fixedPosition
+            if hasattr(part2, "fixedPosition"):
                 p2fix = part2.fixedPosition
 
-            if hasattr(part1,"fixedPosition") and hasattr(part2,"fixedPosition"):
+            if hasattr(part1, "fixedPosition") and hasattr(part2, "fixedPosition"):
                 if part1.fixedPosition and part2.fixedPosition:
                     Bothpartsfixed = True
-                    self.addError(cobj,'Both fixed','')
+                    self.addError(cobj, 'Both fixed', '')
                 elif part1.fixedPosition or part2.fixedPosition:
                     pass
                 if part1.Label not in partsmoved and part2.Label not in partsmoved:
@@ -268,12 +263,12 @@ class   classCheckConstraints():
                     part2.fixedPosition = True
 
 
-            elif hasattr(part1,"fixedPosition") and hasattr(part2,"fixedPosition") == False:
-                if part1.Label  not in partsmoved:
-                    part1.fixedPosition =True
-            elif hasattr(part1,"fixedPosition") == False and hasattr(part2,"fixedPosition"):
-                    if part2.Label  not in partsmoved and part1.Label  not in partsmoved:
-                        part2.fixedPosition =True
+            elif hasattr(part1, "fixedPosition") and hasattr(part2, "fixedPosition") == False:
+                if part1.Label not in partsmoved:
+                    part1.fixedPosition = True
+            elif hasattr(part1, "fixedPosition") == False and hasattr(part2, "fixedPosition"):
+                    if part2.Label not in partsmoved and part1.Label not in partsmoved:
+                        part2.fixedPosition = True
 
 
             #recording the location of part before move***
@@ -296,14 +291,14 @@ class   classCheckConstraints():
             #xx
 
             solved = self.solvelist([cobj]) # solve a single constraint
-            if hasattr(part1,"fixedPosition"):
-                part1.fixedPosition = p1fix  #reset parts fixed
-            if hasattr(part2,"fixedPosition"):
+            if hasattr(part1, "fixedPosition"):
+                part1.fixedPosition = p1fix # reset parts fixed
+            if hasattr(part2, "fixedPosition"):
                 part2.fixedPosition = p2fix
 
 
             # Recording location after move
-            postBasePt1 = part1.Placement.Base  # Round vectors to 6 places
+            postBasePt1 = part1.Placement.Base # Round vectors to 6 places
             postBasePt2 = part2.Placement.Base
             postRotPt1 = part1.Placement.Rotation.Axis
             postRotPt2 = part2.Placement.Rotation.Axis
@@ -311,32 +306,32 @@ class   classCheckConstraints():
             postAnglePt2 = part2.Placement.Rotation.Angle
             localmove = False
 
-            moved = self.partMoved(preBasePt1,postBasePt1,'xyz',cobj,part1.Label)
+            moved = self.partMoved(preBasePt1, postBasePt1, 'xyz', cobj,part1.Label)
             if moved:
                 localmove = True
                 pass
 
-            moved = self.partMoved(preBasePt2,postBasePt2,'xyz',cobj,part2.Label)
+            moved = self.partMoved(preBasePt2, postBasePt2, 'xyz', cobj, part2.Label)
             if moved:
                 localmove = True
                 pass
 
-            moved = self.partMoved(preRotPt1,postRotPt1,'Rotate',cobj,part1.Label)
+            moved = self.partMoved(preRotPt1, postRotPt1, 'Rotate', cobj, part1.Label)
             if moved:
                 localmove = True
                 pass
 
-            moved =  self.partMoved(preRotPt2,postRotPt2,'Rotate',cobj,part2.Label)
+            moved = self.partMoved(preRotPt2, postRotPt2, 'Rotate', cobj, part2.Label)
             if moved:
                 localmove = True
                 pass
 
-            moved =  self.partMoved(preAnglePt1, postAnglePt1,'Angle',cobj,part1.Label)
+            moved = self.partMoved(preAnglePt1, postAnglePt1,'Angle',cobj,part1.Label)
 
             if moved:
                 localmove = True
                 pass
-            moved =  self.partMoved(preAnglePt2, postAnglePt2,'Angle',cobj,part2.Label)
+            moved = self.partMoved(preAnglePt2, postAnglePt2, 'Angle', cobj, part2.Label)
             if moved:
                 localmove = True
                 pass
@@ -355,18 +350,17 @@ class   classCheckConstraints():
 
 
 
-    def partMoved(self,vec1,vec2,movetype,cobj):
+    def partMoved(self, vec1, vec2, movetype, cobj):
 
         if cobj.Name in g.allErrors.keys():
             return(False)
-        #dis = 'a'
         errortype = ''
         foundError = False
         moved = ''
 
         if movetype == 'Angle':
-            dis1=rondnum(vec1)
-            dis2=rondnum(vec2)
+            dis1 = rondnum(vec1)
+            dis2 = rondnum(vec2)
             if dis1 != dis2:
                 foundError = True
                 errortype = 'Conflict'
@@ -374,15 +368,15 @@ class   classCheckConstraints():
 
         else:
 
-            v1=FreeCAD.Vector(rondlist(vec1))
-            v2=FreeCAD.Vector(rondlist(vec2))
-            x,y,z = vec1
-            v1 = [x,y,z]
-            v1=FreeCAD.Vector(rondlist(v1))
+            v1 = FreeCAD.Vector(rondlist(vec1))
+            v2 = FreeCAD.Vector(rondlist(vec2))
+            x, y, z = vec1
+            v1 = [x, y, z]
+            v1 = FreeCAD.Vector(rondlist(v1))
 
-            x,y,z = vec2
-            v2 = [x,y,z]
-            v2=FreeCAD.Vector(rondlist(v2))
+            x, y, z = vec2
+            v2 = [x, y, z]
+            v2 = FreeCAD.Vector(rondlist(v2))
             if v1 != v2:
                 self.test.append(cobj.Name)
                 self.test.append([v1])
@@ -391,10 +385,10 @@ class   classCheckConstraints():
                 errortype = 'Conflict'
                 moved = movetype
         if foundError:
-            self.addError(cobj,errortype,moved)
+            self.addError(cobj, errortype, moved)
         return(foundError)
-    def addError(self,cobj,errortype,movetype):
-        dict = {'Name':cobj.Name,'errortype':errortype,'movetype':movetype}
+    def addError(self, cobj, errortype, movetype):
+        dict = {'Name':cobj.Name, 'errortype':errortype, 'movetype':movetype}
         g.allErrors[cobj.Name] = dict
     def getallconstraints(self):
         doc = FreeCAD.activeDocument()
@@ -414,44 +408,44 @@ class   classCheckConstraints():
         cons = self.getallconstraints()
         print(cons)
 
-        self.checkformovement(cons,False)
+        self.checkformovement(cons, False)
 
-    def solvelist(self,list):
+    def solvelist(self, list):
         # add 1 at a time then solve allSolve
-        workList =[]
+        workList = []
         solved = 'no run'
         doc = FreeCAD.activeDocument()
         for c in list:
             print(c.Name)
             workList.append(c)
-            solved = a2p_solversystem.solveConstraints(doc,None,False,matelist = workList, showFailMessage=False)
+            solved = a2p_solversystem.solveConstraints(doc, None, False, matelist = workList, showFailMessage = False)
         return(solved)
 CheckConstraints = classCheckConstraints()
 
 
 
-def rondlist(list,inch = False):
+def rondlist(list, inch = False):
     x = list[0]
     y = list[1]
     z = list[2]
-    x=rondnum(x)
-    y=rondnum(y)
-    z=rondnum(z)
+    x = rondnum(x)
+    y = rondnum(y)
+    z = rondnum(z)
     if inch:
-        x=x/25.4
-        y=y/25.4
-        z=z/25.4
+        x = x/25.4
+        y = y/25.4
+        z = z/25.4
 
 
-    return([x,y,z])
+    return([x, y, z])
 
 
-def rondnum(num,rndto = g.roundto,mmorin='mm'):
+def rondnum(num, rndto = g.roundto, mmorin = 'mm'):
     # round a number to digits in global
     # left in mm for accuracy.
-    rn = round(num,g.roundto)
+    rn = round(num, g.roundto)
     if mmorin == 'in':
-        rn=rn/25.4
+        rn = rn / 25.4
 
     return(rn)
 
