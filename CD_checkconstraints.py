@@ -97,7 +97,6 @@ class formMain(QtGui.QMainWindow):
         self.btnOpenViewer.move(365, 90)
         self.btnOpenViewer.setFixedWidth(100)
         self.btnOpenViewer.setFixedHeight(28)
-        self.btnOpenViewer.setIcon(QtGui.QIcon('./icons/ConstraintDiagnostics.svg'))
         self.btnOpenViewer.setToolTip("View constraints the assembly.")
         self.btnOpenViewer.setText("Open Viewer")
         self.btnOpenViewer.clicked.connect(lambda:self.openViewer())
