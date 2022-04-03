@@ -179,6 +179,11 @@ class classFuncs():
                     featname = cobj.SubElement2
                 if featname != '':
                     break
+                
+            direction = 'N'
+            if hasattr(cobj, 'directionConstraint'):
+                direction = cobj.directionConstraint
+                
             """ dict is basic info for constraint
              these next functions adds info for the subelements"""
             if 'Face' in featname:
@@ -195,7 +200,7 @@ class classFuncs():
                 num = int(featname[6:])
                 num = num - 1
                 di = self.getvertexbynum(num, g.shape1)
-            d = {'Name':cobj.Name, 'cname':cobj.Name, 'featname':featname, 'subElement':subElement, 'dir':dir, 'newname':''}
+            d = {'Name':cobj.Name, 'cname':cobj.Name, 'featname':featname, 'subElement':subElement, 'dir':direction, 'newname':''}
             d.update(di)
             g.alldicts[cobj.Name] = d # Save the info to a larger dictionary
 
@@ -332,8 +337,6 @@ class classFuncs():
                 mobj.SubElement2 = newfeat
                 g.repaired = g.repaired + 1
         direction = d.get('dir')
-        print (d)
-        print (direction)
         if hasattr(cobj, 'directionConstraint'):
             cobj.directionConstraint = direction
         if hasattr(mobj, 'directionConstraint'):
