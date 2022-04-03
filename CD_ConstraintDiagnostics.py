@@ -90,19 +90,23 @@ class ShowPartProperties(QtGui.QWidget):
         self.setWindowTitle("Constraint Viewer")
         self.setStyleSheet("font: 11pt arial MS")
         bar = QtGui.QMenuBar(self)
-        file = bar.addMenu("Labels")
-        file.addAction("Open Dialog")
-        file.addAction("Delete labels")
-        file.triggered[QtGui.QAction].connect(self.process_menus)
-        tbinfo = bar.addMenu("Info")
-        tbinfo.addAction("Places of accuracy = " + str(g.roundto))
-        tbinfo.triggered[QtGui.QAction].connect(self.process_menus)
-        file = bar.addMenu("Help")
-        file.addAction("Open Help")
-        file.triggered[QtGui.QAction].connect(self.process_menus)
-        file = bar.addMenu("Misc")
-        file.addAction("Change Part")
-        file.triggered[QtGui.QAction].connect(self.process_menus)
+        
+        labelMenu = bar.addMenu("Labels")
+        labelMenu.addAction("Open Dialog")
+        labelMenu.addAction("Delete labels")
+        labelMenu.triggered[QtGui.QAction].connect(self.process_menus)
+        
+        infoMenu = bar.addMenu("Info")
+        infoMenu.addAction("Places of accuracy = " + str(g.roundto))
+        infoMenu.triggered[QtGui.QAction].connect(self.process_menus)
+        
+        helpMenu = bar.addMenu("Help")
+        helpMenu.addAction("Open Help")
+        helpMenu.triggered[QtGui.QAction].connect(self.process_menus)
+        helpMenu = bar.addMenu("Misc")
+        helpMenu.addAction("Change Part")
+        helpMenu.triggered[QtGui.QAction].connect(self.process_menus)
+        
         self.txtboxMainerror = QtGui.QLineEdit(self)
         self.txtboxMainerror.move(250,60)
         self.txtboxMainerror.setFixedHeight(80)
@@ -190,19 +194,19 @@ class ShowPartProperties(QtGui.QWidget):
         if 'Clear Table' in buttext:
             self.clearTable()
         if buttext == 'Attach to':
-           """ attaches leg to selected surface"""
-           sidefuncs.swapselectedleg()
+            """ attaches leg to selected surface"""
+            sidefuncs.swapselectedleg()
 
 
         if buttext == 'Std Solver':
-           self.stdSolve()
+            self.stdSolve()
 
         ''' This is needed if button above is activated '''
         if buttext == 'Solver No Chk':
-           mApp('Option not available')
-           cons = CD_checkconstraints.CheckConstraints.getallconstraints()
-           print(cons)
-           CD_checkconstraints.CheckConstraints.checkformovement(cons,False)
+            mApp('Option not available')
+            cons = CD_checkconstraints.CheckConstraints.getallconstraints()
+            print(cons)
+            CD_checkconstraints.CheckConstraints.checkformovement(cons,False)
 
         if buttext == 'Find w label':
             """ createlabel for single part """
@@ -309,7 +313,7 @@ class ShowPartProperties(QtGui.QWidget):
             if len(fn2) == 0:
                 fn2 = 'None'
 
-            dir = QtGui.QTableWidgetItem(str(dirs[0]))
+            direction = QtGui.QTableWidgetItem(str(dirs[0]))
             sup = QtGui.QTableWidgetItem(str(mate.Suppressed))
             run = QtGui.QTableWidgetItem(str('Run'))
             name = QtGui.QTableWidgetItem(cname)
@@ -319,7 +323,7 @@ class ShowPartProperties(QtGui.QWidget):
             fixed2 = QtGui.QTableWidgetItem(fixed2[0])
             Part2 = QtGui.QTableWidgetItem(part2.Label)
             fname2 = QtGui.QTableWidgetItem(fn2)
-            self.tm.setItem(0, 0, dir)
+            self.tm.setItem(0, 0, direction)
             self.tm.setItem(0, 1, sup)
             self.tm.setItem(0, 2, run)
             self.tm.setItem(0, 3, name)
@@ -350,8 +354,8 @@ class ShowPartProperties(QtGui.QWidget):
         for row in range(self.tm.rowCount()):
             self.tm.setRowHeight(row, 15)
 
-    def hoveronoff(self,bool):
-        self.tm.setMouseTracking(bool)
+    def hoveronoff(self,val):
+        self.tm.setMouseTracking(val)
 
     def cell_was_clicked(self, row, column):
         header = self.tm.horizontalHeaderItem(column).text()
@@ -397,38 +401,22 @@ class ShowPartProperties(QtGui.QWidget):
                 constraint.Suppressed = True
             else:
                 constraint.Suppressed = False
-            bool = constraint.Suppressed
-            boo = str(bool)
+            tx = str(constraint.Suppressed)
             item2 = self.tm.item(row, column)
-            item2.setText(boo)
+            item2.setText(tx)
         if header == 'Direction':
             item2 = self.tm.item(row, column)
             if item2.text() != 'N':
-                dir = constraint.directionConstraint
-                if dir =='opposed':
+                direction = constraint.directionConstraint
+                if direction =='opposed':
                     newdir = 'aligned'
                 else:
                     newdir ='opposed'
                 constraint.directionConstraint = newdir
-                dir = constraint.directionConstraint
+                direction = constraint.directionConstraint
                 item2 = self.tm.item(row, column)
-                item2.setText(dir[0])
+                item2.setText(direction[0])
                 conflicts.checkformovement([constraint])
-
-
-
-
-    def transparentOnold(self,index):
-        buttext = self.btns[index].text()
-        initialTransparencyState = a2plib.isTransparencyEnabled()
-        if 'On' in buttext:
-            initialTransparencyState = a2plib.isTransparencyEnabled()
-            if not initialTransparencyState:
-                a2plib.setTransparency()
-            self.btns[index].setText('Transparent Off')
-        if 'Off' in buttext:
-            self.btns[index].setText('Transparent On')
-            a2plib.restoreTransparency( )
 
     def transparentOn(self,index):
         buttext = self.btns[index].text()
@@ -578,15 +566,10 @@ class classconflictreport():
         return(constraints)
 
     def checkformovement(self,constraintlist,putPartBack = False,continuelist = False):
-        shakenpart = []
-        movedobj = []
         g.movedconsts = []
         doc = FreeCAD.activeDocument()
-        failedcObjects = []
         failedpartnames = []
-        partmoved = ''
         partsmoved = []
-        typemoved = ''
         Bothpartsfixed = []
         if continuelist:
             start = g.checkingnum
@@ -637,7 +620,7 @@ class classconflictreport():
             preRotPt2 = part2.Placement.Rotation.Axis
             preAnglePt1 = part1.Placement.Rotation.Angle
             preAnglePt2 = part2.Placement.Rotation.Angle
-            solved = self.solvelist([cobj]) # solve a single constraint
+            self.solvelist([cobj]) # solve a single constraint
             """ These may be wanted for trouble shooting movement of constraints """
             # doc.recompute()
             # FreeCADGui.updateGui()
@@ -652,34 +635,31 @@ class classconflictreport():
             postAnglePt2 = part2.Placement.Rotation.Angle
 
 
-            disMoved = 0.0
             """ Compares before and after the constraint is run
                 Did part move and what kind of movment"""
-            #if self.isMoved(preBasePt1,postBasePt1,cobj,part1.Label):
             if self.partMoved(preBasePt1.sub(postBasePt1), ' ', cobj, part1.Label):
-                typemoved = 'xyz'
+                #typemoved = 'xyz' #this is nowhere used !
+                pass
 
             if self.partMoved(preBasePt2.sub(postBasePt2), ' ', cobj, part2.Label):
-                #failedpartnames.append(part2.Label)
-                typemoved = 'xyz'
-
-
-
+                #typemoved = 'xyz'
+                pass
 
             if self.partMoved(preRotPt1.sub(postRotPt1), ' ', cobj, part1.Label):
-                #failedpartnames.append(part1.Label)
-                typemoved = 'Rotate'
+                #typemoved = 'Rotate'
+                pass
 
             if self.partMoved(preRotPt2.sub(postRotPt2), ' ', cobj, part2.Label):
-                #failedpartnames.append(part2.Label)
-                typemoved = 'Rotate'
-
+                #typemoved = 'Rotate'
+                pass
 
             if self.partMoved(preAnglePt1, postAnglePt1, cobj, part1.Label):
-                typemoved = 'Angle'
+                #typemoved = 'Angle'
+                pass
 
             if self.partMoved(preAnglePt2, postAnglePt2, cobj, part2.Label):
-                typemoved = 'Angle'
+                #typemoved = 'Angle'
+                pass
 
             if putPartBack:
                 #Places part back in original location if put back is True
@@ -690,12 +670,7 @@ class classconflictreport():
                 part2.Placement.Rotation.Axis = preRot2
                 part2.Placement.Rotation.Angle = preAngle2
 
-
-
-        #create list with cobj names
-        failedcObjects = g.movedconsts
-
-        for e in failedcObjects:
+        for e in g.movedconsts:
             failedpartnames.append(e.Name)
 
 
@@ -725,15 +700,16 @@ class classconflictreport():
         self.checkformovement(cons,False)
 
 
-    def solvelist(self,list):
+    def solvelist(self,inputList):
         #add 1 at a time then solve allSolve
         workList = []
-        solved = 'no run'
         doc = FreeCAD.activeDocument()
-        for c in list:
+        for c in inputList:
             workList.append(c)
             print(workList)
-            solved = a2p_solversystem.solveConstraints(doc, matelist = workList, showFailMessage = False)
+            a2p_solversystem.solveConstraints(doc, matelist = workList, showFailMessage = False)
+            
+            
 conflicts = classconflictreport('conflicts')
 
 class classsidefunctions():
@@ -804,11 +780,11 @@ class classsidefunctions():
         if SubElement == 'SubElement2':
             cobj.SubElement2 = newfeat
             mobj.SubElement2 = newfeat
-        dir = dict_.get('dir')
+        direction = dict_.get('dir')
         if hasattr(cobj, 'directionConstraint'):
-            cobj.directionConstraint = dir
+            cobj.directionConstraint = direction
         if hasattr(mobj, 'directionConstraint'):
-            mobj.directionConstraint = dir
+            mobj.directionConstraint = direction
         return
 
     def replacepart1(self):
@@ -833,7 +809,6 @@ class classsidefunctions():
         rotate = oldpart.Placement.Rotation.Axis
         angle = oldpart.Placement.Rotation.Angle
         tempshape = oldpart.Shape
-        tempshape = oldpart.Shape
         tempbase = newpart.Placement.Base
         tempRotation = newpart.Placement.Rotation.Axis
         tempangle = newpart.Placement.Rotation.Angle
@@ -843,7 +818,6 @@ class classsidefunctions():
         oldpart.Placement.Base = base1
         oldpart.Placement.Rotation.Axis = rotate
         oldpart.Placement.Rotation.Angle = angle
-        g.chgpart == ''
         newpart.Shape = tempshape
         newpart.Placement.Base = tempbase
         newpart.Placement.Rotation.Axis = tempRotation
@@ -869,7 +843,8 @@ class SelObserver:
         pass
 
     def SelObserverON(self):
-        o = FreeCADGui.Selection.addObserver(selObv)
+        FreeCADGui.Selection.addObserver(selObv)
+        
     def SelObserverOFF(self):
         print('SelObserverOFF')
         try:
@@ -879,20 +854,19 @@ class SelObserver:
 
     def setPreselection(self, doc, obj, sub):                # Preselection object
         pass
+    
     def addSelection(self, doc, obj, sub, pnt):               # Selection object
         sidefuncs.trunoffobserv(obj, sub)
 
-
-        pass
     def removeSelection(self, doc, obj, sub):                # Delete the selected object
         pass
+    
     def setSelection(self, doc):
         #this is sent from menu
-        funcs.constraintselected('table')
+        #funcs.constraintselected('table') #funcs does not exist ??!!
+        pass
 
 selObv =SelObserver()
-#selObv.SelObserverON()
-#selObv.SelObserverOFF()
 
 
 class classsearch():
@@ -938,10 +912,10 @@ class classsearch():
 search = classsearch()
 
 
-def rondlist(list, inch = False):
-    x = list[0]
-    y = list[1]
-    z = list[2]
+def rondlist(inputList, inch = False):
+    x = inputList[0]
+    y = inputList[1]
+    z = inputList[2]
     x = rondnum(x)
     y = rondnum(y)
     z = rondnum(z)
@@ -958,10 +932,6 @@ def rondnum(num, rndto = g.roundto, mmorin = 'mm'):
     if mmorin == 'in':
         rn = rn / 25.4
     return(rn)
-
-
-
-
 
 class classlastclickeditem:
     def __init__(self, name):
@@ -1000,6 +970,7 @@ class classlastclickeditem:
         if self.column == 5:
             self.SubElement = 'SubElement2'
         return(self.SubElement)
+    
 lastclc=classlastclickeditem("lastclc")
 
 class formReport(QtGui.QDialog):
@@ -1021,12 +992,6 @@ class formReport(QtGui.QDialog):
         self.lblviewlabel.setFixedWidth(250)
         self.lblviewlabel.setFixedHeight(20)
         self.lblviewlabel.setStyleSheet("font: 13pt arial MS")
-
-    #def resizeEvent(self, event):
-    #    #resize table
-    #    formx = self.width()
-    #    formy = self.height()
-    #    form1.tm.resize(formx -20,formy -200)
 
     def showme(self, msg):
         print('showing editing part')
@@ -1062,14 +1027,15 @@ View constraints
 class rnp_Constraint_Viewer:
 
     def Activated(self):
-        process.startprog()
+        #process.startprog()
+        form1.showme()
 
     def onDeleteConstraint(self):
         self.constraintValueBox.deleteLater()
         a2plib.setConstraintEditorRef(None)
         FreeCADGui.Selection.clearSelection()
 
-    def Deactivated():
+    def Deactivated(self):
         """This function is executed when the workbench is deactivated"""
         return
 
@@ -1083,12 +1049,3 @@ class rnp_Constraint_Viewer:
 
 FreeCADGui.addCommand('rnp_Constraint_Viewer',rnp_Constraint_Viewer())
 #==============================================================================
-
-
-class process:
-    def __init__(self, name):
-        self.name = name
-
-    def startprog():
-        form1.showme()
-
