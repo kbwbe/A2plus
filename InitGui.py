@@ -26,7 +26,7 @@
 __title__ = 'A2plus assembly Workbench - InitGui file'
 __author__ = 'kbwbe'
 
-A2P_VERSION = 'V0.4.55a'
+A2P_VERSION = 'V0.4.55b'
 
 import FreeCAD
 import FreeCADGui
