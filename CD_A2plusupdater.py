@@ -71,9 +71,7 @@ class sideFuncs1():
     def __init__(self):
         pass
     def opendoccheck(self):
-        doc = None
         doc = FreeCAD.activeDocument()
-
         if doc is None:
             msg = 'A file must be selected to start this selector\nPlease open a file and try again'
             mApp(msg)
@@ -88,22 +86,10 @@ class classFuncs():
     def __init__(self):
         pass
 
-
-    def runinorder(self):
-        partname = 'fff'
-        partname = self.selectfiles()
-        if partname == 'No':
-            return
-        if partname == 'fff':
-            return
-        self.secondrun(partname, False)
-
-
     def selectfiles(self):
         ret = sideFuncs.opendoccheck()
         if ret == 'Nostart':
             return('No')
-        doc = FreeCAD.activeDocument()
         partslist = FreeCADGui.Selection.getSelection()
         if len(partslist) == 0:
             mApp('1 No parts were selected to update.\nSelect one part and try again.')
@@ -117,12 +103,11 @@ class classFuncs():
 
         for num in range(0, len(partslist)):
             partobj = partslist[num]
-            partname = self.firstrun(partobj)
+            self.firstrun(partobj)
             self.secondrun(False)
 
     def firstrun(self, partobj):
         g.resetvars()  # reset Variables
-        partname = 'none'
         g.partobj = partobj
         g.partlabel =partobj.Label
         partname = partobj.Name
