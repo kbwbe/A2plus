@@ -30,7 +30,8 @@ import FreeCAD
 from PySide import QtUiTools
 from PySide.QtGui import *
 from PySide import QtGui, QtCore
-import CD_importpart
+import a2p_importpart
+import a2plib
 import CD_ConstraintDiagnostics
 
 
@@ -119,9 +120,12 @@ class classFuncs():
     def secondrun(self, newpart = False):
         doc = FreeCAD.activeDocument()
 
-
         if newpart is False:
-            CD_importpart.updateImportedParts(doc, True)
+            savedAutoSolveState = a2plib.getAutoSolveState()
+            a2plib.setAutoSolve(False)
+            a2p_importpart.updateImportedParts(doc, True)
+            a2plib.setAutoSolve(savedAutoSolveState)
+            
         newobj = g.partobj
         FreeCADGui.updateGui()
         g.shape2 = newobj.Shape
