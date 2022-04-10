@@ -20,8 +20,11 @@
 #*   USA                                                                   *
 #*                                                                         *
 #***************************************************************************
-# This is to be used with A2plus Assembly WorkBench
-# Enables two features to be selected without using the control key
+"""
+This is to be used in conjunction with A2plus Assembly Workbench.
+
+Enables two features to be selected without using the control key.
+"""
 
 import os
 import FreeCAD
@@ -54,12 +57,12 @@ class onebutton:
                 sub = ''
 
             elif g.obj1 != '' and g.feat1 != '':
-                if obj != '' and sub != '': 
+                if obj != '' and sub != '':
                     obj1 = FreeCAD.ActiveDocument.getObject(g.obj1)
                     obj2 = FreeCAD.ActiveDocument.getObject(obj)
-                    FreeCADGui.Selection.addSelection(obj1,g.feat1)
-                    FreeCADGui.Selection.addSelection(obj2,sub)
-                    g.partselected =True
+                    FreeCADGui.Selection.addSelection(obj1, g.feat1)
+                    FreeCADGui.Selection.addSelection(obj2, sub)
+                    g.partselected = True
                     g.feat1 = ''
                     g.obj1 = ''
                     obj = ''
@@ -72,24 +75,26 @@ class SelObserver:
         if g.sONOFF != 'on':
             FreeCADGui.Selection.addObserver(selObv)
             g.sONOFF = 'on'
-            #print('SelObserverON')
+            # print('SelObserverON')
     def SelObserverOFF(self):
         try:
             FreeCADGui.Selection.removeObserver(selObv)
             g.sONOFF = 'off'
-            #print('SelObserverOFF')
+            # print('SelObserverOFF')
         except:
             print('SelObserverOFF by except')
-    def addSelection(self,doc,obj,sub,pnt): # Selection object
-        onebutton.readselect(onebutton,doc,obj,sub)
-    def removeSelection(self,doc,obj,sub): # Delete the selected object
+    def addSelection(self, doc, obj, sub, pnt):  # Selection object
+        onebutton.readselect(onebutton, doc, obj, sub)
+    def removeSelection(self, doc, obj, sub):    # Delete the selected object
         pass
-    def setSelection(self,doc):
+    def setSelection(self, doc):
         pass
-selObv =SelObserver()
 
 
-""" This class looks for mouse clicks in space to unselect parts"""
+selObv = SelObserver()
+
+
+"""This class looks for mouse clicks in space to unselect parts."""
 class ViewObserver:
     def __init__(self):
         self.view = None
@@ -98,10 +103,10 @@ class ViewObserver:
     def vostart(self):
         self.view = FreeCADGui.activeDocument().activeView()
         self.o = ViewObserver()
-        self.c = self.view.addEventCallback("SoMouseButtonEvent",self.o.logPosition)
+        self.c = self.view.addEventCallback("SoMouseButtonEvent", self.o.logPosition)
     def vooff(self):
         try:
-            self.view.removeEventCallback("SoMouseButtonEvent",self.c)
+            self.view.removeEventCallback("SoMouseButtonEvent", self.c)
         except Exception as e:
             print(str(e))
 
@@ -121,55 +126,59 @@ class ViewObserver:
                     FreeCADGui.Selection.clearSelection()
                 else:
                     pass
+
+
 viewob = ViewObserver()
 
 
 
 toolTipText = \
-'''
-Use left mouse button to select two features.\nDo not use the control key
-'''
+"""
+Use left mouse button to select two features.\nDo not use the control key.
+"""
+
+
 class rnp_OneButton:
     def GetResources(self):
         mypath = os.path.dirname(__file__)
         return {
-             'Pixmap' : mypath + "/icons/CD_OneButton.svg",
+             'Pixmap': mypath + "/icons/CD_OneButton.svg",
              'MenuText': 'Use one mouse button to select features',
              'ToolTip': toolTipText,
              'Checkable': self.IsChecked()
              }
 
-    def Activated(self,placeholder = None):
+    def Activated(self, placeholder=None):
         if FreeCAD.activeDocument() is None:
             mApp('No file is opened.\nYou must open an assemly file first.')
             return
         FreeCADGui.Selection.clearSelection()
         if g.buttonenabled == False:
-            selObv.SelObserverON() # Checks for part and enity click
-            viewob.vostart() # Checks for click in background
+            selObv.SelObserverON()  # Checks for part and enity click
+            viewob.vostart()        # Checks for click in background
             g.buttonenabled = True
         else:
             g.buttonenabled = False
             selObv.SelObserverOFF()
             viewob.vooff()
-            
+
     def Deactivated(self):
-        """ This function is executed when the workbench is deactivated"""
+        """This function is executed when the workbench is deactivated."""
         selObv.SelObserverOFF()
         viewob.vooff()
 
     def IsChecked(self):
         return(g.buttonenabled)
-     
+
     def IsActive(self):
         return(True)
-FreeCADGui.addCommand('rnp_OneButton',rnp_OneButton())
+FreeCADGui.addCommand('rnp_OneButton', rnp_OneButton())
 #==============================================================================
 
 class mApp(QtGui.QWidget):
-    ''' This message box was added to make this file a standalone file'''
+    """This message box was added to make this file a standalone file"""
     # for error messages
-    def __init__(self,msg, msgtype = 'ok'):
+    def __init__(self, msg, msgtype='ok'):
         super().__init__()
         self.title = 'Warning'
         self.left = 100
@@ -178,11 +187,9 @@ class mApp(QtGui.QWidget):
         self.height = 300
         self.initUI(msg)
 
-    def initUI(self,msg):
-        #self.setWindowTitle(self.title)
+    def initUI(self, msg):
+        # self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
-        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)       
-        QtGui.QMessageBox.question(self, 'Warning', msg, QtGui.QMessageBox.Ok|QtGui.QMessageBox.Ok)        
+        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+        QtGui.QMessageBox.question(self, 'Warning', msg, QtGui.QMessageBox.Ok|QtGui.QMessageBox.Ok)
         self.show()
-
-
