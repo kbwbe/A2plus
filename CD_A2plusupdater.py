@@ -629,9 +629,9 @@ class rnp_Update_A2pParts:
     def GetResources(self):
         mypath = os.path.dirname(__file__)
         return {
-             'Pixmap' : mypath + "/icons/updateA2.svg",
+             'Pixmap': mypath + "/icons/updateA2.svg",
              'MenuText': 'Updates parts from the A2plus program that has been modified',
-             'ToolTip': 'Updates modifed parts.'
+             'ToolTip': 'Updates modified parts.'
              }
 
 FreeCADGui.addCommand('rnp_Update_A2pParts', rnp_Update_A2pParts())

@@ -934,7 +934,7 @@ def getPos(obj, subElementName):
             if all( hasattr(a,'Center') for a in arcs ):
                 centers = numpy.array([a.Center for a in arcs])
                 sigma = numpy.std( centers, axis=0 )
-                if max(sigma) < 10**-6: #then circular curce
+                if max(sigma) < 10**-6: #then circular curve
                     pos = numpyVecToFC(centers[0])
             if all(isLine(a) for a in arcs):
                 lines = arcs
@@ -988,7 +988,7 @@ def getAxis(obj, subElementName):
             if all( hasattr(a,'Center') for a in arcs ):
                 centers = numpy.array([a.Center for a in arcs])
                 sigma = numpy.std( centers, axis=0 )
-                if max(sigma) < 10**-6: #then circular curce
+                if max(sigma) < 10**-6: #then circular curve
                     axis = arcs[0].Axis
             if all(isLine(a) for a in arcs):
                 lines = arcs

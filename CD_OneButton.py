@@ -150,11 +150,11 @@ class rnp_OneButton:
 
     def Activated(self, placeholder=None):
         if FreeCAD.activeDocument() is None:
-            mApp('No file is opened.\nYou must open an assemly file first.')
+            mApp('No file is opened.\nYou must open an assembly file first.')
             return
         FreeCADGui.Selection.clearSelection()
         if g.buttonenabled == False:
-            selObv.SelObserverON()  # Checks for part and enity click
+            selObv.SelObserverON()  # Checks for part and entity click
             viewob.vostart()        # Checks for click in background
             g.buttonenabled = True
         else:

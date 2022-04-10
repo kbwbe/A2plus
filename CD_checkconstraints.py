@@ -284,14 +284,14 @@ class   classCheckConstraints():
             preAnglePt1 = part1.Placement.Rotation.Angle
             preAnglePt2 = part2.Placement.Rotation.Angle
 
-            solved = self.solvelist([cobj])    # solve a single constraint
+            solved = self.solvelist([cobj])     # solve a single constraint
             if hasattr(part1, "fixedPosition"):
-                part1.fixedPosition = p1fix    # reset parts fixed
+                part1.fixedPosition = p1fix     # reset parts fixed
             if hasattr(part2, "fixedPosition"):
                 part2.fixedPosition = p2fix
 
             # Recording location after move
-            postBasePt1 = part1.Placement.Base # Round vectors to 6 places
+            postBasePt1 = part1.Placement.Base  # Round vectors to 6 places
             postBasePt2 = part2.Placement.Base
             postRotPt1 = part1.Placement.Rotation.Axis
             postRotPt2 = part2.Placement.Rotation.Axis
@@ -333,7 +333,7 @@ class   classCheckConstraints():
 
 
             if putPartBack:
-                # Places part back in origial location if put back is True
+                # Places part back in original location if putPartBack is True
                 part1.Placement.Base = preBase1
                 part1.Placement.Rotation.Axis = preRot1
                 part1.Placement.Rotation.Angle = preAngle1
@@ -392,7 +392,7 @@ class   classCheckConstraints():
                     constraints.append(obj)
 
         if len(constraints) == 0:
-            mApp('Cannot find any contraints in this file.')
+            mApp('Cannot find any constraints in this file.')
             return(None)
         return(constraints)
 

@@ -273,7 +273,7 @@ class ShowPartProperties(QtGui.QWidget):
         self.tm.sortByColumn(i)
 
     def loadtable(self,listObjects):
-        # fill the table with infomation from a list of constraints
+        # fill the table with information from a list of constraints
         self.tm.setRowCount(0)
         doc = FreeCAD.activeDocument()
         row = 0
@@ -561,7 +561,7 @@ class classconflictreport():
                 if not 'mirror' in obj.Name:
                     constraints.append(obj)
         if len(constraints) == 0:
-            mApp('I can not find any contraints in this file.')
+            mApp('I can not find any constraints in this file.')
             return(None)
         return(constraints)
 
@@ -636,7 +636,7 @@ class classconflictreport():
 
 
             """ Compares before and after the constraint is run
-                Did part move and what kind of movment"""
+                Did part move and what kind of movement"""
             if self.partMoved(preBasePt1.sub(postBasePt1), ' ', cobj, part1.Label):
                 #typemoved = 'xyz' #this is nowhere used !
                 pass
