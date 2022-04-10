@@ -70,10 +70,10 @@ class mApp(QtGui.QWidget):
             buttonReply = QtGui.QMessageBox.question(self, 'PyQt5 message', msg, QtGui.QMessageBox.Yes|QMessageBox.No, QtGui.QMessageBox.No)
         if buttonReply == QtGui.QMessageBox.Yes:
             pass
-            #print('Yes clicked.')
+            # print('Yes clicked.')
         else:
             pass
-            #print('No clicked.')
+            # print('No clicked.')
         self.show()
 
 
@@ -117,7 +117,7 @@ class ShowPartProperties(QtGui.QWidget):
 
         """ Main Table """
         self.tm = QtGui.QTableWidget(self)
-        self.tm.setGeometry(10, 120, 650, 50) # xy,wh
+        self.tm.setGeometry(10, 120, 650, 50)  # xy,wh
         self.tm.setWindowTitle("Broken Mates")
         self.tm.setEditTriggers(QtGui.QTableWidget.NoEditTriggers)
         self.tm.setRowCount(0)
@@ -256,7 +256,7 @@ class ShowPartProperties(QtGui.QWidget):
             path = a2plib.pathOfModule() + "\CD_Help for Diagnostic tools.pdf"
             subprocess.Popen([path], shell = True)
 
-    def process_misc_menus(self, q): 
+    def process_misc_menus(self, q):
         menutext = q.text()
         if menutext == "Solve without error checking":
             conflicts.solveNOerrorchecking()
@@ -273,7 +273,7 @@ class ShowPartProperties(QtGui.QWidget):
         self.tm.sortByColumn(i)
 
     def loadtable(self,listObjects):
-        # fill the table with infomation from a list of constraints
+        # fill the table with information from a list of constraints
         self.tm.setRowCount(0)
         doc = FreeCAD.activeDocument()
         row = 0
@@ -561,7 +561,7 @@ class classconflictreport():
                 if not 'mirror' in obj.Name:
                     constraints.append(obj)
         if len(constraints) == 0:
-            mApp('I can not find any contraints in this file.')
+            mApp('I can not find any constraints in this file.')
             return(None)
         return(constraints)
 
@@ -636,7 +636,7 @@ class classconflictreport():
 
 
             """ Compares before and after the constraint is run
-                Did part move and what kind of movment"""
+                Did part move and what kind of movement"""
             if self.partMoved(preBasePt1.sub(postBasePt1), ' ', cobj, part1.Label):
                 #typemoved = 'xyz' #this is nowhere used !
                 pass
@@ -852,7 +852,7 @@ class SelObserver:
         except:
             print('removeObserver failed in C checker')
 
-    def setPreselection(self, doc, obj, sub):                # Preselection object
+    def setPreselection(self, doc, obj, sub):       # Preselection object
         pass
     
     def addSelection(self, doc, obj, sub, pnt):               # Selection object
@@ -927,7 +927,7 @@ def rondlist(inputList, inch = False):
 
 def rondnum(num, rndto = g.roundto, mmorin = 'mm'):
     """" round a number to digits in global
-        left in mm for accuracy. """ 
+        left in mm for accuracy. """
     rn = round(num, g.roundto)
     if mmorin == 'in':
         rn = rn / 25.4
@@ -996,7 +996,7 @@ class formReport(QtGui.QDialog):
     def showme(self, msg):
         print('showing editing part')
         self.show()
- 
+
     def Closeme(self):
         self.close()
 

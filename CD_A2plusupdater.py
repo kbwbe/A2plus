@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 #***************************************************************************
 #*                                                                         *
 #*   Copyright (c) 2020 Dan Miel                                           *
@@ -20,9 +19,12 @@
 #*   USA                                                                   *
 #*                                                                         *
 #***************************************************************************
-""" This is to be used with A2plus Assembly WorkBench. It records the features
-which are linked to the constraints and searches for mating features after the
-part is replaced in the assembly"""
+"""
+This is to be used in conjunction with A2plus Assembly Workbench.
+
+It records the features which are linked to the constraints and searches
+for mating features after the part is replaced in the assembly.
+"""
 
 import os
 import FreeCADGui
@@ -51,6 +53,7 @@ class globaluseclass:
         self.cylfaces = []
         self.notcylfaces = []
         self.partlog = []
+
     def resetvars(self):
         self.partlabel = ''
         self.partname = ''
@@ -125,7 +128,7 @@ class classFuncs():
             a2plib.setAutoSolve(False)
             a2p_importpart.updateImportedParts(doc, True)
             a2plib.setAutoSolve(savedAutoSolveState)
-            
+
         newobj = g.partobj
         FreeCADGui.updateGui()
         g.shape2 = newobj.Shape
@@ -183,11 +186,11 @@ class classFuncs():
                     featname = cobj.SubElement2
                 if featname != '':
                     break
-                
+
             direction = 'N'
             if hasattr(cobj, 'directionConstraint'):
                 direction = cobj.directionConstraint
-                
+
             """ dict is basic info for constraint
              these next functions adds info for the subelements"""
             if 'Face' in featname:
@@ -217,13 +220,13 @@ class classFuncs():
         center = -1
 
         eeee = face.Edges
-        #numofpoints = len(face.Vertexes)
+        # numofpoints = len(face.Vertexes)
         for f0 in face.Vertexes:         # Search the Vertexes of the face
             point = FreeCAD.Vector(f0.Point.x, f0.Point.y, f0.Point.z)
             x, y, z = point
             loc = rondlist([x, y, z])
             facepoints.append(loc)
-        #volume = rondnum(face.Volume)
+        # volume = rondnum(face.Volume)
         radius = -1
         surftype = face.Surface
         surfstr = str(surftype)
@@ -233,7 +236,13 @@ class classFuncs():
             center = rondlist(face.Edges[0].CenterOfMass)
         if 'Plane' in surfstr:
             surfstr = 'Plane'
-        d = {'surftype':surfstr, 'area':area,'facepoints':facepoints, 'center':center, 'radius':radius, 'edges':eeee}
+        d = {'surftype': surfstr,
+             'area': area,
+             'facepoints': facepoints,
+             'center': center,
+             'radius': radius,
+             'edges': eeee
+            }
         return(d)
 
 
@@ -620,9 +629,9 @@ class rnp_Update_A2pParts:
     def GetResources(self):
         mypath = os.path.dirname(__file__)
         return {
-             'Pixmap' : mypath + "/icons/updateA2.svg",
+             'Pixmap': mypath + "/icons/updateA2.svg",
              'MenuText': 'Updates parts from the A2plus program that has been modified',
-             'ToolTip': 'Updates modifed parts.'
+             'ToolTip': 'Updates modified parts.'
              }
 
 FreeCADGui.addCommand('rnp_Update_A2pParts', rnp_Update_A2pParts())

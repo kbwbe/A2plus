@@ -39,7 +39,7 @@ class formMain(QtGui.QMainWindow):
 
         self.btnLabels = [['Add Face Labels', 'Add labels to all of the faces on a selected part'],
                           ['Add Edge Labels', 'Add labels to all of the edges on a selected part'],
-                          ['Add Vertex Labels', 'Add labels to all of the vertexes on a selected part'],
+                          ['Add Vertex Labels', 'Add labels to all of the vertices on a selected part'],
                           ['Delete Labels', 'Delete all labels'],
                           ['Close', '']
                           ]
@@ -116,7 +116,7 @@ class classLabels():
         sel = self.checkselection()
         if not sel:
             return
-        sel = FreeCADGui.Selection.getSelection() # Select an object
+        sel = FreeCADGui.Selection.getSelection()  # Select an object
         if feat == 'Face':
             features = sel[0].Shape.Faces
         if feat == 'Edge':
@@ -135,7 +135,7 @@ class classLabels():
 
 
     def makelabel(self, ent, name, loc):
-        partLabel = FreeCAD.ActiveDocument.addObject("App::AnnotationLabel","partLabel")
+        partLabel = FreeCAD.ActiveDocument.addObject("App::AnnotationLabel", "partLabel")
         partLabel.LabelText = name
         partLabel.BasePosition.x = loc[0]
         partLabel.BasePosition.y = loc[1]
@@ -152,7 +152,7 @@ class classLabels():
                 FreeCAD.ActiveDocument.removeObject(obj.Name)
 
 
-    def attachto(self, sel = None, featname = ''):
+    def attachto(self, sel=None, featname=''):
 
         sel = self.checkselection()
         if not sel:
@@ -192,12 +192,10 @@ class classLabels():
         sel = self.checkselection()
         if not sel:
             return
-        sels = FreeCADGui.Selection.getSelectionEx() # Select an object
+        sels = FreeCADGui.Selection.getSelectionEx()  # Select an object
         for sel in sels:
             featname = sel.SubElementNames[0]
             ent = sel.SubObjects[0]
             self.getentloc(ent, featname)
 
-labels=classLabels()
-
-
+labels = classLabels()

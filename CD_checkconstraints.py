@@ -64,10 +64,10 @@ class mApp(QtGui.QWidget):
             buttonReply = QtGui.QMessageBox.question(self, 'PyQt5 message', msg, QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No)
         if buttonReply == QtGui.QMessageBox.Yes:
             pass
-            #print('Yes clicked.')
+            # print('Yes clicked.')
         else:
             pass
-            #print('No clicked.')
+            # print('No clicked.')
 
         self.show()
 
@@ -124,7 +124,7 @@ class formMain(QtGui.QMainWindow):
 
 
     def resizeEvent(self):
-        #resize table
+        # resize table
         formx = self.width()
         formy = self.height()
         self.txtboxReport.resize(formx - 20, formy - 120)
@@ -132,7 +132,6 @@ class formMain(QtGui.QMainWindow):
     def showme(self, msg):
         self.txtboxReport.setText(msg)
         self.show()
-
 
     def Closeme(self):
         self.close()
@@ -175,11 +174,11 @@ class   classCheckConstraints():
         self.rigids = []
 
 
-    def startcheck(self, constraints = 'all'):
+    def startcheck(self, constraints='all'):
         if filecheck.opendoccheck() == 'Nostart':
             return
         doc = FreeCAD.activeDocument()
-       
+
         if constraints == 'all':
             constraints = self.getallconstraints()
         if len(constraints) == 0:
@@ -198,10 +197,8 @@ class   classCheckConstraints():
         ss.assignParentship(doc)
         rigids = ss.rigids
 
-        for e in rigids: # get rigid parts
+        for e in rigids:  # get rigid parts
             self.rigids.append(e.objectName)
-
-
 
 
         self.dir_errors = a2p_constraintServices.redAdjustConstraintDirections(doc, constraints)
@@ -217,7 +214,7 @@ class   classCheckConstraints():
         CD_ConstraintDiagnostics.statusform.Closeme()
 
 
-    def checkformovement(self, constraintlist, putPartBack = True):
+    def checkformovement(self, constraintlist, putPartBack=True):
         doc = FreeCAD.activeDocument()
         partmoved = ''
         partsmoved = []
@@ -242,7 +239,7 @@ class   classCheckConstraints():
                 continue
             subobj1 = cobj.getPropertyByName('Object1')
             subobj2 = cobj.getPropertyByName('Object2')
-            part1 = doc.getObject(subobj1) # Save Position and fixed
+            part1 = doc.getObject(subobj1)  # Save Position and fixed
             part2 = doc.getObject(subobj2)
             p1fix = False
             p2fix = False
@@ -272,8 +269,7 @@ class   classCheckConstraints():
                     if part2.Label not in partsmoved and part1.Label not in partsmoved:
                         part2.fixedPosition = True
 
-
-            #recording the location of part before move***
+            # recording the location of part before move***
             preBase1 = part1.Placement.Base
             preBase2 = part2.Placement.Base
             preRot1 = part1.Placement.Rotation.Axis
@@ -281,26 +277,21 @@ class   classCheckConstraints():
             preAngle1 = part1.Placement.Rotation.Angle
             preAngle2 = part2.Placement.Rotation.Angle
 
-
-
-
             preBasePt1 = part1.Placement.Base
             preBasePt2 = part2.Placement.Base
             preRotPt1 = part1.Placement.Rotation.Axis
             preRotPt2 = part2.Placement.Rotation.Axis
             preAnglePt1 = part1.Placement.Rotation.Angle
             preAnglePt2 = part2.Placement.Rotation.Angle
-            #xx
 
-            solved = self.solvelist([cobj]) # solve a single constraint
+            solved = self.solvelist([cobj])     # solve a single constraint
             if hasattr(part1, "fixedPosition"):
-                part1.fixedPosition = p1fix # reset parts fixed
+                part1.fixedPosition = p1fix     # reset parts fixed
             if hasattr(part2, "fixedPosition"):
                 part2.fixedPosition = p2fix
 
-
             # Recording location after move
-            postBasePt1 = part1.Placement.Base # Round vectors to 6 places
+            postBasePt1 = part1.Placement.Base  # Round vectors to 6 places
             postBasePt2 = part2.Placement.Base
             postRotPt1 = part1.Placement.Rotation.Axis
             postRotPt2 = part2.Placement.Rotation.Axis
@@ -328,7 +319,7 @@ class   classCheckConstraints():
                 localmove = True
                 pass
 
-            moved = self.partMoved(preAnglePt1, postAnglePt1,'Angle',cobj,part1.Label)
+            moved = self.partMoved(preAnglePt1, postAnglePt1, 'Angle', cobj, part1.Label)
 
             if moved:
                 localmove = True
@@ -342,7 +333,7 @@ class   classCheckConstraints():
 
 
             if putPartBack:
-                #Places part back in origial location if put back is True
+                # Places part back in original location if putPartBack is True
                 part1.Placement.Base = preBase1
                 part1.Placement.Rotation.Axis = preRot1
                 part1.Placement.Rotation.Angle = preAngle1
@@ -401,7 +392,7 @@ class   classCheckConstraints():
                     constraints.append(obj)
 
         if len(constraints) == 0:
-            mApp('Cannot find any contraints in this file.')
+            mApp('Cannot find any constraints in this file.')
             return(None)
         return(constraints)
 
@@ -495,7 +486,3 @@ class rnp_Constraint_Checkeralone:
 
 FreeCADGui.addCommand('rnp_Constraint_Checkeralone', rnp_Constraint_Checkeralone())
 #==============================================================================
-
-
-
-
