@@ -42,7 +42,6 @@ g = globaluseclass("g")
 
 class onebutton:
     def readselect(self,doc,obj,sub):
-        print(obj,sub)
         if g.partselected:
             g.partselected = False
             return
@@ -58,11 +57,14 @@ class onebutton:
 
             elif g.obj1 != '' and g.feat1 != '':
                 if obj != '' and sub != '':
-                    obj1 = FreeCAD.ActiveDocument.getObject(g.obj1)
-                    obj2 = FreeCAD.ActiveDocument.getObject(obj)
-                    FreeCADGui.Selection.addSelection(obj1, g.feat1)
-                    FreeCADGui.Selection.addSelection(obj2, sub)
-                    g.partselected = True
+                    try:
+                        obj1 = FreeCAD.ActiveDocument.getObject(g.obj1)
+                        obj2 = FreeCAD.ActiveDocument.getObject(obj)
+                        FreeCADGui.Selection.addSelection(obj1, g.feat1)
+                        FreeCADGui.Selection.addSelection(obj2, sub)
+                        g.partselected = True
+                    except:
+                        pass
                     g.feat1 = ''
                     g.obj1 = ''
                     obj = ''
