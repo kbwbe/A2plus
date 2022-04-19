@@ -45,11 +45,9 @@ class globaluseclass:
         self.partname = ''
         self.notfoundfeatures = []
         self.foundfeatures = []
-        self.dictOldNew = {}
         self.alldicts = {}
         self.clist = []
         self.partobj = None
-        self.test = []
         self.cylfaces = []
         self.notcylfaces = []
         self.partlog = []
@@ -59,11 +57,9 @@ class globaluseclass:
         self.partname = ''
         self.notfoundfeatures = []
         self.foundfeatures = []
-        self.dictOldNew = {}
         self.alldicts = {}
         self.clist = []
         self.partobj = None
-        self.test = []
         self.cylfaces = []
         self.notcylfaces = []
         self.repaired = 0

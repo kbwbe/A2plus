@@ -41,11 +41,6 @@ class globaluseclass:
         self.checkingnum = 0
         self.roundto = 4
         self.labelexist = False
-        self.movedconsts = []
-        self.exname = ''
-        self.chgpart = ''
-        self.clist = []
-        self.selfeat = []
 g = globaluseclass()
 
 class mApp(QtGui.QWidget):
@@ -413,43 +408,29 @@ class ShowPartProperties(QtGui.QWidget):
 
 
     def showme(self):
-        ret = self.checkforactiveview()# checks to see if a file is opened
-        if ret == 'Nostart':
-            return
+        if FreeCADGui.activeDocument() is None:
+            msg = 'A file must be opened to start this selector\nPlease open a file and try again'
+            mApp(msg)
+            return()
         self.clearTable()
         self.show()
         lastclc.clear
-
-    def checkforactiveview(self):
-        # check that a file is open
-        try:
-            self.view = FreeCADGui.activeDocument().activeView()
-        except:
-            msg = 'A file must be opened to start this selector\nPlease open a file and try again'
-            mApp(msg)
-            return('Nostart')
-        return
-
 
     def Closeme(self):
         #close window and ensure that obsever is off
         selObv.SelObserverOFF()
         self.close()
 
-
-
     def closeEvent(self, event):
         selObv.SelObserverOFF()
         form1.Closeme()
         self.close()
-
 
     def resizeEvent(self, event):
         """ resize table """
         formx = self.width()
         formy = self.height()
         self.tm.resize(formx -20, formy -120)
-
 form1=ShowPartProperties()
 
 
@@ -458,11 +439,6 @@ form1=ShowPartProperties()
 class classconflictreport():
     def __init__(self):
         self.name = None
-        self.dictAllPlacements = {}
-        self.ConstraintsAll = []
-        self.ConstraintsBad = []
-        self.Listofallparts = []
-        self.worklist = []
 
     def selectforTree(self):
         doc = FreeCAD.activeDocument()
@@ -551,7 +527,7 @@ class classsidefunctions():
     def __init__(self, name):
         self.name = name
         self.sel1 = ''
-        self.featname1 = ''
+
     def swapselectedleg(self):
         #starts observer to select a new feature when replacing manually.
         if lastclc.column < 4 or lastclc.column > 5:
@@ -624,10 +600,8 @@ sidefuncs = classsidefunctions('sidefuncs')
 class SelObserver:
     def __init__(self):
         pass
-
     def SelObserverON(self):
-        FreeCADGui.Selection.addObserver(selObv)
-        
+        FreeCADGui.Selection.addObserver(selObv)        
     def SelObserverOFF(self):
         #print('SelObserverOFF')
         try:
@@ -648,7 +622,6 @@ class SelObserver:
         #this is sent from menu
         #funcs.constraintselected('table') #funcs does not exist ??!!
         pass
-
 selObv = SelObserver()
 
 
