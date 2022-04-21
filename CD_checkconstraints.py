@@ -34,7 +34,7 @@ import CD_ConstraintViewer
 class globaluseclass:
     def __init__(self):
         self.checkingnum = 0
-        self.roundto = 4
+        self.roundto = 3
         self.labelexist = False
         self.movedconsts = []
         self.allErrors = {}
@@ -227,7 +227,7 @@ class classCheckConstraints():
             preAnglePt1 = part1.Placement.Rotation.Angle
             preAnglePt2 = part2.Placement.Rotation.Angle
 
-            a2p_solversystem.solveConstraints(FreeCAD.activeDocument(), None, False, [cobj], showFailMessage = True) # solve a single constraint
+            a2p_solversystem.solveConstraints(FreeCAD.activeDocument(), None, False, [cobj], showFailMessage = False) # solve a single constraint
             if self.setfix == 1:
                 part1.fixedPosition = self.p1fix
             if self.setfix == 2:
@@ -244,7 +244,7 @@ class classCheckConstraints():
             v3 = FreeCAD.Vector(rondlist(preBasePt2))
             v4 = FreeCAD.Vector(rondlist(postBasePt2))
             if v1 != v2 or v3 != v4:
-                self.errortype = 'Error'
+                self.errortype = 'Move Error'
             partsmoved.append(part1.Label)
             partsmoved.append(part2.Label)
 

@@ -45,6 +45,7 @@ class globaluseclass:
         self.partname = ''
         self.notfoundfeatures = []
         self.foundfeatures = []
+
         self.alldicts = {}
         self.clist = []
         self.partobj = None
@@ -221,7 +222,7 @@ class classFuncs():
         facepoints = []
         center = -1
 
-        eeee = face.Edges
+        faceedges = face.Edges
         # numofpoints = len(face.Vertexes)
         for f0 in face.Vertexes:         # Search the Vertexes of the face
             point = FreeCAD.Vector(f0.Point.x, f0.Point.y, f0.Point.z)
@@ -238,14 +239,14 @@ class classFuncs():
             center = rondlist(face.Edges[0].CenterOfMass)
         if 'Plane' in surfstr:
             surfstr = 'Plane'
-        d = {'surftype': surfstr,
+        featdict = {'surftype': surfstr,
              'area': area,
              'facepoints': facepoints,
              'center': center,
              'radius': radius,
-             'edges': eeee
+             'edges': faceedges
             }
-        return(d)
+        return(featdict)
 
 
 
@@ -385,7 +386,7 @@ class classFuncs():
 
 
     def findnewface_attempt1(self, d):
-        # First attempt to find a face. Perfect fit is area the same all points the same
+        # First attempt to find a face. Perfect fit is area the same and all points the same
         face = ''
         if d.get('surftype') == 'Cylinder':
                 face = self.findCylinderattempt1(d)

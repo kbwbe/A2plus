@@ -96,7 +96,7 @@ class ShowPartProperties(QtGui.QWidget):
         """ Main Table """
         self.tm = QtGui.QTableWidget(self)
         self.tm.setGeometry(10, 120, 650, 50)  # xy,wh
-        self.tm.setWindowTitle("Broken Mates")
+        self.tm.setWindowTitle("Broken Constraints")
         self.tm.setEditTriggers(QtGui.QTableWidget.NoEditTriggers)
         self.tm.setRowCount(0)
         self.tm.setColumnCount(10)
@@ -119,35 +119,29 @@ class ShowPartProperties(QtGui.QWidget):
         """ Creating function buttons """
         self.btns = []
         btnLabels = [
-            ['Transparent On', 'Toggles Transparency of parts'],
-            ['Find w label', 'Press to toggle a label for selected feature.']
-            ]
-        self.createButtonColumn(5, btnLabels)
-
-        btnLabels = [
             ['Import from part', 'Select a part and import \nall of the constraints for that part'],
             ['Import from Tree', 'Copy selected constraints from the Tree']
             ]
-        self.createButtonColumn(140, btnLabels)
+        self.createButtonColumn(5, btnLabels)
 
         btnLabels = [
             ['Clear Table', 'Clear the table'],
             ['Attach to', 'Select the feature to change in table.\nselect surface to change to.\n']
             ]
+        self.createButtonColumn(140, btnLabels)
+
+        btnLabels = [
+            ['Clear Tree', 'Remove search color from tree.\n'],
+            ['Find in Tree', 'Finds the constraint in the tree\nfor the select row in table.']
+            ]
         self.createButtonColumn(280, btnLabels)
 
         btnLabels = [
             ['Std Solver','Same as the solver above.\n'],
-            #['Solver No Chk', 'Does not check for errors while solving constraints.']  #May be wanted later
-            ['No Option', 'No Option.']
+            ['Find w label', 'Press to toggle a label for selected feature.']
             ]
         self.createButtonColumn(420, btnLabels)
 
-        btnLabels = [
-            ['Find in Tree', 'Finds the constraint in the tree\nfor the select row in table.'],
-            ['Clear Tree', 'Remove search color from tree.\n']
-            ]
-        self.createButtonColumn(550, btnLabels)
 
     def createButtonColumn(self, xloc, btnLabels):
         for row in range(0, len(btnLabels)):
@@ -163,13 +157,10 @@ class ShowPartProperties(QtGui.QWidget):
     def button_pushed(self):
         index = self.btns.index(self.sender())
         buttext = self.btns[index].text()
-        if 'Trans' in buttext:
-            self.transparentOn(index)
         if buttext == 'Import from part':
             conflicts.selectforpart()
         if buttext == 'Import from Tree':
             conflicts.selectforTree()
-
         if 'Find in Tree' in buttext:
             searchterm = lastclc.cname
             search.startsearch(searchterm, 0)
@@ -180,11 +171,8 @@ class ShowPartProperties(QtGui.QWidget):
         if buttext == 'Attach to':
             """ attaches leg to selected surface"""
             sidefuncs.swapselectedleg()
-
-
         if buttext == 'Std Solver':
             self.stdSolve()
-
         if buttext == 'Find w label':
             """ createlabel for single part """
             if g.labelexist:
@@ -252,44 +240,42 @@ class ShowPartProperties(QtGui.QWidget):
         self.tm.setRowCount(0)
         doc = FreeCAD.activeDocument()
         row = 0
-        for constraint in reversed(listObjects):
+        for object in reversed(listObjects):
             try:
-                cname = constraint.Name
-                mate = doc.getObject(cname)
+                cname = object.Name
+                constraint = doc.getObject(cname)
             except:
                 continue
-            ob1 = doc.getObject(mate.Object1)
+            ob1 = doc.getObject(constraint.Object1)
             if hasattr(ob1, 'fixedPosition') == False:
                 fixed1 = 'N'
             else:
                 fixed1 = str(ob1.fixedPosition)
                 fixed1 = fixed1[0:1]
-            ob2 = doc.getObject(mate.Object2)
+            ob2 = doc.getObject(constraint.Object2)
             if hasattr(ob2, 'fixedPosition') == False:
                 fixed2 = 'N'
             else:
-                ob2 = doc.getObject(mate.Object2)
+                ob2 = doc.getObject(constraint.Object2)
                 fixed2 = str(ob2.fixedPosition)
                 fixed2 = fixed2[0:1]
 
-            part1 = doc.getObject(mate.Object1)
-            part2 = doc.getObject(mate.Object2)
+            part1 = doc.getObject(constraint.Object1)
+            part2 = doc.getObject(constraint.Object2)
 
-            try:
-                dirs = mate.directionConstraint
-            except:
-                dirs = 'None'
+            if hasattr(constraint, "directionConstraint"):
+                direction = constraint.directionConstraint
+            else:
+                direction = 'None'
             self.tm.insertRow(0)
-
-            fn1 = mate.SubElement1
-            fn2 = mate.SubElement2
+            fn1 = constraint.SubElement1
+            fn2 = constraint.SubElement2
             if len(fn1 ) == 0:
                 fn1 = 'None'
             if len(fn2) == 0:
                 fn2 = 'None'
-
-            direction = QtGui.QTableWidgetItem(str(dirs[0]))
-            sup = QtGui.QTableWidgetItem(str(mate.Suppressed))
+            direction = QtGui.QTableWidgetItem(direction)
+            sup = QtGui.QTableWidgetItem(str(constraint.Suppressed))
             run = QtGui.QTableWidgetItem(str('Run'))
             name = QtGui.QTableWidgetItem(cname)
             fixed1 = QtGui.QTableWidgetItem(fixed1[0])
@@ -346,7 +332,7 @@ class ShowPartProperties(QtGui.QWidget):
             return
         FreeCADGui.Selection.clearSelection()
         if header == 'Run':
-            conflicts.checkformovement([constraint])
+            conflicts.checkforfixandsolve([constraint])
             FreeCADGui.Selection.addSelection(partobj1, constraint.SubElement1)
             FreeCADGui.Selection.addSelection(partobj2, constraint.SubElement2)
         if header == 'Constraint name':
@@ -374,7 +360,7 @@ class ShowPartProperties(QtGui.QWidget):
             item2.setText(tx)
         if header == 'Direction':
             item2 = self.tm.item(row, column)
-            if item2.text() != 'N':
+            if item2.text() != 'None':
                 direction = constraint.directionConstraint
                 if direction =='opposed':
                     newdir = 'aligned'
@@ -383,29 +369,9 @@ class ShowPartProperties(QtGui.QWidget):
                 constraint.directionConstraint = newdir
                 direction = constraint.directionConstraint
                 item2 = self.tm.item(row, column)
-                item2.setText(direction[0])
-                conflicts.checkformovement([constraint])
-
-    def transparentOn(self, index):
-        buttext = self.btns[index].text()
-        tval = 0
-        if 'On' in buttext:
-            tval = 80
-            self.btns[index].setText('Transparent Off')
-
-        if 'Off' in buttext:
-            tval = 0
-            self.btns[index].setText('Transparent On')
-        for obj in FreeCAD.ActiveDocument.Objects:
-            if hasattr(obj, 'ViewObject'):
-                if hasattr(obj.ViewObject, 'Transparency'):
-                    if obj.Name.startswith("Line") == False:
-                        if obj.Name.startswith("Sketch") == False:
-                            obj.ViewObject.Transparency = tval
-
-
-
-
+                #item2.setText(direction[0])
+                item2.setText(direction)
+                conflicts.checkforfixandsolve([constraint])
 
     def showme(self):
         if FreeCADGui.activeDocument() is None:
@@ -440,6 +406,7 @@ class classconflictreport():
     def __init__(self):
         self.name = None
 
+
     def selectforTree(self):
         doc = FreeCAD.activeDocument()
         clist = []
@@ -468,37 +435,36 @@ class classconflictreport():
         clist = []
         sels = FreeCADGui.Selection.getSelectionEx()
         if len(sels) == 0:
-            mApp('No parts weres selected in the window.')
+            mApp('No parts were selected in the window.')
             return
-        for sel in sels:
-            pnamelist.append(sel.Object.Label)
+        if len(sels) == 1:
+            pnamelist.append(sels[0].Object.Label)
+        else:
+            for sel in sels:
+                pnamelist.append(sel.Object.Label)
         for obj in FreeCAD.ActiveDocument.Objects: # Select constraints
-            if 'ConstraintInfo' in obj.Content:
-                if '_mirror' not in obj.Name:
+            if 'ConstraintInfo' in obj.Content and '_mirror' not in obj.Name:
                     subobj1 = doc.getObject(obj.Object1)
                     subobj2 = doc.getObject(obj.Object2)
                     part1name = subobj1.Label
                     part2name = subobj2.Label
-                    if part1name in pnamelist or part2name in pnamelist:
-                        clist.append(obj)
+                    if len(sels) == 1:
+                        if part1name in pnamelist or part2name in pnamelist:
+                            clist.append(obj)
+                    else:
+                        if part1name in pnamelist and part2name in pnamelist:
+                            clist.append(obj)
         if len(clist) == 0:
-            mApp('There are no constraints for this part.')
+            if len(sels) == 1:
+                msg = 'There are no constraints for this part.'
+            else:
+                msg = 'There are no constraints between these parts.'
+            mApp(msg)
             return
         form1.loadtable(clist)
 
-    def getallconstraints(self):
-        doc = FreeCAD.activeDocument()
-        constraints = []
-        for obj in doc.Objects:
-            if 'ConstraintInfo' in obj.Content:
-                if not 'mirror' in obj.Name:
-                    constraints.append(obj)
-        if len(constraints) == 0:
-            mApp('I can not find any constraints in this file.')
-            return(None)
-        return(constraints)
-
-    def checkformovement(self, constraintlist):
+    def checkforfixandsolve(self, constraintlist):
+        ''' Checks to see if both parts are fixed, then solves constraint. '''
         if len(constraintlist) == 0:
             return
         doc = FreeCAD.activeDocument()
@@ -510,16 +476,20 @@ class classconflictreport():
         part2 = doc.getObject(subobj2)
         self.p1fix = False
         self.p2fix = False
-        ''' Get if part is fixed '''
+        ''' Get if both parts are fixed '''
         if hasattr(part1, "fixedPosition"):
             self.p1fix = part1.fixedPosition
         if hasattr(part2, "fixedPosition"):
             self.p2fix = part2.fixedPosition
-
         if self.p1fix and self.p2fix:
             mApp('Both parts are fixed.')
             return
+        ''' if neither is fixed '''
+        if self.p1fix == False and self.p2fix == False:
+            part1.fixedPosition = True
         a2p_solversystem.solveConstraints(doc, matelist = constraintlist, showFailMessage = False)
+        if hasattr(part1, "fixedPosition"):
+            part1.fixedPosition = self.p1fix
         return
 conflicts = classconflictreport()
 
@@ -573,13 +543,13 @@ class classsidefunctions():
         """ Adds new feature name to table """
         form1.tm.item(lastclc.row, lastclc.column).setText(feat2name)
 
-    def swapfeature(self, dict_):
+    def swapfeature(self, newfeaturedict):
         #changes a legs mating feature
-        newfeat = dict_.get('newfeat')
-        cname = dict_.get('cname')
+        newfeat = newfeaturedict.get('newfeat')
+        cname = newfeaturedict.get('cname')
         cobj = FreeCAD.ActiveDocument.getObject(cname)
         mobj = FreeCAD.ActiveDocument.getObject(cname+'_mirror')
-        SubElement = dict_.get('SubElement')
+        SubElement = newfeaturedict.get('SubElement')
 
         if SubElement == 'SubElement1':
             cobj.SubElement1 = newfeat
@@ -587,7 +557,7 @@ class classsidefunctions():
         if SubElement == 'SubElement2':
             cobj.SubElement2 = newfeat
             mobj.SubElement2 = newfeat
-        direction = dict_.get('dir')
+        direction = newfeaturedict.get('dir')
         if hasattr(cobj, 'directionConstraint'):
             cobj.directionConstraint = direction
         if hasattr(mobj, 'directionConstraint'):
