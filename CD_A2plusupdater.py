@@ -34,7 +34,7 @@ from PySide.QtGui import *
 from PySide import QtGui, QtCore
 import a2p_importpart
 import a2plib
-import CD_ConstraintDiagnostics
+import CD_ConstraintViewer
 
 
 class globaluseclass:
@@ -45,11 +45,10 @@ class globaluseclass:
         self.partname = ''
         self.notfoundfeatures = []
         self.foundfeatures = []
-        self.dictOldNew = {}
+
         self.alldicts = {}
         self.clist = []
         self.partobj = None
-        self.test = []
         self.cylfaces = []
         self.notcylfaces = []
         self.partlog = []
@@ -59,11 +58,9 @@ class globaluseclass:
         self.partname = ''
         self.notfoundfeatures = []
         self.foundfeatures = []
-        self.dictOldNew = {}
         self.alldicts = {}
         self.clist = []
         self.partobj = None
-        self.test = []
         self.cylfaces = []
         self.notcylfaces = []
         self.repaired = 0
@@ -95,14 +92,14 @@ class classFuncs():
             return('No')
         partslist = FreeCADGui.Selection.getSelection()
         if len(partslist) == 0:
-            mApp('1 No parts were selected to update.\nSelect one part and try again.')
+            mApp('No parts were selected to update.\nSelect one part and try again.')
             return('No')
         if len(partslist) > 1:
-            mApp('I have limited the number of parts that can be updaated to 1.\nSelect one part and try again.')
+            mApp('I have limited the number of parts that can be updated to 1.\nSelect one part and try again.')
             return('No')
-        CD_ConstraintDiagnostics.statusform.show()
-        CD_ConstraintDiagnostics.statusform.txtboxstatus.setText('Updating Assembly.')
-        CD_ConstraintDiagnostics.statusform.update()
+        statusform.show()
+        statusform.txtboxstatus.setText('Updating Assembly.')
+        statusform.update()
 
         for num in range(0, len(partslist)):
             partobj = partslist[num]
@@ -136,7 +133,7 @@ class classFuncs():
         self.runpostchange()
         doc.recompute()
         FreeCADGui.updateGui()
-        CD_ConstraintDiagnostics.statusform.Closeme()
+        statusform.Closeme()
 
     def runpostchange(self):
 
@@ -152,8 +149,8 @@ class classFuncs():
             cobj = FreeCAD.ActiveDocument.getObject(e[0])
             clist.append(cobj)
         if len(clist) != 0:
-            CD_ConstraintDiagnostics.form1.show()
-            CD_ConstraintDiagnostics.form1.loadtable(clist)
+            CD_ConstraintViewer.form1.show()
+            CD_ConstraintViewer.form1.loadtable(clist)
         else:
             mApp('Update complete. All surfaces found')
         print('update complete')
@@ -207,7 +204,13 @@ class classFuncs():
                 num = int(featname[6:])
                 num = num - 1
                 di = self.getvertexbynum(num, g.shape1)
-            d = {'Name':cobj.Name, 'cname':cobj.Name, 'featname':featname, 'subElement':subElement, 'dir':direction, 'newname':''}
+            d = {'Name': cobj.Name,
+                 'cname': cobj.Name,
+                 'featname': featname,
+                 'subElement': subElement,
+                 'dir': direction,
+                 'newname': ''
+                 }
             d.update(di)
             g.alldicts[cobj.Name] = d # Save the info to a larger dictionary
 
@@ -219,7 +222,7 @@ class classFuncs():
         facepoints = []
         center = -1
 
-        eeee = face.Edges
+        faceedges = face.Edges
         # numofpoints = len(face.Vertexes)
         for f0 in face.Vertexes:         # Search the Vertexes of the face
             point = FreeCAD.Vector(f0.Point.x, f0.Point.y, f0.Point.z)
@@ -236,14 +239,14 @@ class classFuncs():
             center = rondlist(face.Edges[0].CenterOfMass)
         if 'Plane' in surfstr:
             surfstr = 'Plane'
-        d = {'surftype': surfstr,
+        featdict = {'surftype': surfstr,
              'area': area,
              'facepoints': facepoints,
              'center': center,
              'radius': radius,
-             'edges': eeee
+             'edges': faceedges
             }
-        return(d)
+        return(featdict)
 
 
 
@@ -383,7 +386,7 @@ class classFuncs():
 
 
     def findnewface_attempt1(self, d):
-        # First attempt to find a face. Perfect fit is area the same all points the same
+        # First attempt to find a face. Perfect fit is area the same and all points the same
         face = ''
         if d.get('surftype') == 'Cylinder':
                 face = self.findCylinderattempt1(d)
@@ -401,7 +404,7 @@ class classFuncs():
 
     def findnewface_attempt2(self, dict_):
         """ second attempt ignores area; looks for points(perhaps this should be first
-        if hholes are added area would change)"""
+        if holes are added area would change)"""
         face = ''
         if dict_.get('surftype') == 'Cylinder':
             face = self.findCylinderattempt2(dict_)
@@ -479,7 +482,7 @@ class classFuncs():
                 testdict_ = self.getedgebynum(num, g.shape2)
                 if dict_.get('radius') == testdict_.get('radius')\
                         and dict_.get('center') == testdict_.get('center'):
-                        edge ='Edge' + str(num +1)
+                        edge = 'Edge' + str(num +1)
                         break
         else:
             for num in g.notcylfaces:
@@ -580,27 +583,53 @@ class mApp(QtGui.QWidget):
     # for error messages
     def __init__(self, msg, msgtype = 'ok'):
         super().__init__()
-        self.title = 'PyQt5 messagebox'
-        self.left = 600
-        self.top = 100
-        self.width = 320
-        self.height = 200
+        #self.title = 'Information'
         self.initUI(msg)
 
     def initUI(self, msg, msgtype = 'ok'):
-        self.setWindowTitle(self.title)
+        #self.setWindowTitle(self.title)
         self.setGeometry(800, 300, 300, 400)
         if msgtype == 'ok':
-            buttonReply = QMessageBox.question(self, 'PyQt5 message', msg, QMessageBox.Ok | QMessageBox.Ok)
+            buttonReply = QtGui.QMessageBox.question(self, 'Information', msg, QtGui.QMessageBox.Ok | QtGui.QMessageBox.Ok)
         if msgtype == 'yn':
-            buttonReply = QMessageBox.question(self, 'PyQt5 message', msg, QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        if buttonReply == QMessageBox.Yes:
+            buttonReply = QtGui.QMessageBox.question(self, 'Information', msg, QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No)
+        if buttonReply == QtGui.QMessageBox.Yes:
             return('y')
         else:
             return('n')
 
 
+class formReport(QtGui.QDialog):
+    """ Form shows while updating edited parts. """
+    def __init__(self, name):
+        self.name = name
+        super(formReport, self).__init__()
+        self.setWindowTitle('Constraint Checker')
+        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+        self.setGeometry(300, 100, 300, 200) # xy , wh
+        self.setStyleSheet("font: 10pt arial MS")
+        self.txtboxstatus = QtGui.QTextEdit(self)
+        self.txtboxstatus.move(5,30)
+        self.txtboxstatus.setFixedWidth(250)
+        self.txtboxstatus.setFixedHeight(60)
+        self.lblviewlabel = QtGui.QLabel(self)
+        self.lblviewlabel.setText('Status"')
+        self.lblviewlabel.move(5, 5)
+        self.lblviewlabel.setFixedWidth(250)
+        self.lblviewlabel.setFixedHeight(20)
+        self.lblviewlabel.setStyleSheet("font: 13pt arial MS")
 
+    def showme(self, msg):
+        print('showing editing part')
+        self.show()
+
+    def Closeme(self):
+        self.close()
+
+    def closeEvent(self, event):
+        self.close()
+
+statusform = formReport('statusform')
 
 
 toolTipText = \
