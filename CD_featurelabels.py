@@ -25,10 +25,8 @@ import FreeCADGui
 import FreeCAD
 from PySide.QtGui import *
 from PySide import QtGui, QtCore
-import CD_ConstraintDiagnostics
 
 class formMain(QtGui.QMainWindow):
-
     def __init__(self, name):
         self.name = name
         super(formMain, self).__init__()
@@ -43,7 +41,6 @@ class formMain(QtGui.QMainWindow):
                           ['Delete Labels', 'Delete all labels'],
                           ['Close', '']
                           ]
-
         self.btns=[]
         BtnNum = 0
         for row in range(0, len(self.btnLabels)) :
@@ -56,7 +53,6 @@ class formMain(QtGui.QMainWindow):
             self.btn.released.connect(self.button_pushed) # pressed
             self.btns.append(self.btn)
             BtnNum = BtnNum + 1
-
 
     def button_pushed(self):
         index = self.btns.index(self.sender())
@@ -74,7 +70,6 @@ class formMain(QtGui.QMainWindow):
             labels.attachto()
         if btext == 'Close':
             self.Closeme()
-
         if btext == 'Selected Labels':
             labels.selectedlabels()
 
@@ -107,10 +102,9 @@ class classLabels():
         if self.labelGroup is None:
             self.labelGroup = doc.addObject("App::DocumentObjectGroup", "partLabels")
         if len(FreeCADGui.Selection.getSelection()) == 0:
-            CD_ConstraintDiagnostics.mApp('One part must be selected.\nPlease select One part and try again')
+            mApp('One part must be selected.\nPlease select One part and try again')
             return(False)
         return(True)
-
 
     def addlabels(self, feat):
         sel = self.checkselection()
@@ -151,9 +145,7 @@ class classLabels():
             if "partLabel" in obj.Label:
                 FreeCAD.ActiveDocument.removeObject(obj.Name)
 
-
     def attachto(self, sel=None, featname=''):
-
         sel = self.checkselection()
         if not sel:
             return
@@ -167,10 +159,6 @@ class classLabels():
         ent = s.SubObjects[0]
         self.makelabel(ent, name, loc)
 
-
-
-
-
     def getEntLoc(self, ent, featname):
         if 'V' in featname:
             loc = ent.Point
@@ -180,13 +168,10 @@ class classLabels():
         self.labelGroup.addObject(partLabel)
         self.makelabel(ent, featname, loc)
 
-
     def labelForTable(self, ent, featname):
         """Create a label to find a part."""
         sel = self.checkselection()
         self.getEntLoc(ent, featname)
-
-
 
     def selectedlabels(self):
         sel = self.checkselection()
@@ -197,5 +182,18 @@ class classLabels():
             featname = sel.SubElementNames[0]
             ent = sel.SubObjects[0]
             self.getentloc(ent, featname)
-
 labels = classLabels()
+
+
+class mApp(QtGui.QWidget):
+    ''' This message box was added to make this file a standalone file'''
+    # for error messages
+    def __init__(self,msg):
+        super().__init__()
+        self.initUI(msg)
+
+    def initUI(self,msg):
+        self.setGeometry(100, 100, 400, 300)
+        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)       
+        QtGui.QMessageBox.question(self, 'Info', msg, QtGui.QMessageBox.Ok|QtGui.QMessageBox.Ok)        
+        self.show()
