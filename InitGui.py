@@ -82,6 +82,7 @@ class A2plusWorkbench (Workbench):
         import CD_A2plusupdater  # for Constraint Diagnostic function
         import CD_checkconstraints
         import CD_OneButton
+        import CD_OneButtonDefault
         if a2plib.getRecursiveUpdateEnabled():
             partCommands = [
                 'a2p_ImportPart',
@@ -231,6 +232,7 @@ class A2plusWorkbench (Workbench):
             'rnp_Update_A2pParts',
             'rnp_Constraint_Checker',
             'rnp_OneButton',
+            'rnp_OneButtonDefault',
             ]
        
         self.appendToolbar(
