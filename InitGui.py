@@ -81,7 +81,7 @@ class A2plusWorkbench (Workbench):
         import a2p_searchConstraintConflicts
         import CD_A2plusupdater  # for Constraint Diagnostic function
         import CD_checkconstraints
-        import CD_OneButton
+        #import CD_OneButton
         import CD_OneButtonDefault
         if a2plib.getRecursiveUpdateEnabled():
             partCommands = [
@@ -231,7 +231,7 @@ class A2plusWorkbench (Workbench):
             'rnp_Constraint_Viewer',
             'rnp_Update_A2pParts',
             'rnp_Constraint_Checker',
-            'rnp_OneButton',
+            'rnp_SelectHiddenLayers',
             'rnp_OneButtonDefault',
             ]
        
