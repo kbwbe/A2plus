@@ -12,7 +12,7 @@
 
   <content>
     <workbench>
-      <classname>A2plus</classname>
+      <classname>A2plusWorkbench</classname>
       <subdirectory>./</subdirectory>
       <freecadmin>0.16</freecadmin>
     </workbench>
