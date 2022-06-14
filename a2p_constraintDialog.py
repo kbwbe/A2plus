@@ -147,7 +147,25 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             self.offsetEdit.setDecimals(params.GetInt('Decimals'))
 
             userPreferred = Units.Quantity(offs).getUserPreferred()[0] #offs is string with value and unit
-            user_qty, user_unit = userPreferred.split(' ')
+
+            # the following line does not work with all possible units.            
+            # sometimes a separating blank is missing
+            
+            # user_qty, user_unit = userPreferred.split(' ')
+            
+            # so do own parsing
+            user_qty = ''
+            user_unit = ''
+            for c in userPreferred:
+                if c == ' ':
+                    continue
+                elif c.isdigit():
+                    user_qty += c
+                elif c in ('.',','):
+                    user_qty += c
+                else:
+                    user_unit += c
+                
             user_qty = float(user_qty.replace(",","."))
 
             #self.offsetEdit.setValue(offs.Value)
