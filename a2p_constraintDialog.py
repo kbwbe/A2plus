@@ -135,8 +135,6 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
 
             self.offsetEdit = QtGui.QDoubleSpinBox(self)
 
-            # get the length unit as string
-            self.offsetEdit.setSuffix(" " + str(FreeCAD.Units.Quantity(1, FreeCAD.Units.Length))[3:])
             # the maximum is by default 99.99 and we can allow more
             self.offsetEdit.setMaximum(1e7) # allow up to 1 km
             # set minimum to negative of maximum
@@ -146,33 +144,14 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             params = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Units")
             self.offsetEdit.setDecimals(params.GetInt('Decimals'))
 
-            userPreferred = Units.Quantity(offs).getUserPreferred()[0] #offs is string with value and unit
+            userPreferred = Units.Quantity(offs).getUserPreferred()
 
-            # the following line does not work with all possible units.            
-            # sometimes a separating blank is missing
-            
-            # user_qty, user_unit = userPreferred.split(' ')
-            
-            # so do own parsing
-            user_qty = ''
-            user_unit = ''
-            for c in userPreferred:
-                if c == ' ':
-                    continue
-                elif c.isdigit():
-                    user_qty += c
-                elif c in ('.',','):
-                    user_qty += c
-                else:
-                    user_unit += c
-                
-            user_qty = float(user_qty.replace(",","."))
+            user_qty = Units.Quantity(offs).Value
 
-            #self.offsetEdit.setValue(offs.Value)
-            #self.offsetEdit.setSuffix(" " + str(FreeCAD.Units.Quantity(1, FreeCAD.Units.Length))[3:])
-            self.offsetEdit.setSuffix(" " + user_unit)
+            self.recentUnit = str(FreeCAD.Units.Quantity(1, FreeCAD.Units.Length))[3:]
+            self.offsetEdit.setSuffix(" " + self.recentUnit)
             self.offsetEdit.setValue(user_qty)
-            self.recentUnit = user_unit
+            self.offsetEdit.setSingleStep(userPreferred[1])
 
             self.offsetEdit.setFixedHeight(32)
             QtCore.QObject.connect(self.offsetEdit, QtCore.SIGNAL("valueChanged(double)"), self.handleOffsetChanged)
