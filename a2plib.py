@@ -137,7 +137,7 @@ else:
 
 #------------------------------------------------------------------------------
 def getLanguagePath():
-    return os.path.join(os.path.dirname(__file__),"translations")
+    return os.path.join(os.path.dirname(os.path.dirname(__file__)),"translations")
 #------------------------------------------------------------------------------
 def drawDebugVectorAt(position,direction,rgbColor):
     """
