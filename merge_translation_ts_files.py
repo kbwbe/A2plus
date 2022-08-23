@@ -37,7 +37,7 @@ import glob
 for fn in glob.glob('./translations/*_*.ts'):
     os.system(
         '''
-        lrelease ./translations/{}
+        lrelease {}
         '''.format(fn)
         )
 
