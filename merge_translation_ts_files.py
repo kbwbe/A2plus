@@ -33,11 +33,9 @@ import glob
 # The script has to be started within the main A2plus Folder
 #==============================================================================
 
-
 for fn in glob.glob('./translations/*_*.ts'):
     os.system(
         '''
         lrelease {}
         '''.format(fn)
         )
-
