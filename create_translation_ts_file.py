@@ -51,7 +51,7 @@ os.system(
 print("3. Combine both scans above")
 os.system(
     """
-    lconvert -verbose -i translations/uifiles.ts translations/pyfiles.ts -o translations/A2plus.ts
+    lconvert -i translations/uifiles.ts translations/pyfiles.ts -o translations/A2plus.ts
     """
     )
 # 4) Remove temporary files
