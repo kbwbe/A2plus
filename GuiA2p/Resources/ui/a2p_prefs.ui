@@ -176,7 +176,7 @@ will be updated according to the &quot;mux Info&quot; topology.</string>
 from imported parts</string>
        </property>
        <property name="text">
-        <string>Inherit per face transparency from parts and subassemblies (experimental)</string>
+        <string>Inherit per face color and transparency from parts and subassemblies (experimental)</string>
        </property>
        <property name="prefEntry" stdset="0">
         <cstring>usePerFaceTransparency</cstring>
