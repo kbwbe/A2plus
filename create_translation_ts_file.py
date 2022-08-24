@@ -33,30 +33,36 @@ import glob
 # The script has to be started within the main A2plus Folder
 #==============================================================================
 
-# 1) Scan ui-Files for strings
+# 1) Scan ui files for strings
+print("1. Scan ui files for strings")
 os.system(
     """
     lupdate ./GuiA2p/Resources/ui/*.ui -ts ./translations/uifiles.ts
     """
     )
-# 2) Scan .py-Files for strings
+# 2) Scan .py files for strings
+print("2. Scan .py files for strings")
 os.system(
     """
     pyside2-lupdate *.py -ts translations/pyfiles.ts -verbose
     """
     )
-# 3) combine both scans above
+# 3) Combine both scans above
+print("3. Combine both scans above")
 os.system(
     """
     lconvert -i translations/uifiles.ts translations/pyfiles.ts -o translations/A2plus.ts
     """
     )
-# 4) remove temporary files
+# 4) Remove temporary files
+print("4. Remove temporary files")
+print("                          uifiles.ts")
 os.system(
     """
     rm ./translations/uifiles.ts
     """
     )
+print("                          pyfiles.ts")
 os.system(
     """
     rm ./translations/pyfiles.ts

@@ -8,7 +8,7 @@ The main goal of A2plus is to create a very simple, easy to use, and not over-fe
 
 A2plus workbench tries to implement a new constraint solving algorithm to avoid some problems that occurred with the original solver. It is still under development and experimental at this moment but is showing some potential.
 
-This project started as a fork of Hamish's Assembly 2 workbench (development on A2 went dormant and was unmaintained for a long period). A2plus can be used with FreeCAD v0.16, v0.17 and v0.18 including support for importing parts from external files.
+This project started as a fork of Hamish's Assembly 2 workbench (development on A2 went dormant and was unmaintained for a long period). A2plus can be used with FreeCAD from v0.16 including support for importing parts from external files.
 
 [![Assembly-of-gripping-unig](https://i.imgur.com/P8VqEFo.png)](http://www.youtube.com/watch?v=QMxcQ5tssWk "A2plus: Assembly of a gripping unit.")
 
@@ -50,7 +50,7 @@ This phenomena is seen in many proprietary CAD solutions. Some work is being don
 
 ### Automatic Installation
 
-The recommended way to install A2plus is via FreeCAD's [Addon Manager](https://wiki.freecadweb.org/Addon_Manager) under  the Tools →  'Addon Manager' dropdown menu.
+The recommended way to install A2plus is via FreeCAD's [Addon Manager](https://wiki.freecadweb.org/Addon_Manager) under the Tools → 'Addon Manager' dropdown menu.
 
 ### Manual Installation 
 
