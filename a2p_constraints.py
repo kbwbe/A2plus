@@ -54,14 +54,14 @@ class BasicConstraint():
         self.constraintBaseName = None # <== give a base name here
         self.iconPath = None
         #
-        # Fields for storing data of the two constrainted objects
+        # Fields for storing data of the two constrained objects
         self.ob1Name = None
         self.ob2Name = None
         self.ob1Label = None
         self.ob2Label = None
-        self.ob1 = None # the two constrainted FC objects
+        self.ob1 = None # the two constrained FC objects
         self.ob2 = None
-        self.sub1 = None # the two constrainted FC subelements
+        self.sub1 = None # the two constrained FC subelements
         self.sub2 = None
         #
         self.constraintObject = None
