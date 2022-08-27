@@ -190,7 +190,7 @@ class ShowPartProperties(QtGui.QWidget):
             sels = FreeCAD.ActiveDocument.getObjectsByLabel(pname)
             for e in sels:
                 try:
-                    partobj = e  # line is use to check if part is sellected
+                    partobj = e  # line is used to check if part is selected
                 except:
                     mApp('The table has lost focus. \nPlease reselect in the table.')
                     return
