@@ -1,0 +1,21 @@
+About translation A2plus Workbanch.
+
+For create new language:
+
+1. For create .ts file with all A2plus strings:
+$ python3 create_ts.py
+or
+$ sh create_ts.sh
+
+2. Now you can copy A2plus.ts file to A2plus_"you language two or four letters".ts (A2plus_it.ts for Italy).
+$ cp A2plus.ts A2plus_it.ts
+
+3. And open in QT Linquist or in text editor - xed, mousepad, gedit etc.
+
+4. You must translate you .ts file.
+
+5. Then you must compile .qm files from all .ts files:
+$ python3 compile_qm.py
+or
+$ sh compile_qm.sh
+
