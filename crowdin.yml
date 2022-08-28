@@ -1,0 +1,3 @@
+files:
+  - source: /translations/A2plus.ts
+    translation: /translations/A2plus_%two_letters_code%.ts
