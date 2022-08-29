@@ -1419,7 +1419,7 @@ class DeleteConnectionsCommand:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Info", 'No constraints refer to "%s"' % part.Name)
         else:
             flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
-            msg = u"Delete {}'s constraint(s):\n  - {}?".format(
+            msg = translate("A2plus_importpart", u"Delete {}'s constraint(s):\n  - {}?").format(
                 part.Label,
                 u'\n  - '.join( c.Name for c in deleteList)
                 )

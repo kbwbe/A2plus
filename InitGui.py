@@ -66,7 +66,7 @@ class A2plusWorkbench (Workbench):
         # add translations path
         FreeCADGui.addLanguagePath(a2plib.getLanguagePath())
         FreeCADGui.updateLocale()
-        print("languagePath of A2plus Workbench is: {}".format(a2plib.getLanguagePath()))
+        print(translate("A2plus_appendMenu", "languagePath of A2plus Workbench is:"), "{}".format(a2plib.getLanguagePath()))
 
         import a2p_importpart
         import a2p_recursiveUpdatePlanner
