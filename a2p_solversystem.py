@@ -502,7 +502,7 @@ class SolverSystem():
 
     def solveSystem(self,doc,matelist=None, showFailMessage=True):
         if not a2plib.SIMULATION_STATE:
-            Msg( "\n===== Start Solving System ====== \n" )
+            Msg(translate("A2plus_solversystem", "===== Start Solving System ======\n"))
 
         systemSolved = self.solveAccuracySteps(doc,matelist)
         if self.status == "loadingDependencyError":
@@ -510,7 +510,7 @@ class SolverSystem():
         if systemSolved:
             self.status = "solved"
             if not a2plib.SIMULATION_STATE:
-                Msg( "===== System solved using partial + recursive unfixing =====\n")
+                Msg(translate("A2plus_solversystem", "===== System solved using partial + recursive unfixing =====\n"))
                 self.checkForUnmovedParts()
         else:
             if a2plib.SIMULATION_STATE == True:
@@ -520,7 +520,7 @@ class SolverSystem():
             else: # a2plib.SIMULATION_STATE == False
                 self.status = "unsolved"
                 if showFailMessage == True:
-                    Msg( "===== Could not solve system ====== \n" )
+                    Msg(translate("A2plus_solversystem", "===== Could not solve system ======\n"))
                     msg = \
 translate("A2plus_solversystem",
 '''
@@ -690,7 +690,7 @@ to a fixed part!
                     else:
                         Msg('\n')
                         Msg('convergency-conter: {}\n'.format(self.convergencyCounter))
-                        Msg( "Calculation stopped, no convergency anymore!\n" )
+                        Msg(translate("A2plus_solversystem", "Calculation stopped, no convergency anymore!\n"))
                         return False
 
                 self.lastPositionError = maxPosError
@@ -699,7 +699,7 @@ to a fixed part!
                 self.convergencyCounter = 0
 
             if self.stepCount > SOLVER_MAXSTEPS:
-                Msg( "Reached max calculations count ({})\n".format(SOLVER_MAXSTEPS) )
+                Msg(translate("A2plus_solversystem", "Reached max calculations count ({})\n").format(SOLVER_MAXSTEPS) )
                 return False
         return True
 
