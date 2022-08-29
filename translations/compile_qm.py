@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 #***************************************************************************
 #*                                                                         *
 #*   Copyright (c) 2019 kbwbe                                              *
@@ -28,44 +29,15 @@ import os
 import glob
 
 #==============================================================================
-# Script for preparing translations of A2plus Workbench
+# Script for merging different translations of A2plus Workbench
 #
 # The script has to be started within the A2plus/translations Folder
 #==============================================================================
 
-# 1) Scan ui-Files for strings
-print('1. Scan ui-Files for strings')
-os.system(
-    """
-    lupdate ../GuiA2p/Resources/ui/*.ui -ts uifiles.ts
-    """
-    )
-# 2) Scan .py-Files for strings
-print("2. Scan .py-Files for strings")
-os.system(
-    """
-    pylupdate5 ../*.py -ts pyfiles.ts -verbose
-    """
-    )
-# 3) combine both scans above
-print("3. Combine both scans above")
-os.system(
-    """
-    lconvert -i uifiles.ts pyfiles.ts -o A2plus.ts
-    """
-    )
+for fn in glob.glob('*_*.ts'):
+    os.system(
+        '''
+        lrelease {}
+        '''.format(fn)
+        )
 
-# 4) remove temporary files
-print("4. Remove temporary files")
-print("                          uifiles.ts")
-os.system(
-    """
-    rm uifiles.ts
-    """
-    )
-print("                          pyfiles.ts")
-os.system(
-    """
-    rm pyfiles.ts
-    """
-    )

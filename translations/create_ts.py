@@ -1,5 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 #***************************************************************************
 #*                                                                         *
 #*   Copyright (c) 2019 kbwbe                                              *
@@ -30,41 +31,45 @@ import glob
 #==============================================================================
 # Script for preparing translations of A2plus Workbench
 #
-# The script has to be started within the main A2plus Folder
+# The script has to be started within the A2plus/translations Folder
 #==============================================================================
 
-# 1) Scan ui files for strings
-print("1. Scan ui files for strings")
+# 1) Scan UI files for strings
+print("1. Scan UI files for strings")
 os.system(
     """
-    lupdate ./GuiA2p/Resources/ui/*.ui -ts ./translations/uifiles.ts
+    lupdate ../GuiA2p/Resources/ui/*.ui -ts uifiles.ts
     """
     )
+
 # 2) Scan .py files for strings
 print("2. Scan .py files for strings")
 os.system(
     """
-    pyside2-lupdate *.py -ts translations/pyfiles.ts -verbose
+    pylupdate5 ../*.py -ts pyfiles.ts -verbose
     """
     )
+
 # 3) Combine both scans above
 print("3. Combine both scans above")
 os.system(
     """
-    lconvert -i translations/uifiles.ts translations/pyfiles.ts -o translations/A2plus.ts
+    lconvert -i uifiles.ts pyfiles.ts -o A2plus.ts
     """
     )
+
 # 4) Remove temporary files
 print("4. Remove temporary files")
+os.system(
+    """
+    rm uifiles.ts
+    """
+    )
 print("                          uifiles.ts")
 os.system(
     """
-    rm ./translations/uifiles.ts
+    rm pyfiles.ts
     """
     )
 print("                          pyfiles.ts")
-os.system(
-    """
-    rm ./translations/pyfiles.ts
-    """
-    )
+

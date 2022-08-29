@@ -1,5 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+#! /bin/sh
 
 #***************************************************************************
 #*                                                                         *
@@ -25,20 +24,11 @@
 #*                                                                         *
 #***************************************************************************
 
-import os
-import glob
-
 #==============================================================================
-# Script for merging different translations of A2plus Workbench
+# Script for compilation all translations of A2plus Workbench
 #
-# The script has to be started within the A2plus/translations Folder
+# The script has to be started within the A2plus/translations folder
 #==============================================================================
 
-
-for fn in glob.glob('*_*.ts'):
-    os.system(
-        '''
-        lrelease {}
-        '''.format(fn)
-        )
+lrelease *_*.ts
 
