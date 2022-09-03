@@ -22,20 +22,20 @@
 
 from a2p_translateUtils import *
 
-PARTINFORMATION_SHEET_NAME = '_PARTINFO_'
-PARTINFORMATION_SHEET_LABEL = '#PARTINFO#'
+PARTINFORMATION_SHEET_NAME = "_" + translate("A2p_BoM", "PARTINFO") + "_"
+PARTINFORMATION_SHEET_LABEL = "#" + translate("A2p_BoM", "PARTINFO") + "#"
 
-BOM_SHEET_NAME  = '_PARTSLIST_'  # BOM = BillOfMaterials...
-BOM_SHEET_LABEL = '#PARTSLIST#'
+# BOM = BillOfMaterials...
+BOM_SHEET_NAME = "_" + translate("A2p_BoM", "PARTSLIST") + "_"
+BOM_SHEET_LABEL = "#" + translate("A2p_BoM", "PARTSLIST") + "#"
 BOM_MAX_COLS = 10
 BOM_MAX_LENGTH = 150
 
-
 PARTLIST_COLUMN_NAMES = [
-    u'IDENTNO',
-    u'DESCRIPTION',
-    u'SUPPLIER',
-    u'SUPP.IDENTNO',
-    u'SUPP.DESCRIPTION',
-    u'(FILENAME)'
+    translate("A2p_BoM", "IDENTNO"),
+    translate("A2p_BoM", "DESCRIPTION"),
+    translate("A2p_BoM", "SUPPLIER"),
+    translate("A2p_BoM", "SUPP.IDENTNO"),
+    translate("A2p_BoM", "SUPP.DESCRIPTION"),
+    translate("A2p_BoM", "(FILENAME)")
     ]
