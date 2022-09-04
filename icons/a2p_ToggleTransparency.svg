@@ -2,21 +2,21 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="64"
    height="64"
    id="svg3559"
    version="1.1"
-   inkscape:version="0.92.3 (unknown)"
-   sodipodi:docname="a2p_ToggleTranparency.svg"
-   viewBox="0 0 64 64">
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   sodipodi:docname="a2p_ToggleTransparency.svg"
+   viewBox="0 0 64 64"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <defs
      id="defs3561">
     <linearGradient
@@ -101,21 +101,22 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1"
-     inkscape:cx="32"
-     inkscape:cy="32"
+     inkscape:zoom="4"
+     inkscape:cx="26.625"
+     inkscape:cy="42.375"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:document-units="px"
      inkscape:grid-bbox="true"
-     inkscape:window-width="1366"
-     inkscape:window-height="716"
+     inkscape:window-width="1440"
+     inkscape:window-height="843"
      inkscape:window-x="0"
-     inkscape:window-y="26"
+     inkscape:window-y="0"
      inkscape:window-maximized="1"
      inkscape:snap-global="false"
      inkscape:snap-nodes="false"
-     inkscape:snap-others="false">
+     inkscape:snap-others="false"
+     inkscape:pagecheckerboard="0">
     <inkscape:grid
        type="xygrid"
        id="grid3007"
@@ -134,7 +135,6 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
         <dc:title>Path-Stock</dc:title>
         <dc:date>2015-07-04</dc:date>
         <dc:relation>http://www.freecadweb.org/wiki/index.php?title=Artwork</dc:relation>
@@ -168,8 +168,8 @@
        id="path4243"
        d="m 36.264016,21.010008 -6.362129,-6.142755 c 0,0 1.272166,-1.21009 2.140187,-1.42456 0.868026,-0.21447 1.448979,-0.137026 1.692484,-0.635209 0.243505,-0.498188 0.436678,-1.863901 -0.985814,-3.1737797 C 31.3263,8.3238327 29.45274,7.4726868 28.674402,8.3476741 c -0.77834,0.8749923 -0.10685,1.6956159 -0.598115,2.2786939 -0.491269,0.583078 -1.146579,1.332965 -1.146579,1.332965 L 19.309175,4.3399026 13.200384,10.718774 c 0,0 -0.710798,-0.613606 -0.926068,-1.396997 C 12.059045,8.5383851 12.047972,7.4638266 11.255156,6.9336257 10.46234,6.4034226 8.106029,6.9619361 7.3686997,7.7952239 6.631369,8.628513 5.7778251,10.248174 6.1178282,11.071776 c 0.3400031,0.823604 2.1665903,1.137848 2.918397,1.70975 0.7518089,0.571903 1.1285628,0.940514 1.1285628,0.940514 l -7.5065406,7.466088 7.5342726,7.289525 c 0,0 -0.2409534,0.746161 -1.2320041,1.085733 -0.9910535,0.339573 -1.4891361,0.261384 -2.104289,0.886912 -0.6151674,0.625508 -0.012052,2.852085 0.7841737,3.712918 0.7962235,0.860836 3.2148344,2.32708 3.8299834,1.70156 0.615168,-0.625509 0.265778,-2.358373 0.962098,-3.149958 0.696321,-0.791585 0.983389,-1.083498 0.983389,-1.083498 l 6.279261,6.143496 7.339948,-7.547259 c 0,0 0.245209,-0.332867 -0.837263,-0.819101 -1.082445,-0.48626 -2.072645,-0.06403 -2.619403,-0.844444 -0.546757,-0.780412 -0.359592,-2.724746 0.459757,-3.641438 0.819346,-0.916694 3.453361,-2.676358 4.166713,-1.814777 0.713353,0.861579 -0.02568,1.52955 0.689377,2.556447 0.715055,1.026897 1.217393,1.518376 1.217393,1.518376 z" />
     <path
-       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
-       d="M 4.1212121,59.878788 59.636364,4.2424242"
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 4.1078775,59.878788 59.623029,4.2424242"
        id="path6652"
        inkscape:connector-curvature="0" />
     <path
