@@ -20,7 +20,7 @@
 #*                                                                         *
 #***************************************************************************
 
-import FreeCADGui,FreeCAD
+import FreeCAD, FreeCADGui
 import Spreadsheet
 from PySide import QtGui, QtCore
 import os, copy, time, sys, platform
@@ -81,6 +81,7 @@ class a2p_CreatePartInformationSheet_Command:
         ss.setBackground('A1:A'+str(len(PARTLIST_COLUMN_NAMES)), (0.000000,1.000000,0.000000,1.000000))
         ss.setBackground('B1:B'+str(len(PARTLIST_COLUMN_NAMES)), (0.85,0.85,0.85,1.000000))
         doc.recompute()
+        FreeCAD.Console.PrintMessage("#" + translate("A2plus_partinformation", "PARTINFO") + "#" + translate("A2p_BoM", " spreadsheet has been created") + "\n")
 
     def GetResources(self):
         return {
