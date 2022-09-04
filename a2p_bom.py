@@ -20,7 +20,7 @@
 #*                                                                         *
 #***************************************************************************
 
-import FreeCADGui,FreeCAD
+import FreeCAD, FreeCADGui
 from PySide import QtGui, QtCore
 import Spreadsheet
 import os
@@ -86,7 +86,7 @@ def createPartList(
                             workingDir
                             )
             if linkedSource is None:
-                print(u"BOM ERROR: Could not open sourcefile {}".format(linkedSource1))
+                print(translate("A2p_BoM", "BOM ERROR: Could not open sourcefile {}").format(linkedSource1))
                 continue
             # Is it already processed minimum one time ?
             entry = partListEntries.get(linkedSource,None)
@@ -134,7 +134,7 @@ def createPartList(
 
 
 #------------------------------------------------------------------------------
-toolTip = translate("A2plus",
+toolTip = translate("A2p_BoM",
 '''
 Create a spreadsheet with a
 parts list of this file.
@@ -176,28 +176,28 @@ class a2p_CreatePartlist():
         doc = FreeCAD.activeDocument()
         if doc is None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
-                                        translate("A2plus","No active document found!"),
-                                        translate("A2plus","You have to open a FCStd file first.")
+                                        translate("A2p_BoM","No active document found!"),
+                                        translate("A2p_BoM","You have to open a FCStd file first.")
                                     )
             return
         completeFilePath = doc.FileName
         p,f = os.path.split(completeFilePath)
 
         flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
-        msg = translate("A2plus","Please save before generating a parts list! Save now?")
-        response = QtGui.QMessageBox.information(QtGui.QApplication.activeWindow(), translate("A2plus","Save document?"), msg, flags )
+        msg = translate("A2p_BoM","Please save before generating a parts list! Save now?")
+        response = QtGui.QMessageBox.information(QtGui.QApplication.activeWindow(), translate("A2p_BoM","Save document?"), msg, flags )
         if response == QtGui.QMessageBox.No:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
-                                        translate("A2plus","Parts list generation aborted!"),
-                                        translate("A2plus","You have to save the assembly file first.")
+                                        translate("A2p_BoM","Parts list generation aborted!"),
+                                        translate("A2p_BoM","You have to save the assembly file first.")
                                     )
             return
         else:
             doc.save()
 
         flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
-        msg = translate("A2plus","Do you want to iterate recursively over all included subassemblies?")
-        response = QtGui.QMessageBox.information(QtGui.QApplication.activeWindow(), u"PARTSLIST", msg, flags )
+        msg = translate("A2p_BoM","Do you want to iterate recursively over all included subassemblies?")
+        response = QtGui.QMessageBox.information(QtGui.QApplication.activeWindow(), translate("A2p_BoM", "PARTSLIST"), msg, flags )
         if response == QtGui.QMessageBox.Yes:
             subAssyRecursion = True
         else:
@@ -222,8 +222,8 @@ class a2p_CreatePartlist():
             self.clearPartList()
 
         # Write Column headers to spreadsheet
-        ss.set('A1',u'POS')
-        ss.set('B1',u'QTY')
+        ss.set('A1', translate("A2p_BoM", "POS"))
+        ss.set('B1', translate("A2p_BoM", "QTY"))
         idx1 = ord('C')
         idx2 = idx1 + len(PARTLIST_COLUMN_NAMES)
         i=0
@@ -254,13 +254,13 @@ class a2p_CreatePartlist():
 
         # recompute to finish..
         doc.recompute()
-        print("#PARTSLIST# spreadsheet has been created")
-
+#        print(translate("A2p_BoM", "#PARTSLIST# spreadsheet has been created"))
+        FreeCAD.Console.PrintMessage("#" + translate("A2p_BoM", "PARTSLIST") + "#" + translate("A2p_BoM", " spreadsheet has been created") + "\n")
 
     def GetResources(self):
         return {
             'Pixmap'  : ':/icons/a2p_PartsList.svg',
-            'MenuText': translate("A2plus_CreatePartlist", "Create a spreadsheet with a parts list of this file"),
+            'MenuText': translate("A2p_BoM", "Create a spreadsheet with a parts list of this file"),
             'ToolTip' : toolTip
             }
 

@@ -26,7 +26,8 @@
 __title__ = 'A2plus assembly Workbench - InitGui file'
 __author__ = 'kbwbe'
 
-A2P_VERSION = 'V0.4.57'
+
+A2P_VERSION = 'V0.4.58'
 
 import FreeCAD
 import FreeCADGui
@@ -66,7 +67,8 @@ class A2plusWorkbench (Workbench):
         # add translations path
         FreeCADGui.addLanguagePath(a2plib.getLanguagePath())
         FreeCADGui.updateLocale()
-        print(translate("A2plus_appendMenu", "languagePath of A2plus Workbench is:"), "{}".format(a2plib.getLanguagePath()))
+#        print(translate("A2plus_appendMenu", "languagePath of A2plus Workbench is:"), "{}".format(a2plib.getLanguagePath()))
+        FreeCAD.Console.PrintMessage(translate("A2plus_appendMenu", "Initializing A2plus Workbench ")+A2P_VERSION+'.\n')
 
         import a2p_importpart
         import a2p_recursiveUpdatePlanner

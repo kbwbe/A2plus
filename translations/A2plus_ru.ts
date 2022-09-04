@@ -192,7 +192,12 @@ where they were created</source>
     </message>
 </context>
 <context>
-    <name>A2plus</name>
+    <name>A2p_BoM</name>
+    <message>
+        <location filename="../a2p_bom.py" line="89"/>
+        <source>BOM ERROR: Could not open sourcefile {}</source>
+        <translation>Ошибка BOM: Невозможно открыть файл {}</translation>
+    </message>
     <message>
         <location filename="../a2p_bom.py" line="137"/>
         <source>
@@ -278,9 +283,64 @@ recent assembly are collected.
 <context>
     <name>A2plus_CreatePartlist</name>
     <message>
-        <location filename="../a2p_bom.py" line="263"/>
+        <location filename="../a2p_bom.py" line="225"/>
+        <source>POS</source>
+        <translation>№ пп</translation>
+    </message>
+    <message>
+        <location filename="../a2p_bom.py" line="226"/>
+        <source>QTY</source>
+        <translation>Кол-во</translation>
+    </message>
+    <message>
+        <location filename="../a2p_bom.py" line="264"/>
         <source>Create a spreadsheet with a parts list of this file</source>
-        <translation>Создать электронную таблицу со списком деталей этого файла</translation>
+        <translation>Создать электронную таблицу со списком деталей (Спецификацией) этого файла</translation>
+    </message>
+    <message>
+        <location filename="../a2p_partlistglobals.py" line="26"/>
+        <source>PARTINFO</source>
+        <translation>ИнфоОДетали</translation>
+    </message>
+    <message>
+        <location filename="../a2p_partlistglobals.py" line="30"/>
+        <source>PARTSLIST</source>
+        <translation>Спецификация</translation>
+    </message>
+    <message>
+        <location filename="../a2p_partlistglobals.py" line="35"/>
+        <source>IDENTNO</source>
+        <translation>Артикул</translation>
+    </message>
+    <message>
+        <location filename="../a2p_partlistglobals.py" line="36"/>
+        <source>DESCRIPTION</source>
+        <translation>Описание</translation>
+    </message>
+    <message>
+        <location filename="../a2p_partlistglobals.py" line="37"/>
+        <source>SUPPLIER</source>
+        <translation>Поставщик</translation>
+    </message>
+    <message>
+        <location filename="../a2p_partlistglobals.py" line="38"/>
+        <source>SUPP.IDENTNO</source>
+        <translation>Арт.Поставщика</translation>
+    </message>
+    <message>
+        <location filename="../a2p_partlistglobals.py" line="39"/>
+        <source>SUPP.DESCRIPTION</source>
+        <translation>Описание Поставщика</translation>
+    </message>
+    <message>
+        <location filename="../a2p_partlistglobals.py" line="40"/>
+        <source>(FILENAME)</source>
+        <translation>(Название файла)</translation>
+    </message>
+    <message>
+        <location filename="../a2p_partinformation.py" line="84"/>
+        <source> spreadsheet has been created</source>
+        <translation> таблица создана</translation>
     </message>
 </context>
 <context>
@@ -312,7 +372,7 @@ is invisible at first time.
     <message>
         <location filename="../a2p_MuxAssembly.py" line="261"/>
         <source>Cannot create SimpleAssemblyShape</source>
-        <translation>Не удается создать SimpleAssemblyShape</translation>
+        <translation>Не удаётся создать SimpleAssemblyShape</translation>
     </message>
     <message>
         <location filename="../a2p_MuxAssembly.py" line="261"/>
@@ -338,7 +398,17 @@ is invisible at first time.
 <context>
     <name>A2plus_appendMenu</name>
     <message>
-        <location filename="../InitGui.py" line="197"/>
+        <location filename="../InitGui.py" line="69"/>
+        <source>languagePath of A2plus Workbench is:</source>
+        <translation>languagePath для верстака A2plus:</translation>
+    </message>
+    <message>
+        <location filename="../InitGui.py" line="70"/>
+        <source>Initializing A2plus Workbench </source>
+        <translation>Запуск верстака A2plus </translation>
+    </message>
+    <message>
+        <location filename="../InitGui.py" line="198"/>
         <source>Constraint</source>
         <translation>Ограничение</translation>
     </message>
@@ -361,7 +431,112 @@ is invisible at first time.
 <context>
     <name>A2plus_constraintDialog</name>
     <message>
-        <location filename="../a2p_constraintDialog.py" line="460"/>
+        <location filename="../a2p_constraintDialog.py" line="95"/>
+        <source>Direction</source>
+        <translation>Направление</translation>
+    </message>
+    <message>
+        <location filename="../a2p_constraintDialog.py" line="101"/>
+        <source>aligned</source>
+        <translation>выровнено</translation>
+    </message>
+    <message>
+        <location filename="../a2p_constraintDialog.py" line="102"/>
+        <source>opposed</source>
+        <translation>напротив</translation>
+    </message>
+    <message>
+        <location filename="../a2p_constraintDialog.py" line="108"/>
+        <source>none</source>
+        <translation>нет</translation>
+    </message>
+    <message>
+        <location filename="../a2p_constraintDialog.py" line="124"/>
+        <source>Flip direction</source>
+        <translation>Перевернуть направление</translation>
+    </message>
+    <message>
+        <location filename="../a2p_constraintDialog.py" line="135"/>
+        <source>Offset</source>
+        <translation>Смещение</translation>
+    </message>
+    <message>
+        <location filename="../a2p_constraintDialog.py" line="185"/>
+        <source>Set Zero</source>
+        <translation>Установить ноль</translation>
+    </message>
+    <message>
+        <location filename="../a2p_constraintDialog.py" line="191"/>
+        <source>Flip sign</source>
+        <translation>Перевернуть знак</translation>
+    </message>
+    <message>
+        <location filename="../a2p_constraintDialog.py" line="202"/>
+        <source>Angle</source>
+        <translation>Угол</translation>
+    </message>
+    <message>
+        <location filename="../a2p_constraintDialog.py" line="222"/>
+        <source>Angle in the range 0 - 180 degrees</source>
+        <translation>Угол в диапазоне 0-180 градусов</translation>
+    </message>
+    <message>
+        <location filename="../a2p_constraintDialog.py" line="227"/>
+        <source>Round</source>
+        <translation>Вращать</translation>
+    </message>
+    <message>
+        <location filename="../a2p_constraintDialog.py" line="229"/>
+        <source>Round angle to multiples of 5</source>
+        <translation>Вращать угол до 5 раз</translation>
+    </message>
+    <message>
+        <location filename="../a2p_constraintDialog.py" line="234"/>
+        <source>Perpendicular</source>
+        <translation>Перпендикуляр</translation>
+    </message>
+    <message>
+        <location filename="../a2p_constraintDialog.py" line="236"/>
+        <source>Adds/deletes 90 degrees</source>
+        <translation>Добавить/удалить 90 градусов</translation>
+    </message>
+    <message>
+        <location filename="../a2p_constraintDialog.py" line="245"/>
+        <source>Lock Rotation</source>
+        <translation>Блокировать вращение</translation>
+    </message>
+    <message>
+        <location filename="../a2p_constraintDialog.py" line="261"/>
+        <source>Toggle</source>
+        <translation>Переключить</translation>
+    </message>
+    <message>
+        <location filename="../a2p_constraintDialog.py" line="279"/>
+        <source>Delete this constraint</source>
+        <translation>Удалить это ограничение</translation>
+    </message>
+    <message>
+        <location filename="../a2p_constraintDialog.py" line="284"/>
+        <source>Solve constraints</source>
+        <translation>Решить ограничение</translation>
+    </message>
+    <message>
+        <location filename="../a2p_constraintDialog.py" line="285"/>
+        <source>Solve</source>
+        <translation>Решить</translation>
+    </message>
+    <message>
+        <location filename="../a2p_constraintDialog.py" line="290"/>
+        <source>Accept the settings</source>
+        <translation>Принять настройки</translation>
+    </message>
+    <message>
+        <location filename="../a2p_constraintDialog.py" line="291"/>
+        <source>Accept</source>
+        <translation>Принять</translation>
+    </message>
+    <message>
+        <location filename="../a2p_constraintDialog.py" line="463"/>
         <source>Really delete this constraint?</source>
         <translation>Действительно удалить это ограничение?</translation>
     </message>
@@ -396,7 +571,12 @@ is invisible at first time.
         <translation>Значения изменились! Принять ограничение?</translation>
     </message>
     <message>
-        <location filename="../a2p_constraintDialog.py" line="761"/>
+        <location filename="../a2p_constraintDialog.py" line="743"/>
+        <source>Help</source>
+        <translation>Помощь</translation>
+    </message>
+    <message>
+        <location filename="../a2p_constraintDialog.py" line="764"/>
         <source>
 Select geometry to be constrained
 within 3D View !
@@ -994,7 +1174,7 @@ within this workbench.
     <message>
         <location filename="../a2p_convertPart.py" line="168"/>
         <source>Convert a part to A2plus</source>
-        <translation>Преобразование детали в A2plus</translation>
+        <translation>Преобразовать деталь в A2plus</translation>
     </message>
     <message>
         <location filename="../a2p_convertPart.py" line="177"/>
@@ -1137,7 +1317,7 @@ to the assembly
     <message>
         <location filename="../a2p_importpart.py" line="798"/>
         <source>ASSEMBLY UPDATE</source>
-        <translation></translation>
+        <translation>ОБНОВЛЕНИЕ СБОРКИ</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="833"/>
@@ -1172,7 +1352,7 @@ this function.)
     <message>
         <location filename="../a2p_importpart.py" line="928"/>
         <source>Update parts imported into the assembly</source>
-        <translation>Обновление деталей, импортированных в сборку</translation>
+        <translation>Обновить детали, импортированные в сборку</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="978"/>
@@ -1370,7 +1550,21 @@ After confirmation all related
 constraints are deleted
 at once.
 </source>
-        <translation></translation>
+        <translation>
+Удалить все ограничения
+выбранной детали.
+
+Выберите только одну деталь
+и нажмите эту кнопку.
+
+Появится диалог подтверждения,
+показывающий все ограничения,
+связанные с выбранной деталью.
+
+После подтверждения все
+связанные ограничения удаляются
+одновременно.
+</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="1407"/>
@@ -1381,6 +1575,13 @@ at once.
         <location filename="../a2p_importpart.py" line="1407"/>
         <source>Select exactly 1 part</source>
         <translation>Выберите только 1 деталь</translation>
+    </message>
+    <message>
+        <location filename="../a2p_importpart.py" line="1422"/>
+        <source>Delete {}&apos;s constraint(s):
+  - {}?</source>
+        <translation>Удалить ограничия у {}:
+  - {}?</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="1426"/>
@@ -1395,7 +1596,7 @@ at once.
     <message>
         <location filename="../a2p_importpart.py" line="1453"/>
         <source>Delete all constraints of selected parts</source>
-        <translation>Удаление все ограничения выделенных деталей</translation>
+        <translation>Удалить все ограничения выделенных деталей</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="1459"/>
@@ -1444,7 +1645,21 @@ If you select nothing and hit
 this button, all invisible parts
 will be made visible again.
 </source>
-        <translation></translation>
+        <translation>
+Показать только выбранные элементы
+или все, если ничего не выбрано.
+
+Выберите одну или несколько деталей,
+которые являются единственными, которые
+Вы хотите увидеть в большой сборке.
+
+Нажмите эту кнопку, и все остальные детали
+станут невидимыми.
+
+Если Вы ничего не выберете и нажмёте
+эту кнопку, все невидимые детали снова
+будут видимыми.
+</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="1598"/>
@@ -1499,7 +1714,7 @@ by hitting the solvebutton
     <message>
         <location filename="../a2p_importpart.py" line="1692"/>
         <source>Repair the treeview, if it is damaged somehow. After pressing this button, constraints will grouped under corresponding parts again.</source>
-        <translation>Восстановите древовидную структуру, если она каким-либо образом повреждена. После нажатия этой кнопки ограничения снова будут сгруппированы по соответствующим деталям.</translation>
+        <translation>Восстановить древовидную структуру, если она каким-либо образом повреждена. После нажатия этой кнопки ограничения снова будут сгруппированы по соответствующим деталям.</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="1708"/>
@@ -1539,7 +1754,7 @@ toggled between &apos;aligned&apos; and
     <message>
         <location filename="../a2p_importpart.py" line="1789"/>
         <source>Generates HTML file with detailed constraining structure</source>
-        <translation>Создаст файл HTML с подробной структурой ограничений</translation>
+        <translation>Создаёт файл HTML с подробной структурой ограничений</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="1813"/>
@@ -1554,7 +1769,7 @@ toggled between &apos;aligned&apos; and
     <message>
         <location filename="../a2p_importpart.py" line="1854"/>
         <source>Show part labels in 3D view</source>
-        <translation>Отображение меток деталей в 3D-виде</translation>
+        <translation>Показать метки деталей в 3D-виде</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="1855"/>
@@ -1584,17 +1799,17 @@ toggled between &apos;aligned&apos; and
     <message>
         <location filename="../a2p_importpart.py" line="1925"/>
         <source>Convert absolute paths of imported parts to relative ones</source>
-        <translation>Преобразовать абсолютные путей импортируемых деталей в относительные</translation>
+        <translation>Преобразовать абсолютные пути импортируемых деталей в относительные</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="1926"/>
         <source>Converts absolute paths of imported parts to relative ones</source>
-        <translation>Преобразовывает абсолютные путей импортируемых деталей в относительные</translation>
+        <translation>Преобразовывает абсолютные пути импортируемых деталей в относительные</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="1958"/>
         <source>Save and exit the active document</source>
-        <translation>Сохраните и закройте активный документ</translation>
+        <translation>Сохранить и закрыть активный документ</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="1964"/>
@@ -1646,7 +1861,7 @@ ViewProviders старых импортированных
     <message>
         <location filename="../a2p_importpart.py" line="2009"/>
         <source>Please save and reopen this assembly file</source>
-        <translation>Сохраните и снова откройте этот файл сборки</translation>
+        <translation>Сохранить и снова открыть этот файл сборки</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="2020"/>
@@ -1697,7 +1912,7 @@ This spreadsheet will be read out
 by the parts list function of A2plus.
 </source>
         <translation>
-Создайте электронную таблицу для заказа
+Создать электронную таблицу для заказа
 или информации о логистике.
 
 Созданную электронную таблицу можно
@@ -1721,7 +1936,7 @@ by the parts list function of A2plus.
     <message>
         <location filename="../a2p_partinformation.py" line="88"/>
         <source>Create a spreadsheet for ordering or logistics information</source>
-        <translation>Создайте электронную таблицу для заказа или информации о логистике</translation>
+        <translation>Создать электронную таблицу для заказа или информации о логистике</translation>
     </message>
 </context>
 <context>
@@ -1744,7 +1959,7 @@ Subassemblies are updated,
 if necessary, too.
 </source>
         <translation>
-Обновите детали, которые были
+Обновление деталей, которые были
 импортированы в сборку.
 
 (Если Вы изменяете деталь во внешнем
@@ -1766,7 +1981,7 @@ if necessary, too.
     <message>
         <location filename="../a2p_recursiveUpdatePlanner.py" line="137"/>
         <source>RECURSIVE UPDATE</source>
-        <translation></translation>
+        <translation>РЕКУРСИВНОЕ ОБНОВЛЕНИЕ</translation>
     </message>
     <message>
         <location filename="../a2p_recursiveUpdatePlanner.py" line="186"/>
@@ -1776,7 +1991,7 @@ if necessary, too.
     <message>
         <location filename="../a2p_recursiveUpdatePlanner.py" line="208"/>
         <source>Update imports recursively</source>
-        <translation>Обновлять импорт рекурсивно</translation>
+        <translation>Обновить все импорты рекурсивно</translation>
     </message>
 </context>
 <context>
@@ -1840,7 +2055,7 @@ Do you want to delete this constraint-pair?
     <message>
         <location filename="../a2p_searchConstraintConflicts.py" line="112"/>
         <source>Identify conflicting constraints</source>
-        <translation>Выявление конфликтующих ограничений</translation>
+        <translation>Выявить конфликтующие ограничения</translation>
     </message>
 </context>
 <context>
@@ -1864,6 +2079,27 @@ Do you want to delete this constraint-pair?
         <location filename="../a2p_solversystem.py" line="226"/>
         <source>Delete broken constraints?</source>
         <translation>Удалить нарушенные ограничения?</translation>
+    </message>
+    <message>
+        <location filename="../a2p_solversystem.py" line="505"/>
+        <source>===== Start Solving System ======
+</source>
+        <translation>===== Запуск системы решения ======
+</translation>
+    </message>
+    <message>
+        <location filename="../a2p_solversystem.py" line="513"/>
+        <source>===== System solved using partial + recursive unfixing =====
+</source>
+        <translation>===== Система решена с использование частичного + рекурсивного ослабления =====
+</translation>
+    </message>
+    <message>
+        <location filename="../a2p_solversystem.py" line="523"/>
+        <source>===== Could not solve system ======
+</source>
+        <translation>===== Невозможно решить систему ======
+</translation>
     </message>
     <message>
         <location filename="../a2p_solversystem.py" line="525"/>
@@ -1900,9 +2136,23 @@ to a fixed part!
         <translation>Не удалось переместить некоторые детали</translation>
     </message>
     <message>
+        <location filename="../a2p_solversystem.py" line="693"/>
+        <source>Calculation stopped, no convergency anymore!
+</source>
+        <translation>Расчёт остановлен, больше нет сходимости!
+</translation>
+    </message>
+    <message>
+        <location filename="../a2p_solversystem.py" line="702"/>
+        <source>Reached max calculations count ({})
+</source>
+        <translation>Достигнуто максимальное количество расчётов ({})
+</translation>
+    </message>
+    <message>
         <location filename="../a2p_solversystem.py" line="739"/>
         <source>Solve constraints</source>
-        <translation>Решение ограничений</translation>
+        <translation>Решить ограничения</translation>
     </message>
     <message>
         <location filename="../a2p_solversystem.py" line="740"/>
