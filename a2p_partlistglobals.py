@@ -22,14 +22,13 @@
 
 from a2p_translateUtils import *
 
-#PARTINFORMATION_SHEET_NAME = "_" + translate("A2p_BoM", "PARTINFO") + "_"
 PARTINFORMATION_SHEET_NAME = "_PARTINFO_"
 PARTINFORMATION_SHEET_LABEL = "#" + translate("A2p_BoM", "PARTINFO") + "#"
 
 # BOM = BillOfMaterials...
-BOM_SHEET_NAME = "_" + translate("A2p_BoM", "PARTSLIST") + "_"
-
+BOM_SHEET_NAME = "_PARTSLIST_"
 BOM_SHEET_LABEL = "#" + translate("A2p_BoM", "PARTSLIST") + "#"
+
 BOM_MAX_COLS = 10
 BOM_MAX_LENGTH = 150
 
