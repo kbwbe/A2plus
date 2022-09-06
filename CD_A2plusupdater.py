@@ -486,7 +486,7 @@ class classFuncs():
                         break
         else:
             for num in g.notcylfaces:
-                testdict_ = self.getfacebynum(num, g.shape2)
+                testdict_ = self.getedgebynum(num, g.shape2)
                 if dict_.get('length') == testdict_.get('length')\
                    and dict_.get('center') == testdict_.get('center'):
                     edge ='Edge' + str(num +1)
