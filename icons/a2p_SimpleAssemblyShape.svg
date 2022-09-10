@@ -2,21 +2,21 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="64"
    height="64"
    id="svg3559"
    version="1.1"
-   inkscape:version="0.92.3 (unknown)"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
    sodipodi:docname="a2p_SimpleAssemblyShape.svg"
-   viewBox="0 0 64 64">
+   viewBox="0 0 64 64"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <defs
      id="defs3561">
     <linearGradient
@@ -149,7 +149,8 @@
        y1="22.983917"
        x2="36.276485"
        y2="22.983917"
-       gradientUnits="userSpaceOnUse" />
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(0.19555666,-2.9715908e-4)" />
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient1033"
@@ -185,21 +186,22 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1"
-     inkscape:cx="32"
-     inkscape:cy="32"
+     inkscape:zoom="5.6568542"
+     inkscape:cx="26.074563"
+     inkscape:cy="49.939416"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:document-units="px"
      inkscape:grid-bbox="true"
-     inkscape:window-width="1366"
-     inkscape:window-height="716"
+     inkscape:window-width="1440"
+     inkscape:window-height="843"
      inkscape:window-x="0"
-     inkscape:window-y="26"
+     inkscape:window-y="0"
      inkscape:window-maximized="1"
      inkscape:snap-global="false"
      inkscape:snap-nodes="false"
-     inkscape:snap-others="false">
+     inkscape:snap-others="false"
+     inkscape:pagecheckerboard="0">
     <inkscape:grid
        type="xygrid"
        id="grid3007"
@@ -218,7 +220,6 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
         <dc:title>Path-Stock</dc:title>
         <dc:date>2015-07-04</dc:date>
         <dc:relation>http://www.freecadweb.org/wiki/index.php?title=Artwork</dc:relation>
@@ -250,7 +251,7 @@
        id="g6512"
        transform="rotate(-21.5,4.0302919,-61.060914)" />
     <path
-       d="m 35.269315,11.086138 -8.843306,0.07795 c 0,0 0.05921,-1.7547709 0.528002,-2.5161462 0.468796,-0.7613778 0.937441,-1.113336 0.76194,-1.6393404 -0.175502,-0.526008 -0.994965,-1.6355002 -2.927663,-1.5727332 -1.93266,0.062741 -3.865554,0.7688529 -3.807417,1.9384833 0.05814,1.1696331 1.112262,1.2842897 1.170552,2.0445028 0.05829,0.7602157 0.116489,1.7543857 0.116489,1.7543857 l -10.775879,-0.09326 0.113909,8.83144 c 0,0 -0.937059,0.06055 -1.6396859,-0.347319 C 9.263627,19.156232 8.502561,18.397563 7.565462,18.57509 c -0.9371,0.177525 -2.226273,2.227445 -2.168114,3.338589 0.05816,1.111145 0.584603,2.864626 1.404381,3.21375 0.819779,0.349124 2.3428489,-0.707014 3.279927,-0.826052 0.93708,-0.11904 1.464163,-0.120199 1.464163,-0.120199 l -0.120993,10.586595 9.634634,0.03965 c 0,0 -0.07311,0.458661 -0.541969,1.395498 -0.46886,0.936839 -0.697102,1.896849 -0.697422,2.774173 -3.19e-4,0.87732 3.081365,1.497243 4.252639,1.553151 1.171276,0.05591 3.924055,-0.593517 3.924377,-1.470833 3.21e-4,-0.877322 -1.463439,-1.868396 -1.521618,-2.921052 -0.05818,-1.052657 -0.05803,-1.462071 -0.05803,-1.462071 l 8.78472,-0.01934 -0.05472,-10.527724 c 0,0 -0.05842,-0.409284 -1.171295,0.0026 -1.112878,0.41187 -1.523196,1.407065 -2.460169,1.233663 -0.936973,-0.173402 -2.166279,-1.691384 -2.224396,-2.919504 -0.05812,-1.22812 0.587228,-4.329406 1.699916,-4.214878 1.112689,0.114525 1.05376,1.108951 2.283536,1.340196 1.229775,0.231246 1.932552,0.2297 1.932552,0.2297 z"
+       d="m 35.464872,11.085841 -8.843306,0.07795 c 0,0 0.05921,-1.7547711 0.528002,-2.5161464 0.468796,-0.7613778 0.937441,-1.113336 0.76194,-1.6393404 -0.175502,-0.526008 -0.994965,-1.6355002 -2.927663,-1.5727332 -1.93266,0.062741 -3.865554,0.7688529 -3.807417,1.9384833 0.05814,1.1696331 1.112262,1.2842897 1.170552,2.0445028 0.05829,0.7602159 0.116489,1.7543859 0.116489,1.7543859 l -10.775879,-0.09326 0.113909,8.83144 c 0,0 -0.937059,0.06055 -1.639686,-0.347319 -0.7026294,-0.407869 -1.4636954,-1.166538 -2.4007944,-0.989011 -0.9371,0.177525 -2.226273,2.227445 -2.168114,3.338589 0.05816,1.111145 0.584603,2.864626 1.404381,3.21375 0.819779,0.349124 2.3428489,-0.707014 3.2799274,-0.826052 0.93708,-0.11904 1.464163,-0.120199 1.464163,-0.120199 l -0.120993,10.586595 9.634634,0.03965 c 0,0 -0.07311,0.458661 -0.541969,1.395498 -0.46886,0.936839 -0.697102,1.896849 -0.697422,2.774173 -3.19e-4,0.87732 3.081365,1.497243 4.252639,1.553151 1.171276,0.05591 3.924055,-0.593517 3.924377,-1.470833 3.21e-4,-0.877322 -1.463439,-1.868396 -1.521618,-2.921052 -0.05818,-1.052657 -0.05803,-1.462071 -0.05803,-1.462071 l 8.78472,-0.01934 -0.05472,-10.527724 c 0,0 -0.05842,-0.409284 -1.171295,0.0026 -1.112878,0.41187 -1.523196,1.407065 -2.460169,1.233663 -0.936973,-0.173402 -2.166279,-1.691384 -2.224396,-2.919504 -0.05812,-1.22812 0.587228,-4.329406 1.699916,-4.214878 1.112689,0.114525 1.05376,1.108951 2.283536,1.340196 1.229775,0.231246 1.932552,0.2297 1.932552,0.2297 z"
        id="path4243"
        style="fill:url(#linearGradient1027);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        inkscape:connector-curvature="0"

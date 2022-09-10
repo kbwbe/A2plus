@@ -2,20 +2,21 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="64"
    height="64"
    id="svg3085"
    version="1.1"
-   inkscape:version="0.92.3 (2405546, 2018-03-11)"
-   sodipodi:docname="a2p_CenterOfMassConstraint.svg">
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   sodipodi:docname="a2p_CenterOfMassConstraint.svg"
+   viewBox="0 0 57.6 57.6"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <defs
      id="defs3087">
     <linearGradient
@@ -77,9 +78,9 @@
        style="overflow:visible">
       <path
          id="path4692"
-         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         d="M 5.77,0 -2.88,5 V -5 Z"
          style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
-         transform="scale(-0.2,-0.2)"
+         transform="scale(-0.2)"
          inkscape:connector-curvature="0" />
     </marker>
     <linearGradient
@@ -117,30 +118,30 @@
     </linearGradient>
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="3.6842619 : 5.0066992 : 1"
-       inkscape:vp_y="-27.498543 : -45.297844 : 1"
-       inkscape:vp_z="-46.715775 : -11.759466 : 1"
-       inkscape:persp3d-origin="12 : 10.666667 : 1"
+       inkscape:vp_x="3.3158357 : 4.5060293 : 1"
+       inkscape:vp_y="-24.748689 : -40.76806 : 1"
+       inkscape:vp_z="-42.044198 : -10.583519 : 1"
+       inkscape:persp3d-origin="10.8 : 9.6000003 : 1"
        id="perspective3096" />
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="-13.436262 : 14.723626 : 1"
-       inkscape:vp_y="0 : 954.05 : 0"
-       inkscape:vp_z="44.68773 : 14.723626 : 1"
-       inkscape:persp3d-origin="15.625734 : 9.6353598 : 1"
+       inkscape:vp_x="-12.092636 : 13.251263 : 1"
+       inkscape:vp_y="0 : 858.645 : 0"
+       inkscape:vp_z="40.218957 : 13.251263 : 1"
+       inkscape:persp3d-origin="14.063161 : 8.6718238 : 1"
        id="perspective3094" />
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="-4 : 10 : 1"
-       inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_z="28 : 10 : 1"
-       inkscape:persp3d-origin="12 : 4.666667 : 1"
+       inkscape:vp_x="-3.6 : 9 : 1"
+       inkscape:vp_y="0 : 900 : 0"
+       inkscape:vp_z="25.2 : 9 : 1"
+       inkscape:persp3d-origin="10.8 : 4.2000003 : 1"
        id="perspective3011" />
     <inkscape:path-effect
        effect="skeletal"
        id="path-effect3066"
        is_visible="true"
-       pattern="M 0,0 0,10 10,5 z"
+       pattern="M 0,0 V 10 L 10,5 Z"
        copytype="single_stretched"
        prop_scale="1"
        scale_y_rel="false"
@@ -149,7 +150,9 @@
        tang_offset="0"
        prop_units="false"
        vertical_pattern="false"
-       fuse_tolerance="0" />
+       fuse_tolerance="0"
+       lpeversion="0"
+       hide_knot="false" />
     <linearGradient
        inkscape:collect="always"
        id="linearGradient7597">
@@ -171,7 +174,7 @@
        style="overflow:visible">
       <path
          id="path3995"
-         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
          style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
          transform="matrix(0.8,0,0,0.8,10,0)"
          inkscape:connector-curvature="0" />
@@ -185,7 +188,7 @@
        style="overflow:visible">
       <path
          id="path4010"
-         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
          style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
          transform="matrix(-0.2,0,0,-0.2,-1.2,0)"
          inkscape:connector-curvature="0" />
@@ -199,7 +202,7 @@
        style="overflow:visible">
       <path
          id="path4007"
-         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
          style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
          transform="matrix(0.2,0,0,0.2,1.2,0)"
          inkscape:connector-curvature="0" />
@@ -227,9 +230,9 @@
        style="overflow:visible">
       <path
          id="path4137"
-         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         d="M 5.77,0 -2.88,5 V -5 Z"
          style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
-         transform="scale(0.8,0.8)"
+         transform="scale(0.8)"
          inkscape:connector-curvature="0" />
     </marker>
     <marker
@@ -241,7 +244,7 @@
        style="overflow:visible">
       <path
          id="path4092"
-         d="M 0,-7.0710768 -7.0710894,0 0,7.0710589 7.0710462,0 0,-7.0710768 z"
+         d="M 0,-7.0710768 -7.0710894,0 0,7.0710589 7.0710462,0 Z"
          style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
          transform="matrix(0.8,0,0,0.8,-5.6,0)"
          inkscape:connector-curvature="0" />
@@ -255,7 +258,7 @@
        style="overflow:visible">
       <path
          id="path4083"
-         d="M 0,-7.0710768 -7.0710894,0 0,7.0710589 7.0710462,0 0,-7.0710768 z"
+         d="M 0,-7.0710768 -7.0710894,0 0,7.0710589 7.0710462,0 Z"
          style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
          transform="matrix(0.8,0,0,0.8,5.6,0)"
          inkscape:connector-curvature="0" />
@@ -269,7 +272,7 @@
        style="overflow:visible">
       <path
          id="path3998"
-         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
          style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
          transform="matrix(-0.8,0,0,-0.8,-10,0)"
          inkscape:connector-curvature="0" />
@@ -296,10 +299,10 @@
        gradientUnits="userSpaceOnUse" />
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="1.132573 : 16.837097 : 1"
-       inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_z="31.983524 : 20.416825 : 1"
-       inkscape:persp3d-origin="15.674165 : -5.599381 : 1"
+       inkscape:vp_x="1.0193157 : 15.153387 : 1"
+       inkscape:vp_y="0 : 900 : 0"
+       inkscape:vp_z="28.785172 : 18.375143 : 1"
+       inkscape:persp3d-origin="14.106749 : -5.0394429 : 1"
        id="perspective3011-3" />
     <linearGradient
        inkscape:collect="always"
@@ -352,17 +355,18 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="8.25"
-     inkscape:cx="-10.90909"
-     inkscape:cy="32"
+     inkscape:cx="33.757576"
+     inkscape:cy="31.939394"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:grid-bbox="true"
      inkscape:document-units="px"
-     inkscape:window-width="2560"
-     inkscape:window-height="1361"
-     inkscape:window-x="-9"
-     inkscape:window-y="-9"
-     inkscape:window-maximized="1">
+     inkscape:window-width="1440"
+     inkscape:window-height="843"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:pagecheckerboard="0">
     <inkscape:grid
        type="xygrid"
        id="grid3113"
@@ -379,7 +383,6 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -389,40 +392,44 @@
      inkscape:groupmode="layer"
      transform="translate(0,32)">
     <g
-       id="g7304"
-       transform="translate(-2,-8)">
-      <rect
-         style="fill:#ef2929;fill-opacity:1;stroke:#000000;stroke-width:2.03497052;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
-         id="rect991"
-         width="41.502823"
-         height="42.966885"
-         x="15.470407"
-         y="-13.140169"
-         transform="matrix(1,0,-0.25881905,0.96592583,0,0)" />
-      <rect
-         transform="matrix(1,0,-0.25881905,0.96592583,0,0)"
-         y="-7.1248045"
-         x="21.2808"
-         height="30.936157"
-         width="29.882032"
-         id="rect993"
-         style="fill:#a40000;fill-opacity:1;stroke:#a40000;stroke-width:1.40657163;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none" />
+       id="g728"
+       transform="translate(-3.6)">
+      <g
+         id="g7304"
+         transform="translate(-2,-8)">
+        <rect
+           style="fill:#ef2929;fill-opacity:1;stroke:#000000;stroke-width:2.03497;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+           id="rect991"
+           width="41.502823"
+           height="42.966885"
+           x="15.470407"
+           y="-13.140169"
+           transform="matrix(1,0,-0.25881905,0.96592583,0,0)" />
+        <rect
+           transform="matrix(1,0,-0.25881905,0.96592583,0,0)"
+           y="-7.1248045"
+           x="21.2808"
+           height="30.936157"
+           width="29.882032"
+           id="rect993"
+           style="fill:#a40000;fill-opacity:1;stroke:#a40000;stroke-width:1.40657;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none" />
+      </g>
+      <ellipse
+         style="fill:#ad7fa8;fill-opacity:1;stroke:#000000;stroke-width:1.65295;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:6;stroke-opacity:1"
+         id="path3132-3-6"
+         cx="22.509262"
+         cy="22.509262"
+         rx="11.885194"
+         ry="11.37223"
+         transform="matrix(0.71081858,-0.7033754,0.71081858,0.7033754,0,0)" />
+      <circle
+         style="fill:#75507b;fill-opacity:1;stroke:#ad7fa8;stroke-width:1.72307;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+         id="path3828"
+         cx="32"
+         cy="0"
+         inkscape:transform-center-x="19.325331"
+         inkscape:transform-center-y="-5.4110918"
+         r="9.8823128" />
     </g>
-    <ellipse
-       style="fill:#ad7fa8;fill-opacity:1;stroke:#000000;stroke-width:1.6529454;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:6.00000048;stroke-opacity:1"
-       id="path3132-3-6"
-       cx="22.509262"
-       cy="22.509262"
-       rx="11.885194"
-       ry="11.37223"
-       transform="matrix(0.71081858,-0.7033754,0.71081858,0.7033754,0,0)" />
-    <circle
-       style="fill:#75507b;fill-opacity:1;stroke:#ad7fa8;stroke-width:1.72306991;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
-       id="path3828"
-       cx="32"
-       cy="0"
-       inkscape:transform-center-x="19.325331"
-       inkscape:transform-center-y="-5.4110918"
-       r="9.8823128" />
   </g>
 </svg>

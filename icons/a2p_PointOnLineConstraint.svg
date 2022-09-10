@@ -2,20 +2,20 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="64"
    height="64"
    id="svg3085"
    version="1.1"
-   inkscape:version="0.92.3 (unknown)"
-   sodipodi:docname="a2p_PointOnLineConstraint.svg">
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   sodipodi:docname="a2p_PointOnLineConstraint.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <defs
      id="defs3087">
     <linearGradient
@@ -352,17 +352,18 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="8.25"
-     inkscape:cx="38.121212"
-     inkscape:cy="29.840525"
+     inkscape:cx="34.848485"
+     inkscape:cy="29.878788"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:grid-bbox="true"
      inkscape:document-units="px"
-     inkscape:window-width="1366"
-     inkscape:window-height="716"
+     inkscape:window-width="1440"
+     inkscape:window-height="843"
      inkscape:window-x="0"
-     inkscape:window-y="26"
-     inkscape:window-maximized="1">
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:pagecheckerboard="0">
     <inkscape:grid
        type="xygrid"
        id="grid3113"
@@ -379,7 +380,6 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -388,29 +388,32 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      transform="translate(0,32)">
-    <rect
-       style="fill:#729fcf;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
-       id="rect3874"
-       width="7.6412416"
-       height="69.641243"
-       x="18.806797"
-       y="-57.44804"
-       transform="rotate(45)" />
-    <ellipse
-       style="fill:#ef2929;fill-opacity:1;stroke:#000000;stroke-width:2.00005531;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:6.00000048;stroke-opacity:1"
-       id="path3132-3-6"
-       cx="22.50926"
-       cy="22.50926"
-       rx="14.381022"
-       ry="13.760338"
-       transform="matrix(0.71081857,-0.70337541,0.71081857,0.70337541,0,0)" />
-    <circle
-       style="fill:#a40000;fill-opacity:1;stroke:#ef2929;stroke-width:2.08490562;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
-       id="path3828"
-       cx="32"
-       cy="0"
-       inkscape:transform-center-x="19.325331"
-       inkscape:transform-center-y="-5.4110918"
-       r="11.957547" />
+    <g
+       id="g613">
+      <rect
+         style="fill:#729fcf;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+         id="rect3874"
+         width="7.6412416"
+         height="69.641243"
+         x="18.806797"
+         y="-57.44804"
+         transform="rotate(45)" />
+      <ellipse
+         style="fill:#ef2929;fill-opacity:1;stroke:#000000;stroke-width:2.00005531;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:6.00000048;stroke-opacity:1"
+         id="path3132-3-6"
+         cx="22.50926"
+         cy="22.50926"
+         rx="14.381022"
+         ry="13.760338"
+         transform="matrix(0.71081857,-0.70337541,0.71081857,0.70337541,0,0)" />
+      <circle
+         style="fill:#a40000;fill-opacity:1;stroke:#ef2929;stroke-width:2.08490562;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+         id="path3828"
+         cx="32"
+         cy="0"
+         inkscape:transform-center-x="19.325331"
+         inkscape:transform-center-y="-5.4110918"
+         r="11.957547" />
+    </g>
   </g>
 </svg>

@@ -23,8 +23,8 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>480</y>
-     <width>621</width>
+     <y>430</y>
+     <width>690</width>
      <height>81</height>
     </rect>
    </property>
@@ -42,7 +42,7 @@
      <rect>
       <x>20</x>
       <y>30</y>
-      <width>241</width>
+      <width>661</width>
       <height>50</height>
      </rect>
     </property>
@@ -89,9 +89,9 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>240</y>
-     <width>621</width>
-     <height>231</height>
+     <y>220</y>
+     <width>690</width>
+     <height>201</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -111,7 +111,7 @@
      <rect>
       <x>22</x>
       <y>21</y>
-      <width>476</width>
+      <width>661</width>
       <height>158</height>
      </rect>
     </property>
@@ -228,9 +228,9 @@ subassemblies. Otherwise you can break the assembly.</string>
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>610</y>
-     <width>621</width>
-     <height>161</height>
+     <y>540</y>
+     <width>690</width>
+     <height>141</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -247,8 +247,8 @@ subassemblies. Otherwise you can break the assembly.</string>
      <rect>
       <x>20</x>
       <y>20</y>
-      <width>391</width>
-      <height>139</height>
+      <width>661</width>
+      <height>111</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -298,7 +298,13 @@ subassemblies. Otherwise you can break the assembly.</string>
       </widget>
      </item>
      <item>
-      <widget class="Gui::PrefFileChooser" name="fileChooser">
+      <widget class="Gui::PrefFileChooser" name="fileChooser" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="minimumSize">
         <size>
          <width>350</width>
@@ -311,9 +317,6 @@ subassemblies. Otherwise you can break the assembly.</string>
          <height>16777215</height>
         </size>
        </property>
-       <property name="mode">
-        <enum>Gui::FileChooser::Directory</enum>
-       </property>
        <property name="prefEntry" stdset="0">
         <cstring>projectFolder</cstring>
        </property>
@@ -322,19 +325,6 @@ subassemblies. Otherwise you can break the assembly.</string>
        </property>
       </widget>
      </item>
-     <item>
-      <spacer name="verticalSpacer_6">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
     </layout>
    </widget>
   </widget>
@@ -342,8 +332,8 @@ subassemblies. Otherwise you can break the assembly.</string>
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>160</y>
-     <width>621</width>
+     <y>140</y>
+     <width>690</width>
      <height>61</height>
     </rect>
    </property>
@@ -361,7 +351,7 @@ subassemblies. Otherwise you can break the assembly.</string>
      <rect>
       <x>20</x>
       <y>30</y>
-      <width>601</width>
+      <width>661</width>
       <height>17</height>
      </rect>
     </property>
@@ -384,8 +374,8 @@ subassemblies. Otherwise you can break the assembly.</string>
     <rect>
      <x>0</x>
      <y>10</y>
-     <width>621</width>
-     <height>131</height>
+     <width>690</width>
+     <height>111</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -402,35 +392,19 @@ subassemblies. Otherwise you can break the assembly.</string>
      <rect>
       <x>21</x>
       <y>21</y>
-      <width>469</width>
+      <width>661</width>
       <height>77</height>
      </rect>
     </property>
     <layout class="QFormLayout" name="formLayout_2">
-     <item row="0" column="0">
-      <widget class="Gui::PrefRadioButton" name="radioButton">
-       <property name="toolTip">
-        <string>Solver begins with a fixed part and a part constrained to it.
-All other parts are not calculated. If a solution could be
-found, the next constrained part is added for the
-calculation and so on.</string>
-       </property>
-       <property name="text">
-        <string>Use solving of partial systems (recommended for static assemblies)</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-       <property name="prefEntry" stdset="0">
-        <cstring>usePartialSolver</cstring>
-       </property>
-       <property name="prefPath" stdset="0">
-        <cstring>Mod/A2plus</cstring>
-       </property>
-      </widget>
-     </item>
      <item row="1" column="0">
       <widget class="Gui::PrefRadioButton" name="radioButton_2">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="toolTip">
         <string>Solver tries to move all parts at once
 in direction to a fixed part</string>
@@ -457,6 +431,34 @@ where they were created</string>
        </property>
        <property name="prefEntry" stdset="0">
         <cstring>forceFixedPosition</cstring>
+       </property>
+       <property name="prefPath" stdset="0">
+        <cstring>Mod/A2plus</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0" colspan="2">
+      <widget class="Gui::PrefRadioButton" name="radioButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="toolTip">
+        <string>Solver begins with a fixed part and a part constrained to it.
+All other parts are not calculated. If a solution could be
+found, the next constrained part is added for the
+calculation and so on.</string>
+       </property>
+       <property name="text">
+        <string>Use solving of partial systems (recommended for static assemblies)</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+       <property name="prefEntry" stdset="0">
+        <cstring>usePartialSolver</cstring>
        </property>
        <property name="prefPath" stdset="0">
         <cstring>Mod/A2plus</cstring>
