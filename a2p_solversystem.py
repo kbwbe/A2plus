@@ -709,6 +709,15 @@ to a fixed part!
 
 #------------------------------------------------------------------------------
 def solveConstraints( doc, cache=None, useTransaction = True, matelist=None, showFailMessage=True):
+
+    if doc is None:
+        QtGui.QMessageBox.information(
+                    QtGui.QApplication.activeWindow(),
+                    translate("a2p_solversystem","No active document found!"),
+                    translate("a2p_solversystem","Before running solver, you have to open an assembly file.")
+                    )
+        return
+
     if useTransaction: doc.openTransaction("a2p_systemSolving")
     ss = SolverSystem()
     systemSolved = ss.solveSystem(doc, matelist, showFailMessage )
