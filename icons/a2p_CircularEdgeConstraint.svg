@@ -2,20 +2,20 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="64"
    height="64"
    id="svg3085"
    version="1.1"
-   inkscape:version="0.92.3 (unknown)"
-   sodipodi:docname="a2p_CircularEdgeConstraint.svg">
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   sodipodi:docname="a2p_CircularEdgeConstraint.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <defs
      id="defs3087">
     <linearGradient
@@ -361,18 +361,19 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.5"
-     inkscape:cx="32"
-     inkscape:cy="32"
+     inkscape:zoom="4"
+     inkscape:cx="21.875"
+     inkscape:cy="24.875"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:grid-bbox="true"
      inkscape:document-units="px"
-     inkscape:window-width="1366"
-     inkscape:window-height="716"
+     inkscape:window-width="1440"
+     inkscape:window-height="843"
      inkscape:window-x="0"
-     inkscape:window-y="26"
-     inkscape:window-maximized="1">
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:pagecheckerboard="0">
     <inkscape:grid
        type="xygrid"
        id="grid3130"
@@ -389,7 +390,6 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -399,57 +399,61 @@
      inkscape:groupmode="layer"
      transform="translate(0,32)">
     <g
-       id="g5367"
-       transform="translate(0.08571073)">
+       id="g624"
+       transform="matrix(1.0495921,0,0,0.99910964,-2.8252465,0)">
       <g
-         transform="translate(-15.770624,0.85709912)"
-         id="g5352">
-        <ellipse
-           ry="24.086018"
-           rx="7.0860171"
-           cy="-0.85709912"
-           cx="62.169888"
-           id="ellipse4410"
-           style="fill:none;stroke:#ef2929;stroke-width:4;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:6.00000048;stroke-opacity:1" />
-        <ellipse
-           ry="27"
-           rx="10"
-           cy="-0.85709912"
-           cx="62.169888"
-           id="ellipse4408"
-           style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:6.00000048;stroke-opacity:1" />
-        <ellipse
-           style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:6.00000048;stroke-opacity:1"
-           id="ellipse4412"
-           cx="62.169888"
-           cy="-0.85709912"
-           rx="4.2165799"
-           ry="21.216579" />
-      </g>
-      <g
-         transform="translate(-14.570685)"
-         id="g5357">
-        <ellipse
-           style="fill:none;stroke:#729fcf;stroke-width:4;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:6.00000048;stroke-opacity:1"
-           id="ellipse5343"
-           cx="32"
-           cy="0"
-           rx="7.0860171"
-           ry="24.086018" />
-        <ellipse
-           style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:6.00000048;stroke-opacity:1"
-           id="ellipse5345"
-           cx="32"
-           cy="0"
-           rx="10"
-           ry="27" />
-        <ellipse
-           ry="21.216579"
-           rx="4.2165799"
-           cy="0"
-           cx="32"
-           id="ellipse5347"
-           style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:6.00000048;stroke-opacity:1" />
+         id="g5367"
+         transform="translate(0.08571073)">
+        <g
+           transform="translate(-15.770624,0.85709912)"
+           id="g5352">
+          <ellipse
+             ry="24.086018"
+             rx="7.0860171"
+             cy="-0.85709912"
+             cx="62.169888"
+             id="ellipse4410"
+             style="fill:none;stroke:#ef2929;stroke-width:4;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:6;stroke-opacity:1" />
+          <ellipse
+             ry="27"
+             rx="10"
+             cy="-0.85709912"
+             cx="62.169888"
+             id="ellipse4408"
+             style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:6;stroke-opacity:1" />
+          <ellipse
+             style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:6;stroke-opacity:1"
+             id="ellipse4412"
+             cx="62.169888"
+             cy="-0.85709912"
+             rx="4.2165799"
+             ry="21.216579" />
+        </g>
+        <g
+           transform="translate(-14.570685)"
+           id="g5357">
+          <ellipse
+             style="fill:none;stroke:#729fcf;stroke-width:4;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:6;stroke-opacity:1"
+             id="ellipse5343"
+             cx="32"
+             cy="0"
+             rx="7.0860171"
+             ry="24.086018" />
+          <ellipse
+             style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:6;stroke-opacity:1"
+             id="ellipse5345"
+             cx="32"
+             cy="0"
+             rx="10"
+             ry="27" />
+          <ellipse
+             ry="21.216579"
+             rx="4.2165799"
+             cy="0"
+             cx="32"
+             id="ellipse5347"
+             style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:6;stroke-opacity:1" />
+        </g>
       </g>
     </g>
   </g>

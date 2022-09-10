@@ -2,20 +2,20 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="64"
    height="64"
    id="svg3085"
    version="1.1"
-   inkscape:version="0.91 r13725"
-   sodipodi:docname="a2p_AxisParallelConstraint.svg">
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   sodipodi:docname="a2p_AxisParallelConstraint.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <defs
      id="defs3087">
     <linearGradient
@@ -351,18 +351,19 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="8.25"
-     inkscape:cx="38.121212"
-     inkscape:cy="29.840525"
+     inkscape:zoom="4.125"
+     inkscape:cx="31.393939"
+     inkscape:cy="44.242424"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:grid-bbox="true"
      inkscape:document-units="px"
-     inkscape:window-width="1614"
-     inkscape:window-height="1264"
-     inkscape:window-x="659"
-     inkscape:window-y="472"
-     inkscape:window-maximized="0">
+     inkscape:window-width="1440"
+     inkscape:window-height="843"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:pagecheckerboard="0">
     <inkscape:grid
        type="xygrid"
        id="grid3113"
@@ -379,7 +380,6 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -388,21 +388,25 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      transform="translate(0,32)">
-    <rect
-       style="fill:#729fcf;fill-opacity:1;stroke:#000000;stroke-width:1.757411;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
-       id="rect3874"
-       width="6.6684942"
-       height="61.61541"
-       x="17.873697"
-       y="-39.255985"
-       transform="matrix(0.92736153,0.37416652,-0.36218517,0.93210616,0,0)" />
-    <rect
-       style="fill:#ef2929;fill-opacity:1;stroke:#000000;stroke-width:1.757411;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
-       id="rect3874-3"
-       width="6.6684942"
-       height="61.61541"
-       x="33.631229"
-       y="-45.093727"
-       transform="matrix(0.92736153,0.37416652,-0.36218517,0.93210616,0,0)" />
+    <g
+       id="g539"
+       transform="matrix(1,0,0,0.95894838,0,0.772433)">
+      <rect
+         style="fill:#729fcf;fill-opacity:1;stroke:#000000;stroke-width:1.75741;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+         id="rect3874"
+         width="6.6684942"
+         height="61.61541"
+         x="17.873697"
+         y="-39.255985"
+         transform="matrix(0.92736153,0.37416652,-0.36218517,0.93210616,0,0)" />
+      <rect
+         style="fill:#ef2929;fill-opacity:1;stroke:#000000;stroke-width:1.75741;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+         id="rect3874-3"
+         width="6.6684942"
+         height="61.61541"
+         x="33.631229"
+         y="-45.093727"
+         transform="matrix(0.92736153,0.37416652,-0.36218517,0.93210616,0,0)" />
+    </g>
   </g>
 </svg>

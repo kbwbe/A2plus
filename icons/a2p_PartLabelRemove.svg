@@ -2,22 +2,22 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="64px"
    height="64px"
    id="svg3018"
    sodipodi:version="0.32"
-   inkscape:version="0.91 r13725"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
    sodipodi:docname="a2p_PartLabelRemove.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
-   version="1.1">
+   version="1.1"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <defs
      id="defs3020">
     <linearGradient
@@ -84,7 +84,7 @@
        xlink:href="#linearGradient3869"
        id="linearGradient4194"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.24745314,0.42860142,-0.45126417,0.2605375,629.73651,-60.347464)"
+       gradientTransform="matrix(0.22668901,0.39263689,-0.42821252,0.24722862,605.08642,-47.103634)"
        x1="-45"
        y1="1044.3622"
        x2="-55"
@@ -98,19 +98,20 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.6054688"
-     inkscape:cx="56.325929"
-     inkscape:cy="15.042425"
+     inkscape:cx="31.856071"
+     inkscape:cy="15.160419"
      inkscape:current-layer="g3861"
      showgrid="true"
      inkscape:document-units="px"
      inkscape:grid-bbox="true"
-     inkscape:window-width="1024"
+     inkscape:window-width="1112"
      inkscape:window-height="713"
-     inkscape:window-x="809"
-     inkscape:window-y="779"
+     inkscape:window-x="410"
+     inkscape:window-y="127"
      inkscape:snap-bbox="true"
      inkscape:snap-nodes="false"
-     inkscape:window-maximized="0">
+     inkscape:window-maximized="0"
+     inkscape:pagecheckerboard="0">
     <inkscape:grid
        type="xygrid"
        id="grid2987"
@@ -195,8 +196,8 @@
          inkscape:connector-curvature="0"
          sodipodi:nodetypes="cc" />
       <path
-         style="fill:none;stroke:url(#linearGradient4194);stroke-width:4.68861294;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-         d="m 161.88969,169.76122 -8.96768,30.32211"
+         style="fill:none;stroke:url(#linearGradient4194);stroke-width:4.37147;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 161.70698,172.23549 -8.86703,28.15408"
          id="path3002-7-6"
          inkscape:connector-curvature="0"
          sodipodi:nodetypes="cc" />
