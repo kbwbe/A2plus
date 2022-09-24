@@ -658,7 +658,7 @@ class rnp_Update_A2pParts:
     def GetResources(self):
         mypath = os.path.dirname(__file__)
         return {
-             'Pixmap': mypath + "/icons/updateA2.svg",
+             'Pixmap': mypath + "/icons/a2p_update.svg",
              'MenuText': translate("A2plus", "Updates parts from the A2plus program that has been modified"),
              'ToolTip': translate("A2plus", "Updates modified parts.")
              }
