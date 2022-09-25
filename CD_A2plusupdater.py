@@ -27,15 +27,15 @@ for mating features after the part is replaced in the assembly.
 """
 
 import os
-import FreeCADGui
 import FreeCAD
+import FreeCADGui
 from PySide import QtUiTools
 from PySide.QtGui import *
 from PySide import QtGui, QtCore
 import a2p_importpart
 import a2plib
 import CD_ConstraintViewer
-
+from a2p_translateUtils import translate
 
 class globaluseclass:
 
@@ -73,7 +73,7 @@ class sideFuncs1():
     def opendoccheck(self):
         doc = FreeCAD.activeDocument()
         if doc is None:
-            msg = 'A file must be selected to start this selector\nPlease open a file and try again'
+            msg = translate("A2plus", "A file must be selected to start this selector\nPlease open a file and try again")
             mApp(msg)
             return('Nostart')
 
@@ -92,13 +92,13 @@ class classFuncs():
             return('No')
         partslist = FreeCADGui.Selection.getSelection()
         if len(partslist) == 0:
-            mApp('No parts were selected to update.\nSelect one part and try again.')
+            mApp(translate("A2plus", "No parts were selected to update.\nSelect one part and try again."))
             return('No')
         if len(partslist) > 1:
-            mApp('I have limited the number of parts that can be updated to 1.\nSelect one part and try again.')
+            mApp(translate("A2plus", "I have limited the number of parts that can be updated to 1.\nSelect one part and try again."))
             return('No')
         statusform.show()
-        statusform.txtboxstatus.setText('Updating Assembly.')
+        statusform.txtboxstatus.setText(translate("A2plus", "Updating Assembly."))
         statusform.update()
 
         for num in range(0, len(partslist)):
@@ -152,11 +152,11 @@ class classFuncs():
             CD_ConstraintViewer.form1.show()
             CD_ConstraintViewer.form1.loadtable(clist)
         else:
-            mApp('Update complete. All surfaces found')
-        print('update complete')
-        print('Total Constraints ' + str(len(g.clist)))
-        print('Repaired constraints ' + (str(g.repaired )))
-        print('Features not found ' + str(len(g.notfoundfeatures)))
+            mApp(translate("A2plus", "Update complete. All surfaces found"))
+        print(translate("A2plus", "Update complete"))
+        print(translate("A2plus", "Total Constraints ") + str(len(g.clist)))
+        print(translate("A2plus", "Repaired constraints ") + (str(g.repaired )))
+        print(translate("A2plus", "Features not found ") + str(len(g.notfoundfeatures)))
 
     def getfeatstomove(self):
         doc = FreeCAD.activeDocument()
@@ -583,16 +583,14 @@ class mApp(QtGui.QWidget):
     # for error messages
     def __init__(self, msg, msgtype = 'ok'):
         super().__init__()
-        #self.title = 'Information'
         self.initUI(msg)
 
     def initUI(self, msg, msgtype = 'ok'):
-        #self.setWindowTitle(self.title)
         self.setGeometry(800, 300, 300, 400)
         if msgtype == 'ok':
-            buttonReply = QtGui.QMessageBox.question(self, 'Information', msg, QtGui.QMessageBox.Ok | QtGui.QMessageBox.Ok)
+            buttonReply = QtGui.QMessageBox.question(self, translate("A2plus", "Information"), msg, QtGui.QMessageBox.Ok | QtGui.QMessageBox.Ok)
         if msgtype == 'yn':
-            buttonReply = QtGui.QMessageBox.question(self, 'Information', msg, QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No)
+            buttonReply = QtGui.QMessageBox.question(self, translate("A2plus", "Information"), msg, QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No)
         if buttonReply == QtGui.QMessageBox.Yes:
             return('y')
         else:
@@ -604,7 +602,7 @@ class formReport(QtGui.QDialog):
     def __init__(self, name):
         self.name = name
         super(formReport, self).__init__()
-        self.setWindowTitle('Constraint Checker')
+        self.setWindowTitle(translate("A2plus", "Constraint Checker"))
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
         self.setGeometry(300, 100, 300, 200) # xy , wh
         self.setStyleSheet("font: 10pt arial MS")
@@ -620,7 +618,7 @@ class formReport(QtGui.QDialog):
         self.lblviewlabel.setStyleSheet("font: 13pt arial MS")
 
     def showme(self, msg):
-        print('showing editing part')
+        print(translate("A2plus", "Showing editing part"))
         self.show()
 
     def Closeme(self):
@@ -633,6 +631,7 @@ statusform = formReport('statusform')
 
 
 toolTipText = \
+translate("A2plus",
 '''
 Updates the A2plus.assembly when parts are modified.
 To update the assembly, select the part that you have modified and press the icon.
@@ -644,6 +643,7 @@ reconnect them after the update.
 If this fails you can undo this update by using the undo button
 and running the standard A2plus updater.
 '''
+)
 
 class rnp_Update_A2pParts:
     def Activated(self):
@@ -658,9 +658,9 @@ class rnp_Update_A2pParts:
     def GetResources(self):
         mypath = os.path.dirname(__file__)
         return {
-             'Pixmap': mypath + "/icons/updateA2.svg",
-             'MenuText': 'Updates parts from the A2plus program that has been modified',
-             'ToolTip': 'Updates modified parts.'
+             'Pixmap': mypath + "/icons/a2p_Update.svg",
+             'MenuText': translate("A2plus", "Updates parts from the A2plus program that has been modified"),
+             'ToolTip': translate("A2plus", "Updates modified parts.")
              }
 
 FreeCADGui.addCommand('rnp_Update_A2pParts', rnp_Update_A2pParts())
