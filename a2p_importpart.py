@@ -22,7 +22,7 @@
 #*                                                                         *
 #***************************************************************************
 
-import FreeCADGui,FreeCAD
+import FreeCAD, FreeCADGui
 from PySide import QtGui, QtCore
 import os
 import copy
@@ -106,7 +106,7 @@ class a2p_multiShapeExtractDialog(QtGui.QDialog):
         self.initUI()
 
     def initUI(self):
-        self.setWindowTitle('Import Objects')
+        self.setWindowTitle(translate("A2plus", "Import Objects"))
         self.mainLayout = QtGui.QGridLayout() # a VBoxLayout for the whole form
 
         lzip = sorted(zip(self.labelList, self.iconList))
@@ -115,7 +115,7 @@ class a2p_multiShapeExtractDialog(QtGui.QDialog):
         l = self.labelList
 
         self.label = QtGui.QLabel(self)
-        self.label.setText("Select objects to import")
+        self.label.setText(translate("A2plus", "Select objects to import"))
 
         self.listView = QtGui.QListWidget()
         for i, item in enumerate(l):
@@ -128,8 +128,8 @@ class a2p_multiShapeExtractDialog(QtGui.QDialog):
 
         self.buttons = QtGui.QDialogButtonBox(self)
         self.buttons.setOrientation(QtCore.Qt.Horizontal)
-        self.buttons.addButton("Cancel", QtGui.QDialogButtonBox.RejectRole)
-        self.buttons.addButton("Import", QtGui.QDialogButtonBox.AcceptRole)
+        self.buttons.addButton(translate("A2plus", "Cancel"), QtGui.QDialogButtonBox.RejectRole)
+        self.buttons.addButton(translate("A2plus", "Import"), QtGui.QDialogButtonBox.AcceptRole)
         self.connect(self.buttons, QtCore.SIGNAL("accepted()"), self, QtCore.SLOT("accept()"))
         self.connect(self.buttons, QtCore.SIGNAL("rejected()"), self, QtCore.SLOT("reject()"))
 
@@ -148,7 +148,7 @@ class a2p_multiShapeExtractDialog(QtGui.QDialog):
 
             if checked_items:
                 for i in checked_items:
-                    print("Importing", i)
+                    print(translate("A2plus", "Importing"), i)
 
             self.data.tx = checked_items
 
@@ -177,7 +177,7 @@ class a2p_shapeExtractDialog(QtGui.QDialog):
 
     def initUI(self):
         self.resize(400,100)
-        self.setWindowTitle('select a shape to be imported')
+        self.setWindowTitle(translate("A2plus", "Select a shape to be imported"))
         self.mainLayout = QtGui.QGridLayout() # a VBoxLayout for the whole form
 
         self.shapeCombo = QtGui.QComboBox(self)
@@ -187,8 +187,8 @@ class a2p_shapeExtractDialog(QtGui.QDialog):
 
         self.buttons = QtGui.QDialogButtonBox(self)
         self.buttons.setOrientation(QtCore.Qt.Horizontal)
-        self.buttons.addButton("Cancel", QtGui.QDialogButtonBox.RejectRole)
-        self.buttons.addButton("Choose", QtGui.QDialogButtonBox.AcceptRole)
+        self.buttons.addButton(translate("A2plus", "Cancel"), QtGui.QDialogButtonBox.RejectRole)
+        self.buttons.addButton(translate("A2plus", "Choose"), QtGui.QDialogButtonBox.AcceptRole)
         self.connect(self.buttons, QtCore.SIGNAL("accepted()"), self, QtCore.SLOT("accept()"))
         self.connect(self.buttons, QtCore.SIGNAL("rejected()"), self, QtCore.SLOT("reject()"))
 
@@ -241,8 +241,8 @@ def importPartFromFile(
             ImportGui.insert(filename,newname)
             importDoc = FreeCAD.ActiveDocument
         else:
-            msg = translate("A2plus_importpart","A part can only be imported from a FreeCAD '*.FCStd' file")
-            QtGui.QMessageBox.information( QtGui.QApplication.activeWindow(), translate("A2plus_importpart","Value Error"), msg )
+            msg = translate("A2plus", "A part can only be imported from a FreeCAD '*.FCStd' file")
+            QtGui.QMessageBox.information( QtGui.QApplication.activeWindow(), translate("A2plus", "Value Error"), msg )
             return
 
     #-------------------------------------------
@@ -266,10 +266,10 @@ def importPartFromFile(
     importableObjects = topoMapper.getTopLevelObjects(allowSketches=True)
 
     if len(importableObjects) == 0:
-        msg = translate("A2plus_importpart","No visible Part to import found. Aborting operation")
+        msg = translate("A2plus", "No visible Part to import found. Aborting operation")
         QtGui.QMessageBox.information(
             QtGui.QApplication.activeWindow(),
-            translate("A2plus_importpart","Import Error"),
+            translate("A2plus", "Import Error"),
             msg
             )
         return
@@ -290,10 +290,10 @@ def importPartFromFile(
                 dc)
             dialog.exec_()
             if dc.tx is None:
-                msg = translate("A2plus_importpart","Import of a shape reference aborted by user")
+                msg = translate("A2plus", "Import of a shape reference aborted by user")
                 QtGui.QMessageBox.information(
                     QtGui.QApplication.activeWindow(),
-                    translate("A2plus_importpart","Import Error"),
+                    translate("A2plus", "Import Error"),
                     msg
                     )
                 return
@@ -402,7 +402,7 @@ def importPartFromFile(
         #=========================================
         # create a group containing imported LCS's
         lcsGroupObjectName = 'LCS_Collection'
-        lcsGroupLabel = 'LCS_Collection'
+        lcsGroupLabel = translate("A2plus", "LCS_Collection")
 
         if PYVERSION < 3:
             lcsGroup = doc.addObject( "Part::FeaturePython", lcsGroupObjectName.encode('utf-8') )
@@ -429,7 +429,7 @@ def importPartFromFile(
 
 #==============================================================================
 toolTip = \
-translate("A2plus_importpart",
+translate("A2plus",
 '''
 Add shapes from an external file
 to the assembly
@@ -441,7 +441,7 @@ class a2p_ImportShapeReferenceCommand():
     def GetResources(self):
         return {'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_ShapeReference.svg',
                 'Accel' : "Ctrl+Shift+A", # a default shortcut (optional)
-                'MenuText': translate("A2plus_importpart","Add shapes from an external file"),
+                'MenuText': translate("A2plus", "Add shapes from an external file"),
                 'ToolTip' : toolTip
                 }
 
@@ -449,16 +449,16 @@ class a2p_ImportShapeReferenceCommand():
         if FreeCAD.ActiveDocument is None:
             QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
-               translate("A2plus_importpart","No active Document found"),
-               translate("A2plus_importpart","First create an empty file and save it under desired name")
+               translate("A2plus", "No active Document found"),
+               translate("A2plus", "First create an empty file and save it under desired name")
                )
             return
         #
         if FreeCAD.ActiveDocument.FileName == '':
             QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
-               translate("A2plus_importpart","Unnamed document"),
-               translate("A2plus_importpart","Before inserting first part, please save the empty assembly to give it a name")
+               translate("A2plus", "Unnamed document"),
+               translate("A2plus", "Before inserting first part, please save the empty assembly to give it a name")
                )
             FreeCADGui.SendMsgToActiveView("Save")
             return
@@ -469,7 +469,7 @@ class a2p_ImportShapeReferenceCommand():
 
         dialog = QtGui.QFileDialog(
             QtGui.QApplication.activeWindow(),
-            translate("A2plus_importpart","Select FreeCAD document to import part from")
+            translate("A2plus", "Select FreeCAD document to import part from")
             )
         # set option "DontUseNativeDialog"=True, as native Filedialog shows
         # misbehavior on Unbuntu 18.04 LTS. It works case sensitively, what is not wanted...
@@ -477,7 +477,7 @@ class a2p_ImportShapeReferenceCommand():
             dialog.setOption(QtGui.QFileDialog.DontUseNativeDialog, False)
         else:
             dialog.setOption(QtGui.QFileDialog.DontUseNativeDialog, True)
-        dialog.setNameFilter(translate("A2plus_importpart","Supported Formats (*.FCStd *.fcstd *.stp *.step);;All files (*.*)"))
+        dialog.setNameFilter(translate("A2plus", "Supported Formats (*.FCStd *.fcstd *.stp *.step);;All files (*.*)"))
         if dialog.exec_():
             if PYVERSION < 3:
                 filename = unicode(dialog.selectedFiles()[0])
@@ -487,14 +487,13 @@ class a2p_ImportShapeReferenceCommand():
             return
 
         if not a2plib.checkFileIsInProjectFolder(filename):
-            msg = translate("A2plus_importpart","The part you try to import is outside of your project-folder! Check your settings of A2plus preferences.")
+            msg = translate("A2plus", "The part you try to import is outside of your project-folder! Check your settings of A2plus preferences.")
             QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
-                translate("A2plus_importpart","Import Error"),
+                translate("A2plus", "Import Error"),
                 msg
                 )
             return
-
 
 
         #==========================================================================================
@@ -524,9 +523,11 @@ class a2p_ImportShapeReferenceCommand():
                 ImportGui.insert(filename,newname)
                 importDoc = FreeCAD.ActiveDocument
             else:
-                msg = translate("A2plus_importpart","A part can only be imported from a FreeCAD '*.FCStd' file")
-                QtGui.QMessageBox.information( QtGui.QApplication.activeWindow(), translate("A2plus_importpart","Value Error"), msg )
+                msg = translate("A2plus", "A part can only be imported from a FreeCAD '*.FCStd' file")
+                QtGui.QMessageBox.information( QtGui.QApplication.activeWindow(), translate("A2plus", "Value Error"), msg )
                 return
+
+            
         #==========================================================================================
         # file seems to be open....
         # detect the importable objects...
@@ -535,14 +536,15 @@ class a2p_ImportShapeReferenceCommand():
         importableObjects = topoMapper.getTopLevelObjects(allowSketches=True)
 
         if len(importableObjects) == 0:
-            msg = "No visible Part to import found. Aborting operation"
+            msg = translate("A2plus", "No visible Part to import found. Aborting operation")
             QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
-                translate("A2plus_importpart","Import Error"),
+                translate("A2plus", "Import Error"),
                 msg
                 )
             return
 
+        
         #==========================================================================================
         # creates a dialog for selecting the parts
         #==========================================================================================
@@ -573,7 +575,7 @@ class a2p_ImportShapeReferenceCommand():
             importedObject = importPartFromFile(doc, filename, extractSingleShape=True, desiredShapeLabel = so)
 
             if not importedObject:
-                a2plib.Msg(translate("A2plus_importpart","imported Object is empty/none\n"))
+                a2plib.Msg(translate("A2plus", "Imported Object is empty/none\n"))
                 continue
 
             importedObjectsList.append(importedObject)
@@ -626,7 +628,7 @@ FreeCADGui.addCommand('a2p_ImportShapeReferenceCommand',a2p_ImportShapeReference
 
 #==============================================================================
 toolTip = \
-translate("A2plus_importpart",
+translate("A2plus",
 '''
 Restore transparency to
 active document objects
@@ -638,14 +640,14 @@ class a2p_Restore_Transparency_Command():
     def GetResources(self):
         return {'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_Restore_Transparency.svg',
                 'Accel'   : "Shift+T", # a default shortcut (optional)
-                'MenuText': translate("A2plus_importpart", "Restore transparency to active document objects"),
+                'MenuText': translate("A2plus", "Restore transparency to active document objects"),
                 'ToolTip' : toolTip
                 }
 
     def Activated(self):
         doc = FreeCAD.ActiveDocument
         if doc is None:
-            FreeCAD.Console.Print("No active document found")
+            FreeCAD.Console.Print(translate("A2plus", "No active document found"))
             return
         else:
             for obj in doc.Objects:
@@ -666,7 +668,7 @@ FreeCADGui.addCommand('a2p_Restore_Transparency',a2p_Restore_Transparency_Comman
 
 #==============================================================================
 toolTip = \
-translate("A2plus_importpart",
+translate("A2plus",
 '''
 Add a part from an external file
 to the assembly
@@ -678,7 +680,7 @@ class a2p_ImportPartCommand():
     def GetResources(self):
         return {'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_ImportPart.svg',
                 'Accel'   : "Shift+A", # a default shortcut (optional)
-                'MenuText': translate("A2plus_importpart", "Add a part from an external file"),
+                'MenuText': translate("A2plus", "Add a part from an external file"),
                 'ToolTip' : toolTip
                 }
 
@@ -686,16 +688,16 @@ class a2p_ImportPartCommand():
         if FreeCAD.ActiveDocument is None:
             QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
-               translate("A2plus_importpart","No active Document found"),
-               translate("A2plus_importpart","First create an empty file and save it under desired name")
+               translate("A2plus", "No active Document found"),
+               translate("A2plus", "First create an empty file and save it under desired name")
                )
             return
         #
         if FreeCAD.ActiveDocument.FileName == '':
             QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
-               translate("A2plus_importpart","Unnamed document"),
-               translate("A2plus_importpart","Before inserting first part, please save the empty assembly to give it a name")
+               translate("A2plus", "Unnamed document"),
+               translate("A2plus", "Before inserting first part, please save the empty assembly to give it a name")
                )
             FreeCADGui.SendMsgToActiveView("Save")
             return
@@ -706,7 +708,7 @@ class a2p_ImportPartCommand():
 
         dialog = QtGui.QFileDialog(
             QtGui.QApplication.activeWindow(),
-            translate("A2plus_importpart","Select FreeCAD document to import part from")
+            translate("A2plus", "Select FreeCAD document to import part from")
             )
         # set option "DontUseNativeDialog"=True, as native Filedialog shows
         # misbehavior on Unbuntu 18.04 LTS. It works case sensitively, what is not wanted...
@@ -714,7 +716,7 @@ class a2p_ImportPartCommand():
             dialog.setOption(QtGui.QFileDialog.DontUseNativeDialog, False)
         else:
             dialog.setOption(QtGui.QFileDialog.DontUseNativeDialog, True)
-        dialog.setNameFilter(translate("A2plus_importpart","Supported Formats (*.FCStd *.fcstd *.stp *.step);;All files (*.*)"))
+        dialog.setNameFilter(translate("A2plus", "Supported Formats (*.FCStd *.fcstd *.stp *.step);;All files (*.*)"))
         if dialog.exec_():
             if PYVERSION < 3:
                 filename = unicode(dialog.selectedFiles()[0])
@@ -724,10 +726,10 @@ class a2p_ImportPartCommand():
             return
 
         if not a2plib.checkFileIsInProjectFolder(filename):
-            msg = translate("A2plus_importpart","The part you try to import is outside of your project-folder! Check your settings of A2plus preferences.")
+            msg = translate("A2plus", "The part you try to import is outside of your project-folder! Check your settings of A2plus preferences.")
             QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
-                translate("A2plus_importpart","Import Error"),
+                translate("A2plus","Import Error"),
                 msg
                 )
             return
@@ -736,7 +738,7 @@ class a2p_ImportPartCommand():
         importedObject = importPartFromFile(doc, filename)
 
         if not importedObject:
-            a2plib.Msg("imported Object is empty/none\n")
+            a2plib.Msg(translate("A2plus", "Imported Object is empty/none\n"))
             return
 
         mw = FreeCADGui.getMainWindow()
@@ -775,8 +777,8 @@ def updateImportedParts(doc, partial=False):
     if doc is None:
         QtGui.QMessageBox.information(
                         QtGui.QApplication.activeWindow(),
-                        translate("A2plus_importpart","No active document found!"),
-                        translate("A2plus_importpart","Before updating parts, you have to open an assembly file.")
+                        translate("A2plus", "No active document found!"),
+                        translate("A2plus", "Before updating parts, you have to open an assembly file.")
                         )
         return
 
@@ -794,10 +796,10 @@ def updateImportedParts(doc, partial=False):
             response = QtGui.QMessageBox.Yes
         else:
             flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
-            msg = translate("A2plus_importpart","Do you want to update only the selected parts?")
+            msg = translate("A2plus", "Do you want to update only the selected parts?")
             response = QtGui.QMessageBox.information(
                             QtGui.QApplication.activeWindow(),
-                            translate("A2plus_importpart","ASSEMBLY UPDATE"),
+                            translate("A2plus", "ASSEMBLY UPDATE"),
                             msg,
                             flags
                             )
@@ -831,8 +833,8 @@ def updateImportedParts(doc, partial=False):
 
             if absPath is None:
                 QtGui.QMessageBox.critical(  QtGui.QApplication.activeWindow(),
-                                            translate("A2plus_importpart","Source file not found"),
-                                            translate("A2plus_importpart","Unable to find {}").format(
+                                            translate("A2plus", "Source file not found"),
+                                            translate("A2plus", "Unable to find {}").format(
                                                 obj.sourceFile
                                                 )
                                         )
@@ -905,7 +907,7 @@ def updateImportedParts(doc, partial=False):
 
 
 toolTip = \
-translate("A2plus_importpart",
+translate("A2plus",
 '''
 Update parts, which have been
 imported to the assembly.
@@ -925,7 +927,7 @@ class a2p_UpdateImportedPartsCommand:
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.path_a2p + '/icons/a2p_ImportPart_Update.svg',
-            'MenuText': translate("A2plus_importpart", "Update parts imported into the assembly"),
+            'MenuText': translate("A2plus", "Update parts imported into the assembly"),
             'ToolTip' : toolTip
             }
 
@@ -975,7 +977,7 @@ def duplicateImportedPart( part ):
 
 
 toolTip = \
-translate("A2plus_importpart",
+translate("A2plus",
 '''
 Make a duplicate of a
 part, which is already
@@ -1029,7 +1031,7 @@ class a2p_DuplicatePartCommand:
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_DuplicatePart.svg',
-            'MenuText': translate("A2plus_importpart", "Create duplicate of a part"),
+            'MenuText': translate("A2plus", "Create duplicate of a part"),
             'ToolTip' : toolTip
             }
 
@@ -1038,7 +1040,7 @@ FreeCADGui.addCommand('a2p_duplicatePart', a2p_DuplicatePartCommand())
 
 
 toolTip = \
-translate("A2plus_importpart",
+translate("A2plus",
 '''
 Edit an imported part.
 
@@ -1075,19 +1077,18 @@ class a2p_EditPartCommand:
 
                 QtGui.QMessageBox.information(
                     QtGui.QApplication.activeWindow(),
-                    translate("A2plus_importpart","Information"),
-                    translate("A2plus_importpart","Please edit the highlighted object. When finished, update the assembly")
+                    translate("A2plus", "Information"),
+                    translate("A2plus", "Please edit the highlighted object. When finished, update the assembly")
                     )
                 return
             except:
                 pass
             QtGui.QMessageBox.critical(
                 QtGui.QApplication.activeWindow(),
-                translate("A2plus_importpart","File error ! "),
-                translate("A2plus_importpart","Cannot find the local source object. Has it been deleted?")
+                translate("A2plus", "File error!"),
+                translate("A2plus", "Cannot find the local source object. Has it been deleted?")
                 )
             return
-
 
 
         #====================================================
@@ -1098,10 +1099,10 @@ class a2p_EditPartCommand:
         assemblyPath = os.path.normpath(os.path.split(doc.FileName)[0])
         fileNameWithinProjectFile = a2plib.findSourceFileInProject(obj.sourceFile, assemblyPath)
         if fileNameWithinProjectFile is None:
-            msg = translate("A2plus_importpart","You want to edit a file which is not found below your project-folder. This is not allowed when using preference Use project Folder")
+            msg = translate("A2plus", "You want to edit a file which is not found below your project-folder. This is not allowed when using preference Use project Folder")
             QtGui.QMessageBox.critical(
                 QtGui.QApplication.activeWindow(),
-                translate("A2plus_importpart","File error ! "),
+                translate("A2plus", "File error!"),
                 msg
                 )
             return
@@ -1129,8 +1130,8 @@ class a2p_EditPartCommand:
                 ImportGui.open(fileNameWithinProjectFile, newname)
                 FreeCAD.ActiveDocument.Label = fname
                 FreeCADGui.SendMsgToActiveView("ViewFit")
-                msg = translate("A2plus_importpart","Editing a STEP file as '*.FCStd' file\nPlease export the saved file as \'.step\'\n") + fileNameWithinProjectFile
-                QtGui.QMessageBox.information( QtGui.QApplication.activeWindow(), "Info", msg )
+                msg = translate("A2plus", "Editing a STEP file as '*.FCStd' file.\nPlease export the saved file as \'.step\'\n") + fileNameWithinProjectFile
+                QtGui.QMessageBox.information( QtGui.QApplication.activeWindow(), translate("A2plus", "Info"), msg )
             else:
                 FreeCAD.open(fileNameWithinProjectFile)
         else:
@@ -1157,13 +1158,11 @@ class a2p_EditPartCommand:
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_EditPart.svg',
-            'MenuText': translate("A2plus_importpart", "Edit an imported part (open linked FCStd file)"),
+            'MenuText': translate("A2plus", "Edit an imported part (open linked FCStd file)"),
             'ToolTip' : toolTip
             }
 
 FreeCADGui.addCommand('a2p_editImportedPart', a2p_EditPartCommand())
-
-
 
 
 #===============================================================================
@@ -1210,7 +1209,7 @@ class PartMover:
                 #FreeCAD.activeDocument().removeObject(self.obj.Name)
 #===============================================================================
 toolTip = \
-translate("A2plus_importpart",
+translate("A2plus",
 '''
 Move the selected part.
 
@@ -1248,9 +1247,8 @@ class a2p_MovePartCommand:
 
     def GetResources(self):
         return {
-            #'Pixmap' : ':/assembly2/icons/MovePart.svg',
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_MovePart.svg',
-            'MenuText': translate("A2plus_importpart", "Move the selected part"),
+            'MenuText': translate("A2plus", "Move the selected part"),
             'ToolTip' : toolTip
             }
 
@@ -1292,8 +1290,8 @@ class ConstrainedPartsMover:
                 self.doc.commitTransaction()
                 QtGui.QMessageBox.information(
                     QtGui.QApplication.activeWindow(),
-                   translate("A2plus_importpart","Animation problem detected"),
-                   translate("A2plus_importpart","Use system undo if necessary.")
+                   translate("A2plus", "Animation problem detected"),
+                   translate("A2plus", "Use system undo if necessary.")
                    )
                 self.removeCallbacks()
 
@@ -1309,8 +1307,8 @@ class ConstrainedPartsMover:
             if hasattr(self.obj, 'fixedPosition') and self.obj.fixedPosition == True:
                 QtGui.QMessageBox.information(
                     QtGui.QApplication.activeWindow(),
-                   translate("A2plus_importpart","Invalid selection"),
-                   translate("A2plus_importpart","A2plus will not move a part with property") + '''fixedPosition == True'''
+                   translate("A2plus", "Invalid selection"),
+                   translate("A2plus", "A2plus will not move a part with property ") + '''fixedPosition == True'''
                    )
                 self.removeCallbacks()
                 del self
@@ -1330,9 +1328,11 @@ class ConstrainedPartsMover:
         if info['State'] == 'UP' and info['Key'] == 'ESCAPE':
             doc.commitTransaction()
             self.removeCallbacks()
+
+
 #===============================================================================
 toolTip = \
-translate("A2plus_importpart",
+translate("A2plus",
 '''
 Move the a part under rule of constraints.
 
@@ -1367,9 +1367,8 @@ class a2p_MovePartUnderConstraints:
 
     def GetResources(self):
         return {
-            #'Pixmap' : ':/assembly2/icons/MovePart.svg',
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_MovePartUnderConstraints.svg',
-            'MenuText': translate("A2plus_importpart", "Move the selected part under constraints"),
+            'MenuText': translate("A2plus", "Move the selected part under constraints"),
             'ToolTip' : toolTip
             }
 
@@ -1377,10 +1376,8 @@ FreeCADGui.addCommand('a2p_MovePartUnderConstraints', a2p_MovePartUnderConstrain
 #===============================================================================
 
 
-
-
 toolTipText = \
-translate("A2plus_importpart",
+translate("A2plus",
 '''
 Delete all constraints
 of a selected part.
@@ -1406,8 +1403,8 @@ class DeleteConnectionsCommand:
         if len(selection) != 1:
             QtGui.QMessageBox.critical(
                 QtGui.QApplication.activeWindow(),
-               translate("A2plus_importpart","Selection Error"),
-               translate("A2plus_importpart","Select exactly 1 part"))
+               translate("A2plus", "Selection Error"),
+               translate("A2plus", "Select exactly 1 part"))
             return
         part = selection[0]
         deleteList = []
@@ -1416,22 +1413,22 @@ class DeleteConnectionsCommand:
                 if part.Name in [ c.Object1, c.Object2 ]:
                     deleteList.append(c)
         if len(deleteList) == 0:
-            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Info", 'No constraints refer to "%s"' % part.Name)
+            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), translate("A2plus", "Info"), translate("A2plus", "No constraints refer to '%s'") % part.Name)
         else:
             flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
-            msg = translate("A2plus_importpart", u"Delete {}'s constraint(s):\n  - {}?").format(
+            msg = translate("A2plus", "Delete {}'s constraint(s):\n  - {}?").format(
                 part.Label,
                 u'\n  - '.join( c.Name for c in deleteList)
                 )
             response = QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
-                translate("A2plus_importpart","Delete constraints?"),
+                translate("A2plus", "Delete constraints?"),
                 msg,
                 flags
                 )
             if response == QtGui.QMessageBox.Yes:
                 doc = FreeCAD.activeDocument()
-                doc.openTransaction(translate("A2plus_importpart","Deleting part's constraints"))
+                doc.openTransaction(translate("A2plus", "Deleting part's constraints"))
                 for c in deleteList:
                     a2plib.removeConstraint(c)
                 doc.commitTransaction()
@@ -1450,13 +1447,15 @@ class DeleteConnectionsCommand:
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_DeleteConnections.svg',
-            'MenuText': translate("A2plus_importpart", "Delete all constraints of selected parts"),
+            'MenuText': translate("A2plus", "Delete all constraints of selected parts"),
             'ToolTip' : toolTipText
             }
 FreeCADGui.addCommand('a2p_DeleteConnectionsCommand', DeleteConnectionsCommand())
+#===============================================================================
+
 
 toolTip = \
-translate("A2plus_importpart",
+translate("A2plus",
 '''
 Highlight both parts, which are
 related to a selected constraint.
@@ -1499,11 +1498,13 @@ class ViewConnectionsCommand:
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_ViewConnection.svg',
-            'MenuText': translate("A2plus_importpart", "Highlight both constrained parts"),
+            'MenuText': translate("A2plus", "Highlight both constrained parts"),
             'ToolTip' : toolTip
             }
 
 FreeCADGui.addCommand('a2p_ViewConnectionsCommand', ViewConnectionsCommand())
+#===============================================================================
+
 
 class ViewConnectionsObserver:
     def __init__(self,initialTransparencyState):
@@ -1534,7 +1535,7 @@ class ViewConnectionsObserver:
                 FreeCAD.ActiveDocument.getObject(selected.Object2), selected.SubElement2)
 
 toolTip = \
-translate("A2plus_importpart",
+translate("A2plus",
 '''
 Show only selected elements,
 or all if none is selected.
@@ -1562,8 +1563,8 @@ class a2p_isolateCommand:
     def Activated(self):
         if FreeCAD.activeDocument() is None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
-                                        translate("A2plus_importpart","No active document found!"),
-                                        translate("A2plus_importpart","You have to open an assembly file first.")
+                                        translate("A2plus", "No active document found!"),
+                                        translate("A2plus", "You have to open an assembly file first.")
                                     )
             return
         selection = [s for s in FreeCADGui.Selection.getSelection() if s.Document == FreeCAD.ActiveDocument ]
@@ -1595,22 +1596,20 @@ class a2p_isolateCommand:
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_Isolate_Element.svg',
-            'MenuText': translate("A2plus_importpart", "Show only selected elements or all if none is selected"),
+            'MenuText': translate("A2plus", "Show only selected elements or all if none is selected"),
             'ToolTip' : toolTip
             }
 
 FreeCADGui.addCommand('a2p_isolateCommand', a2p_isolateCommand())
-
-
-
+#===============================================================================
 
 
 class a2p_ToggleTransparencyCommand:
     def Activated(self, checked):
         if FreeCAD.activeDocument() is None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
-                                        translate("A2plus_importpart","No active document found!"),
-                                        translate("A2plus_importpart","You have to open an assembly file first.")
+                                        translate("A2plus", "No active document found!"),
+                                        translate("A2plus", "You have to open an assembly file first.")
                                     )
             return
         if a2plib.isTransparencyEnabled():
@@ -1627,16 +1626,16 @@ class a2p_ToggleTransparencyCommand:
     def GetResources(self):
         return {
             'Pixmap'   : a2plib.pathOfModule()+'/icons/a2p_ToggleTransparency.svg',
-            'MenuText' : translate("A2plus_importpart", "Toggle transparency of assembly"),
-            'ToolTip'  : translate("A2plus_importpart", "Toggles transparency of assembly"),
+            'MenuText' : translate("A2plus", "Toggle transparency of assembly"),
+            'ToolTip'  : translate("A2plus", "Toggles transparency of assembly"),
             'Checkable': self.IsChecked()
         }
 FreeCADGui.addCommand('a2p_ToggleTransparencyCommand', a2p_ToggleTransparencyCommand())
-
+#===============================================================================
 
 
 toolTipMessage = \
-translate("A2plus_importpart",
+translate("A2plus",
 '''
 Toggle AutoSolve
 
@@ -1661,12 +1660,12 @@ class a2p_ToggleAutoSolveCommand:
     def GetResources(self):
         return {
             'Pixmap'   : a2plib.pathOfModule()+'/icons/a2p_ToggleAutoSolve.svg',
-            'MenuText' : translate("A2plus_importpart", "Toggle auto solve"),
+            'MenuText' : translate("A2plus", "Toggle auto solve"),
             'ToolTip'  : toolTipMessage,
             'Checkable': self.IsChecked()
             }
 FreeCADGui.addCommand('a2p_ToggleAutoSolveCommand', a2p_ToggleAutoSolveCommand())
-
+#===============================================================================
 
 
 class a2p_TogglePartialProcessingCommand:
@@ -1680,24 +1679,24 @@ class a2p_TogglePartialProcessingCommand:
     def GetResources(self):
         return {
             'Pixmap'   : a2plib.pathOfModule()+'/icons/a2p_TogglePartial.svg',
-            'MenuText' : translate("A2plus_importpart", "Toggle partial processing"),
-            'ToolTip'  : translate("A2plus_importpart", "Toggle partial processing"),
+            'MenuText' : translate("A2plus", "Toggle partial processing"),
+            'ToolTip'  : translate("A2plus", "Toggle partial processing"),
             'Checkable': self.IsChecked()
             }
 FreeCADGui.addCommand('a2p_TogglePartialProcessingCommand', a2p_TogglePartialProcessingCommand())
-
+#===============================================================================
 
 
 toolTipMessage = \
-translate("A2plus_importpart","Repair the treeview, if it is damaged somehow. After pressing this button, constraints will grouped under corresponding parts again.")
+translate("A2plus", "Repair the treeview, if it is damaged somehow. After pressing this button, constraints will grouped under corresponding parts again.")
 
 class a2p_repairTreeViewCommand:
 
     def Activated(self):
         if FreeCAD.activeDocument() is None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
-                                        translate("A2plus_importpart","No active document found!"),
-                                        translate("A2plus_importpart","You have to open an assembly file first.")
+                                        translate("A2plus", "No active document found!"),
+                                        translate("A2plus", "You have to open an assembly file first.")
                                     )
             return
         a2plib.a2p_repairTreeView()
@@ -1705,13 +1704,15 @@ class a2p_repairTreeViewCommand:
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_RepairTree.svg',
-            'MenuText': translate("A2plus_importpart", "Repair the tree view if it is somehow damaged"),
+            'MenuText': translate("A2plus", "Repair the tree view if it is somehow damaged"),
             'ToolTip' : toolTipMessage
             }
 FreeCADGui.addCommand('a2p_repairTreeViewCommand', a2p_repairTreeViewCommand())
+#===============================================================================
+
 
 toolTip = \
-translate("A2plus_importpart",
+translate("A2plus",
 '''
 Flip direction of last constraint.
 
@@ -1729,8 +1730,8 @@ class a2p_FlipConstraintDirectionCommand:
     def Activated(self):
         if FreeCAD.activeDocument() is None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
-                                        translate("A2plus_importpart","No active document found!"),
-                                        translate("A2plus_importpart","You have to open an assembly file first.")
+                                        translate("A2plus", "No active document found!"),
+                                        translate("A2plus", "You have to open an assembly file first.")
                                     )
             return
         a2p_FlipConstraintDirection()
@@ -1738,10 +1739,12 @@ class a2p_FlipConstraintDirectionCommand:
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_FlipConstraint.svg',
-            'MenuText': translate("A2plus_importpart", "Flip direction of last constraint"),
+            'MenuText': translate("A2plus", "Flip direction of last constraint"),
             'ToolTip' : toolTip
             }
 FreeCADGui.addCommand('a2p_FlipConstraintDirectionCommand', a2p_FlipConstraintDirectionCommand())
+#===============================================================================
+
 
 def a2p_FlipConstraintDirection():
     """Updating constraints, deactivated at moment."""
@@ -1750,8 +1753,8 @@ def a2p_FlipConstraintDirection():
     if len(constraints) == 0:
         QtGui.QMessageBox.information(
             QtGui.qApp.activeWindow(),
-            "Command Aborted",
-            'Flip aborted since no a2p constraints in active document.'
+            translate("A2plus", "Command Aborted"),
+            translate("A2plus", "Flip aborted since no a2p constraints in active document.")
             )
         return
     lastConstraintAdded = constraints[-1]
@@ -1773,8 +1776,8 @@ class a2p_Show_Hierarchy_Command:
         doc = FreeCAD.activeDocument()
         if doc is None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
-                                        translate("A2plus_importpart","No active document found!"),
-                                        translate("A2plus_importpart","You have to open an assembly file first.")
+                                        translate("A2plus", "No active document found!"),
+                                        translate("A2plus", "You have to open an assembly file first.")
                                     )
             return
         ss = a2p_solversystem.SolverSystem()
@@ -1785,11 +1788,11 @@ class a2p_Show_Hierarchy_Command:
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_Treeview.svg',
-            'MenuText': translate("A2plus_importpart", "Generate HTML file with detailed constraining structure"),
-            'ToolTip' : translate("A2plus_importpart", "Generates HTML file with detailed constraining structure")
+            'MenuText': translate("A2plus", "Generate HTML file with detailed constraining structure"),
+            'ToolTip' : translate("A2plus", "Generates HTML file with detailed constraining structure")
             }
 FreeCADGui.addCommand('a2p_Show_Hierarchy_Command', a2p_Show_Hierarchy_Command())
-
+#===============================================================================
 
 
 class a2p_Show_PartLabels_Command:
@@ -1811,8 +1814,8 @@ class a2p_Show_PartLabels_Command:
                     a2pObjects.append(ob)
             if len(a2pObjects) == 0:
                 QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
-                                            translate("A2plus_importpart","Nothing found to be labeled!"),
-                                            translate("A2plus_importpart","This document does not contain A2p-objects")
+                                            translate("A2plus", "Nothing found to be labeled!"),
+                                            translate("A2plus", "This document does not contain A2p-objects")
                                         )
                 return
 
@@ -1851,11 +1854,12 @@ class a2p_Show_PartLabels_Command:
     def GetResources(self):
         return {
             'Pixmap'   : a2plib.pathOfModule()+'/icons/a2p_PartLabel.svg',
-            'MenuText' : translate("A2plus_importpart", "Show part labels in 3D view"),
-            'ToolTip'  : translate("A2plus_importpart", "Toggle showing part labels in 3D view"),
+            'MenuText' : translate("A2plus", "Show part labels in 3D view"),
+            'ToolTip'  : translate("A2plus", "Toggle showing part labels in 3D view"),
             'Checkable': False
             }
 FreeCADGui.addCommand('a2p_Show_PartLabels_Command', a2p_Show_PartLabels_Command())
+#===============================================================================
 
 
 class a2p_Show_DOF_info_Command:
@@ -1886,12 +1890,12 @@ class a2p_Show_DOF_info_Command:
     def GetResources(self):
         return {
             'Pixmap'   : a2plib.pathOfModule()+'/icons/a2p_DOFs.svg',
-            'MenuText' : translate("A2plus_importpart", "Print detailed DOF information"),
-            'ToolTip'  : translate("A2plus_importpart", "Toggle printing detailed DOF information"),
+            'MenuText' : translate("A2plus", "Print detailed DOF information"),
+            'ToolTip'  : translate("A2plus", "Toggle printing detailed DOF information"),
             'Checkable': False
             }
 FreeCADGui.addCommand('a2p_Show_DOF_info_Command', a2p_Show_DOF_info_Command())
-
+#===============================================================================
 
 
 class a2p_absPath_to_relPath_Command:
@@ -1899,8 +1903,8 @@ class a2p_absPath_to_relPath_Command:
         doc = FreeCAD.activeDocument()
         if doc is None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
-                                        translate("A2plus_importpart","No active document found!"),
-                                        translate("A2plus_importpart","You have to open an assembly file first.")
+                                        translate("A2plus", "No active document found!"),
+                                        translate("A2plus", "You have to open an assembly file first.")
                                     )
             return
         assemblyPath = os.path.normpath(  os.path.split( os.path.normpath(doc.FileName) )[0])
@@ -1922,12 +1926,10 @@ class a2p_absPath_to_relPath_Command:
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_SetRelativePathes.svg',
-            'MenuText': translate("A2plus_importpart", "Convert absolute paths of imported parts to relative ones"),
-            'ToolTip' : translate("A2plus_importpart", "Converts absolute paths of imported parts to relative ones")
+            'MenuText': translate("A2plus", "Convert absolute paths of imported parts to relative ones"),
+            'ToolTip' : translate("A2plus", "Converts absolute paths of imported parts to relative ones")
             }
 FreeCADGui.addCommand('a2p_absPath_to_relPath_Command', a2p_absPath_to_relPath_Command())
-
-
 
 
 #==============================================================================
@@ -1954,14 +1956,15 @@ class a2p_SaveAndExit_Command:
     def GetResources(self):
         return {
             'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_Save_and_exit.svg',
-            'MenuText': translate("A2plus_importpart", "Save and exit the active document"),
-            'ToolTip' : translate("A2plus_importpart", "Save and exit the active document")
+            'MenuText': translate("A2plus", "Save and exit the active document"),
+            'ToolTip' : translate("A2plus", "Save and exit the active document")
             }
 FreeCADGui.addCommand('a2p_SaveAndExit_Command', a2p_SaveAndExit_Command())
 
+
 #==============================================================================
 toolTip = \
-translate("A2plus_importpart",
+translate("A2plus",
 '''
 Migrate proxies of imported parts
 
@@ -1985,8 +1988,8 @@ class a2p_MigrateProxiesCommand():
         flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
         response = QtGui.QMessageBox.information(
             QtGui.QApplication.activeWindow(),
-            translate("A2plus_importpart","Migrate proxies of importedParts to recent version"),
-            translate("A2plus_importpart","Make sure you have a backup of your files. Proceed?"),
+            translate("A2plus", "Migrate proxies of importedParts to recent version"),
+            translate("A2plus", "Make sure you have a backup of your files. Proceed?"),
             flags
             )
         if response == QtGui.QMessageBox.Yes:
@@ -2008,8 +2011,8 @@ class a2p_MigrateProxiesCommand():
 
         QtGui.QMessageBox.information(
             QtGui.QApplication.activeWindow(),
-            translate("A2plus_importpart","The proxies have been migrated."),
-            translate("A2plus_importpart","Please save and reopen this assembly file")
+            translate("A2plus", "The proxies have been migrated."),
+            translate("A2plus", "Please save and reopen this assembly file")
             )
 
 
@@ -2017,12 +2020,13 @@ class a2p_MigrateProxiesCommand():
     def GetResources(self):
         return {
             'Pixmap' : ':/icons/a2p_Upgrade.svg',
-            'MenuText': translate("A2plus_importpart", "Migrate proxies of imported parts"),
+            'MenuText': translate("A2plus", "Migrate proxies of imported parts"),
             'ToolTip': toolTip
             }
 
 FreeCADGui.addCommand('a2p_MigrateProxiesCommand', a2p_MigrateProxiesCommand())
 #==============================================================================
+
 
 def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
     if not a2plib.getUseTopoNaming(): return
@@ -2129,19 +2133,19 @@ def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
         for cName in deletionList:
 
             flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.Abort
-            message = "Constraint %s is broken. Delete constraint? Otherwise check for wrong linkage." % cName
-            #response = QtGui.QMessageBox.critical(QtGui.qApp.activeWindow(), "Broken Constraint", message, flags )
-            response = QtGui.QMessageBox.critical(None, "Broken Constraint", message, flags )
+            message = translate("A2plus", "Constraint %s is broken. Delete constraint? Otherwise check for wrong linkage.") % cName
+            #response = QtGui.QMessageBox.critical(QtGui.qApp.activeWindow(), translate("A2plus", "Broken Constraint"), message, flags )
+            response = QtGui.QMessageBox.critical(None, translate("A2plus", "Broken Constraint"), message, flags )
 
             if response == QtGui.QMessageBox.Yes:
-                FreeCAD.Console.PrintError("Removing constraint %s" % cName)
+                FreeCAD.Console.PrintError(translate("A2plus", "Removing constraint %s") % cName)
                 c = doc.getObject(cName)
                 a2plib.removeConstraint(c)
 
 
 #==============================================================================
 toolTip = \
-translate("A2plus_importpart",
+translate("A2plus",
 '''
 Clean up solver debug output from 3D view
 '''
@@ -2161,7 +2165,7 @@ class a2p_cleanUpDebug3dCommand():
     def GetResources(self):
         return {
             'Pixmap'  : ':/icons/a2p_RemoveDebug3D.svg',
-            'MenuText': translate("A2plus_importpart", "Clean up solver debug output from 3D view"),
+            'MenuText': translate("A2plus", "Clean up solver debug output from 3D view"),
             'ToolTip' : toolTip
             }
 
