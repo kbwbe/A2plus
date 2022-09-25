@@ -62,6 +62,7 @@ class a2p_SearchConstraintConflictsCommand:
                 )
             return
         
+        a2plib.SHOW_WARNING_FLOATING_PARTS = False
         for c in constraints:
             workList.append(c)
             solved = a2p_solversystem.solveConstraints(doc,matelist = workList, showFailMessage=False)
@@ -100,7 +101,7 @@ Do you want to delete this constraint-pair?
                     )
                 if response == QtGui.QMessageBox.Yes:
                     a2plib.removeConstraint(c)
-                return
+        a2plib.SHOW_WARNING_FLOATING_PARTS = True
        
     def IsActive(self):
         if FreeCAD.activeDocument() is None: return False
