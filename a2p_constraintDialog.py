@@ -162,8 +162,11 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             for c in userPreferred:
                 if c == ' ':
                     continue
+                elif c == '-':
+                    if len(user_qty) == 0:
+                        user_qty += c
                 elif c.isdigit():
-                    user_qty += c
+                        user_qty += c
                 elif c in ('.',','):
                     user_qty += c
                 else:
