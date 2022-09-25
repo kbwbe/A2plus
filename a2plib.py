@@ -50,6 +50,8 @@ SHOW_CONSTRAINTS_ON_TOOLBAR= preferences.GetBool('showConstraintsOnToolbar',True
 RECURSIVE_UPDATE_ENABLED = preferences.GetBool('enableRecursiveUpdate',False)
 USE_SOLID_UNION = preferences.GetBool('useSolidUnion',True)
 
+SHOW_WARNING_FLOATING_PARTS = True
+
 # if SIMULATION_STATE == True assemblies are solved with less accuracy
 SIMULATION_STATE = False
 

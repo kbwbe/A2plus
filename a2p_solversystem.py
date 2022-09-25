@@ -546,16 +546,21 @@ Please run the conflict finder tool !
             FreeCADGui.Selection.clearSelection()
             for obj in self.unmovedParts:
                 FreeCADGui.Selection.addSelection(obj)
-            msg = translate("A2plus_solversystem",'''
+                msg = translate("A2plus_solversystem",'''
 The highlighted parts were not moved. They are
 not constrained (also over constraint chains)
 to a fixed part!
 ''')
-            QtGui.QMessageBox.information(
-                QtGui.QApplication.activeWindow(),
-                translate("A2plus_solversystem","Could not move some parts"),
-                msg
-                )
+            if a2plib.SHOW_WARNING_FLOATING_PARTS: #dialog is not needet during conflict finding
+                QtGui.QMessageBox.information(
+                    QtGui.QApplication.activeWindow(),
+                    translate("A2plus_solversystem","Could not move some parts"),
+                    msg
+                    )
+            else:
+                print ('')
+                print (msg) # during conflict finding do a print to console output
+                print ('')
 
     def printList(self, name, l):
         Msg("{} = (".format(name))
