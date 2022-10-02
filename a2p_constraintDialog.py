@@ -75,7 +75,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
 
     def initUI(self):
         #self.setMinimumHeight(self.minHeight)
-        self.setWindowTitle(translate("A2plus_constraintDialog",'Constraint properties'))
+        self.setWindowTitle(translate("A2plus", "Constraint properties"))
         #self.resize(300,600)
 
         self.mainLayout = QtGui.QGridLayout() # a VBoxLayout for the whole form
@@ -92,20 +92,20 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         #==============================
         if hasattr(self.constraintObject,"directionConstraint"):
             lbl3 = QtGui.QLabel(self)
-            lbl3.setText(translate("A2plus_constraintDialog", "Direction"))
+            lbl3.setText(translate("A2plus", "Direction"))
             lbl3.setFixedHeight(32)
             self.mainLayout.addWidget(lbl3,self.lineNo,0)
 
             # create items list for QComboBox
             self.directionCombo = QtGui.QComboBox(self)
-            self.directionCombo.insertItem(0,translate("A2plus_constraintDialog", "aligned"))
-            self.directionCombo.insertItem(1,translate("A2plus_constraintDialog", "opposed"))
+            self.directionCombo.insertItem(0,translate("A2plus", "aligned"))
+            self.directionCombo.insertItem(1,translate("A2plus", "opposed"))
 
             d = self.constraintObject.directionConstraint # not every constraint has a direction
             #
             # for compat with old A2plus assemblies
             if d == "none":
-                self.directionCombo.insertItem(2,translate("A2plus_constraintDialog", "none"))
+                self.directionCombo.insertItem(2,translate("A2plus", "none"))
 
             # activate item of list
             if d == "aligned":
@@ -121,7 +121,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
 
             self.flipDirectionButton = QtGui.QPushButton(self)
             self.flipDirectionButton.setIcon(QtGui.QIcon(':/icons/a2p_FlipConstraint.svg'))
-            self.flipDirectionButton.setText(translate("A2plus_constraintDialog", "Flip direction"))
+            self.flipDirectionButton.setText(translate("A2plus", "Flip direction"))
             self.flipDirectionButton.setFixedHeight(32)
             QtCore.QObject.connect(self.flipDirectionButton, QtCore.SIGNAL("clicked()"), self.flipDirection)
             self.mainLayout.addWidget(self.flipDirectionButton,self.lineNo,2)
@@ -132,7 +132,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         if hasattr(self.constraintObject,"offset"):
             offs = self.constraintObject.offset
             lbl4 = QtGui.QLabel(self)
-            lbl4.setText(translate("A2plus_constraintDialog", "Offset"))
+            lbl4.setText(translate("A2plus", "Offset"))
             lbl4.setFixedHeight(32)
             self.mainLayout.addWidget(lbl4,self.lineNo,0)
 
@@ -185,13 +185,13 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             self.mainLayout.addWidget(self.offsetEdit,self.lineNo,1)
 
             self.offsetSetZeroButton = QtGui.QPushButton(self)
-            self.offsetSetZeroButton.setText(translate("A2plus_constraintDialog", "Set Zero"))
+            self.offsetSetZeroButton.setText(translate("A2plus", "Set Zero"))
             self.offsetSetZeroButton.setFixedHeight(32)
             QtCore.QObject.connect(self.offsetSetZeroButton, QtCore.SIGNAL("clicked()"), self.setOffsetZero)
             self.mainLayout.addWidget(self.offsetSetZeroButton,self.lineNo,2)
 
             self.flipOffsetSignButton = QtGui.QPushButton(self)
-            self.flipOffsetSignButton.setText(translate("A2plus_constraintDialog", "Flip sign"))
+            self.flipOffsetSignButton.setText(translate("A2plus", "Flip sign"))
             self.flipOffsetSignButton.setFixedHeight(32)
             QtCore.QObject.connect(self.flipOffsetSignButton, QtCore.SIGNAL("clicked()"), self.flipOffsetSign)
             self.mainLayout.addWidget(self.flipOffsetSignButton,self.lineNo,3)
@@ -202,7 +202,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         if hasattr(self.constraintObject,"angle"):
             angle = self.constraintObject.angle
             lbl5 = QtGui.QLabel(self)
-            lbl5.setText(translate("A2plus_constraintDialog", "Angle"))
+            lbl5.setText(translate("A2plus", "Angle"))
             lbl5.setFixedHeight(32)
             self.mainLayout.addWidget(lbl5,self.lineNo,0)
 
@@ -222,21 +222,21 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             self.angleEdit.setDecimals(params.GetInt('Decimals'))
             self.angleEdit.setValue(angle)
             self.angleEdit.setFixedHeight(32)
-            self.angleEdit.setToolTip(translate("A2plus_constraintDialog", "Angle in the range 0 - 180 degrees"))
+            self.angleEdit.setToolTip(translate("A2plus", "Angle in the range 0 - 180 degrees"))
             QtCore.QObject.connect(self.angleEdit, QtCore.SIGNAL("valueChanged(double)"), self.handleAngleChanged)
             self.mainLayout.addWidget(self.angleEdit,self.lineNo,1)
 
             self.roundAngleButton = QtGui.QPushButton(self)
-            self.roundAngleButton.setText(translate("A2plus_constraintDialog", "Round"))
+            self.roundAngleButton.setText(translate("A2plus", "Round"))
             self.roundAngleButton.setFixedHeight(32)
-            self.roundAngleButton.setToolTip(translate("A2plus_constraintDialog", "Round angle to multiples of 5"))
+            self.roundAngleButton.setToolTip(translate("A2plus", "Round angle to multiples of 5"))
             QtCore.QObject.connect(self.roundAngleButton, QtCore.SIGNAL("clicked()"), self.roundAngle)
             self.mainLayout.addWidget(self.roundAngleButton,self.lineNo,2)
 
             self.perpendicularAngleButton = QtGui.QPushButton(self)
-            self.perpendicularAngleButton.setText(translate("A2plus_constraintDialog", "Perpendicular"))
+            self.perpendicularAngleButton.setText(translate("A2plus", "Perpendicular"))
             self.perpendicularAngleButton.setFixedHeight(32)
-            self.perpendicularAngleButton.setToolTip(translate("A2plus_constraintDialog", "Adds/deletes 90 degrees"))
+            self.perpendicularAngleButton.setToolTip(translate("A2plus", "Adds/deletes 90 degrees"))
             QtCore.QObject.connect(self.perpendicularAngleButton, QtCore.SIGNAL("clicked()"), self.perpendicularAngle)
             self.mainLayout.addWidget(self.perpendicularAngleButton,self.lineNo,3)
 
@@ -245,13 +245,13 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         #==============================
         if hasattr(self.constraintObject,"lockRotation"):
             lbl6 = QtGui.QLabel(self)
-            lbl6.setText(translate("A2plus_constraintDialog", "Lock Rotation"))
+            lbl6.setText(translate("A2plus", "Lock Rotation"))
             lbl6.setFixedHeight(32)
             self.mainLayout.addWidget(lbl6,self.lineNo,0)
 
             self.lockRotationCombo = QtGui.QComboBox(self)
-            self.lockRotationCombo.insertItem(0,"False")
-            self.lockRotationCombo.insertItem(1,"True")
+            self.lockRotationCombo.insertItem(0, translate("A2plus", "False"))
+            self.lockRotationCombo.insertItem(1, translate("A2plus", "True"))
             if self.constraintObject.lockRotation: # not every constraint has a direction
                 self.lockRotationCombo.setCurrentIndex(1)
             else:
@@ -261,7 +261,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
 
             self.flipLockRotationButton = QtGui.QPushButton(self)
             self.flipLockRotationButton.setIcon(QtGui.QIcon(':/icons/a2p_LockRotation.svg'))
-            self.flipLockRotationButton.setText(translate("A2plus_constraintDialog", "Toggle"))
+            self.flipLockRotationButton.setText(translate("A2plus", "Toggle"))
             self.flipLockRotationButton.setFixedHeight(32)
             QtCore.QObject.connect(self.flipLockRotationButton, QtCore.SIGNAL("clicked()"), self.flipLockRotation)
             self.mainLayout.addWidget(self.flipLockRotationButton,self.lineNo,2)
@@ -278,20 +278,20 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         self.deleteButton = QtGui.QPushButton(self.buttonPanel)
         self.deleteButton.setFixedHeight(32)
         self.deleteButton.setIcon(QtGui.QIcon(':/icons/a2p_DeleteConnections.svg')) #need new Icon
-        self.deleteButton.setToolTip(translate("A2plus_constraintDialog", "Delete this constraint"))
-        self.deleteButton.setText(translate("A2plus_constraintDialog", "Delete this constraint"))
+        self.deleteButton.setToolTip(translate("A2plus", "Delete this constraint"))
+        self.deleteButton.setText(translate("A2plus", "Delete"))
 
         self.solveButton = QtGui.QPushButton(self.buttonPanel)
         self.solveButton.setFixedHeight(32)
         self.solveButton.setIcon(QtGui.QIcon(':/icons/a2p_Solver.svg'))
-        self.solveButton.setToolTip(translate("A2plus_constraintDialog", "Solve constraints"))
-        self.solveButton.setText(translate("A2plus_constraintDialog", "Solve"))
+        self.solveButton.setToolTip(translate("A2plus", "Solve constraints"))
+        self.solveButton.setText(translate("A2plus", "Solve"))
 
         self.acceptButton = QtGui.QPushButton(self.buttonPanel)
         self.acceptButton.setFixedHeight(32)
         self.acceptButton.setIcon(QtGui.QIcon(':/icons/a2p_CheckAssembly.svg')) #need new Icon
-        self.acceptButton.setToolTip(translate("A2plus_constraintDialog", "Accept the settings"))
-        self.acceptButton.setText(translate("A2plus_constraintDialog", "Accept"))
+        self.acceptButton.setToolTip(translate("A2plus", "Accept the settings"))
+        self.acceptButton.setText(translate("A2plus", "Accept"))
         #self.acceptButton.setDefault(True)
 
         self.buttonPanelLayout.addWidget(self.deleteButton)
@@ -338,8 +338,8 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         if self.constraintObject not in doc.Objects:
             QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
-                translate("A2plus_constraintDialog","Constraint does not exist anymore"),
-                translate("A2plus_constraintDialog","Constraint has already been deleted")
+                translate("A2plus", "Constraint does not exist anymore"),
+                translate("A2plus", "Constraint has already been deleted")
                 )
             a2plib.setConstraintEditorRef(None)
             self.Deleted.emit()
@@ -455,8 +455,8 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         if self.constraintObject not in doc.Objects:
             QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
-                translate("A2plus_constraintDialog","Constraint does not exist anymore"),
-                translate("A2plus_constraintDialog","Constraint has already been deleted")
+                translate("A2plus", "Constraint does not exist anymore"),
+                translate("A2plus", "Constraint has already been deleted")
                 )
             a2plib.setConstraintEditorRef(None)
             self.Deleted.emit()
@@ -465,8 +465,8 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
         response = QtGui.QMessageBox.information(
             QtGui.QApplication.activeWindow(),
-            translate("A2plus_constraintDialog","Confirmation required"),
-            translate("A2plus_constraintDialog","Really delete this constraint?"),
+            translate("A2plus", "Confirmation required"),
+            translate("A2plus", "Really delete this constraint?"),
             flags
             )
         if response == QtGui.QMessageBox.Yes:
@@ -488,8 +488,8 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         if self.constraintObject not in doc.Objects:
             QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
-                translate("A2plus_constraintDialog","Constraint does not exist anymore"),
-                translate("A2plus_constraintDialog","Constraint has already been deleted")
+                translate("A2plus", "Constraint does not exist anymore"),
+                translate("A2plus", "Constraint has already been deleted")
                 )
             a2plib.setConstraintEditorRef(None)
             self.Deleted.emit()
@@ -503,8 +503,8 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
         if self.constraintObject not in doc.Objects:
             QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
-                translate("A2plus_constraintDialog","Constraint does not exist anymore"),
-                translate("A2plus_constraintDialog","Constraint has already been deleted")
+                translate("A2plus", "Constraint does not exist anymore"),
+                translate("A2plus", "Constraint has already been deleted")
                 )
             a2plib.setConstraintEditorRef(None)
             self.Deleted.emit()
@@ -514,8 +514,8 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
             response = QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
-                translate("A2plus_constraintDialog","Confirmation required"),
-                translate("A2plus_constraintDialog","Exit and delete new constraint?"),
+                translate("A2plus", "Confirmation required"),
+                translate("A2plus", "Exit and delete new constraint?"),
                 flags
                 )
             if response == QtGui.QMessageBox.Yes:
@@ -528,8 +528,8 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
                 flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
                 response = QtGui.QMessageBox.information(
                     QtGui.QApplication.activeWindow(),
-                    translate("A2plus_constraintDialog","Information"),
-                    translate("A2plus_constraintDialog","Values changed! Accept Constraint?"),
+                    translate("A2plus", "Information"),
+                    translate("A2plus", "Values changed! Accept Constraint?"),
                     flags
                     )
                 if response == QtGui.QMessageBox.Yes:
@@ -546,7 +546,7 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
 
 #==============================================================================
 toolTipText = \
-translate("A2plus_constraintDialog",
+translate("A2plus",
 '''
 Select geometry to be constrained
 within 3D View !
@@ -568,7 +568,7 @@ class a2p_ConstraintCollection(QtGui.QWidget):
         self.initUI()
 
     def initUI(self):
-        self.setWindowTitle(translate("A2plus_constraintDialog",'Constraint Tools'))
+        self.setWindowTitle(translate("A2plus",'Constraint Tools'))
         #self.setMinimumHeight(self.baseHeight)
         self.mainLayout = QtGui.QVBoxLayout() # a VBoxLayout for the whole form
 
@@ -743,7 +743,7 @@ class a2p_ConstraintCollection(QtGui.QWidget):
         #-------------------------------------
 
         self.helpButton = QtGui.QPushButton(self)
-        self.helpButton.setText(translate("A2plus_constraintDialog", "Help"))
+        self.helpButton.setText(translate("A2plus", "Help"))
         self.helpButton.setFixedSize(150,32)
         QtCore.QObject.connect(self.helpButton, QtCore.SIGNAL("clicked()"), self.showConstraintCollectionHelp)
 
@@ -764,7 +764,7 @@ class a2p_ConstraintCollection(QtGui.QWidget):
 
     def showConstraintCollectionHelp(self):
         msg = \
-translate("A2plus_constraintDialog",
+translate("A2plus",
 '''
 Select geometry to be constrained
 within 3D View !
@@ -778,7 +778,7 @@ button.
 )
         QtGui.QMessageBox.information(
             QtGui.QApplication.activeWindow(),
-            translate("A2plus_constraintDialog","Constraint tools help"),
+            translate("A2plus", "Constraint tools help"),
             msg
             )
 
@@ -963,7 +963,7 @@ class a2p_ConstraintValuePanel(QtGui.QDockWidget):
             mode
             )
         self.setWidget(self.cvw)
-        self.setWindowTitle(translate("A2plus_constraintDialog", "Constraint properties"))
+        self.setWindowTitle(translate("A2plus", "Constraint properties"))
 
         #self.resize(300,500)
 
@@ -1025,7 +1025,7 @@ class a2p_ConstraintPanel(QtGui.QDockWidget):
         self.resize(200,250)
         cc = a2p_ConstraintCollection(None)
         self.setWidget(cc)
-        self.setWindowTitle(translate("A2plus_constraintDialog", "Constraint Tools"))
+        self.setWindowTitle(translate("A2plus", "Constraint Tools"))
         #
         mw = FreeCADGui.getMainWindow()
         mw.addDockWidget(QtCore.Qt.RightDockWidgetArea,self)
@@ -1067,7 +1067,7 @@ class a2p_ConstraintPanel(QtGui.QDockWidget):
 
 #==============================================================================
 toolTipText = \
-translate("A2plus_constraintDialog",
+translate("A2plus",
 '''
 Opens a dialog to
 define constraints
@@ -1087,14 +1087,14 @@ class a2p_ConstraintDialogCommand:
     def GetResources(self):
         return {
              'Pixmap'  : ':/icons/a2p_DefineConstraints.svg',
-             'MenuText': translate("A2plus_constraintDialog", "Define constraints"),
+             'MenuText': translate("A2plus", "Define constraints"),
              'ToolTip' : toolTipText
              }
 
 FreeCADGui.addCommand('a2p_ConstraintDialogCommand', a2p_ConstraintDialogCommand())
 #==============================================================================
 toolTipText = \
-translate("A2plus_constraintDialog",
+translate("A2plus",
 '''
 Edit selected constraint
 
@@ -1110,8 +1110,8 @@ class a2p_EditConstraintCommand:
         if self.selectedConstraint is None:
             QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
-                translate("A2plus_constraintDialog","Selection Error !"),
-                translate("A2plus_constraintDialog","Please select exact one constraint first.")
+                translate("A2plus", "Selection Error!"),
+                translate("A2plus", "Please select exact one constraint first.")
                 )
             return
 
@@ -1140,7 +1140,7 @@ class a2p_EditConstraintCommand:
     def GetResources(self):
         return {
              'Pixmap'  : ':/icons/a2p_EditConstraint.svg',
-             'MenuText': translate("A2plus_constraintDialog", "Edit selected constraint"),
+             'MenuText': translate("A2plus", "Edit selected constraint"),
              'ToolTip' : toolTipText
              }
 

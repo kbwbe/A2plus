@@ -171,7 +171,7 @@ def muxAssemblyWithTopoNames(doc, desiredShapeLabel=None):
                 solid = shell
     except:
         # keeping a shell if solid is failing
-        FreeCAD.Console.PrintWarning('Union of Shapes FAILED\n')
+        FreeCAD.Console.PrintWarning(translate("A2plus", "Union of Shapes FAILED\n"))
         solid = shell
 
     # transparency could change to different values depending
@@ -232,7 +232,7 @@ class ViewProviderSimpleAssemblyShape:
         return mode
 
 toolTip = \
-translate("A2plus_MuxAssembly",
+translate("A2plus",
 '''
 Create or refresh a simple shape
 of the complete Assembly.
@@ -259,8 +259,8 @@ def createOrUpdateSimpleAssemblyShape(doc):
 
     if len(visibleImportObjects) == 0:
         QtGui.QMessageBox.critical(  QtGui.QApplication.activeWindow(),
-                                     translate("A2plus_MuxAssembly","Cannot create SimpleAssemblyShape"),
-                                     translate("A2plus_MuxAssembly","No visible ImportParts found")
+                                     translate("A2plus", "Cannot create SimpleAssemblyShape"),
+                                     translate("A2plus", "No visible ImportParts found")
                                    )
         return
 
@@ -294,7 +294,7 @@ def createOrUpdateSimpleAssemblyShape(doc):
                 solid = shell
     except:
         # keeping a shell if solid is failing
-        FreeCAD.Console.PrintWarning('Union of Shapes FAILED\n')
+        FreeCAD.Console.PrintWarning(translate("A2plus", "Union of Shapes FAILED"),"\n")
         solid = shell
     sas.Shape = solid #shell
     sas.ViewObject.Visibility = False
@@ -305,15 +305,15 @@ class a2p_SimpleAssemblyShapeCommand():
     def GetResources(self):
         import a2plib
         return {'Pixmap'  : a2plib.path_a2p +'/icons/a2p_SimpleAssemblyShape.svg',
-                'MenuText': translate("A2plus_MuxAssembly", "Create or refresh simple shape of complete assembly"),
+                'MenuText': translate("A2plus", "Create or refresh simple shape of complete assembly"),
                 'ToolTip' : toolTip
                 }
 
     def Activated(self):
         if FreeCAD.activeDocument() is None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
-                                        translate("A2plus_MuxAssembly","No active document found!"),
-                                        translate("A2plus_MuxAssembly","You have to open an assembly file first.")
+                                        translate("A2plus", "No active document found!"),
+                                        translate("A2plus", "You have to open an assembly file first.")
                                     )
             return
         doc = FreeCAD.ActiveDocument
