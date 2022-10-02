@@ -449,7 +449,7 @@ class a2p_ImportShapeReferenceCommand():
         if FreeCAD.ActiveDocument is None:
             QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
-               translate("A2plus", "No active Document found"),
+               translate("A2plus", "No active document found!"),
                translate("A2plus", "First create an empty file and save it under desired name")
                )
             return
@@ -647,7 +647,7 @@ class a2p_Restore_Transparency_Command():
     def Activated(self):
         doc = FreeCAD.ActiveDocument
         if doc is None:
-            FreeCAD.Console.Print(translate("A2plus", "No active document found"))
+            FreeCAD.Console.Print(translate("A2plus", "No active document found!"))
             return
         else:
             for obj in doc.Objects:
@@ -688,7 +688,7 @@ class a2p_ImportPartCommand():
         if FreeCAD.ActiveDocument is None:
             QtGui.QMessageBox.information(
                 QtGui.QApplication.activeWindow(),
-               translate("A2plus", "No active Document found"),
+               translate("A2plus", "No active document found!"),
                translate("A2plus", "First create an empty file and save it under desired name")
                )
             return
@@ -2156,7 +2156,7 @@ class a2p_cleanUpDebug3dCommand():
     def Activated(self):
         sg = FreeCADGui.ActiveDocument.ActiveView.getSceneGraph()
         if sg is not None:
-            print('3D-Debug contained {} vectors'.format(len(a2plib.solver_debug_objects)))
+            print(translate("A2plus", "3D-Debug contained '{}' vectors").format(len(a2plib.solver_debug_objects)))
             for vec in a2plib.solver_debug_objects:
                 sg.removeChild(vec)
             a2plib.graphical_debug_output = []
