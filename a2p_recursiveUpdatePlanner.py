@@ -20,11 +20,10 @@
 #*                                                                         *
 #***************************************************************************
 
-import FreeCADGui
-import FreeCAD
-from PySide import QtGui
 import os
-
+import FreeCAD
+import FreeCADGui
+from PySide import QtGui
 from a2p_translateUtils import *
 import a2plib
 from a2p_importpart import updateImportedParts
@@ -63,7 +62,7 @@ def createUpdateFileList(
 
         if a2plib.to_bytes(ob.getA2pSource()) == b'converted':
             print(
-                "Did not update converted part '{}'".format(
+                translate("A2plus", "Did not update converted part '{}'").format(
                     ob.name
                     )
                 )
@@ -99,7 +98,7 @@ def createUpdateFileList(
     return needToUpdate, filesToUpdate
 #==============================================================================
 toolTip = \
-translate("A2plus_recursiveUpdatePlanner",
+translate("A2plus",
 """
 Update parts, which have been
 imported to the assembly.
@@ -126,8 +125,8 @@ class a2p_recursiveUpdateImportedPartsCommand:
         if doc is None:
             QtGui.QMessageBox.information(
                         QtGui.QApplication.activeWindow(),
-                        translate("a2p_recursiveUpdateImportedPartsCommand","No active document found!"),
-                        translate("a2p_recursiveUpdateImportedPartsCommand","Before recursive updating parts, you have to open an assembly file.")
+                        translate("A2plus", "No active document found!"),
+                        translate("A2plus", "Before recursive updating parts, you have to open an assembly file.")
                         )
             return
             
@@ -142,10 +141,10 @@ class a2p_recursiveUpdateImportedPartsCommand:
                      ]
         if selection and len(selection)>0:
             flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
-            msg = translate("A2plus_recursiveUpdatePlanner","Do you want to update only the selected parts?")
+            msg = translate("A2plus", "Do you want to update only the selected parts?")
             response = QtGui.QMessageBox.information(
                             QtGui.QApplication.activeWindow(),
-                            translate("A2plus_recursiveUpdatePlanner","RECURSIVE UPDATE"),
+                            translate("A2plus", "RECURSIVE UPDATE"),
                             msg,
                             flags
                             )
@@ -192,8 +191,8 @@ class a2p_recursiveUpdateImportedPartsCommand:
                     ImportGui.insert(filename,newname)
                     importDoc = FreeCAD.ActiveDocument
                 else:
-                    msg = translate("A2plus_recursiveUpdatePlanner","A part can only be imported from a FreeCAD '*.fcstd' file")
-                    QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), "Value Error", msg )
+                    msg = translate("A2plus", "A part can only be imported from a FreeCAD '*.fcstd' file")
+                    QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), translate("A2plus", "Value Error"), msg )
                     return
 
             if importDoc==doc and partial==True:
@@ -204,7 +203,7 @@ class a2p_recursiveUpdateImportedPartsCommand:
             FreeCADGui.updateGui()
             importDoc.save()
             print(
-                u"==== Assembly '{}' has been updated! =====".format(
+                translate("A2plus", "==== Assembly '{}' has been updated! =====").format(
                     importDoc.FileName
                     )
                 )
@@ -214,7 +213,7 @@ class a2p_recursiveUpdateImportedPartsCommand:
     def GetResources(self):
         return {
             'Pixmap'  : ':/icons/a2p_RecursiveUpdate.svg',
-            'MenuText': translate("A2plus_recursiveUpdatePlanner", "Update imports recursively"),
+            'MenuText': translate("A2plus", "Update imports recursively"),
             'ToolTip' : toolTip
             }
 

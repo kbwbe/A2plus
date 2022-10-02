@@ -499,7 +499,7 @@ class TopoMapper(object):
                     if hasattr(ob.ViewObject,"Visibility"):
                         if ob.ViewObject.Visibility == False or not a2plib.isGlobalVisible(ob):
                             print(
-                                "Import ignored invisible shape! {}".format(
+                                translate("A2plus", "Import ignored invisible shape: '{}'").format(
                                     ob.Name
                                     )
                                   )
