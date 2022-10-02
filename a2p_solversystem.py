@@ -20,6 +20,7 @@
 #*                                                                         *
 #***************************************************************************
 
+import os
 import FreeCAD, FreeCADGui
 from PySide import QtGui
 from a2p_translateUtils import *
@@ -34,7 +35,6 @@ from a2plib import (
     )
 from a2p_dependencies import Dependency
 from a2p_rigid import Rigid
-import os
 
 SOLVER_MAXSTEPS = 50000
 
@@ -137,7 +137,7 @@ class SolverSystem():
 
         if len(faultyConstraintList) > 0:
             for fc in faultyConstraintList:
-                print(u"remove faulty constraint '{}'".format(fc.Label))
+                print(translate("A2plus", "Remove faulty constraint '{}'").format(fc.Label))
                 doc.removeObject(fc.Name)
 
     def loadSystem(self,doc, matelist=None):
@@ -217,15 +217,15 @@ class SolverSystem():
             rig.hierarchyLinkedRigids.extend(rig.linkedRigids)
 
         if len(deleteList) > 0:
-            msg = translate("A2plus_solversystem","The following constraints are broken:") + "\n"
+            msg = translate("A2plus", "The following constraints are broken:") + "\n"
             for c in deleteList:
                 msg += "{}\n".format(c.Label)
-            msg += translate("A2plus_solversystem","Do you want to delete them ?")
+            msg += translate("A2plus", "Do you want to delete them?")
 
             flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
             response = QtGui.QMessageBox.critical(
                 QtGui.QApplication.activeWindow(),
-                translate("A2plus_solversystem","Delete broken constraints?"),
+                translate("A2plus", "Delete broken constraints?"),
                 msg,
                 flags
                 )
@@ -308,7 +308,7 @@ class SolverSystem():
 
             rig.beautyDOFPrint()
             numdep+=rig.countDependencies()
-        Msg( 'there are {} dependencies\n'.format(numdep/2))
+        Msg( translate("A2plus", "There are '{}' dependencies\n").format(numdep/2))
 
     def retrieveDOFInfo(self):
         """
@@ -383,7 +383,7 @@ class SolverSystem():
         with the same filename of the assembly
         '''
         out_file = os.path.splitext(self.doc.FileName)[0] + '_asm_hierarchy.html'
-        Msg("Writing visual hierarchy to: {}\n".format(out_file))
+        Msg(translate("A2plus", "Writing visual hierarchy to: '{}'\n").format(out_file))
         f = open(out_file, "w")
 
         f.write("<!DOCTYPE html>\n")
@@ -502,7 +502,7 @@ class SolverSystem():
 
     def solveSystem(self,doc,matelist=None, showFailMessage=True):
         if not a2plib.SIMULATION_STATE:
-            Msg(translate("A2plus_solversystem", "===== Start Solving System ======\n"))
+            Msg(translate("A2plus", "===== Start Solving System ======\n"))
 
         systemSolved = self.solveAccuracySteps(doc,matelist)
         if self.status == "loadingDependencyError":
@@ -510,7 +510,7 @@ class SolverSystem():
         if systemSolved:
             self.status = "solved"
             if not a2plib.SIMULATION_STATE:
-                Msg(translate("A2plus_solversystem", "===== System solved using partial + recursive unfixing =====\n"))
+                Msg(translate("A2plus", "===== System solved using partial + recursive unfixing =====\n"))
                 self.checkForUnmovedParts()
         else:
             if a2plib.SIMULATION_STATE == True:
@@ -520,17 +520,17 @@ class SolverSystem():
             else: # a2plib.SIMULATION_STATE == False
                 self.status = "unsolved"
                 if showFailMessage == True:
-                    Msg(translate("A2plus_solversystem", "===== Could not solve system ======\n"))
+                    Msg(translate("A2plus", "===== Could not solve system ======\n"))
                     msg = \
-translate("A2plus_solversystem",
+translate("A2plus",
 '''
 Constraints inconsistent. Cannot solve System.
-Please run the conflict finder tool !
+Please run the conflict finder tool!
 '''
 )
                     QtGui.QMessageBox.information(
                         QtGui.QApplication.activeWindow(),
-                        translate("A2plus_solversystem","Constraint mismatch"),
+                        translate("A2plus", "Constraint mismatch"),
                         msg
                         )
                 return systemSolved
@@ -546,7 +546,8 @@ Please run the conflict finder tool !
             FreeCADGui.Selection.clearSelection()
             for obj in self.unmovedParts:
                 FreeCADGui.Selection.addSelection(obj)
-                msg = translate("A2plus_solversystem",'''
+                msg = translate("A2plus",
+'''
 The highlighted parts were not moved. They are
 not constrained (also over constraint chains)
 to a fixed part!
@@ -554,7 +555,7 @@ to a fixed part!
             if a2plib.SHOW_WARNING_FLOATING_PARTS: #dialog is not needet during conflict finding
                 QtGui.QMessageBox.information(
                     QtGui.QApplication.activeWindow(),
-                    translate("A2plus_solversystem","Could not move some parts"),
+                    translate("A2plus", "Could not move some parts"),
                     msg
                     )
             else:
@@ -695,7 +696,7 @@ to a fixed part!
                     else:
                         Msg('\n')
                         Msg('convergency-conter: {}\n'.format(self.convergencyCounter))
-                        Msg(translate("A2plus_solversystem", "Calculation stopped, no convergency anymore!\n"))
+                        Msg(translate("A2plus", "Calculation stopped, no convergency anymore!\n"))
                         return False
 
                 self.lastPositionError = maxPosError
@@ -704,7 +705,7 @@ to a fixed part!
                 self.convergencyCounter = 0
 
             if self.stepCount > SOLVER_MAXSTEPS:
-                Msg(translate("A2plus_solversystem", "Reached max calculations count ({})\n").format(SOLVER_MAXSTEPS) )
+                Msg(translate("A2plus", "Reached max calculations count: {}\n").format(SOLVER_MAXSTEPS) )
                 return False
         return True
 
@@ -718,8 +719,8 @@ def solveConstraints( doc, cache=None, useTransaction = True, matelist=None, sho
     if doc is None:
         QtGui.QMessageBox.information(
                     QtGui.QApplication.activeWindow(),
-                    translate("a2p_solversystem","No active document found!"),
-                    translate("a2p_solversystem","Before running solver, you have to open an assembly file.")
+                    translate("A2plus", "No active document found!"),
+                    translate("A2plus", "Before running solver, you have to open an assembly file.")
                     )
         return
 
@@ -736,7 +737,7 @@ def autoSolveConstraints( doc, callingFuncName, cache=None, useTransaction=True,
     if callingFuncName is not None:
         """
         print (
-            "autoSolveConstraints called from '{}'".format(
+            translate("A2plus", "AutoSolveConstraints called from '{}'").format(
                 callingFuncName
                 )
                )
@@ -750,8 +751,8 @@ class a2p_SolverCommand:
     def GetResources(self):
         return {
             'Pixmap'  : path_a2p + '/icons/a2p_Solver.svg',
-            'MenuText': translate("A2plus_solversystem", "Solve constraints"),
-            'ToolTip' : translate("A2plus_solversystem", "Solves constraints")
+            'MenuText': translate("A2plus", "Solve constraints"),
+            'ToolTip' : translate("A2plus", "Solves constraints")
             }
 
 FreeCADGui.addCommand('a2p_SolverCommand', a2p_SolverCommand())
