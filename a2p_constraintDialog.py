@@ -121,6 +121,12 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
 
             self.flipDirectionButton = QtGui.QPushButton(self)
             self.flipDirectionButton.setIcon(QtGui.QIcon(':/icons/a2p_FlipConstraint.svg'))
+            self.flipDirectionButton.setToolTip(
+                translate("A2plus", "Flip direction between") + " '" + 
+                translate("A2plus", "aligned") + "' " + 
+                translate("A2plus", "and") + " '" + 
+                translate("A2plus", "opposed") +"'"
+                )
             self.flipDirectionButton.setText(translate("A2plus", "Flip direction"))
             self.flipDirectionButton.setFixedHeight(32)
             QtCore.QObject.connect(self.flipDirectionButton, QtCore.SIGNAL("clicked()"), self.flipDirection)
@@ -185,12 +191,22 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
             self.mainLayout.addWidget(self.offsetEdit,self.lineNo,1)
 
             self.offsetSetZeroButton = QtGui.QPushButton(self)
+            self.offsetSetZeroButton.setToolTip(
+                translate("A2plus", "Set 0 to") + " '" + 
+                translate("A2plus", "Offset") + "' "  + 
+                translate("A2plus", "field")
+                )
             self.offsetSetZeroButton.setText(translate("A2plus", "Set Zero"))
             self.offsetSetZeroButton.setFixedHeight(32)
             QtCore.QObject.connect(self.offsetSetZeroButton, QtCore.SIGNAL("clicked()"), self.setOffsetZero)
             self.mainLayout.addWidget(self.offsetSetZeroButton,self.lineNo,2)
 
             self.flipOffsetSignButton = QtGui.QPushButton(self)
+            self.flipOffsetSignButton.setToolTip(
+                translate("A2plus", "Flip sign between '+' and '-' in") + " '" + 
+                translate("A2plus", "Offset") + "' "  + 
+                translate("A2plus", "field")
+                )
             self.flipOffsetSignButton.setText(translate("A2plus", "Flip sign"))
             self.flipOffsetSignButton.setFixedHeight(32)
             QtCore.QObject.connect(self.flipOffsetSignButton, QtCore.SIGNAL("clicked()"), self.flipOffsetSign)
@@ -261,6 +277,12 @@ class a2p_ConstraintValueWidget(QtGui.QWidget):
 
             self.flipLockRotationButton = QtGui.QPushButton(self)
             self.flipLockRotationButton.setIcon(QtGui.QIcon(':/icons/a2p_LockRotation.svg'))
+            self.flipLockRotationButton.setToolTip(
+                translate("A2plus", "Toggle between") + " '" + 
+                translate("A2plus", "False") + "' " + 
+                translate("A2plus", "and") + " '" + 
+                translate("A2plus", "True") +"'"
+                )
             self.flipLockRotationButton.setText(translate("A2plus", "Toggle"))
             self.flipLockRotationButton.setFixedHeight(32)
             QtCore.QObject.connect(self.flipLockRotationButton, QtCore.SIGNAL("clicked()"), self.flipLockRotation)
@@ -568,7 +590,7 @@ class a2p_ConstraintCollection(QtGui.QWidget):
         self.initUI()
 
     def initUI(self):
-        self.setWindowTitle(translate("A2plus",'Constraint Tools'))
+        self.setWindowTitle(translate("A2plus", "Constraint Tools"))
         #self.setMinimumHeight(self.baseHeight)
         self.mainLayout = QtGui.QVBoxLayout() # a VBoxLayout for the whole form
 
@@ -778,7 +800,7 @@ button.
 )
         QtGui.QMessageBox.information(
             QtGui.QApplication.activeWindow(),
-            translate("A2plus", "Constraint tools help"),
+            translate("A2plus", "Constraint Tools help"),
             msg
             )
 
