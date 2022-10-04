@@ -645,7 +645,7 @@ class TopoMapper(object):
                         solid = shell # fall back to shell if faces are missing
             except:
                 # keeping a shell if solid is failing
-                FreeCAD.Console.PrintWarning('Union of Shapes FAILED\n')
+                FreeCAD.Console.PrintWarning(translate("A2plus", "Union of Shapes FAILED") + "\n")
                 solid = shell
         
         #-------------------------------------------
