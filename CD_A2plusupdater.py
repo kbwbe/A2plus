@@ -73,7 +73,7 @@ class sideFuncs1():
     def opendoccheck(self):
         doc = FreeCAD.activeDocument()
         if doc is None:
-            msg = translate("A2plus", "A file must be selected to start this selector\nPlease open a file and try again")
+            msg = translate("A2plus", "A file must be selected to start this selector.") + "\n" + translate("A2plus", "Please open a file and try again.")
             mApp(msg)
             return('Nostart')
 
@@ -92,10 +92,10 @@ class classFuncs():
             return('No')
         partslist = FreeCADGui.Selection.getSelection()
         if len(partslist) == 0:
-            mApp(translate("A2plus", "No parts were selected to update.\nSelect one part and try again."))
+            mApp(translate("A2plus", "No parts were selected to update.") + "\n" + translate("A2plus", "Select one part and try again."))
             return('No')
         if len(partslist) > 1:
-            mApp(translate("A2plus", "I have limited the number of parts that can be updated to 1.\nSelect one part and try again."))
+            mApp(translate("A2plus", "I have limited the number of parts that can be updated to 1.") + "\n" + translate("A2plus", "Select one part and try again."))
             return('No')
         statusform.show()
         statusform.txtboxstatus.setText(translate("A2plus", "Updating Assembly."))
@@ -152,8 +152,8 @@ class classFuncs():
             CD_ConstraintViewer.form1.show()
             CD_ConstraintViewer.form1.loadtable(clist)
         else:
-            mApp(translate("A2plus", "Update complete. All surfaces found"))
-        print(translate("A2plus", "Update complete"))
+            mApp(translate("A2plus", "Update complete.") + " " + translate("A2plus", "All surfaces found"))
+        print(translate("A2plus", "Update complete."))
         print(translate("A2plus", "Total Constraints ") + str(len(g.clist)))
         print(translate("A2plus", "Repaired constraints ") + (str(g.repaired )))
         print(translate("A2plus", "Features not found ") + str(len(g.notfoundfeatures)))
@@ -611,7 +611,7 @@ class formReport(QtGui.QDialog):
         self.txtboxstatus.setFixedWidth(250)
         self.txtboxstatus.setFixedHeight(60)
         self.lblviewlabel = QtGui.QLabel(self)
-        self.lblviewlabel.setText('Status"')
+        self.lblviewlabel.setText(translate("A2plus", "Status"))
         self.lblviewlabel.move(5, 5)
         self.lblviewlabel.setFixedWidth(250)
         self.lblviewlabel.setFixedHeight(20)
