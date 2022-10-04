@@ -173,7 +173,8 @@ will be updated according to the &quot;mux Info&quot; topology.</string>
       <widget class="Gui::PrefCheckBox" name="checkBox_7">
        <property name="toolTip">
         <string>Use color and transparency settings
-from imported parts</string>
+from imported parts.
+Note: For WB PartDesign it work for Body only.</string>
        </property>
        <property name="text">
         <string>Inherit per face color and transparency from parts and subassemblies (experimental)</string>
