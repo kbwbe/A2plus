@@ -575,7 +575,7 @@ class a2p_ImportShapeReferenceCommand():
             importedObject = importPartFromFile(doc, filename, extractSingleShape=True, desiredShapeLabel = so)
 
             if not importedObject:
-                a2plib.Msg(translate("A2plus", "Imported Object is empty/none\n"))
+                a2plib.Msg(translate("A2plus", "Imported Object is empty/none") + "\n")
                 continue
 
             importedObjectsList.append(importedObject)
@@ -834,7 +834,7 @@ def updateImportedParts(doc, partial=False):
             if absPath is None:
                 QtGui.QMessageBox.critical(  QtGui.QApplication.activeWindow(),
                                             translate("A2plus", "Source file not found"),
-                                            translate("A2plus", "Unable to find {}").format(
+                                            translate("A2plus", "Unable to find '{}'").format(
                                                 obj.sourceFile
                                                 )
                                         )
@@ -1413,7 +1413,9 @@ class DeleteConnectionsCommand:
                 if part.Name in [ c.Object1, c.Object2 ]:
                     deleteList.append(c)
         if len(deleteList) == 0:
-            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), translate("A2plus", "Info"), translate("A2plus", "No constraints refer to '%s'") % part.Name)
+            QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
+                                          translate("A2plus", "Info"),
+                                          translate("A2plus", "No constraints refer to '%s'") % part.Name)
         else:
             flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
             msg = translate("A2plus", "Delete {}'s constraint(s):\n  - {}?").format(
@@ -1428,7 +1430,7 @@ class DeleteConnectionsCommand:
                 )
             if response == QtGui.QMessageBox.Yes:
                 doc = FreeCAD.activeDocument()
-                doc.openTransaction(translate("A2plus", "Deleting part's constraints"))
+                doc.openTransaction(translate("A2plus", "Deleting part's constraints")) #TODO Need "\n" on end of Transaction?
                 for c in deleteList:
                     a2plib.removeConstraint(c)
                 doc.commitTransaction()

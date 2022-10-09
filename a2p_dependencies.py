@@ -103,7 +103,7 @@ class Dependency():
         self.lockRotation = False
 
     def __str__(self):
-        return u"Dependencies between {}-{}, type {}".format(
+        return translate("A2plus", "Dependencies between {} - {}, type {}").format(
             self.currentRigid.label,
             self.dependedRigid.label,
             self.Type

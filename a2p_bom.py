@@ -177,7 +177,7 @@ class a2p_CreatePartlist():
         if doc is None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
                                         translate("A2plus", "No active document found!"),
-                                        translate("A2plusM", "You have to open a FCStd file first.")
+                                        translate("A2plus", "You have to open a FCStd file first.")
                                     )
             return
         completeFilePath = doc.FileName

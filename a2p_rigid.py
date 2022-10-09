@@ -517,17 +517,17 @@ class Rigid():
         pretty print output that describe the current DOF of the rigid.
         """
         Msg('\n')
-        Msg(u"Current Rigid = {}\n".format(self.label) )
+        Msg(translate("A2plus", "Current Rigid = '{}'").format(self.label) + "\n")
         if self.fixed:
-            Msg(u"    is Fixed\n")
+            Msg(translate("A2plus", "    is Fixed") + "\n")
         else:
-            Msg(u"    is not Fixed and has {} DegreesOfFreedom\n".format(self.currentDOF()))
+            Msg(translate("A2plus", "    is not Fixed and has {} DegreesOfFreedom").format(self.currentDOF()) + "\n")
         for rig in self.depsPerLinkedRigids.keys():
-            Msg(u"    Depends on Rigid = {}\n".format(rig.label))
+            Msg(translate("A2plus", "    Depends on Rigid = {}").format(rig.label) + "\n")
             for dep in self.depsPerLinkedRigids[rig]:
                 Msg(u"        {}\n".format(dep) )
-            Msg(u"        DOF Position free with this rigid = {}\n".format( len(self.dofPOSPerLinkedRigids[rig])))
-            Msg(u"        DOF Rotation free with this rigid = {}\n".format( len(self.dofROTPerLinkedRigids[rig])))
+            Msg(translate("A2plus", "        DOF Position free with this rigid = {}").format( len(self.dofPOSPerLinkedRigids[rig])) + "\n")
+            Msg(translate("A2plus", "        DOF Rotation free with this rigid = {}").format( len(self.dofROTPerLinkedRigids[rig])) + "\n")
 
 
 
