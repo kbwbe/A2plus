@@ -31,6 +31,8 @@ import a2p_solversystem
 import a2p_constraintServices
 import CD_ConstraintViewer
 
+translate = FreeCAD.Qt.translate
+
 class globaluseclass:
     def __init__(self):
         self.checkingnum = 0
@@ -46,7 +48,7 @@ class mApp(QtGui.QWidget):
     # for error messages
     def __init__(self, msg):
         super().__init__()
-        self.title = 'Information'
+        self.title = translate("A2plus", "Information")
         self.initUI(msg)
 
     def initUI(self, msg, msgtype = 'ok'):
@@ -54,9 +56,9 @@ class mApp(QtGui.QWidget):
         self.setGeometry(100, 100, 320, 200)
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
         if msgtype == 'ok':
-            buttonReply = QtGui.QMessageBox.question(self, 'Information', msg, QtGui.QMessageBox.Ok | QtGui.QMessageBox.Ok)
+            buttonReply = QtGui.QMessageBox.question(self, translate("A2plus", "Information"), msg, QtGui.QMessageBox.Ok | QtGui.QMessageBox.Ok)
         if msgtype == 'yn':
-            buttonReply = QtGui.QMessageBox.question(self, 'Information', msg, QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No)
+            buttonReply = QtGui.QMessageBox.question(self, translate("A2plus", "Information"), msg, QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No)
         if buttonReply == QtGui.QMessageBox.Yes:
             pass
             # print('Yes clicked.')
@@ -71,7 +73,7 @@ class formMain(QtGui.QMainWindow):
     def __init__(self, name):
         self.name = name
         super(formMain, self).__init__()
-        self.setWindowTitle('Constraint Checker')
+        self.setWindowTitle(translate("A2plus", "Constraint Checker"))
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
         self.setGeometry(300, 100, 600, 140)
         self.setStyleSheet("font:11pt arial MS")
@@ -81,7 +83,7 @@ class formMain(QtGui.QMainWindow):
 
 
         self.lblviewlabel = QtGui.QLabel(self)
-        self.lblviewlabel.setText('To view the constraints, press "Open Viewer"')
+        self.lblviewlabel.setText(translate("A2plus", "To view the constraints, press 'Open Viewer'"))
         self.lblviewlabel.move(5, 5)
         self.lblviewlabel.setFixedWidth(350)
         self.lblviewlabel.setFixedHeight(20)
@@ -91,16 +93,16 @@ class formMain(QtGui.QMainWindow):
         self.btnOpenViewer.move(365, 5)
         self.btnOpenViewer.setFixedWidth(100)
         self.btnOpenViewer.setFixedHeight(28)
-        self.btnOpenViewer.setToolTip("View the listed constraints in the the Constraint Viewer.")
-        self.btnOpenViewer.setText("Open Viewer")
+        self.btnOpenViewer.setToolTip(translate("A2plus", "View the listed constraints in the the Constraint Viewer."))
+        self.btnOpenViewer.setText(translate("A2plus", "Open Viewer"))
         self.btnOpenViewer.clicked.connect(lambda:self.openViewer())
 
         self.btnCloseForm = QtGui.QPushButton(self)
         self.btnCloseForm.move(475, 5)
         self.btnCloseForm.setFixedWidth(100)
         self.btnCloseForm.setFixedHeight(28)
-        self.btnCloseForm.setToolTip("Close this form.")
-        self.btnCloseForm.setText("Close")
+        self.btnCloseForm.setToolTip(translate("A2plus", "Close this form."))
+        self.btnCloseForm.setText(translate("A2plus", "Close"))
         self.btnCloseForm.clicked.connect(lambda:self.Closeme())
 
     def openViewer(self):
@@ -142,7 +144,7 @@ class classCheckConstraints():
     def startcheck(self):
         ''' Check for opened file '''
         if FreeCAD.activeDocument() is None:
-            msg = 'A A2plus file must be opened to start this checker\nPlease open a file and try again'
+            msg = translate("A2plus", "A A2plus file must be opened to start this checker") + "\n" + translate("A2plus", "Please open a file and try again")
             mApp(msg)
             return
 
@@ -157,10 +159,10 @@ class classCheckConstraints():
 
         constraints = self.getallconstraints()
         if len(constraints) == 0:
-            mApp('Cannot find any constraints in this file.')
+            mApp(translate("A2plus", "Cannot find any constraints in this file."))
             return()
 
-        statusform.showme('Checking constraints')
+        statusform.showme(translate("A2plus", "Checking constraints"))
         self.dir_errors = a2p_constraintServices.redAdjustConstraintDirections(FreeCAD.activeDocument())
         print(self.dir_errors)
         self.checkformovement(constraints, True)
@@ -171,8 +173,8 @@ class classCheckConstraints():
                 msg = msg + line + '\n'
             form1.showme(msg)
         else:
-            print()
-            print('No constraint errors found')
+            FreeCAD.Console.PrintMessage("")
+            FreeCAD.Console.PrintMessage(translate("A2plus", "No constraint errors found") + "\n")
         statusform.Closeme()
 
 
@@ -188,7 +190,7 @@ class classCheckConstraints():
             self.p2fix = False
             self.setfix = 0
             cobj = constraintlist[checkingnum]
-            statusform.setWindowTitle('Checking ' + str(checkingnum) + ' of ' + str(len(constraintlist)))
+            statusform.setWindowTitle(translate("A2plus", "Checking ") + str(checkingnum) + translate("A2plus", " of ") + str(len(constraintlist)))
             
 
             subobj1 = cobj.getPropertyByName('Object1')
@@ -280,7 +282,7 @@ class formReport(QtGui.QDialog):
     def __init__(self, name):
         self.name = name
         super(formReport, self).__init__()
-        self.setWindowTitle('Checking Constraints')
+        self.setWindowTitle(translate("A2plus", "Checking Constraints"))
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
         self.setGeometry(300, 100, 300, 40) # xy , wh
         self.setStyleSheet("font: 10pt arial MS") 
@@ -310,9 +312,6 @@ def rondlist(list, inch = False):
     return([x, y, z])
 
 
-
-
-
 def rondnum(num, mmorin = 'mm'):
     # round a number to digits in global
     # left in mm for accuracy.
@@ -322,16 +321,9 @@ def rondnum(num, mmorin = 'mm'):
     return(rn)
 
 
-
-
-
-
-
 toolTipText = \
-'''
-This checks all constraints. After checking it will list all constraints that it found problems with./n
-The list can then be opened in the Constraint viewer.
-'''
+    translate("A2plus", "This checks all constraints. After checking it will list all constraints that it found problems with.") + "/n" +\
+    translate("A2plus", "The list can then be opened in the Constraint viewer.")
 
 class rnp_Constraint_Checker:
 
@@ -350,8 +342,8 @@ class rnp_Constraint_Checker:
         mypath = os.path.dirname(__file__)
         return {
              'Pixmap' : mypath + "/icons/CD_ConstraintChecker.svg",
-             'MenuText': 'Checks constraints',
-             'ToolTip': 'Checks constraints'
+             'MenuText': translate("A2plus", "Checks constraints"),
+             'ToolTip': translate("A2plus", "Checks constraints")
              }
 
 FreeCADGui.addCommand('rnp_Constraint_Checker', rnp_Constraint_Checker())
