@@ -34,7 +34,7 @@ class formMain(QtGui.QMainWindow):
         super(formMain, self).__init__()
         self.setWindowTitle(translate("A2plus", "Create Labels"))
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
-        self.setGeometry(300, 200, 200, 200)
+        self.setGeometry(300, 200, 260, 200)
         self.setStyleSheet("font: 11pt arial MS")
 
         self.btnLabels = [[translate("A2plus", "Add Face Labels"), translate("A2plus", "Add labels to all of the faces on a selected part")],
