@@ -22,22 +22,20 @@
 #*                                                                         *
 #***************************************************************************
 
+import os
+import sys
 import FreeCAD
 import FreeCADGui
 from FreeCAD import Base
-import  Part
+import Part
 from PySide import QtGui
 from PySide import QtCore
-import os
-import sys
 import copy
 import platform
 import numpy
 from pivy import coin
 from a2p_translateUtils import *
 
-
-PYVERSION =  sys.version_info[0]
 
 preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
 
@@ -140,6 +138,7 @@ else:
 #------------------------------------------------------------------------------
 def getLanguagePath():
     return os.path.join(os.path.dirname(os.path.dirname(__file__)),"translations")
+
 #------------------------------------------------------------------------------
 def drawDebugVectorAt(position,direction,rgbColor):
     """
@@ -215,30 +214,20 @@ def isGlobalVisible(ob):
     return result
 #------------------------------------------------------------------------------
 def to_bytes(tx):
-    if PYVERSION > 2:
-        if isinstance(tx, str):
-            value = tx.encode("utf-8")
-        else:
-            value = tx
+    if isinstance(tx, str):
+        value = tx.encode("utf-8")
     else:
-        if isinstance(tx,unicode):
-            value = tx.encode("utf-8")
-        else:
-            value = tx
+        value = tx
     return value # Instance of bytes
+
 #------------------------------------------------------------------------------
 def to_str(tx):
-    if PYVERSION > 2:
-        if isinstance(tx, bytes):
-            value = tx.decode("utf-8")
-        else:
-            value = tx
+    if isinstance(tx, bytes):
+        value = tx.decode("utf-8")
     else:
-        if isinstance(tx, unicode):
-            value = tx
-        else:
-            value = tx.decode("utf-8")
+        value = tx
     return value # Instance of unicode string
+
 #------------------------------------------------------------------------------
 def setSimulationState(boolVal):
     global SIMULATION_STATE
@@ -612,7 +601,6 @@ def drawVector(fromPoint,toPoint, color):
     line.Shape = l.toShape()
     line.ViewObject.LineColor = color
     line.ViewObject.LineWidth = 1
-
 
     c = Part.makeCone(0,1,4)
     cone = doc.addObject("Part::Feature","ArrowHead")
@@ -1129,12 +1117,12 @@ def deleteConstraintsOfDeletedObjects():
 
         missingObjects = set(missingObjects)
 
-        msg = translate("A2plus_lib","Not existing part(s):") + "\n  - {}".format(
+        msg = translate("A2plus", "Not existing part(s):") + "\n  - {}".format(
             u'\n  - '.join( objName for objName in missingObjects)
             )
         QtGui.QMessageBox.information(
             QtGui.QApplication.activeWindow(),
-            translate("A2plus_lib","Constraints of missing parts removed!"),
+            translate("A2plus", "Constraints of missing parts removed!"),
             msg
             )
 #------------------------------------------------------------------------------

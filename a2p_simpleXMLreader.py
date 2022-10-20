@@ -30,15 +30,14 @@
 # libcoin-buildin and the OS system one on various OS.
 #===========================================================================
 
-
-
-import FreeCAD
 import os
+import FreeCAD
 import zipfile
 import xml.sax.saxutils as saxutils
 
-from a2p_translateUtils import *
+#from a2p_translateUtils import *
 import a2plib
+translate = FreeCAD.Qt.translate
 
 #===========================================================================
 class simpleXMLObject(object):
@@ -235,25 +234,23 @@ class FCdocumentReader(object):
 
     def openDocument(self,_fileName):
         fileName = _fileName
-
-        if a2plib.PYVERSION == 3:
-            fileName = a2plib.to_str(fileName)
+        fileName = a2plib.to_str(fileName)
 
         self.clear()
 
         # got a fileName is not None ?
         if fileName is None:
-            print (u"fcDocumentReader: failed to open file with None name!")
+            FreeCAD.Console.PrintMessage("fcDocumentReader: " + translate("A2plus", "failed to open file with None name!") + "\n")
             return
 
         # check whether file exists or not...
         if not os.path.exists( fileName ):
-            print (u"fcDocumentReader: file {} does not exist!".format(fileName))
+            FreeCAD.Console.PrintMessage("fcDocumentReader: " + translate("A2plus", "file '{}' does not exist!").format(fileName) + "\n")
             return
 
         # check for fcstd file
         if not fileName.lower().endswith(a2plib.to_str('.fcstd')):
-            print (u"fcDocumentReader: file {} is no FCStd file!".format(fileName))
+            FreeCAD.Console.PrintMessage("fcDocumentReader: " + translate("A2plus", "file '{}' is no FCStd file!").format(fileName) + "\n")
             return
 
         # decompress the file

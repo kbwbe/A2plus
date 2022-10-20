@@ -26,7 +26,6 @@ from PySide import QtGui, QtCore
 import Spreadsheet
 import string
 
-from a2p_translateUtils import *
 import a2plib
 #from a2p_fcdocumentreader import FCdocumentReader
 from a2p_simpleXMLreader import FCdocumentReader
@@ -40,6 +39,7 @@ from a2p_partlistglobals import (
     BOM_MAX_LENGTH
     )
 
+translate = FreeCAD.Qt.translate
 
 #------------------------------------------------------------------------------
 def createPartList(
@@ -86,7 +86,7 @@ def createPartList(
                             workingDir
                             )
             if linkedSource is None:
-                print(translate("A2plus", "BOM ERROR: Could not open sourcefile {}").format(linkedSource1))
+                print(translate("A2plus", "BOM ERROR: Could not open sourcefile '{}'").format(linkedSource1))
                 continue
             # Is it already processed minimum one time ?
             entry = partListEntries.get(linkedSource,None)
@@ -107,8 +107,7 @@ def createPartList(
             for ob in docReader2.getSpreadsheetObjects():
 
                 sheetName = PARTINFORMATION_SHEET_NAME
-                if a2plib.PYVERSION > 2:
-                    sheetName = a2plib.to_bytes(PARTINFORMATION_SHEET_NAME)
+                sheetName = a2plib.to_bytes(PARTINFORMATION_SHEET_NAME)
 
                 if ob.name == sheetName:
                     cells = ob.getCells()
@@ -246,16 +245,12 @@ class a2p_CreatePartlist():
             values = partListEntries[k][1]
             for j,tx in enumerate(values): # all strings inside values are unicode!
                 #ss.set needs 2. argument as unicode for py3 and utf-8 string for py2!!!
-                if a2plib.PYVERSION > 2:
-                    tx2 = tx # preserve unicode
-                else:
-                    tx2 = a2plib.to_bytes(tx) # convert to utf-8
+                tx2 = tx # preserve unicode
                 ss.set(chr(idx3+2+j)+str(idx+2),tx2)
 
         # recompute to finish..
         doc.recompute()
-#        print(translate("A2plus", "#PARTSLIST# spreadsheet has been created"))
-        FreeCAD.Console.PrintMessage("#" + translate("A2plus", "PARTSLIST") + "#" + translate("A2plus", " spreadsheet has been created") + "\n")
+        FreeCAD.Console.PrintMessage(translate("A2plus", "#PARTSLIST# spreadsheet has been created") + "\n")
 
     def GetResources(self):
         return {
