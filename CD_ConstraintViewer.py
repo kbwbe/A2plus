@@ -142,6 +142,11 @@ class ShowPartProperties(QtGui.QWidget):
             ]
         self.createButtonColumn(420, btnLabels)
 
+        btnLabels = [
+            ['Close','Close this window'],
+            ]
+        self.createButtonColumn(560, btnLabels)
+
 
     def createButtonColumn(self, xloc, btnLabels):
         for row in range(0, len(btnLabels)):
@@ -205,6 +210,9 @@ class ShowPartProperties(QtGui.QWidget):
 
         if buttext == 'Find Constraint':
             search.startsearch(lastclc.cname, 0)
+
+        if buttext == 'Close':
+            self.Closeme()
 
     def clearTable(self):
         self.tm.setRowCount(0)
