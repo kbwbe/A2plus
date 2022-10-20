@@ -24,6 +24,7 @@
 # Tries to find constraints that are conflicting with each other.
 
 import os
+import sys
 import FreeCAD
 import FreeCADGui
 import subprocess
@@ -216,8 +217,18 @@ class ShowPartProperties(QtGui.QWidget):
         if q.text() == "Delete labels":
             CD_featurelabels.labels.deletelabels()
         if q.text() == "Open Help":
-            path = a2plib.pathOfModule() + "\CD_Help for Diagnostic tools.pdf"
-            subprocess.Popen([path], shell = True)
+            pdf_file = os.path.join(os.path.dirname(os.path.dirname(__file__)),'CD_Help for Diagnostic tools.pdf')
+            # pdf_file = a2plib.pathOfModule() + "\CD_Help for Diagnostic tools.pdf"
+            # For Linux Mint 21 64-bit with XFCE
+            if sys.platform in ['linux', 'linux2', 'darwin', 'cygwin']:
+                import webbrowser
+                webbrowser.open_new_tab(pdf_file)
+            # For Windows 10 Pro 64-bit
+            elif sys.platform == 'win32':
+                subprocess.Popen([pdf_file], shell = True)
+            # For others OS
+            else:
+                print("Found platform %s, OS %s" % (sys.platform, os.name))
 
     def process_misc_menus(self, q):
         menutext = q.text()
