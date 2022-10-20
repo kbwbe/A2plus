@@ -219,7 +219,7 @@ class ShowPartProperties(QtGui.QWidget):
         if q.text() == "Open Help":
             pdf_file = os.path.join(os.path.dirname(os.path.dirname(__file__)),'CD_Help for Diagnostic tools.pdf')
             # pdf_file = a2plib.pathOfModule() + "\CD_Help for Diagnostic tools.pdf"
-            # For Linux Mint 21 64-bit
+            # For Linux Mint 21 64-bit with XFCE
             if sys.platform in ['linux', 'linux2', 'darwin', 'cygwin']:
                 import webbrowser
                 webbrowser.open_new_tab(pdf_file)
