@@ -62,6 +62,7 @@ class A2plusWorkbench (Workbench):
             import a2p_Resources2
         else:
             import a2p_Resources3
+        # twice imported a2plib?
         import a2plib
 
         # add translations path
