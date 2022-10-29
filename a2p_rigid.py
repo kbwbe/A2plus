@@ -20,6 +20,7 @@
 #*                                                                         *
 #***************************************************************************
 
+import os, sys
 import random
 import time
 import traceback
@@ -56,7 +57,6 @@ from a2p_libDOF import (
     SystemYAxis,
     SystemZAxis
     )
-import os, sys
 #from __builtin__ import False
 
 
@@ -528,8 +528,3 @@ class Rigid():
                 Msg(u"        {}\n".format(dep) )
             Msg(translate("A2plus", "        DOF Position free with this rigid = {}").format( len(self.dofPOSPerLinkedRigids[rig])) + "\n")
             Msg(translate("A2plus", "        DOF Rotation free with this rigid = {}").format( len(self.dofROTPerLinkedRigids[rig])) + "\n")
-
-
-
-
-

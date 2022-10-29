@@ -29,32 +29,32 @@ __author__ = 'kbwbe'
 
 A2P_VERSION = 'V0.4.59e'
 
+import sys
 import FreeCAD
 import FreeCADGui
+translate = FreeCAD.Qt.translate
 
-
-import sys
-PyVersion = sys.version_info[0]
-if PyVersion == 2:
-    import a2p_Resources2
-else:
-    import a2p_Resources3
+import a2p_Resources3
 
 
 class A2plusWorkbench (Workbench):
 
     def __init__(self):
         global A2P_VERSION
-        from a2p_translateUtils import translate
+        translate = FreeCAD.Qt.translate
+#        from a2p_translateUtils import translate
         import a2plib
         self.__class__.Icon = a2plib.pathOfModule() + "/icons/a2p_Workbench.svg"
         self.__class__.MenuText = 'A2plus'
-        self.__class__.ToolTip  = translate("A2plus_solversystem", "An other assembly workbench for FreeCAD.")
+        self.__class__.ToolTip  = translate("A2plus", "An other assembly workbench for FreeCAD.")
+
+    def QT_TRANSLATE_NOOP(context, text):
+        return text
 
     def Initialize(self):
-        from a2p_translateUtils import QT_TRANSLATE_NOOP
-        from a2p_translateUtils import translate
-        from a2p_translateUtils import tr_
+#        from a2p_translateUtils import QT_TRANSLATE_NOOP
+#        from a2p_translateUtils import translate
+#        from a2p_translateUtils import tr_
 
         import sys
         PyVersion = sys.version_info[0]
@@ -69,7 +69,10 @@ class A2plusWorkbench (Workbench):
         FreeCADGui.addLanguagePath(a2plib.getLanguagePath())
         FreeCADGui.updateLocale()
 #        print(translate("A2plus_appendMenu", "languagePath of A2plus Workbench is:"), "{}".format(a2plib.getLanguagePath()))
-        FreeCAD.Console.PrintMessage(translate("A2plus_appendMenu", "Initializing A2plus Workbench ")+A2P_VERSION+'.\n')
+        FreeCAD.Console.PrintMessage(translate("A2plus", "Initializing A2plus Workbench ") + A2P_VERSION + ".\n")
+
+        # add icons path
+        FreeCADGui.addIconPath(':/icons')
 
         import a2p_importpart
         import a2p_recursiveUpdatePlanner
@@ -85,38 +88,33 @@ class A2plusWorkbench (Workbench):
         import CD_A2plusupdater  # for Constraint Diagnostic function
         import CD_checkconstraints
         import CD_OneButton
+        
+        # Create list of commands for toolbar A2p_Part and menu A2plus
+        partCommands = [
+            'a2p_ImportPart',
+            'a2p_ImportShapeReferenceCommand',
+            'a2p_updateImportedParts',
+            'a2p_movePart',
+            'a2p_MovePartUnderConstraints',
+            'a2p_duplicatePart',
+            'a2p_ConvertPart',
+            'a2p_editImportedPart',
+            'a2p_SaveAndExit_Command',
+            ]
+
         if a2plib.getRecursiveUpdateEnabled():
-            partCommands = [
-                'a2p_ImportPart',
-                'a2p_ImportShapeReferenceCommand',
-                'a2p_updateImportedParts',
-                'a2p_recursiveUpdateImportedPartsCommand',
-                'a2p_movePart',
-                'a2p_MovePartUnderConstraints',
-                'a2p_duplicatePart',
-                'a2p_ConvertPart',
-                'a2p_editImportedPart',
-                'a2p_SaveAndExit_Command',
-                ]
-        else:
-            partCommands = [
-                'a2p_ImportPart',
-                'a2p_ImportShapeReferenceCommand',
-                'a2p_updateImportedParts',
-                'a2p_movePart',
-                'a2p_MovePartUnderConstraints',
-                'a2p_duplicatePart',
-                'a2p_ConvertPart',
-                'a2p_editImportedPart',
-                'a2p_SaveAndExit_Command',
-                ]
+            partCommands.insert(3, 'a2p_recursiveUpdateImportedPartsCommand')
+
+        # Create list of commands for toolbar A2p_constraint
+        constraintCommands = [
+            'a2p_ConstraintDialogCommand',
+            'a2p_EditConstraintCommand',
+            'a2p_reAdjustConstraintDirectionsCommand',
+            'a2p_DeleteConnectionsCommand',
+            ]
 
         if a2plib.SHOW_CONSTRAINTS_ON_TOOLBAR:
-            constraintCommands = [
-                'a2p_ConstraintDialogCommand',
-                'a2p_EditConstraintCommand',
-                'a2p_reAdjustConstraintDirectionsCommand',
-                'a2p_DeleteConnectionsCommand',
+            constraintCommands1 = [
                 'a2p_PointIdentityConstraintCommand',
                 'a2p_PointOnLineConstraintCommand',
                 'a2p_PointOnPlaneConstraintCommand',
@@ -132,31 +130,23 @@ class A2plusWorkbench (Workbench):
                 'a2p_AngledPlanesConstraintCommand',
                 'a2p_CenterOfMassConstraintCommand',
                 ]
-        else:
-            constraintCommands = [
-                'a2p_ConstraintDialogCommand',
-                'a2p_EditConstraintCommand',
-                'a2p_reAdjustConstraintDirectionsCommand',
-                'a2p_DeleteConnectionsCommand',
-                ]
+            constraintCommands.extend(constraintCommands1)
+
+        # Create list of commands for toolbar A2p_Solver
+        solverCommands = [
+            'a2p_SolverCommand',
+            'a2p_ToggleAutoSolveCommand',
+            'a2p_FlipConstraintDirectionCommand',
+            'a2p_Show_Hierarchy_Command',
+            'a2p_SearchConstraintConflictsCommand'
+            ]
 
         if a2plib.GRAPHICALDEBUG:
-            solverCommands = [
-                'a2p_SolverCommand',
-                'a2p_ToggleAutoSolveCommand',
-                'a2p_FlipConstraintDirectionCommand',
-                'a2p_Show_Hierarchy_Command',
-                'a2p_SearchConstraintConflictsCommand',
+            solverCommands.append(
                 'a2p_cleanUpDebug3dCommand'
-                ]
-        else:
-            solverCommands = [
-                'a2p_SolverCommand',
-                'a2p_ToggleAutoSolveCommand',
-                'a2p_FlipConstraintDirectionCommand',
-                'a2p_Show_Hierarchy_Command',
-                'a2p_SearchConstraintConflictsCommand'
-                ]
+                )
+
+        # Create list of commands for toolbar A2p_View
         viewCommands = [
             'a2p_isolateCommand',
             'a2p_ViewConnectionsCommand',
@@ -165,6 +155,8 @@ class A2plusWorkbench (Workbench):
             'a2p_Show_PartLabels_Command',
             'a2p_Show_DOF_info_Command',
             ]
+
+        # Create list of commands for toolbar A2p_Misc
         miscCommands = [
             'a2p_SimpleAssemblyShapeCommand',
             'a2p_repairTreeViewCommand',
@@ -172,6 +164,21 @@ class A2plusWorkbench (Workbench):
             'a2p_CreatePartlist',
             ]
 
+        # Create list of commands for toolbar A2p_Diagnostics
+        DiagnosticCommands = [
+            'rnp_Constraint_Viewer',
+            'rnp_Update_A2pParts',
+            'rnp_Constraint_Checker',
+            'rnp_OneButton',
+            ]
+
+        menuEntries = [
+            'a2p_absPath_to_relPath_Command',
+            'a2p_MigrateProxiesCommand'
+            ]
+       
+
+        # Create toolbars
         self.appendToolbar(
                'A2p_Part',
                partCommands
@@ -192,55 +199,45 @@ class A2plusWorkbench (Workbench):
                'A2p_Misc',
                miscCommands
                )
+        self.appendToolbar(
+           'A2p_Diagnostics',
+           DiagnosticCommands
+           )
 
+
+        # Create menus
         self.appendMenu(
             'A2plus',
             partCommands
             )
         self.appendMenu(
-            ['A2plus', translate("A2plus_appendMenu",'Constraint')],
+            ['A2plus', QT_TRANSLATE_NOOP("Workbench", "Constraint")],
             constraintCommands
             )
         self.appendMenu(
-            ['A2plus', translate("A2plus_appendMenu",'Solver')],
+            ['A2plus', QT_TRANSLATE_NOOP("Workbench", "Solver")],
             solverCommands
             )
         self.appendMenu(
-            ['A2plus', translate("A2plus_appendMenu",'View')],
+            ['A2plus', QT_TRANSLATE_NOOP("Workbench", "View")],
             viewCommands
             )
+        miscCommands.extend(menuEntries)
         self.appendMenu(
-            ['A2plus', translate("A2plus_appendMenu",'Misc')],
+            ['A2plus', QT_TRANSLATE_NOOP("Workbench", "Misc")],
             miscCommands
             )
-
-        menuEntries = [
-            'a2p_absPath_to_relPath_Command',
-            'a2p_MigrateProxiesCommand'
-            ]
         self.appendMenu(
-            ['A2plus', 'Misc'],
-            menuEntries
-            )
-        FreeCADGui.addIconPath(':/icons')
+           ['A2plus', QT_TRANSLATE_NOOP("Workbench", "Diagnostic")],
+           DiagnosticCommands
+           )
 
         FreeCADGui.addPreferencePage(
             a2plib.pathOfModule() +
             '/GuiA2p/Resources/ui/a2p_prefs.ui','A2plus'
             )
 
-        DiagnosticCommands = [
-            'rnp_Constraint_Viewer',
-            'rnp_Update_A2pParts',
-            'rnp_Constraint_Checker',
-            'rnp_OneButton',
-            ]
-       
-        self.appendToolbar(
-           'A2Diagnostics',
-           DiagnosticCommands
-           )
-
+        
     def Activated(self):
         import a2p_observers
         FreeCAD.addDocumentObserver(a2p_observers.redoUndoObserver)
