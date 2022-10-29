@@ -31,6 +31,8 @@ import FreeCAD
 import FreeCADGui
 from PySide import QtGui, QtCore
 
+translate = FreeCAD.Qt.translate
+
 class globaluseclass:
     def __init__(self,name):
         self.sONOFF = 'off'
@@ -84,7 +86,8 @@ class SelObserver:
             g.sONOFF = 'off'
             # print('SelObserverOFF')
         except:
-            print('SelObserverOFF by except')
+            FreeCAD.Console.PrintMessage(translate("A2plus", "SelObserverOFF by except") + "\n")
+
     def addSelection(self, doc, obj, sub, pnt):  # Selection object
         onebutton.readselect(onebutton, doc, obj, sub)
     def removeSelection(self, doc, obj, sub):    # Delete the selected object
@@ -133,36 +136,31 @@ class ViewObserver:
 viewob = ViewObserver()
 
 
-
-toolTipText = \
-"""
-Use left mouse button to select two features.\nDo not use the control key.
-"""
-
-
 class rnp_OneButton:
     def GetResources(self):
         mypath = os.path.dirname(__file__)
         return {
              'Pixmap': mypath + "/icons/CD_OneButton.svg",
-             'MenuText': 'Use one mouse button to select features',
-             'ToolTip': toolTipText,
+             'MenuText': translate("A2plus", "Use one mouse button to select features"),
+             'ToolTip': translate("A2plus", "Use left mouse button to select two features.\nDo not use the control key."),
              'Checkable': self.IsChecked()
              }
 
     def Activated(self, placeholder=None):
         if FreeCAD.activeDocument() is None:
-            mApp('No file is opened.\nYou must open an assembly file first.')
+            mApp(translate("A2plus", "No file is opened.\nYou must open an assembly file first."))
             return
         FreeCADGui.Selection.clearSelection()
         if g.buttonenabled == False:
             selObv.SelObserverON()  # Checks for part and entity click
             viewob.vostart()        # Checks for click in background
             g.buttonenabled = True
+            FreeCAD.Console.PrintMessage(translate("A2plus", "OneButton is ON") + "\n")
         else:
             g.buttonenabled = False
             selObv.SelObserverOFF()
             viewob.vooff()
+            FreeCAD.Console.PrintMessage(translate("A2plus", "OneButton is OFF") + "\n")
 
     def Deactivated(self):
         """This function is executed when the workbench is deactivated."""
@@ -182,7 +180,7 @@ class mApp(QtGui.QWidget):
     # for error messages
     def __init__(self, msg, msgtype='ok'):
         super().__init__()
-        self.title = 'Warning'
+        self.title = translate("A2plus", "Warning")
         self.left = 100
         self.top = 100
         self.width = 400
@@ -193,5 +191,5 @@ class mApp(QtGui.QWidget):
         # self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
-        QtGui.QMessageBox.question(self, 'Warning', msg, QtGui.QMessageBox.Ok|QtGui.QMessageBox.Ok)
+        QtGui.QMessageBox.question(self, translate("A2plus", "Warning"), msg, QtGui.QMessageBox.Ok|QtGui.QMessageBox.Ok)
         self.show()
