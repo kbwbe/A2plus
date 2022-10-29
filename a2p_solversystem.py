@@ -369,7 +369,7 @@ class SolverSystem():
 
         if A2P_DEBUG_LEVEL > 0:
             Msg(20*"=" + "\n")
-            Msg(translate("A2plus", "Hierarchy:") + "\n" )
+            Msg(translate("A2plus", "Hierarchy:") + "\n")
             Msg(20*"=" + "\n")
             for rig in self.rigids:
                 if rig.fixed: rig.printHierarchy(0)

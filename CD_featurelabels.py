@@ -77,11 +77,9 @@ class formMain(QtGui.QMainWindow):
         if btext == 'Selected Labels':
             labels.selectedlabels()
 
-
     def hideMe(self):
         QtGui.Selection.clearSelection()
         self.close()
-
 
     def showme(self):
         self.show()
