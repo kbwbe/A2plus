@@ -25,17 +25,19 @@
 
 import os
 import sys
+import subprocess
+from PySide import QtCore, QtGui, QtUiTools
+#from PySide.QtGui import *
+
 import FreeCAD
 import FreeCADGui
-import subprocess
 
-from PySide import QtGui, QtCore
-from PySide import QtUiTools
-from PySide.QtGui import *
 import a2plib
-import CD_checkconstraints
 import a2p_solversystem
+import CD_checkconstraints
 import CD_featurelabels
+
+translate = FreeCAD.Qt.translate
 
 class globaluseclass:
     def __init__(self):
@@ -55,9 +57,9 @@ class mApp(QtGui.QWidget):
         self.setGeometry(100, 200, 320, 200)
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
         if msgtype == 'ok':
-            buttonReply = QtGui.QMessageBox.question(self, 'Information', msg, QtGui.QMessageBox.Ok|QtGui.QMessageBox.Ok)
+            buttonReply = QtGui.QMessageBox.question(self, translate("A2plus", "Information"), msg, QtGui.QMessageBox.Ok|QtGui.QMessageBox.Ok)
         if msgtype == 'yn':
-            buttonReply = QtGui.QMessageBox.question(self, 'Information', msg, QtGui.QMessageBox.Yes|QtGui.QMessageBox.No, QtGui.QMessageBox.No)
+            buttonReply = QtGui.QMessageBox.question(self, translate("A2plus", "Information"), msg, QtGui.QMessageBox.Yes|QtGui.QMessageBox.No, QtGui.QMessageBox.No)
         if buttonReply == QtGui.QMessageBox.Yes:
             pass
             # print('Yes clicked.')
@@ -76,35 +78,35 @@ class ShowPartProperties(QtGui.QWidget):
 
     def drt(self):
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
-        self.setGeometry(100, 50, 700, 280)#xy,wh
-        self.setWindowTitle("Constraint Viewer")
+        self.setGeometry(100, 50, 1024, 280)  # x, y, w, h
+        self.setWindowTitle(translate("A2plus", "Constraint Viewer"))
         self.setStyleSheet("font: 11pt arial MS")
         bar = QtGui.QMenuBar(self)
         
-        labelMenu = bar.addMenu("Labels")
-        labelMenu.addAction("Open Dialog")
-        labelMenu.addAction("Delete labels")
+        labelMenu = bar.addMenu(translate("A2plus", "Labels"))
+        labelMenu.addAction(translate("A2plus", "Open Dialog"))
+        labelMenu.addAction(translate("A2plus", "Delete labels"))
         labelMenu.triggered[QtGui.QAction].connect(self.process_menus)
         
-        infoMenu = bar.addMenu("Info")
-        infoMenu.addAction("Places of accuracy = " + str(g.roundto))
+        infoMenu = bar.addMenu(translate("A2plus", "Info"))
+        infoMenu.addAction(translate("A2plus", "Places of accuracy = {}").format(str(g.roundto)))
         infoMenu.triggered[QtGui.QAction].connect(self.process_menus)
         
-        helpMenu = bar.addMenu("Help")
-        helpMenu.addAction("Open Help")
+        helpMenu = bar.addMenu(translate("A2plus", "Help"))
+        helpMenu.addAction(translate("A2plus", "Open Help"))
         helpMenu.triggered[QtGui.QAction].connect(self.process_menus)
 
         """ Main Table """
         self.tm = QtGui.QTableWidget(self)
         self.tm.setGeometry(10, 120, 650, 50)  # xy,wh
-        self.tm.setWindowTitle("Broken Constraints")
+        self.tm.setWindowTitle(translate("A2plus", "Broken Constraints"))
         self.tm.setEditTriggers(QtGui.QTableWidget.NoEditTriggers)
         self.tm.setRowCount(0)
         self.tm.setColumnCount(10)
         self.tm.setMouseTracking(True)
         self.tm.cellClicked.connect(self.cell_was_clicked)
-        self.tm.setHorizontalHeaderLabels(['Direction',
-                                           'Suppress',
+        self.tm.setHorizontalHeaderLabels([translate("A2plus", "Direction"),
+                                           translate("A2plus", "Suppress"),
                                            'Run',
                                            'Constraint name',
                                            'Prt1 feat',
@@ -120,41 +122,41 @@ class ShowPartProperties(QtGui.QWidget):
         """ Creating function buttons """
         self.btns = []
         btnLabels = [
-            ['Import from part', 'Select a part and import \nall of the constraints for that part'],
-            ['Import from Tree', 'Copy selected constraints from the Tree']
+            [translate("A2plus", "Import from part"), translate("A2plus", "Select a part and import \nall of the constraints for that part")],
+            [translate("A2plus", "Import from Tree"), translate("A2plus", "Copy selected constraints from the Tree")]
             ]
         self.createButtonColumn(5, btnLabels)
 
         btnLabels = [
-            ['Clear Table', 'Clear the table'],
-            ['Attach to', 'Select the feature to change in table.\nselect surface to change to.\n']
+            [translate("A2plus", "Clear Table"), translate("A2plus", "Clear the table")],
+            [translate("A2plus", "Attach to"), translate("A2plus", "Select the feature to change in table.\nSelect surface to change to.")]
             ]
-        self.createButtonColumn(140, btnLabels)
+        self.createButtonColumn(145, btnLabels)
 
         btnLabels = [
-            ['Clear Tree', 'Remove search color from tree.\n'],
-            ['Find in Tree', 'Finds the constraint in the tree\nfor the select row in table.']
+            [translate("A2plus", "Clear Tree"), translate("A2plus", "Remove search color from tree.")],
+            [translate("A2plus", "Find in Tree"), translate("A2plus", "Finds the constraint in the tree\nfor the select row in table.")]
             ]
-        self.createButtonColumn(280, btnLabels)
+        self.createButtonColumn(285, btnLabels)
 
         btnLabels = [
-            ['Std Solver','Same as the solver above.\n'],
-            ['Find w label', 'Press to toggle a label for selected feature.']
+            [translate("A2plus", "Std Solver"), translate("A2plus", "Same as the solver above.")],
+            [translate("A2plus", "Find w label"), translate("A2plus", "Press to toggle a label for selected feature.")]
             ]
-        self.createButtonColumn(420, btnLabels)
+        self.createButtonColumn(425, btnLabels)
 
         btnLabels = [
-            ['Close','Close this window'],
+            [translate("A2plus", "Close"), translate("A2plus", "Close this window")],
             ]
-        self.createButtonColumn(560, btnLabels)
+        self.createButtonColumn(565, btnLabels)
 
 
     def createButtonColumn(self, xloc, btnLabels):
         for row in range(0, len(btnLabels)):
-            btny = 30 +(26*row)
+            btny = 30 +(28*row)
             self.btn = QtGui.QPushButton(str(btnLabels[row][0]), self)
             self.btn.move(xloc, btny)
-            self.btn.setFixedWidth(130)
+            self.btn.setFixedWidth(140)
             self.btn.setFixedHeight(25)
             self.btn.setToolTip(btnLabels[row][1])
             self.btn.released.connect(self.button_pushed) # pressed
@@ -163,23 +165,23 @@ class ShowPartProperties(QtGui.QWidget):
     def button_pushed(self):
         index = self.btns.index(self.sender())
         buttext = self.btns[index].text()
-        if buttext == 'Import from part':
+        if buttext == translate("A2plus", "Import from part"):
             conflicts.selectforpart()
-        if buttext == 'Import from Tree':
+        if buttext == translate("A2plus", "Import from Tree"):
             conflicts.selectforTree()
-        if 'Find in Tree' in buttext:
-            searchterm = lastclc.cname
-            search.startsearch(searchterm, 0)
-        if 'Clear Tree' in buttext:
-            search.reset1()
-        if 'Clear Table' in buttext:
+        if translate("A2plus", "Clear Table") in buttext:
             self.clearTable()
-        if buttext == 'Attach to':
+        if buttext == translate("A2plus", "Attach to"):
             """ attaches leg to selected surface"""
             sidefuncs.swapselectedleg()
-        if buttext == 'Std Solver':
+        if translate("A2plus", "Clear Tree") in buttext:
+            search.reset1()
+        if translate("A2plus", "Find in Tree") in buttext:
+            searchterm = lastclc.cname
+            search.startsearch(searchterm, 0)
+        if buttext == translate("A2plus", "Std Solver"):
             self.stdSolve()
-        if buttext == 'Find w label':
+        if buttext == translate("A2plus", "Find w label"):
             """ createlabel for single part """
             if g.labelexist:
                 CD_featurelabels.labels.deletelabels()
@@ -191,28 +193,28 @@ class ShowPartProperties(QtGui.QWidget):
             elif lastclc.column == 5:
                 pname = self.tm.item(lastclc.row, 9).text()
             else:
-                mApp('A part feature must be selected in the table')
+                mApp(translate("A2plus", "A part feature must be selected in the table"))
                 return
             sels = FreeCAD.ActiveDocument.getObjectsByLabel(pname)
             for e in sels:
                 try:
                     partobj = e  # line is used to check if part is selected
                 except:
-                    mApp('The table has lost focus. \nPlease reselect in the table.')
+                    mApp(translate("A2plus", "The table has lost focus.\nPlease reselect in the table."))
                     return
                 s = FreeCADGui.Selection.getSelectionEx()[0]
                 try:
                     ent = s.SubObjects[0]
                 except:
-                    mApp('The selected text in the table is not a proper feature name.\n' + fname + '   ' + pname)
+                    mApp(translate("A2plus", "The selected text in the table is not a proper feature name:\n{}      {}").format(fname, pname))
                     return
                 CD_featurelabels.labels.labelForTable(ent, fname)
                 g.labelexist = True
 
-        if buttext == 'Find Constraint':
+        if buttext == translate("A2plus", "Find Constraint"):
             search.startsearch(lastclc.cname, 0)
 
-        if buttext == 'Close':
+        if buttext == translate("A2plus", "Close"):
             self.Closeme()
 
     def clearTable(self):
@@ -220,12 +222,13 @@ class ShowPartProperties(QtGui.QWidget):
 
     def process_menus(self, q):
         """ process the menu according to the button text"""
-        if q.text() == "Open Dialog":
+        if q.text() == translate("A2plus", "Open Dialog"):
             CD_featurelabels.form1.showme()
-        if q.text() == "Delete labels":
+        if q.text() == translate("A2plus", "Delete labels"):
             CD_featurelabels.labels.deletelabels()
-        if q.text() == "Open Help":
-            pdf_file = os.path.join(os.path.dirname(os.path.dirname(__file__)),'CD_Help for Diagnostic tools.pdf')
+        if q.text() == translate("A2plus", "Open Help"):
+            # File name may be translated, e.g. to "CD_Помощь для инструмента Диагностики.pdf" (this file must be present)
+            pdf_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), translate("A2plus", "CD_Help for Diagnostic tools.pdf"))
             # pdf_file = a2plib.pathOfModule() + "\CD_Help for Diagnostic tools.pdf"
             # For Linux Mint 21 64-bit with XFCE
             if sys.platform in ['linux', 'linux2', 'darwin', 'cygwin']:
@@ -347,7 +350,7 @@ class ShowPartProperties(QtGui.QWidget):
             partobj1 = FreeCAD.ActiveDocument.getObject(constraint.Object1)
             partobj2 = FreeCAD.ActiveDocument.getObject(constraint.Object2)
         except:
-            mApp('Constraint is not in file. Was it deleted?')
+            mApp(translate("A2plus", "Constraint is not in file. Was it deleted?"))
             return
         FreeCADGui.Selection.clearSelection()
         if header == 'Run':
@@ -369,7 +372,7 @@ class ShowPartProperties(QtGui.QWidget):
         if header == 'Part2':
             FreeCADGui.Selection.addSelection(partobj2)
 
-        if header == 'Suppress':
+        if header == translate("A2plus", "Suppress"):
             if constraint.Suppressed == False:
                 constraint.Suppressed = True
             else:
@@ -377,7 +380,7 @@ class ShowPartProperties(QtGui.QWidget):
             tx = str(constraint.Suppressed)
             item2 = self.tm.item(row, column)
             item2.setText(tx)
-        if header == 'Direction':
+        if header == translate("A2plus", "Direction"):
             item2 = self.tm.item(row, column)
             if item2.text() != 'None':
                 direction = constraint.directionConstraint
@@ -394,8 +397,7 @@ class ShowPartProperties(QtGui.QWidget):
 
     def showme(self):
         if FreeCADGui.activeDocument() is None:
-            msg = 'A file must be opened to start this selector\nPlease open a file and try again'
-            mApp(msg)
+            mApp(translate("A2plus", "A file must be opened to start this selector.\nPlease open a file and try again"))
             return()
         self.clearTable()
         self.show()
@@ -419,12 +421,9 @@ class ShowPartProperties(QtGui.QWidget):
 form1=ShowPartProperties()
 
 
-
-
 class classconflictreport():
     def __init__(self):
         self.name = None
-
 
     def selectforTree(self):
         doc = FreeCAD.activeDocument()
@@ -432,7 +431,7 @@ class classconflictreport():
         sels = FreeCADGui.Selection.getSelectionEx()
         if len(sels) == 0:
             form1.clearTable()
-            mApp('Nothing was selected in the Tree.')
+            mApp(translate("A2plus", "Nothing was selected in the Tree."))
             return
         for sel in sels:
             cname = sel.Object.Name
@@ -442,7 +441,7 @@ class classconflictreport():
                 clist.append(cobj)
             if len(clist) == 0:
                 form1.clearTable()
-                mApp('There were no constraints selected in the Tree.\nSelect one or more constraints and try again.')
+                mApp(translate("A2plus", "There were no constraints selected in the Tree.\nSelect one or more constraints and try again."))
                 return
         form1.loadtable(clist)
 
@@ -454,7 +453,7 @@ class classconflictreport():
         clist = []
         sels = FreeCADGui.Selection.getSelectionEx()
         if len(sels) == 0:
-            mApp('No parts were selected in the window.')
+            mApp(translate("A2plus", "No parts were selected in the window."))
             return
         if len(sels) == 1:
             pnamelist.append(sels[0].Object.Label)
@@ -475,9 +474,9 @@ class classconflictreport():
                             clist.append(obj)
         if len(clist) == 0:
             if len(sels) == 1:
-                msg = 'There are no constraints for this part.'
+                msg = translate("A2plus", "There are no constraints for this part.")
             else:
-                msg = 'There are no constraints between these parts.'
+                msg = translate("A2plus", "There are no constraints between these parts.")
             mApp(msg)
             return
         form1.loadtable(clist)
@@ -520,10 +519,10 @@ class classsidefunctions():
     def swapselectedleg(self):
         #starts observer to select a new feature when replacing manually.
         if lastclc.column < 4 or lastclc.column > 5:
-            mApp('Surfaces can only be replaced in columns/nPart1 feat or Part2 feat')
+            mApp(translate("A2plus", "Surfaces can only be replaced in columns/nPart1 feat or Part2 feat"))
             return
         if len(FreeCADGui.Selection.getSelectionEx()) == 0 and lastclc.text != 'None':
-            mApp('No feature has been selected')
+            mApp(translate("A2plus", "No feature has been selected"))
             return
         selObv.SelObserverON()
 
@@ -555,7 +554,7 @@ class classsidefunctions():
         partobj1 = FreeCAD.ActiveDocument.getObject(cobj.Object1)
         partobj2 = FreeCAD.ActiveDocument.getObject(cobj.Object2)
         if sel.Object.Name != partobj1.Name and sel.Object.Name != partobj2.Name:
-            mApp('The constraint can only be moved to another surface of the same part')
+            mApp(translate("A2plus", "The constraint can only be moved to another surface of the same part"))
             return
         FreeCADGui.Selection.addSelection(partobj1, cobj.SubElement1)
         FreeCADGui.Selection.addSelection(partobj2, cobj.SubElement2)
@@ -596,7 +595,7 @@ class SelObserver:
         try:
             FreeCADGui.Selection.removeObserver(selObv)
         except:
-            print('removeObserver failed in C checker')
+            print(translate("A2plus", "removeObserver failed in C checker"))
 
     def setPreselection(self, doc, obj, sub): # Preselection object
         pass
@@ -721,12 +720,14 @@ lastclc = classlastclickeditem("lastclc")
 
 
 toolTipText = \
+translate("A2plus",
 '''
 Constraint Viewer. You can view the features the constraint is attached to,
  run a single constraint or change the the feature the constraint is attached to.
 See the help for more information.
 '''
-
+)
+                           
 class rnp_Constraint_Viewer:
 
     def Activated(self):
@@ -740,7 +741,7 @@ class rnp_Constraint_Viewer:
         mypath = os.path.dirname(__file__)
         return {
              'Pixmap' : mypath + "/icons/CD_ConstraintViewer.svg",
-             'MenuText': 'View and edit selected constraints',
+             'MenuText': translate("A2plus", "View and edit selected constraints"),
              'ToolTip': toolTipText
              }
 
