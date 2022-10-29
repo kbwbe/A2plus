@@ -68,7 +68,7 @@ class formMain(QtGui.QMainWindow):
 
         if btext == translate("A2plus", "Delete Labels"):
             labels.deletelabels()
-       if btext == translate("A2plus", "Close"):
+        if btext == translate("A2plus", "Close"):
             self.Closeme()
             
         # Not present?

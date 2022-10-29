@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #***************************************************************************
 #*                                                                         *
 #*   Copyright (c) 2018 kbwbe                                              *
@@ -368,7 +369,7 @@ class SolverSystem():
 
         if A2P_DEBUG_LEVEL > 0:
             Msg(20*"=" + "\n")
-            Msg(translate("A2plus", "Hierarchy:) + "\n")
+            Msg(translate("A2plus", "Hierarchy:") + "\n" )
             Msg(20*"=" + "\n")
             for rig in self.rigids:
                 if rig.fixed: rig.printHierarchy(0)
@@ -494,7 +495,7 @@ class SolverSystem():
 
     def solveSystem(self,doc,matelist=None, showFailMessage=True):
         if not a2plib.SIMULATION_STATE:
-            Msg("===== " translate("A2plus", "Start Solving System") + " =====\n")
+            Msg("===== " + translate("A2plus", "Start Solving System") + " =====\n")
 
         systemSolved = self.solveAccuracySteps(doc,matelist)
         if self.status == "loadingDependencyError":
