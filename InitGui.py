@@ -57,7 +57,13 @@ class A2plusWorkbench (Workbench):
 #        from a2p_translateUtils import tr_
 
         import sys
-        import a2p_Resources3
+        PyVersion = sys.version_info[0]
+        if PyVersion == 2:
+            import a2p_Resources2
+        else:
+            import a2p_Resources3
+        # twice imported a2plib?
+        import a2plib
 
         # add translations path
         FreeCADGui.addLanguagePath(a2plib.getLanguagePath())
