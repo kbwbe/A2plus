@@ -27,7 +27,7 @@ __title__ = 'A2plus assembly Workbench - InitGui file'
 __author__ = 'kbwbe'
 
 
-A2P_VERSION = 'V0.4.59e'
+A2P_VERSION = 'V0.4.59g'
 
 import sys
 import FreeCAD
@@ -40,6 +40,7 @@ import a2p_Resources3
 
 class A2plusWorkbench (Workbench):
 
+
     def __init__(self):
         global A2P_VERSION
         translate = FreeCAD.Qt.translate
@@ -49,13 +50,11 @@ class A2plusWorkbench (Workbench):
         self.__class__.MenuText = 'A2plus'
         self.__class__.ToolTip  = translate("A2plus", "An other assembly workbench for FreeCAD.")
 
-    def QT_TRANSLATE_NOOP(context, text):
-        return text
-
     def Initialize(self):
 #        from a2p_translateUtils import QT_TRANSLATE_NOOP
 #        from a2p_translateUtils import translate
 #        from a2p_translateUtils import tr_
+        translate = FreeCAD.Qt.translate
 
         import sys
         import a2plib
@@ -208,24 +207,24 @@ class A2plusWorkbench (Workbench):
             partCommands
             )
         self.appendMenu(
-            ['A2plus', QT_TRANSLATE_NOOP("Workbench", "Constraint")],
+            ['A2plus', translate("Workbench", "Constraint")],
             constraintCommands
             )
         self.appendMenu(
-            ['A2plus', QT_TRANSLATE_NOOP("Workbench", "Solver")],
+            ['A2plus', translate("Workbench", "Solver")],
             solverCommands
             )
         self.appendMenu(
-            ['A2plus', QT_TRANSLATE_NOOP("Workbench", "View")],
+            ['A2plus', translate("Workbench", "View")],
             viewCommands
             )
         miscCommands.extend(menuEntries)
         self.appendMenu(
-            ['A2plus', QT_TRANSLATE_NOOP("Workbench", "Misc")],
+            ['A2plus', translate("Workbench", "Misc")],
             miscCommands
             )
         self.appendMenu(
-           ['A2plus', QT_TRANSLATE_NOOP("Workbench", "Diagnostic")],
+           ['A2plus', translate("Workbench", "Diagnostic")],
            DiagnosticCommands
            )
 
