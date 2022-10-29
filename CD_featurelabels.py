@@ -68,7 +68,7 @@ class formMain(QtGui.QMainWindow):
 
         if btext == translate("A2plus", "Delete Labels"):
             labels.deletelabels()
-       if btext == translate("A2plus", "Close"):
+        if btext == translate("A2plus", "Close"):
             self.Closeme()
             
         # Not present?
@@ -77,11 +77,9 @@ class formMain(QtGui.QMainWindow):
         if btext == 'Selected Labels':
             labels.selectedlabels()
 
-
     def hideMe(self):
         QtGui.Selection.clearSelection()
         self.close()
-
 
     def showme(self):
         self.show()
