@@ -157,9 +157,9 @@ class rnp_OneButton:
             g.buttonenabled = True
             FreeCAD.Console.PrintMessage(translate("A2plus", "OneButton is ON") + "\n")
         else:
-            g.buttonenabled = False
             selObv.SelObserverOFF()
             viewob.vooff()
+            g.buttonenabled = False
             FreeCAD.Console.PrintMessage(translate("A2plus", "OneButton is OFF") + "\n")
 
     def Deactivated(self):
