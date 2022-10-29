@@ -191,8 +191,11 @@ class a2p_recursiveUpdateImportedPartsCommand:
                     ImportGui.insert(filename,newname)
                     importDoc = FreeCAD.ActiveDocument
                 else:
-                    msg = translate("A2plus", "A part can only be imported from a FreeCAD '*.fcstd' file")
-                    QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(), translate("A2plus", "Value Error"), msg )
+                    QtGui.QMessageBox.information(
+                                QtGui.QApplication.activeWindow(),
+                                translate("A2plus", "Value Error"),
+                                translate("A2plus", "A part can only be imported from a FreeCAD '*.fcstd' file")
+                                )
                     return
 
             if importDoc==doc and partial==True:
@@ -202,8 +205,8 @@ class a2p_recursiveUpdateImportedPartsCommand:
 
             FreeCADGui.updateGui()
             importDoc.save()
-            print(
-                translate("A2plus", "==== Assembly '{}' has been updated! =====").format(
+            FreeCAD.Console.PrintMessage(
+                translate("A2plus", "===== Assembly '{}' has been updated! =====\n").format(
                     importDoc.FileName
                     )
                 )

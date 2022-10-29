@@ -1,4 +1,9 @@
+<a href="https://github.com/kbwbe/A2plus"><img src="https://github.com/kbwbe/A2plus/blob/master/icons/a2p_Workbench.svg" height="100px" width="100px"></a>
 # A2plus
+[Documentation](https://wiki.freecadweb.org/A2plus_Workbench) • 
+[Forum](https://forum.freecadweb.org/viewtopic.php?f=20&t=29207) •
+[Git repository](https://github.com/kbwbe/A2plus)
+
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/kbwbe/A2plus.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/kbwbe/A2plus/alerts/) [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/kbwbe/A2plus.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/kbwbe/A2plus/context:python)  
 
 ## Description

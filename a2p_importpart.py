@@ -22,11 +22,11 @@
 #*                                                                         *
 #***************************************************************************
 
+import os
+import sys
 import FreeCAD, FreeCADGui
 from PySide import QtGui, QtCore
-import os
 import copy
-import sys
 import platform
 from a2p_translateUtils import *
 import a2plib
@@ -43,7 +43,7 @@ import a2p_lcs_support
 from a2p_importedPart_class import Proxy_importPart, ImportedPartViewProviderProxy
 import a2p_constraintServices
 
-PYVERSION = sys.version_info[0]
+#PYVERSION = sys.version_info[0]
 
 #==============================================================================
 
@@ -324,10 +324,7 @@ def importPartFromFile(
                 document=doc,
                 extension=dc.tx
                 )
-        if PYVERSION < 3:
-            newObj = doc.addObject( "Part::FeaturePython", partName.encode('utf-8') )
-        else:
-            newObj = doc.addObject( "Part::FeaturePython", str(partName.encode('utf-8')) )    # works on Python 3.6.5
+        newObj = doc.addObject( "Part::FeaturePython", str(partName.encode('utf-8')) )    # works on Python 3.6.5
         newObj.Label = partLabel
 
     Proxy_importPart(newObj)
@@ -404,10 +401,7 @@ def importPartFromFile(
         lcsGroupObjectName = 'LCS_Collection'
         lcsGroupLabel = translate("A2plus", "LCS_Collection")
 
-        if PYVERSION < 3:
-            lcsGroup = doc.addObject( "Part::FeaturePython", lcsGroupObjectName.encode('utf-8') )
-        else:
-            lcsGroup = doc.addObject( "Part::FeaturePython", str(lcsGroupObjectName.encode('utf-8')) )    # works on Python 3.6.5
+        lcsGroup = doc.addObject( "Part::FeaturePython", str(lcsGroupObjectName.encode('utf-8')) )    # works on Python 3.6.5
         lcsGroup.Label = lcsGroupLabel
 
         a2p_lcs_support.LCS_Group(lcsGroup)
@@ -479,10 +473,7 @@ class a2p_ImportShapeReferenceCommand():
             dialog.setOption(QtGui.QFileDialog.DontUseNativeDialog, True)
         dialog.setNameFilter(translate("A2plus", "Supported Formats (*.FCStd *.fcstd *.stp *.step);;All files (*.*)"))
         if dialog.exec_():
-            if PYVERSION < 3:
-                filename = unicode(dialog.selectedFiles()[0])
-            else:
-                filename = str(dialog.selectedFiles()[0])
+            filename = str(dialog.selectedFiles()[0])
         else:
             return
 
@@ -718,10 +709,7 @@ class a2p_ImportPartCommand():
             dialog.setOption(QtGui.QFileDialog.DontUseNativeDialog, True)
         dialog.setNameFilter(translate("A2plus", "Supported Formats (*.FCStd *.fcstd *.stp *.step);;All files (*.*)"))
         if dialog.exec_():
-            if PYVERSION < 3:
-                filename = unicode(dialog.selectedFiles()[0])
-            else:
-                filename = str(dialog.selectedFiles()[0])
+            filename = str(dialog.selectedFiles()[0])
         else:
             return
 
@@ -796,11 +784,10 @@ def updateImportedParts(doc, partial=False):
             response = QtGui.QMessageBox.Yes
         else:
             flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
-            msg = translate("A2plus", "Do you want to update only the selected parts?")
             response = QtGui.QMessageBox.information(
                             QtGui.QApplication.activeWindow(),
                             translate("A2plus", "ASSEMBLY UPDATE"),
-                            msg,
+                            translate("A2plus", "Do you want to update only the selected parts?"),
                             flags
                             )
         if response == QtGui.QMessageBox.Yes:
@@ -941,10 +928,7 @@ def duplicateImportedPart( part ):
     nameBase = part.Label
     partName = a2plib.findUnusedObjectName(nameBase,document=doc)
     partLabel = a2plib.findUnusedObjectLabel(nameBase,document=doc)
-    if PYVERSION >= 3:
-        newObj = doc.addObject("Part::FeaturePython", str(partName.encode("utf-8")) )
-    else:
-        newObj = doc.addObject("Part::FeaturePython", partName.encode("utf-8") )
+    newObj = doc.addObject("Part::FeaturePython", str(partName.encode("utf-8")) )
 
     newObj.Label = partLabel
 
@@ -2115,12 +2099,12 @@ def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
 
                         if newIndex >= 0:
                             setattr(c, SubElement, newSubElementName )
-                            print (
-                                    "oldConstraintString (KEY) : {}".format(
+                            FreeCAD.Console.PrintMessage (
+                                    "oldConstraintString (KEY) : '{}'".format(
                                     oldConstraintString
                                     )
                                    )
-                            print ("Updating by SubElement-Map: {} => {} ".format(
+                            FreeCAD.Console.PrintMessage (translate("A2plus", "Updating by SubElement-Map: '{}' => '{}'").format(
                                        subElementName,newSubElementName
                                        )
                                    )
@@ -2146,12 +2130,6 @@ def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
 
 
 #==============================================================================
-toolTip = \
-translate("A2plus",
-'''
-Clean up solver debug output from 3D view
-'''
-)
 
 class a2p_cleanUpDebug3dCommand():
 
@@ -2168,7 +2146,7 @@ class a2p_cleanUpDebug3dCommand():
         return {
             'Pixmap'  : ':/icons/a2p_RemoveDebug3D.svg',
             'MenuText': translate("A2plus", "Clean up solver debug output from 3D view"),
-            'ToolTip' : toolTip
+            'ToolTip' : translate("A2plus", "Clean up solver debug output from 3D view")
             }
 
 FreeCADGui.addCommand('a2p_cleanUpDebug3dCommand', a2p_cleanUpDebug3dCommand())

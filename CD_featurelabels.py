@@ -21,25 +21,27 @@
 # This is to be used with A2plus Assembly WorkBench
 #
 
-import FreeCADGui
 import FreeCAD
-from PySide.QtGui import *
+import FreeCADGui
+# from PySide.QtGui import *
 from PySide import QtGui, QtCore
+
+translate = FreeCAD.Qt.translate
 
 class formMain(QtGui.QMainWindow):
     def __init__(self, name):
         self.name = name
         super(formMain, self).__init__()
-        self.setWindowTitle('Create Labels')
+        self.setWindowTitle(translate("A2plus", "Create Labels"))
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
-        self.setGeometry(300, 200, 200, 200)
+        self.setGeometry(300, 200, 260, 200)
         self.setStyleSheet("font: 11pt arial MS")
 
-        self.btnLabels = [['Add Face Labels', 'Add labels to all of the faces on a selected part'],
-                          ['Add Edge Labels', 'Add labels to all of the edges on a selected part'],
-                          ['Add Vertex Labels', 'Add labels to all of the vertices on a selected part'],
-                          ['Delete Labels', 'Delete all labels'],
-                          ['Close', '']
+        self.btnLabels = [[translate("A2plus", "Add Face Labels"), translate("A2plus", "Add labels to all of the faces on a selected part")],
+                          [translate("A2plus", "Add Edge Labels"), translate("A2plus", "Add labels to all of the edges on a selected part")],
+                          [translate("A2plus", "Add Vertex Labels"), translate("A2plus", "Add labels to all of the vertices on a selected part")],
+                          [translate("A2plus", "Delete Labels"), translate("A2plus", "Delete all labels")],
+                          [translate("A2plus", "Close"), '']
                           ]
         self.btns=[]
         BtnNum = 0
@@ -47,7 +49,7 @@ class formMain(QtGui.QMainWindow):
             btny = 20 +(28*row)
             self.btn = QtGui.QPushButton( str(self.btnLabels[row][0]), self)
             self.btn.move(5, btny)
-            self.btn.setFixedWidth(190)
+            self.btn.setFixedWidth(250)
             self.btn.setFixedHeight(25)
             self.btn.setToolTip(self.btnLabels[row][1])
             self.btn.released.connect(self.button_pushed) # pressed
@@ -57,27 +59,27 @@ class formMain(QtGui.QMainWindow):
     def button_pushed(self):
         index = self.btns.index(self.sender())
         btext = self.btns[index].text()
-        if btext == 'Add Face Labels':
-            labels.addlabels('Face')
-        if btext == 'Add Edge Labels':
-            labels.addlabels('Edge')
-        if btext == 'Add Vertex Labels':
-            labels.addlabels('Vertex')
+        if btext == translate("A2plus", "Add Face Labels"):
+            labels.addlabels(translate("A2plus", "Face"))
+        if btext == translate("A2plus", "Add Edge Labels"):
+            labels.addlabels(translate("A2plus", "Edge"))
+        if btext == translate("A2plus", "Add Vertex Labels"):
+            labels.addlabels(translate("A2plus", "Vertex"))
 
-        if btext == 'Delete Labels':
+        if btext == translate("A2plus", "Delete Labels"):
             labels.deletelabels()
+        if btext == translate("A2plus", "Close"):
+            self.Closeme()
+            
+        # Not present?
         if btext == 'Attach to':
             labels.attachto()
-        if btext == 'Close':
-            self.Closeme()
         if btext == 'Selected Labels':
             labels.selectedlabels()
-
 
     def hideMe(self):
         QtGui.Selection.clearSelection()
         self.close()
-
 
     def showme(self):
         self.show()
@@ -102,7 +104,7 @@ class classLabels():
         if self.labelGroup is None:
             self.labelGroup = doc.addObject("App::DocumentObjectGroup", "partLabels")
         if len(FreeCADGui.Selection.getSelection()) == 0:
-            mApp('One part must be selected.\nPlease select One part and try again')
+            mApp(translate("A2plus", "One part must be selected.") + "\n" + translate("A2plus", "Please select One part and try again"))
             return(False)
         return(True)
 
@@ -111,16 +113,16 @@ class classLabels():
         if not sel:
             return
         sel = FreeCADGui.Selection.getSelection()  # Select an object
-        if feat == 'Face':
+        if feat == translate("A2plus", "Face"):
             features = sel[0].Shape.Faces
-        if feat == 'Edge':
+        if feat == translate("A2plus", "Edge"):
             features = sel[0].Shape.Edges
-        if feat == 'Vertex':
+        if feat == translate("A2plus", "Vertex"):
             features = sel[0].Shape.Vertexes
 
         for num in range(0, len(features)):
             ent = features[num]
-            if feat == 'Vertex':
+            if feat == translate("A2plus", "Vertex"):
                 loc = ent.Point
             else:
                 loc = ent.CenterOfMass
@@ -195,5 +197,5 @@ class mApp(QtGui.QWidget):
     def initUI(self,msg):
         self.setGeometry(100, 100, 400, 300)
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)       
-        QtGui.QMessageBox.question(self, 'Info', msg, QtGui.QMessageBox.Ok|QtGui.QMessageBox.Ok)        
+        QtGui.QMessageBox.question(self, translate("A2plus", "Info"), msg, QtGui.QMessageBox.Ok|QtGui.QMessageBox.Ok)        
         self.show()

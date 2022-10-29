@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #***************************************************************************
 #*                                                                         *
 #*   Copyright (c) 2018 kbwbe                                              *
@@ -23,7 +24,7 @@
 import os
 import FreeCAD, FreeCADGui
 from PySide import QtGui
-from a2p_translateUtils import *
+#from a2p_translateUtils import *
 import a2plib
 from a2plib import (
     path_a2p,
@@ -37,6 +38,7 @@ from a2p_dependencies import Dependency
 from a2p_rigid import Rigid
 
 SOLVER_MAXSTEPS = 50000
+translate = FreeCAD.Qt.translate
 
 # SOLVER_CONTROLDATA has been replaced by SolverSystem.getSolverControlData()
 #SOLVER_CONTROLDATA = {
@@ -137,7 +139,7 @@ class SolverSystem():
 
         if len(faultyConstraintList) > 0:
             for fc in faultyConstraintList:
-                print(translate("A2plus", "Remove faulty constraint '{}'").format(fc.Label))
+                FreeCAD.Console.PrintMessage(translate("A2plus", "Remove faulty constraint '{}'").format(fc.Label) + "\n")
                 doc.removeObject(fc.Name)
 
     def loadSystem(self,doc, matelist=None):
@@ -268,7 +270,7 @@ class SolverSystem():
                 if ob.ViewObject.Visibility == True:
                     bbCenter = ob.Shape.BoundBox.Center
                     dofLabel = doc.addObject("App::AnnotationLabel","dofLabel")
-                    dofLabel.LabelText = "FREE"
+                    dofLabel.LabelText = translate("A2plus", "FREE")
                     dofLabel.BasePosition.x = bbCenter.x
                     dofLabel.BasePosition.y = bbCenter.y
                     dofLabel.BasePosition.z = bbCenter.z
@@ -287,9 +289,9 @@ class SolverSystem():
                 bbCenter = ob.Shape.BoundBox.Center
                 dofLabel = doc.addObject("App::AnnotationLabel","dofLabel")
                 if rig.fixed:
-                    dofLabel.LabelText = "Fixed"
+                    dofLabel.LabelText = translate("A2plus", "Fixed")
                 else:
-                    dofLabel.LabelText = "DOFs: {}".format(dofCount)
+                    dofLabel.LabelText = translate("A2plus", "DOFs: {}").format(dofCount)
                 dofLabel.BasePosition.x = bbCenter.x
                 dofLabel.BasePosition.y = bbCenter.y
                 dofLabel.BasePosition.z = bbCenter.z
@@ -308,7 +310,7 @@ class SolverSystem():
 
             rig.beautyDOFPrint()
             numdep+=rig.countDependencies()
-        Msg( translate("A2plus", "There are '{}' dependencies\n").format(numdep/2))
+        Msg( translate("A2plus", "There are '{}' dependencies").format(numdep/2) + "\n")
 
     def retrieveDOFInfo(self):
         """
@@ -367,7 +369,7 @@ class SolverSystem():
 
         if A2P_DEBUG_LEVEL > 0:
             Msg(20*"=" + "\n")
-            Msg("Hierarchy:\n")
+            Msg(translate("A2plus", "Hierarchy:") + "\n")
             Msg(20*"=" + "\n")
             for rig in self.rigids:
                 if rig.fixed: rig.printHierarchy(0)
@@ -383,7 +385,7 @@ class SolverSystem():
         with the same filename of the assembly
         '''
         out_file = os.path.splitext(self.doc.FileName)[0] + '_asm_hierarchy.html'
-        Msg(translate("A2plus", "Writing visual hierarchy to: '{}'\n").format(out_file))
+        Msg(translate("A2plus", "Writing visual hierarchy to: '{}'").format(out_file) + "\n")
         f = open(out_file, "w")
 
         f.write("<!DOCTYPE html>\n")
@@ -391,7 +393,7 @@ class SolverSystem():
         f.write("<head>\n")
         f.write('    <meta charset="utf-8">\n')
         f.write('    <meta http-equiv="X-UA-Compatible" content="IE=edge">\n')
-        f.write('    <title>A2P assembly hierarchy visualization</title>\n')
+        f.write('    <title>' + translate("A2plus", "A2P assembly hierarchy visualization") + '</title>\n')
         f.write("</head>\n")
         f.write("<body>\n")
         f.write('<div class="mermaid">\n')
@@ -402,27 +404,18 @@ class SolverSystem():
             # No children, add current rogod as a leaf entry
             if len(rig.childRigids) == 0:
                 message = u"{}\n".format(rigLabel)
-                if a2plib.PYVERSION < 3:
-                    f.write(a2plib.to_bytes(message))
-                else:
-                    f.write(message)
+                f.write(message)
             else:
                 # Rigid have children, add them based on the dependency list
                 for d in rig.dependencies:
                     if d.dependedRigid in rig.childRigids:
                         dependedRigLabel = a2plib.to_str(d.dependedRigid.label).replace(u' ',u'_')
                         if rig.fixed:
-                            message = u"{}({}<br>*FIXED*) -- {} --> {}\n".format(rigLabel, rigLabel, d.Type, dependedRigLabel)
-                            if a2plib.PYVERSION < 3:
-                                f.write(a2plib.to_bytes(message))
-                            else:
-                                f.write(message)
+                            message = "{}({}<br>*" + translate("A2plus", "FIXED") + "*) -- {} --> {}\n".format(rigLabel, rigLabel, d.Type, dependedRigLabel)
+                            f.write(message)
                         else:
                             message = u"{} -- {} --> {}\n".format(rigLabel, d.Type, dependedRigLabel)
-                            if a2plib.PYVERSION < 3:
-                                f.write(a2plib.to_bytes(message))
-                            else:
-                                f.write(message)
+                            f.write(message)
 
         f.write("</div>\n")
         f.write('    <script src="https://unpkg.com/mermaid@7.1.2/dist/mermaid.js"></script>\n')
@@ -492,17 +485,17 @@ class SolverSystem():
             if rig.maxSingleAxisError > self.maxSingleAxisError:
                 self.maxSingleAxisError = rig.maxSingleAxisError
         if not a2plib.SIMULATION_STATE:
-            Msg( 'TARGET   POS-ACCURACY :{}\n'.format(self.mySOLVER_POS_ACCURACY) )
-            Msg( 'REACHED  POS-ACCURACY :{}\n'.format(self.maxPosError) )
-            Msg( 'TARGET  SPIN-ACCURACY :{}\n'.format(self.mySOLVER_SPIN_ACCURACY) )
-            Msg( 'REACHED SPIN-ACCURACY :{}\n'.format(self.maxAxisError) )
-            Msg( 'SA SPIN-ACCURACY      :{}\n'.format(self.maxSingleAxisError) )
+            Msg(translate("A2plus", "TARGET   POS-ACCURACY :{}").format(self.mySOLVER_POS_ACCURACY) + "\n")
+            Msg(translate("A2plus", "REACHED  POS-ACCURACY :{}").format(self.maxPosError) + "\n")
+            Msg(translate("A2plus", "TARGET  SPIN-ACCURACY :{}").format(self.mySOLVER_SPIN_ACCURACY) + "\n")
+            Msg(translate("A2plus", "REACHED SPIN-ACCURACY :{}").format(self.maxAxisError) + "\n")
+            Msg(translate("A2plus", "SA      SPIN-ACCURACY :{}").format(self.maxSingleAxisError) + "\n")
 
         return systemSolved
 
     def solveSystem(self,doc,matelist=None, showFailMessage=True):
         if not a2plib.SIMULATION_STATE:
-            Msg(translate("A2plus", "===== Start Solving System ======\n"))
+            Msg("===== " + translate("A2plus", "Start Solving System") + " =====\n")
 
         systemSolved = self.solveAccuracySteps(doc,matelist)
         if self.status == "loadingDependencyError":
@@ -510,7 +503,7 @@ class SolverSystem():
         if systemSolved:
             self.status = "solved"
             if not a2plib.SIMULATION_STATE:
-                Msg(translate("A2plus", "===== System solved using partial + recursive unfixing =====\n"))
+                Msg("===== " + translate("A2plus", "System solved using partial + recursive unfixing") + " =====\n")
                 self.checkForUnmovedParts()
         else:
             if a2plib.SIMULATION_STATE == True:
@@ -520,7 +513,7 @@ class SolverSystem():
             else: # a2plib.SIMULATION_STATE == False
                 self.status = "unsolved"
                 if showFailMessage == True:
-                    Msg(translate("A2plus", "===== Could not solve system ======\n"))
+                    Msg("===== " + translate("A2plus", "Could not solve system") + " =====\n")
                     msg = \
 translate("A2plus",
 '''
@@ -696,7 +689,7 @@ to a fixed part!
                     else:
                         Msg('\n')
                         Msg('convergency-conter: {}\n'.format(self.convergencyCounter))
-                        Msg(translate("A2plus", "Calculation stopped, no convergency anymore!\n"))
+                        Msg(translate("A2plus", "Calculation stopped, no convergency anymore!") + "\n")
                         return False
 
                 self.lastPositionError = maxPosError
@@ -705,7 +698,7 @@ to a fixed part!
                 self.convergencyCounter = 0
 
             if self.stepCount > SOLVER_MAXSTEPS:
-                Msg(translate("A2plus", "Reached max calculations count: {}\n").format(SOLVER_MAXSTEPS) )
+                Msg(translate("A2plus", "Reached max calculations count: {}").format(SOLVER_MAXSTEPS) + "\n")
                 return False
         return True
 
@@ -758,10 +751,7 @@ class a2p_SolverCommand:
 FreeCADGui.addCommand('a2p_SolverCommand', a2p_SolverCommand())
 #------------------------------------------------------------------------------
 
-
-
-
 if __name__ == "__main__":
-    DebugMsg(A2P_DEBUG_1, "Starting solveConstraints latest script...\n" )
+    DebugMsg(A2P_DEBUG_1, translate("A2plus", "Starting solveConstraints latest script...") + "\n")
     doc = FreeCAD.activeDocument()
     solveConstraints(doc)
