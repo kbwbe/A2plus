@@ -35,9 +35,11 @@ class globaluseclass:
     def __init__(self):
         self.checkingnum = 0
         self.roundto = 3
-        self.labelexist = False
-        self.movedconsts = []
-        self.allErrors = {}
+        #self.labelexist = False
+        #self.movedconsts = []
+        #self.allErrors = {}
+        self.errorList = []
+        self.conflicterror = False
 g = globaluseclass()
 
 
@@ -104,14 +106,14 @@ class formMain(QtGui.QMainWindow):
         self.btnCloseForm.clicked.connect(lambda:self.Closeme())
 
     def openViewer(self):
-        clist = []
-        doc = FreeCAD.activeDocument()
-        for (k, v) in g.allErrors.items():
-            cobj = doc.getObject(k)
-            clist.append(cobj)
-
-        CD_ConstraintViewer.form1.show()
-        CD_ConstraintViewer.form1.loadtable(clist)
+        #clist = []
+        #doc = FreeCAD.activeDocument()
+        #for (k, v) in g.allErrors.items():
+        #    cobj = doc.getObject(k)
+        #    clist.append(cobj)
+        CD_ConstraintViewer.form1.loadtable(g.errorList)
+        #CD_ConstraintViewer.form1.show()
+        #CD_ConstraintViewer.form1.loadtable(clist)
 
 
     def resizeEvent(self, event):
@@ -138,6 +140,7 @@ class classCheckConstraints():
         self.name = None
         self.dir_errors = []
         self.rigids = []
+        self.floaters = []
 
     def startcheck(self):
         ''' Check for opened file '''
@@ -151,10 +154,16 @@ class classCheckConstraints():
         ss = a2p_solversystem.SolverSystem()
         ss.loadSystem(doc)
         ss.assignParentship(doc)
+        
         rigids = ss.rigids
+        print('Rigids***')
         for e in rigids: # get rigid part
+            if e.disatanceFromFixed is None:
+                self.floaters.append(e.label)
             self.rigids.append(e.label)
-
+            print(e.label)
+            print(e.disatanceFromFixed)
+        print(self.floaters)
         constraints = self.getallconstraints()
         if len(constraints) == 0:
             mApp('Cannot find any constraints in this file.')
@@ -164,12 +173,8 @@ class classCheckConstraints():
         self.dir_errors = a2p_constraintServices.redAdjustConstraintDirections(FreeCAD.activeDocument())
         print(self.dir_errors)
         self.checkformovement(constraints, True)
-        if len(g.allErrors) != 0:
-            msg = ''
-            for e in g.allErrors:
-                line = str(g.allErrors.get(e))
-                msg = msg + line + '\n'
-            form1.showme(msg)
+        if len(g.errorList) != 0:
+            form1.openViewer()
         else:
             print()
             print('No constraint errors found')
@@ -178,8 +183,7 @@ class classCheckConstraints():
 
     def checkformovement(self, constraintlist, putPartBack = True):
         doc = FreeCAD.activeDocument()
-        partsmoved = []
-        g.allErrors = {}
+        g.errorList = []
         self.Bothpartsfixed = False
 
         for checkingnum in range(0, len(constraintlist)):
@@ -189,7 +193,8 @@ class classCheckConstraints():
             self.setfix = 0
             cobj = constraintlist[checkingnum]
             statusform.setWindowTitle('Checking ' + str(checkingnum) + ' of ' + str(len(constraintlist)))
-            
+            if cobj.Suppressed:
+                continue
 
             subobj1 = cobj.getPropertyByName('Object1')
             subobj2 = cobj.getPropertyByName('Object2')
@@ -204,12 +209,17 @@ class classCheckConstraints():
 
             if cobj.Name in self.dir_errors: 
                 errortype = 'Feature Missing'
-                self.addError(cobj, errortype, part1, part2)
+                self.addError(cobj, errortype)
                 continue
 
             if self.p1fix and self.p2fix:
                 """ If both are fixed report and skip solving"""
-                self.addError(cobj, 'Both fixed', part1,part2)
+                self.addError(cobj, 'Both fixed')
+                continue
+
+            if part1.Label in self.floaters and part2.Label in self.floaters:
+                # If both parts are in floaters list report as Floaters
+                self.addError(cobj,'Floating parts')
                 continue
             if self.p1fix == False and self.p2fix == False:
                 """ If neither part is fixed, fix part 1"""
@@ -235,7 +245,7 @@ class classCheckConstraints():
             self.setfix = 0
 
             # Recording location after move
-            postBasePt1 = part1.Placement.Base  # Round vectors to 4 places
+            postBasePt1 = part1.Placement.Base # Round vectors to 4 places
             postBasePt2 = part2.Placement.Base
  
             ''' Checking if part moved '''
@@ -243,11 +253,12 @@ class classCheckConstraints():
             v2 = FreeCAD.Vector(rondlist(postBasePt1)) 
             v3 = FreeCAD.Vector(rondlist(preBasePt2))
             v4 = FreeCAD.Vector(rondlist(postBasePt2))
-            if v1 != v2 or v3 != v4:
-                self.errortype = 'Move Error'
-            partsmoved.append(part1.Label)
-            partsmoved.append(part2.Label)
 
+            if v1 != v2 or v3 != v4:
+                # If either part moved then report Conflict
+                self.errortype = 'Conflict. '
+                self.addError(cobj, self.errortype)
+            errortype = '' 
 
             if putPartBack:
                 # Places part back in original location if putPartBack is True
@@ -257,12 +268,9 @@ class classCheckConstraints():
                 part2.Placement.Base = preBasePt2
                 part2.Placement.Rotation.Axis = preRotPt2
                 part2.Placement.Rotation.Angle = preAnglePt2
-            if self.errortype != '':
-                self.addError(cobj, self.errortype, part1, part2)
 
-    def addError(self, cobj, errortype, part1, part2):
-        tempdict = {'Name':cobj.Name, 'errortype':errortype, 'part1':part1.Label, 'part2':part2.Label}
-        g.allErrors[cobj.Name] = tempdict
+    def addError(self, cobj, errortype):
+            g.errorList.append([cobj, errortype])
 
     def getallconstraints(self):
         doc = FreeCAD.activeDocument()
@@ -297,6 +305,7 @@ statusform = formReport('statusform')
 
 
 def rondlist(list, inch = False):
+    #Rounds 3 numbers such as vectors
     x = list[0]
     y = list[1]
     z = list[2]

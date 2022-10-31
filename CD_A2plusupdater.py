@@ -486,7 +486,7 @@ class classFuncs():
                         break
         else:
             for num in g.notcylfaces:
-                testdict_ = self.getfacebynum(num, g.shape2)
+                testdict_ = self.getedgebynum(num, g.shape2)
                 if dict_.get('length') == testdict_.get('length')\
                    and dict_.get('center') == testdict_.get('center'):
                     edge ='Edge' + str(num +1)
@@ -658,7 +658,7 @@ class rnp_Update_A2pParts:
     def GetResources(self):
         mypath = os.path.dirname(__file__)
         return {
-             'Pixmap': mypath + "/icons/a2p_Update.svg",
+             'Pixmap': mypath + "/icons/a2pUpdate.svg",
              'MenuText': translate("A2plus", "Updates parts from the A2plus program that has been modified"),
              'ToolTip': translate("A2plus", "Updates modified parts.")
              }
