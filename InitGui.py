@@ -207,24 +207,24 @@ class A2plusWorkbench (Workbench):
             partCommands
             )
         self.appendMenu(
-            ['A2plus', translate("Workbench", "Constraint")],
+            ['A2plus', QT_TRANSLATE_NOOP("Workbench", "Constraint")],
             constraintCommands
             )
         self.appendMenu(
-            ['A2plus', translate("Workbench", "Solver")],
+            ['A2plus', QT_TRANSLATE_NOOP("Workbench", "Solver")],
             solverCommands
             )
         self.appendMenu(
-            ['A2plus', translate("Workbench", "View")],
+            ['A2plus', QT_TRANSLATE_NOOP("Workbench", "View")],
             viewCommands
             )
         miscCommands.extend(menuEntries)
         self.appendMenu(
-            ['A2plus', translate("Workbench", "Misc")],
+            ['A2plus', QT_TRANSLATE_NOOP("Workbench", "Misc")],
             miscCommands
             )
         self.appendMenu(
-           ['A2plus', translate("Workbench", "Diagnostic")],
+           ['A2plus', QT_TRANSLATE_NOOP("Workbench", "Diagnostic")],
            DiagnosticCommands
            )
 
