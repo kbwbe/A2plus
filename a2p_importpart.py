@@ -2100,13 +2100,13 @@ def importUpdateConstraintSubobjects( doc, oldObject, newObject ):
                         if newIndex >= 0:
                             setattr(c, SubElement, newSubElementName )
                             FreeCAD.Console.PrintMessage (
-                                    "oldConstraintString (KEY) : '{}'".format(
+                                    "oldConstraintString (KEY): {}".format(
                                     oldConstraintString
                                     )
                                    )
-                            FreeCAD.Console.PrintMessage (translate("A2plus", "Updating by SubElement-Map: '{}' => '{}'").format(
+                            FreeCAD.Console.PrintMessage (translate("A2plus", "  Updating by SubElement-Map: '{}' => '{}'").format(
                                        subElementName,newSubElementName
-                                       )
+                                       ) + "\n"
                                    )
                             continue
                         #
