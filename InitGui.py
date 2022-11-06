@@ -33,6 +33,7 @@ import sys
 import FreeCAD
 import FreeCADGui
 translate = FreeCAD.Qt.translate
+QT_TRANSLATE_NOOP = FreeCAD.Qt.QT_TRANSLATE_NOOP
 
 import a2plib
 import a2p_Resources3
@@ -44,17 +45,14 @@ class A2plusWorkbench (Workbench):
     def __init__(self):
         global A2P_VERSION
         translate = FreeCAD.Qt.translate
-#        from a2p_translateUtils import translate
         import a2plib
         self.__class__.Icon = a2plib.pathOfModule() + "/icons/a2p_Workbench.svg"
         self.__class__.MenuText = 'A2plus'
         self.__class__.ToolTip  = translate("A2plus", "An other assembly workbench for FreeCAD.")
 
     def Initialize(self):
-#        from a2p_translateUtils import QT_TRANSLATE_NOOP
-#        from a2p_translateUtils import translate
-#        from a2p_translateUtils import tr_
         translate = FreeCAD.Qt.translate
+        QT_TRANSLATE_NOOP = FreeCAD.Qt.QT_TRANSLATE_NOOP
 
         import sys
         import a2plib
@@ -64,7 +62,6 @@ class A2plusWorkbench (Workbench):
         # add translations path
         FreeCADGui.addLanguagePath(a2plib.getLanguagePath())
         FreeCADGui.updateLocale()
-#        print(translate("A2plus_appendMenu", "languagePath of A2plus Workbench is:"), "{}".format(a2plib.getLanguagePath()))
         FreeCAD.Console.PrintMessage(translate("A2plus", "Initializing A2plus Workbench ") + A2P_VERSION + ".\n")
 
         # add icons path
