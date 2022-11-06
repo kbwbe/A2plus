@@ -37,9 +37,11 @@ class globaluseclass:
     def __init__(self):
         self.checkingnum = 0
         self.roundto = 3
-        self.labelexist = False
-        self.movedconsts = []
-        self.allErrors = {}
+        #self.labelexist = False
+        #self.movedconsts = []
+        #self.allErrors = {}
+        self.errorList = []
+        self.conflicterror = False
 g = globaluseclass()
 
 
@@ -106,14 +108,15 @@ class formMain(QtGui.QMainWindow):
         self.btnCloseForm.clicked.connect(lambda:self.Closeme())
 
     def openViewer(self):
-        clist = []
-        doc = FreeCAD.activeDocument()
-        for (k, v) in g.allErrors.items():
-            cobj = doc.getObject(k)
-            clist.append(cobj)
+        CD_ConstraintViewer.form1.loadtable(g.errorList)
+        #clist = []
+        #doc = FreeCAD.activeDocument()
+        #for (k, v) in g.allErrors.items():
+        #    cobj = doc.getObject(k)
+        #    clist.append(cobj)
 
-        CD_ConstraintViewer.form1.show()
-        CD_ConstraintViewer.form1.loadtable(clist)
+        #CD_ConstraintViewer.form1.show()
+        #CD_ConstraintViewer.form1.loadtable(clist)
 
 
     def resizeEvent(self, event):
@@ -140,7 +143,7 @@ class classCheckConstraints():
         self.name = None
         self.dir_errors = []
         self.rigids = []
-
+        self.floaters = []
     def startcheck(self):
         ''' Check for opened file '''
         if FreeCAD.activeDocument() is None:
@@ -155,8 +158,9 @@ class classCheckConstraints():
         ss.assignParentship(doc)
         rigids = ss.rigids
         for e in rigids: # get rigid part
+            if e.disatanceFromFixed is None:
+                self.floaters.append(e.label)
             self.rigids.append(e.label)
-
         constraints = self.getallconstraints()
         if len(constraints) == 0:
             mApp(translate("A2plus", "Cannot find any constraints in this file."))
@@ -166,12 +170,13 @@ class classCheckConstraints():
         self.dir_errors = a2p_constraintServices.redAdjustConstraintDirections(FreeCAD.activeDocument())
         print(self.dir_errors)
         self.checkformovement(constraints, True)
-        if len(g.allErrors) != 0:
-            msg = ''
-            for e in g.allErrors:
-                line = str(g.allErrors.get(e))
-                msg = msg + line + '\n'
-            form1.showme(msg)
+        if len(g.errorList) != 0:
+            form1.openViewer()
+            #msg = ''
+            #for e in g.allErrors:
+            #    line = str(g.allErrors.get(e))
+            #    msg = msg + line + '\n'
+            #form1.showme(msg)
         else:
             FreeCAD.Console.PrintMessage("")
             FreeCAD.Console.PrintMessage(translate("A2plus", "No constraint errors found") + "\n")
@@ -180,8 +185,7 @@ class classCheckConstraints():
 
     def checkformovement(self, constraintlist, putPartBack = True):
         doc = FreeCAD.activeDocument()
-        partsmoved = []
-        g.allErrors = {}
+        g.errorList = []
         self.Bothpartsfixed = False
 
         for checkingnum in range(0, len(constraintlist)):
@@ -206,12 +210,17 @@ class classCheckConstraints():
 
             if cobj.Name in self.dir_errors: 
                 errortype = 'Feature Missing'
-                self.addError(cobj, errortype, part1, part2)
+                self.addError(cobj, errortype)
                 continue
 
             if self.p1fix and self.p2fix:
                 """ If both are fixed report and skip solving"""
-                self.addError(cobj, 'Both fixed', part1,part2)
+                self.addError(cobj, 'Both fixed')
+                continue
+            
+            if part1.Label in self.floaters and part2.Label in self.floaters:
+                # If both parts are in floaters list report as Floaters
+                self.addError(cobj,'Floating parts')
                 continue
             if self.p1fix == False and self.p2fix == False:
                 """ If neither part is fixed, fix part 1"""
@@ -246,9 +255,9 @@ class classCheckConstraints():
             v3 = FreeCAD.Vector(rondlist(preBasePt2))
             v4 = FreeCAD.Vector(rondlist(postBasePt2))
             if v1 != v2 or v3 != v4:
-                self.errortype = 'Move Error'
-            partsmoved.append(part1.Label)
-            partsmoved.append(part2.Label)
+                self.errortype = 'Conflict. '
+                self.addError(cobj, self.errortype)
+            errortype = ''
 
 
             if putPartBack:
@@ -259,12 +268,10 @@ class classCheckConstraints():
                 part2.Placement.Base = preBasePt2
                 part2.Placement.Rotation.Axis = preRotPt2
                 part2.Placement.Rotation.Angle = preAnglePt2
-            if self.errortype != '':
-                self.addError(cobj, self.errortype, part1, part2)
+            
 
-    def addError(self, cobj, errortype, part1, part2):
-        tempdict = {'Name':cobj.Name, 'errortype':errortype, 'part1':part1.Label, 'part2':part2.Label}
-        g.allErrors[cobj.Name] = tempdict
+    def addError(self, cobj, errortype):
+            g.errorList.append([cobj, errortype])
 
     def getallconstraints(self):
         doc = FreeCAD.activeDocument()

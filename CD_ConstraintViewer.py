@@ -102,7 +102,7 @@ class ShowPartProperties(QtGui.QWidget):
         self.tm.setWindowTitle(translate("A2plus", "Broken Constraints"))
         self.tm.setEditTriggers(QtGui.QTableWidget.NoEditTriggers)
         self.tm.setRowCount(0)
-        self.tm.setColumnCount(10)
+        self.tm.setColumnCount(11)
         self.tm.setMouseTracking(True)
         self.tm.cellClicked.connect(self.cell_was_clicked)
         self.tm.setHorizontalHeaderLabels([translate("A2plus", "Direction"),
@@ -111,10 +111,11 @@ class ShowPartProperties(QtGui.QWidget):
                                            'Constraint name',
                                            'Prt1 feat',
                                            'Prt2 feat',
-                                           'F1',
                                            'Part1',
-                                           'F2',
-                                           'Part2'
+                                           'Part2',
+                                           'P1 Fixed',
+                                           'P2 Fixed',
+                                           'Problem'
                                            ]
                                           ) 
         self.tm.horizontalHeader().sectionClicked.connect(self.fun)
@@ -257,12 +258,22 @@ class ShowPartProperties(QtGui.QWidget):
         # click in column header to sort column
         self.tm.sortByColumn(i)
 
-    def loadtable(self, listObjects):
+    def loadtable(self, TempList):
+        self.showme()
+        ConstraintList = []
+        try:
+            test = str(len(TempList[0])) #if this fail array is only one collumn
+            ConstraintList = TempList
+        except:
+            for e in TempList:            #Add second column to array if needed
+                ConstraintList.append([e, 'None'])
         # fill the table with information from a list of constraints
         self.tm.setRowCount(0)
         doc = FreeCAD.activeDocument()
         row = 0
-        for object in reversed(listObjects):
+        for objects in reversed(ConstraintList):
+            object = objects[0]
+            problemstr = objects[1]
             try:
                 cname = object.Name
                 constraint = doc.getObject(cname)
@@ -273,15 +284,12 @@ class ShowPartProperties(QtGui.QWidget):
                 fixed1 = 'N'
             else:
                 fixed1 = str(ob1.fixedPosition)
-                fixed1 = fixed1[0:1]
             ob2 = doc.getObject(constraint.Object2)
             if hasattr(ob2, 'fixedPosition') == False:
                 fixed2 = 'N'
             else:
                 ob2 = doc.getObject(constraint.Object2)
                 fixed2 = str(ob2.fixedPosition)
-                fixed2 = fixed2[0:1]
-
             part1 = doc.getObject(constraint.Object1)
             part2 = doc.getObject(constraint.Object2)
 
@@ -300,22 +308,24 @@ class ShowPartProperties(QtGui.QWidget):
             sup = QtGui.QTableWidgetItem(str(constraint.Suppressed))
             run = QtGui.QTableWidgetItem(str('Run'))
             name = QtGui.QTableWidgetItem(cname)
-            fixed1 = QtGui.QTableWidgetItem(fixed1[0])
+            fixed1 = QtGui.QTableWidgetItem(fixed1)
             Part1 = QtGui.QTableWidgetItem(part1.Label)
             fname1 = QtGui.QTableWidgetItem(fn1)
-            fixed2 = QtGui.QTableWidgetItem(fixed2[0])
+            fixed2 = QtGui.QTableWidgetItem(fixed2)
             Part2 = QtGui.QTableWidgetItem(part2.Label)
             fname2 = QtGui.QTableWidgetItem(fn2)
+            problem = QtGui.QTableWidgetItem(str(problemstr))
             self.tm.setItem(0, 0, direction)
             self.tm.setItem(0, 1, sup)
             self.tm.setItem(0, 2, run)
             self.tm.setItem(0, 3, name)
             self.tm.setItem(0, 4, fname1)
             self.tm.setItem(0, 5, fname2)
-            self.tm.setItem(0, 6, fixed1)
-            self.tm.setItem(0, 7, Part1)
-            self.tm.setItem(0, 8, fixed2)
-            self.tm.setItem(0, 9, Part2)
+            self.tm.setItem(0, 6, Part1)
+            self.tm.setItem(0, 7, Part2)
+            self.tm.setItem(0, 8, fixed1)
+            self.tm.setItem(0, 9, fixed2)
+            self.tm.setItem(0, 10, problem)
 
             if self.tm.item(0, 4).text() == 'None':
                 self.tm.item(0, 4).setBackground(QtGui.QBrush(QtGui.QColor('yellow')))
@@ -323,10 +333,6 @@ class ShowPartProperties(QtGui.QWidget):
             if self.tm.item(0, 5).text() == 'None':
                 self.tm.item(0, 5).setBackground(QtGui.QBrush(QtGui.QColor('yellow')))
             row = row+1
-
-            if cname in CD_checkconstraints.g.allErrors:
-                if CD_checkconstraints.g.allErrors[cname].get('errortype') == 'Direction':
-                    self.tm.item(0, 3).setBackground(QtGui.QBrush(QtGui.QColor('yellow')))
         header = self.tm.horizontalHeader()
         header.setResizeMode(QtGui.QHeaderView.ResizeToContents)
         self.current_hover = [0, 0]
