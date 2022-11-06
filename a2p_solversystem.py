@@ -310,7 +310,7 @@ class SolverSystem():
 
             rig.beautyDOFPrint()
             numdep+=rig.countDependencies()
-        Msg( translate("A2plus", "There are '{}' dependencies").format(numdep/2) + "\n")
+        Msg(translate("A2plus", "There are {:.0f} dependencies").format(numdep/2) + "\n")
 
     def retrieveDOFInfo(self):
         """
