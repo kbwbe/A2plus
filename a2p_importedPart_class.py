@@ -32,7 +32,6 @@ from FreeCAD import  Base
 from PySide import QtGui
 from a2p_translateUtils import *
 import a2plib
-from a2p_versionmanagement import A2P_VERSION
 #==============================================================================
 class Proxy_importPart:
     """The a2p importPart object."""
@@ -50,7 +49,7 @@ class Proxy_importPart:
             obj.objectType = 'a2pPart'
         if not "a2p_Version" in propList:
             obj.addProperty("App::PropertyString", "a2p_Version", "importPart")
-            obj.a2p_Version = A2P_VERSION
+            obj.a2p_Version = a2plib.getA2pVersion()
         if not "sourceFile" in propList:
             obj.addProperty("App::PropertyFile", "sourceFile", "importPart")
         if not "sourcePart" in propList:
