@@ -27,8 +27,6 @@ __title__ = 'A2plus assembly Workbench - InitGui file'
 __author__ = 'kbwbe'
 
 
-A2P_VERSION = 'V0.4.60b'
-
 import sys
 import FreeCAD
 import FreeCADGui
@@ -43,7 +41,6 @@ class A2plusWorkbench (Workbench):
 
 
     def __init__(self):
-        global A2P_VERSION
         translate = FreeCAD.Qt.translate
         import a2plib
         self.__class__.Icon = a2plib.pathOfModule() + "/icons/a2p_Workbench.svg"
@@ -58,11 +55,13 @@ class A2plusWorkbench (Workbench):
         import a2plib
         import a2p_Resources3
         translate = FreeCAD.Qt.translate
-        
+
         # add translations path
         FreeCADGui.addLanguagePath(a2plib.getLanguagePath())
         FreeCADGui.updateLocale()
-        FreeCAD.Console.PrintMessage(translate("A2plus", "Initializing A2plus Workbench ") + A2P_VERSION + ".\n")
+
+        # print A2plus version
+        FreeCAD.Console.PrintMessage(translate("A2plus", "Initializing A2plus Workbench v{}").format(a2plib.getA2pVersion()) + ".\n")
 
         # add icons path
         FreeCADGui.addIconPath(':/icons')
@@ -230,7 +229,7 @@ class A2plusWorkbench (Workbench):
             '/GuiA2p/Resources/ui/a2p_prefs.ui','A2plus'
             )
 
-        
+
     def Activated(self):
         import a2p_observers
         FreeCAD.addDocumentObserver(a2p_observers.redoUndoObserver)
