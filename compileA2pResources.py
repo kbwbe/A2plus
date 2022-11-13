@@ -49,11 +49,11 @@ f = open(qrc_filename,'w')
 f.write(qrc)
 f.close()
 
-os.system(
-    'pyside-rcc -o a2p_Resources2.py {}'.format(
-        qrc_filename
-        )
-    )
+#os.system(
+#    'pyside-rcc -o a2p_Resources2.py {}'.format(
+#        qrc_filename
+#        )
+#    )
 os.system(
     'pyside-rcc -py3 -o a2p_Resources3.py {}'.format(
         qrc_filename
