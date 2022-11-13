@@ -30,11 +30,6 @@ import time
 from a2p_translateUtils import *
 import a2plib
 from a2p_MuxAssembly import createTopoInfo
-from a2p_versionmanagement import A2P_VERSION
-from a2plib import (
-    appVersionStr,
-    AUTOSOLVE_ENABLED
-    )
 from a2p_importedPart_class import Proxy_importPart
 from a2p_importedPart_class import Proxy_convertPart # for compat.
 from a2p_importedPart_class import ImportedPartViewProviderProxy # for compat.
@@ -94,7 +89,7 @@ def convertToImportedPart(doc, obj):
     Proxy_importPart(newObj)
     ImportedPartViewProviderProxy(newObj.ViewObject)
 
-    newObj.a2p_Version = A2P_VERSION
+    newObj.a2p_Version = a2plib.getA2pVersion()
     newObj.sourceFile = filename
     newObj.localSourceObject = obj.Name
     #newObj.sourcePart = ""

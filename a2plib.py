@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #***************************************************************************
 #*                                                                         *
 #*   Copyright (c) 2018 kbwbe                                              *
@@ -34,7 +35,7 @@ import copy
 import platform
 import numpy
 from pivy import coin
-from a2p_translateUtils import *
+translate = FreeCAD.Qt.translate
 
 
 preferences = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/A2plus")
@@ -140,6 +141,23 @@ def getLanguagePath():
     return os.path.join(os.path.dirname(os.path.dirname(__file__)),"translations")
 
 #------------------------------------------------------------------------------
+def getA2pVersion():
+    #A2plus_path = os.path.dirname(pathOfModule())
+    A2plus_path = pathOfModule()
+    try:
+        metadata = FreeCAD.Metadata(os.path.join(A2plus_path, 'package.xml'))
+        return metadata.Version
+    except: # Older FreeCAD versions do not support FreeCAD.Metadata, do a workaround
+        tx = ' ?? '
+        f = open(os.path.join(A2plus_path, 'package.xml'),'r')
+        lines = f.readlines()
+        for line in lines:
+            strippedLine = line.strip(' ').strip('\n').strip('\r')
+            if strippedLine.startswith('<version>'):
+                tx = strippedLine.lstrip('<version>').rstrip('</version>')
+        return tx
+
+#------------------------------------------------------------------------------
 def drawDebugVectorAt(position,direction,rgbColor):
     """
     Function draws a vector directly to 3D view using pivy/Coin.
@@ -212,6 +230,7 @@ def isGlobalVisible(ob):
             # do search in tree upwards
             result = isGlobalVisible(inList[0])
     return result
+
 #------------------------------------------------------------------------------
 def to_bytes(tx):
     if isinstance(tx, str):
