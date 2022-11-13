@@ -94,7 +94,7 @@ def convertToImportedPart(doc, obj):
     Proxy_importPart(newObj)
     ImportedPartViewProviderProxy(newObj.ViewObject)
 
-    newObj.a2p_Version = A2P_VERSION
+    newObj.a2p_Version = a2plib.getA2pVersion()
     newObj.sourceFile = filename
     newObj.localSourceObject = obj.Name
     #newObj.sourcePart = ""

@@ -31,7 +31,6 @@ import platform
 from a2p_translateUtils import *
 import a2plib
 from a2p_MuxAssembly import muxAssemblyWithTopoNames
-from a2p_versionmanagement import A2P_VERSION
 import a2p_solversystem
 from a2plib import getRelativePathesEnabled
 import a2p_importedPart_class
@@ -331,7 +330,7 @@ def importPartFromFile(
     if FreeCAD.GuiUp:
         ImportedPartViewProviderProxy(newObj.ViewObject)
 
-    newObj.a2p_Version = A2P_VERSION
+    newObj.a2p_Version = a2plib.getA2pVersion()
     assemblyPath = os.path.normpath(os.path.split(doc.FileName)[0])
     absPath = os.path.normpath(filename)
     if getRelativePathesEnabled():
@@ -829,7 +828,7 @@ def updateImportedParts(doc, partial=False):
                 newPartCreationTime = os.path.getmtime( absPath )
                 if (
                     newPartCreationTime > obj.timeLastImport or
-                    obj.a2p_Version != A2P_VERSION or
+                    obj.a2p_Version != a2plib.getA2pVersion() or
                     a2plib.getRecalculateImportedParts() # open always all parts as they could depend on spreadsheets
                     ):
                     cacheKeyExtension = obj.sourcePart
@@ -861,7 +860,7 @@ def updateImportedParts(doc, partial=False):
                     newObject = objectCache.get(cacheKey)
                     obj.timeLastImport = newPartCreationTime
                     if hasattr(newObject, 'a2p_Version'):
-                        obj.a2p_Version = A2P_VERSION
+                        obj.a2p_Version = a2plib.getA2pVersion()
                     importUpdateConstraintSubobjects( doc, obj, newObject ) # do this before changing shape and mux
                     if hasattr(newObject, 'muxInfo'):
                         obj.muxInfo = newObject.muxInfo
