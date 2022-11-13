@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #***************************************************************************
 #*                                                                         *
 #*   Copyright (c) 2018 kbwbe                                              *
@@ -141,9 +142,20 @@ def getLanguagePath():
 
 #------------------------------------------------------------------------------
 def getA2pVersion():
-    A2plus_path = os.path.dirname(pathOfModule())
-    metadata = FreeCAD.Metadata(os.path.join(A2plus_path, 'package.xml'))
-    return metadata.Version
+    #A2plus_path = os.path.dirname(pathOfModule())
+    A2plus_path = pathOfModule()
+    try:
+        metadata = FreeCAD.Metadata(os.path.join(A2plus_path, 'package.xml'))
+        return metadata.Version
+    except: # Older FreeCAD versions do not support FreeCAD.Metadata, do a workaround
+        tx = ' ?? '
+        f = open(os.path.join(A2plus_path, 'package.xml'),'r')
+        lines = f.readlines()
+        for line in lines:
+            strippedLine = line.strip(' ').strip('\n').strip('\r')
+            if strippedLine.startswith('<version>'):
+                tx = strippedLine.lstrip('<version>').rstrip('</version>')
+        return tx
 
 #------------------------------------------------------------------------------
 def drawDebugVectorAt(position,direction,rgbColor):
