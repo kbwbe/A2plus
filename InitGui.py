@@ -74,7 +74,7 @@ class A2plusWorkbench (Workbench):
         import a2p_partinformation
         import a2p_constraintDialog
         import a2p_constraintcommands
-        import a2p_bom # bom == bill of materials == partslist
+        import a2p_BoM # BoM == Bill of Materials == partslist
         import a2p_constraintServices
         import a2p_searchConstraintConflicts
         import CD_A2plusupdater  # for Constraint Diagnostic function
