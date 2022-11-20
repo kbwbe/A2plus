@@ -37,7 +37,7 @@ from a2p_partlistglobals import (
 
 #------------------------------------------------------------------------------
 toolTip = \
-translate("A2plus_partinformation",
+translate("A2plus",
 """
 Create a spreadsheet for ordering or
 logistics information.
@@ -57,8 +57,8 @@ class a2p_CreatePartInformationSheet_Command:
         doc = FreeCAD.activeDocument()
         if doc is None:
             QtGui.QMessageBox.information(  QtGui.QApplication.activeWindow(),
-                                        translate("A2plus_partinformation","No active document found!"),
-                                        translate("A2plus_partinformation","You have to open a FCStd file first.")
+                                        translate("A2plus","No active document found!"),
+                                        translate("A2plus","You have to open a FCStd file first.")
                                     )
             return
 
@@ -81,12 +81,12 @@ class a2p_CreatePartInformationSheet_Command:
         ss.setBackground('A1:A'+str(len(PARTLIST_COLUMN_NAMES)), (0.000000,1.000000,0.000000,1.000000))
         ss.setBackground('B1:B'+str(len(PARTLIST_COLUMN_NAMES)), (0.85,0.85,0.85,1.000000))
         doc.recompute()
-        FreeCAD.Console.PrintMessage("#" + translate("A2plus_partinformation", "PARTINFO") + "#" + translate("A2p_BoM", " spreadsheet has been created") + "\n")
-
+        FreeCAD.Console.PrintMessage(translate("A2p_BoM", "#PARTINFO# spreadsheet has been created") + "\n")
+        
     def GetResources(self):
         return {
             'Pixmap'  : ':/icons/a2p_PartsInfo.svg',
-            'MenuText': translate("A2plus_partinformation", "Create a spreadsheet for ordering or logistics information"),
+            'MenuText': translate("A2plus", "Create a spreadsheet for ordering or logistics information"),
             'ToolTip' : toolTip
             }
 
