@@ -86,7 +86,7 @@ def createPartList(
                             workingDir
                             )
             if linkedSource is None:
-                print(translate("A2plus", "BOM ERROR: Could not open sourcefile '{}'").format(linkedSource1))
+                print(translate("A2p_BoM", "BOM ERROR: Could not open sourcefile '{}'").format(linkedSource1))
                 continue
             # Is it already processed minimum one time ?
             entry = partListEntries.get(linkedSource,None)
@@ -196,7 +196,7 @@ class a2p_CreatePartlist():
 
         flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
         msg = translate("A2plus", "Do you want to iterate recursively over all included subassemblies?")
-        response = QtGui.QMessageBox.information(QtGui.QApplication.activeWindow(), translate("A2plus", "PARTSLIST"), msg, flags )
+        response = QtGui.QMessageBox.information(QtGui.QApplication.activeWindow(), translate("A2p_BoM", "PARTSLIST"), msg, flags )
         if response == QtGui.QMessageBox.Yes:
             subAssyRecursion = True
         else:
@@ -221,8 +221,8 @@ class a2p_CreatePartlist():
             self.clearPartList()
 
         # Write Column headers to spreadsheet
-        ss.set('A1', translate("A2plus", "POS"))
-        ss.set('B1', translate("A2plus", "QTY"))
+        ss.set('A1', translate("A2p_BoM", "POS"))
+        ss.set('B1', translate("A2p_BoM", "QTY"))
         idx1 = ord('C')
         idx2 = idx1 + len(PARTLIST_COLUMN_NAMES)
         i=0
@@ -250,7 +250,7 @@ class a2p_CreatePartlist():
 
         # recompute to finish..
         doc.recompute()
-        FreeCAD.Console.PrintMessage(translate("A2plus", "#PARTSLIST# spreadsheet has been created") + "\n")
+        FreeCAD.Console.PrintMessage(translate("A2p_BoM", "#PARTSLIST# spreadsheet has been created") + "\n")
 
     def GetResources(self):
         return {
