@@ -34,7 +34,7 @@ import FreeCADGui
 
 import a2plib
 import a2p_solversystem
-import CD_checkconstraints
+import CD_CheckConstraints
 import CD_featurelabels
 
 translate = FreeCAD.Qt.translate
