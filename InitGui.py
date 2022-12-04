@@ -78,7 +78,7 @@ class A2plusWorkbench (Workbench):
         import a2p_constraintServices
         import a2p_searchConstraintConflicts
         import CD_A2plusupdater  # for Constraint Diagnostic function
-        import CD_checkconstraints
+        import CD_CheckConstraints
         import CD_OneButton
         
         # Create list of commands for toolbar A2p_Part and menu A2plus
