@@ -32,8 +32,10 @@ import FreeCADGui
 
 import a2plib
 import a2p_solversystem
+
+
 import CD_CheckConstraints
-import CD_featurelabels
+import CD_FeatureLabels
 
 translate = FreeCAD.Qt.translate
 
@@ -197,7 +199,7 @@ class ShowPartProperties(QtGui.QWidget):
         if buttext == translate("A2plus", "Find w label"):
             """ createlabel for single part """
             if g.labelexist:
-                CD_featurelabels.labels.deletelabels()
+                CD_FeatureLabels.labels.deletelabels()
                 g.labelexist = False
                 return
             fname = lastclc.text
@@ -221,7 +223,7 @@ class ShowPartProperties(QtGui.QWidget):
                 except:
                     mApp(translate("A2plus", "The selected text in the table is not a proper feature name:\n{}      {}").format(fname, pname))
                     return
-                CD_featurelabels.labels.labelForTable(ent, fname)
+                CD_FeatureLabels.labels.labelForTable(ent, fname)
                 g.labelexist = True
 
         if buttext == translate("A2plus", "Find Constraint"):
@@ -236,9 +238,9 @@ class ShowPartProperties(QtGui.QWidget):
     def process_menus(self, q):
         """ process the menu according to the button text"""
         if q.text() == translate("A2plus", "Open Dialog"):
-            CD_featurelabels.form1.showme()
+            CD_FeatureLabels.form1.showme()
         if q.text() == translate("A2plus", "Delete labels"):
-            CD_featurelabels.labels.deletelabels()
+            CD_FeatureLabels.labels.deletelabels()
         if q.text() == translate("A2plus", "Open Help"):
             # File name may be translated, e.g. to "CD_Помощь для инструмента Диагностики.pdf" (this file must be present)
             pdf_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), translate("A2plus", "CD_Help for Diagnostic tools.pdf"))
