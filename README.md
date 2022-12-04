@@ -222,8 +222,7 @@ First steps to create an A2plus assembly:
 
 * Create a new empty document.
 * Save the active document with a name. If not, you'd be asked for by A2plus.
-* Add a part or shapes from external file.
-* The first imported part or shape gets set as fixed position (by default). You can change it later.
+* Add a part or shapes from external file. The first imported part or shape gets set as fixed position (by default). You can change it later.
 * Add a second part or shapes from external file.
 * Select some faces or edges or vertices, you want to constrain, and push the "Constraint Tools" button, 
   the Tools menu pops-up,
