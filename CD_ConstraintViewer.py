@@ -1,25 +1,24 @@
-# -*- coding: utf-8 -*-
-#***************************************************************************
-#*                                                                         *
-#*   Copyright (c) 2020 Dan Miel                                           *
-#*                                                                         *
-#*   This program is free software; you can redistribute it and/or modify  *
-#*   it under the terms of the GNU Lesser General Public License (LGPL)    *
-#*   as published by the Free Software Foundation; either version 2 of     *
-#*   the License, or (at your option) any later version.                   *
-#*   for detail see the LICENCE text file.                                 *
-#*                                                                         *
-#*   This program is distributed in the hope that it will be useful,       *
-#*   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
-#*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
-#*   GNU Library General Public License for more details.                  *
-#*                                                                         *
-#*   You should have received a copy of the GNU Library General Public     *
-#*   License along with this program; if not, write to the Free Software   *
-#*   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  *
-#*   USA                                                                   *
-#*                                                                         *
-#***************************************************************************
+# ***************************************************************************
+# *                                                                         *
+# *   Copyright (c) 2020 Dan Miel                                           *
+# *                                                                         *
+# *   This program is free software; you can redistribute it and/or modify  *
+# *   it under the terms of the GNU Lesser General Public License (LGPL)    *
+# *   as published by the Free Software Foundation; either version 2 of     *
+# *   the License, or (at your option) any later version.                   *
+# *   for detail see the LICENCE text file.                                 *
+# *                                                                         *
+# *   This program is distributed in the hope that it will be useful,       *
+# *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+# *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+# *   GNU Library General Public License for more details.                  *
+# *                                                                         *
+# *   You should have received a copy of the GNU Library General Public     *
+# *   License along with this program; if not, write to the Free Software   *
+# *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  *
+# *   USA                                                                   *
+# *                                                                         *
+# ***************************************************************************
 # This is to be used with A2plus Assembly WorkBench
 # Tries to find constraints that are conflicting with each other.
 
@@ -27,7 +26,6 @@ import os
 import sys
 import subprocess
 from PySide import QtCore, QtGui, QtUiTools
-#from PySide.QtGui import *
 
 import FreeCAD
 import FreeCADGui
@@ -39,27 +37,42 @@ import CD_featurelabels
 
 translate = FreeCAD.Qt.translate
 
+
 class globaluseclass:
     def __init__(self):
         self.checkingnum = 0
         self.roundto = 4
         self.labelexist = False
+
+
 g = globaluseclass()
+
 
 class mApp(QtGui.QWidget):
 
     # for error messages
-    def __init__(self, msg, msgtype = 'ok'):
+    def __init__(self, msg, msgtype='ok'):
         super().__init__()
         self.initUI(msg)
 
-    def initUI(self, msg, msgtype = 'ok'):
+    def initUI(self, msg, msgtype='ok'):
         self.setGeometry(100, 200, 320, 200)
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
         if msgtype == 'ok':
-            buttonReply = QtGui.QMessageBox.question(self, translate("A2plus", "Information"), msg, QtGui.QMessageBox.Ok|QtGui.QMessageBox.Ok)
+            buttonReply = QtGui.QMessageBox.question(
+                self,
+                translate("A2plus", "Information"),
+                msg,
+                QtGui.QMessageBox.Ok | QtGui.QMessageBox.Ok
+                )
         if msgtype == 'yn':
-            buttonReply = QtGui.QMessageBox.question(self, translate("A2plus", "Information"), msg, QtGui.QMessageBox.Yes|QtGui.QMessageBox.No, QtGui.QMessageBox.No)
+            buttonReply = QtGui.QMessageBox.question(
+                self,
+                translate("A2plus", "Information"),
+                msg,
+                QtGui.QMessageBox.Yes | QtGui.QMessageBox.No,
+                QtGui.QMessageBox.No
+                )
         if buttonReply == QtGui.QMessageBox.Yes:
             pass
             # print('Yes clicked.')
@@ -82,16 +95,16 @@ class ShowPartProperties(QtGui.QWidget):
         self.setWindowTitle(translate("A2plus", "Constraint Viewer"))
         self.setStyleSheet("font: 11pt arial MS")
         bar = QtGui.QMenuBar(self)
-        
+
         labelMenu = bar.addMenu(translate("A2plus", "Labels"))
         labelMenu.addAction(translate("A2plus", "Open Dialog"))
         labelMenu.addAction(translate("A2plus", "Delete labels"))
         labelMenu.triggered[QtGui.QAction].connect(self.process_menus)
-        
+
         infoMenu = bar.addMenu(translate("A2plus", "Info"))
         infoMenu.addAction(translate("A2plus", "Places of accuracy = {}").format(str(g.roundto)))
         infoMenu.triggered[QtGui.QAction].connect(self.process_menus)
-        
+
         helpMenu = bar.addMenu(translate("A2plus", "Help"))
         helpMenu.addAction(translate("A2plus", "Open Help"))
         helpMenu.triggered[QtGui.QAction].connect(self.process_menus)
@@ -117,7 +130,7 @@ class ShowPartProperties(QtGui.QWidget):
                                            'P2 Fixed',
                                            'Problem'
                                            ]
-                                          ) 
+                                          )
         self.tm.horizontalHeader().sectionClicked.connect(self.fun)
 
         """ Creating function buttons """
@@ -151,16 +164,15 @@ class ShowPartProperties(QtGui.QWidget):
             ]
         self.createButtonColumn(565, btnLabels)
 
-
     def createButtonColumn(self, xloc, btnLabels):
         for row in range(0, len(btnLabels)):
-            btny = 30 +(28*row)
+            btny = 30 + (28*row)
             self.btn = QtGui.QPushButton(str(btnLabels[row][0]), self)
             self.btn.move(xloc, btny)
             self.btn.setFixedWidth(140)
             self.btn.setFixedHeight(25)
             self.btn.setToolTip(btnLabels[row][1])
-            self.btn.released.connect(self.button_pushed) # pressed
+            self.btn.released.connect(self.button_pushed)  # pressed
             self.btns.append(self.btn)
 
     def button_pushed(self):
@@ -237,7 +249,7 @@ class ShowPartProperties(QtGui.QWidget):
                 webbrowser.open_new_tab(pdf_file)
             # For Windows 10 Pro 64-bit
             elif sys.platform == 'win32':
-                subprocess.Popen([pdf_file], shell = True)
+                subprocess.Popen([pdf_file], shell=True)
             # For others OS
             else:
                 print("Found platform %s, OS %s" % (sys.platform, os.name))
@@ -252,7 +264,7 @@ class ShowPartProperties(QtGui.QWidget):
         a2p_solversystem.solveConstraints(doc)
 
     def fun4(self, Ncol):
-        self.tm = self.tm.sort_values(self.tm.headers[Ncol], ascending = QtGui.AscendingOrder)
+        self.tm = self.tm.sort_values(self.tm.headers[Ncol], ascending=QtGui.AscendingOrder)
 
     def fun(self, i):
         # click in column header to sort column
@@ -262,10 +274,10 @@ class ShowPartProperties(QtGui.QWidget):
         self.showme()
         ConstraintList = []
         try:
-            test = str(len(TempList[0])) #if this fail array is only one collumn
+            test = str(len(TempList[0]))  # if this fail array is only one collumn
             ConstraintList = TempList
         except:
-            for e in TempList:            #Add second column to array if needed
+            for e in TempList:            # Add second column to array if needed
                 ConstraintList.append([e, 'None'])
         # fill the table with information from a list of constraints
         self.tm.setRowCount(0)
@@ -280,12 +292,12 @@ class ShowPartProperties(QtGui.QWidget):
             except:
                 continue
             ob1 = doc.getObject(constraint.Object1)
-            if hasattr(ob1, 'fixedPosition') == False:
+            if hasattr(ob1, 'fixedPosition') is False:
                 fixed1 = 'N'
             else:
                 fixed1 = str(ob1.fixedPosition)
             ob2 = doc.getObject(constraint.Object2)
-            if hasattr(ob2, 'fixedPosition') == False:
+            if hasattr(ob2, 'fixedPosition') is False:
                 fixed2 = 'N'
             else:
                 ob2 = doc.getObject(constraint.Object2)
@@ -300,7 +312,7 @@ class ShowPartProperties(QtGui.QWidget):
             self.tm.insertRow(0)
             fn1 = constraint.SubElement1
             fn2 = constraint.SubElement2
-            if len(fn1 ) == 0:
+            if len(fn1) == 0:
                 fn1 = 'None'
             if len(fn2) == 0:
                 fn2 = 'None'
@@ -343,13 +355,13 @@ class ShowPartProperties(QtGui.QWidget):
         for row in range(self.tm.rowCount()):
             self.tm.setRowHeight(row, 15)
 
-    def hoveronoff(self,val):
+    def hoveronoff(self, val):
         self.tm.setMouseTracking(val)
 
     def cell_was_clicked(self, row, column):
         header = self.tm.horizontalHeaderItem(column).text()
         item = self.tm.item(row, 3)
-        lastclc.cellpicked(row,column)
+        lastclc.cellpicked(row, column)
         cname = item.text()
         try:
             constraint = FreeCAD.ActiveDocument.getObject(cname)
@@ -379,7 +391,7 @@ class ShowPartProperties(QtGui.QWidget):
             FreeCADGui.Selection.addSelection(partobj2)
 
         if header == translate("A2plus", "Suppress"):
-            if constraint.Suppressed == False:
+            if constraint.Suppressed is False:
                 constraint.Suppressed = True
             else:
                 constraint.Suppressed = False
@@ -390,14 +402,14 @@ class ShowPartProperties(QtGui.QWidget):
             item2 = self.tm.item(row, column)
             if item2.text() != 'None':
                 direction = constraint.directionConstraint
-                if direction =='opposed':
+                if direction == 'opposed':
                     newdir = 'aligned'
                 else:
-                    newdir ='opposed'
+                    newdir = 'opposed'
                 constraint.directionConstraint = newdir
                 direction = constraint.directionConstraint
                 item2 = self.tm.item(row, column)
-                #item2.setText(direction[0])
+                # item2.setText(direction[0])
                 item2.setText(direction)
                 conflicts.checkforfixandsolve([constraint])
 
@@ -410,7 +422,7 @@ class ShowPartProperties(QtGui.QWidget):
         lastclc.clear
 
     def Closeme(self):
-        #close window and ensure that obsever is off
+        # close window and ensure that obsever is off
         selObv.SelObserverOFF()
         self.close()
 
@@ -423,8 +435,10 @@ class ShowPartProperties(QtGui.QWidget):
         """ resize table """
         formx = self.width()
         formy = self.height()
-        self.tm.resize(formx -20, formy -120)
-form1=ShowPartProperties()
+        self.tm.resize(formx - 20, formy - 120)
+
+
+form1 = ShowPartProperties()
 
 
 class classconflictreport():
@@ -451,8 +465,7 @@ class classconflictreport():
                 return
         form1.loadtable(clist)
 
-
-    #select a part in the Gui and the attached constraints are sent to the form.
+    # select a part in the Gui and the attached constraints are sent to the form.
     def selectforpart(self):
         pnamelist = []
         doc = FreeCAD.activeDocument()
@@ -466,18 +479,18 @@ class classconflictreport():
         else:
             for sel in sels:
                 pnamelist.append(sel.Object.Label)
-        for obj in FreeCAD.ActiveDocument.Objects: # Select constraints
+        for obj in FreeCAD.ActiveDocument.Objects:  # Select constraints
             if 'ConstraintInfo' in obj.Content and '_mirror' not in obj.Name:
-                    subobj1 = doc.getObject(obj.Object1)
-                    subobj2 = doc.getObject(obj.Object2)
-                    part1name = subobj1.Label
-                    part2name = subobj2.Label
-                    if len(sels) == 1:
-                        if part1name in pnamelist or part2name in pnamelist:
-                            clist.append(obj)
-                    else:
-                        if part1name in pnamelist and part2name in pnamelist:
-                            clist.append(obj)
+                subobj1 = doc.getObject(obj.Object1)
+                subobj2 = doc.getObject(obj.Object2)
+                part1name = subobj1.Label
+                part2name = subobj2.Label
+                if len(sels) == 1:
+                    if part1name in pnamelist or part2name in pnamelist:
+                        clist.append(obj)
+                else:
+                    if part1name in pnamelist and part2name in pnamelist:
+                        clist.append(obj)
         if len(clist) == 0:
             if len(sels) == 1:
                 msg = translate("A2plus", "There are no constraints for this part.")
@@ -496,7 +509,7 @@ class classconflictreport():
         cobj = constraintlist[g.checkingnum]
         subobj1 = cobj.getPropertyByName('Object1')
         subobj2 = cobj.getPropertyByName('Object2')
-        part1 = doc.getObject(subobj1) # Save Position and fixed
+        part1 = doc.getObject(subobj1)  # Save Position and fixed
         part2 = doc.getObject(subobj2)
         self.p1fix = False
         self.p2fix = False
@@ -509,13 +522,16 @@ class classconflictreport():
             mApp('Both parts are fixed.')
             return
         ''' if neither is fixed '''
-        if self.p1fix == False and self.p2fix == False:
+        if self.p1fix is False and self.p2fix is False:
             part1.fixedPosition = True
-        a2p_solversystem.solveConstraints(doc, matelist = constraintlist, showFailMessage = False)
+        a2p_solversystem.solveConstraints(doc, matelist=constraintlist, showFailMessage=False)
         if hasattr(part1, "fixedPosition"):
             part1.fixedPosition = self.p1fix
         return
+
+
 conflicts = classconflictreport()
+
 
 class classsidefunctions():
     def __init__(self, name):
@@ -523,18 +539,17 @@ class classsidefunctions():
         self.sel1 = ''
 
     def swapselectedleg(self):
-        #starts observer to select a new feature when replacing manually.
+        # starts observer to select a new feature when replacing manually.
         if lastclc.column < 4 or lastclc.column > 5:
-            mApp(translate("A2plus", "Surfaces can only be replaced in columns/nPart1 feat or Part2 feat"))
+            mApp(translate("A2plus", "Surfaces can only be replaced in columns\nPart1 feat or Part2 feat"))
             return
         if len(FreeCADGui.Selection.getSelectionEx()) == 0 and lastclc.text != 'None':
             mApp(translate("A2plus", "No feature has been selected"))
             return
         selObv.SelObserverON()
 
-
     def turnoffobserv(self):
-        #Turns observer off and selects both features
+        # Turns observer off and selects both features
         selObv.SelObserverOFF()
         self.swap1leg()
 
@@ -550,10 +565,10 @@ class classsidefunctions():
             feat2name = sel.SubElementNames[0]
         cname = lastclc.cname
         FreeCADGui.Selection.clearSelection()
-        d = {'cname' : cname,
-             'SubElement' : lastclc.SubElement,
-             'dir' : lastclc.dir,
-             'newfeat' : feat2name
+        d = {'cname': cname,
+             'SubElement': lastclc.SubElement,
+             'dir': lastclc.dir,
+             'newfeat': feat2name
              }
         self.swapfeature(d)
         cobj = FreeCAD.ActiveDocument.getObject(cname)
@@ -568,7 +583,7 @@ class classsidefunctions():
         form1.tm.item(lastclc.row, lastclc.column).setText(feat2name)
 
     def swapfeature(self, newfeaturedict):
-        #changes a legs mating feature
+        # changes a legs mating feature
         newfeat = newfeaturedict.get('newfeat')
         cname = newfeaturedict.get('cname')
         cobj = FreeCAD.ActiveDocument.getObject(cname)
@@ -588,34 +603,39 @@ class classsidefunctions():
             mobj.directionConstraint = direction
         return
 
+
 sidefuncs = classsidefunctions('sidefuncs')
 
 
 class SelObserver:
     def __init__(self):
         pass
+
     def SelObserverON(self):
-        FreeCADGui.Selection.addObserver(selObv)        
+        FreeCADGui.Selection.addObserver(selObv)
+
     def SelObserverOFF(self):
-        #print('SelObserverOFF')
+        # print('SelObserverOFF')
         try:
             FreeCADGui.Selection.removeObserver(selObv)
         except:
             print(translate("A2plus", "removeObserver failed in C checker"))
 
-    def setPreselection(self, doc, obj, sub): # Preselection object
+    def setPreselection(self, doc, obj, sub):  # Preselection object
         pass
-    
-    def addSelection(self, doc, obj, sub, pnt): # Selection object
+
+    def addSelection(self, doc, obj, sub, pnt):  # Selection object
         sidefuncs.turnoffobserv()
 
-    def removeSelection(self, doc, obj, sub): # Delete the selected object
+    def removeSelection(self, doc, obj, sub):  # Delete the selected object
         pass
-    
+
     def setSelection(self, doc):
-        #this is sent from menu
-        #funcs.constraintselected('table') #funcs does not exist ??!!
+        # this is sent from menu
+        # funcs.constraintselected('table')  # funcs does not exist ??!!
         pass
+
+
 selObv = SelObserver()
 
 
@@ -623,6 +643,7 @@ class classsearch():
     ''' This is for searching in tree for constraint name '''
     def __init__(self):
         self.founditems = []
+
     def startsearch(self, searchterm, colnum):
         mw = FreeCADGui.getMainWindow()
         tab = mw.findChild(QtGui.QTabWidget, u'combiTab')
@@ -652,7 +673,6 @@ class classsearch():
             itm.setBackground(0, QtGui.QBrush())
             self.resetAll(itm)
 
-
     def reset1(self):
         mw = FreeCADGui.getMainWindow()
         tab = mw.findChild(QtGui.QTabWidget, u'combiTab')
@@ -660,10 +680,12 @@ class classsearch():
         top = tree.topLevelItem(0)
         for idx in range(top.childCount()):
             self.resetAll(top.child(idx))
+
+
 search = classsearch()
 
 
-def rondlist(inputList, inch = False):
+def rondlist(inputList, inch=False):
     x = inputList[0]
     y = inputList[1]
     z = inputList[2]
@@ -676,13 +698,15 @@ def rondlist(inputList, inch = False):
         z = z/25.4
     return([x, y, z])
 
-def rondnum(num, mmorin = 'mm'):
+
+def rondnum(num, mmorin='mm'):
     """" round a number to digits in global
         left in mm for accuracy. """
     rn = round(num, g.roundto)
     if mmorin == 'in':
         rn = rn / 25.4
     return(rn)
+
 
 class classlastclickeditem:
     def __init__(self, Name):
@@ -701,7 +725,7 @@ class classlastclickeditem:
         self.header = ''
         self.cname = ''
         self.cobj = None
-        self.dir= 'N'
+        self.dir = 'N'
 
     def cellpicked(self, row, column):
         item = form1.tm.item(row, column)
@@ -721,19 +745,11 @@ class classlastclickeditem:
         if self.column == 5:
             self.SubElement = 'SubElement2'
         return(self.SubElement)
-    
+
+
 lastclc = classlastclickeditem("lastclc")
 
 
-toolTipText = \
-translate("A2plus",
-'''
-Constraint Viewer. You can view the features the constraint is attached to,
- run a single constraint or change the the feature the constraint is attached to.
-See the help for more information.
-'''
-)
-                           
 class rnp_Constraint_Viewer:
 
     def Activated(self):
@@ -746,10 +762,13 @@ class rnp_Constraint_Viewer:
     def GetResources(self):
         mypath = os.path.dirname(__file__)
         return {
-             'Pixmap' : mypath + "/icons/CD_ConstraintViewer.svg",
-             'MenuText': translate("A2plus", "View and edit selected constraints"),
-             'ToolTip': toolTipText
+            'Pixmap': mypath + "/icons/CD_ConstraintViewer.svg",
+            'MenuText': translate("A2plus", "View and edit selected constraints"),
+            'ToolTip': translate("A2plus", "Constraint Viewer. You can view the features the constraint is attached to,\n"
+                                            "run a single constraint or change the the feature the constraint is attached to.\n"
+                                            "See the help for more information."
+                                 )
              }
 
+
 FreeCADGui.addCommand('rnp_Constraint_Viewer', rnp_Constraint_Viewer())
-#==============================================================================
