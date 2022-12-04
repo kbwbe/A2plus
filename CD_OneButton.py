@@ -1,25 +1,24 @@
-# -*- coding: utf-8 -*-
-#***************************************************************************
-#*                                                                         *
-#*   Copyright (c) 2020 Dan Miel                                           *
-#*                                                                         *
-#*   This program is free software; you can redistribute it and/or modify  *
-#*   it under the terms of the GNU Lesser General Public License (LGPL)    *
-#*   as published by the Free Software Foundation; either version 2 of     *
-#*   the License, or (at your option) any later version.                   *
-#*   for detail see the LICENCE text file.                                 *
-#*                                                                         *
-#*   This program is distributed in the hope that it will be useful,       *
-#*   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
-#*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
-#*   GNU Library General Public License for more details.                  *
-#*                                                                         *
-#*   You should have received a copy of the GNU Library General Public     *
-#*   License along with this program; if not, write to the Free Software   *
-#*   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  *
-#*   USA                                                                   *
-#*                                                                         *
-#***************************************************************************
+# ***************************************************************************
+# *                                                                         *
+# *   Copyright (c) 2020 Dan Miel                                           *
+# *                                                                         *
+# *   This program is free software; you can redistribute it and/or modify  *
+# *   it under the terms of the GNU Lesser General Public License (LGPL)    *
+# *   as published by the Free Software Foundation; either version 2 of     *
+# *   the License, or (at your option) any later version.                   *
+# *   for detail see the LICENCE text file.                                 *
+# *                                                                         *
+# *   This program is distributed in the hope that it will be useful,       *
+# *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+# *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+# *   GNU Library General Public License for more details.                  *
+# *                                                                         *
+# *   You should have received a copy of the GNU Library General Public     *
+# *   License along with this program; if not, write to the Free Software   *
+# *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  *
+# *   USA                                                                   *
+# *                                                                         *
+# ***************************************************************************
 """
 This is to be used in conjunction with A2plus Assembly Workbench.
 
@@ -27,23 +26,28 @@ Enables two features to be selected without using the control key.
 """
 
 import os
+from PySide import QtGui, QtCore
+
 import FreeCAD
 import FreeCADGui
-from PySide import QtGui, QtCore
 
 translate = FreeCAD.Qt.translate
 
+
 class globaluseclass:
-    def __init__(self,name):
+    def __init__(self, name):
         self.sONOFF = 'off'
         self.feat1 = ''
         self.buttonenabled = False
         self.obj1 = ''
         self.partselected = False
+
+
 g = globaluseclass("g")
 
+
 class onebutton:
-    def readselect(self,doc,obj,sub):
+    def readselect(self, doc, obj, sub):
         if g.partselected:
             g.partselected = False
             return
@@ -72,14 +76,17 @@ class onebutton:
                     obj = ''
                     sub = ''
 
+
 class SelObserver:
     def __init__(self):
         pass
+
     def SelObserverON(self):
         if g.sONOFF != 'on':
             FreeCADGui.Selection.addObserver(selObv)
             g.sONOFF = 'on'
             # print('SelObserverON')
+
     def SelObserverOFF(self):
         try:
             FreeCADGui.Selection.removeObserver(selObv)
@@ -90,8 +97,10 @@ class SelObserver:
 
     def addSelection(self, doc, obj, sub, pnt):  # Selection object
         onebutton.readselect(onebutton, doc, obj, sub)
+
     def removeSelection(self, doc, obj, sub):    # Delete the selected object
         pass
+
     def setSelection(self, doc):
         pass
 
@@ -99,16 +108,18 @@ class SelObserver:
 selObv = SelObserver()
 
 
-"""This class looks for mouse clicks in space to unselect parts."""
+# This class looks for mouse clicks in space to unselect parts.
 class ViewObserver:
     def __init__(self):
         self.view = None
         self.o = None
         self.c = None
+
     def vostart(self):
         self.view = FreeCADGui.activeDocument().activeView()
         self.o = ViewObserver()
         self.c = self.view.addEventCallback("SoMouseButtonEvent", self.o.logPosition)
+
     def vooff(self):
         try:
             self.view.removeEventCallback("SoMouseButtonEvent", self.c)
@@ -151,7 +162,7 @@ class rnp_OneButton:
             mApp(translate("A2plus", "No file is opened.\nYou must open an assembly file first."))
             return
         FreeCADGui.Selection.clearSelection()
-        if g.buttonenabled == False:
+        if g.buttonenabled is False:
             selObv.SelObserverON()  # Checks for part and entity click
             viewob.vostart()        # Checks for click in background
             g.buttonenabled = True
@@ -172,8 +183,10 @@ class rnp_OneButton:
 
     def IsActive(self):
         return(True)
+
+
 FreeCADGui.addCommand('rnp_OneButton', rnp_OneButton())
-#==============================================================================
+
 
 class mApp(QtGui.QWidget):
     """This message box was added to make this file a standalone file"""
@@ -191,5 +204,5 @@ class mApp(QtGui.QWidget):
         # self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
-        QtGui.QMessageBox.question(self, translate("A2plus", "Warning"), msg, QtGui.QMessageBox.Ok|QtGui.QMessageBox.Ok)
+        QtGui.QMessageBox.question(self, translate("A2plus", "Warning"), msg, QtGui.QMessageBox.Ok | QtGui.QMessageBox.Ok)
         self.show()
