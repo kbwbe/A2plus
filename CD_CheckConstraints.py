@@ -1,47 +1,51 @@
-#***************************************************************************
-#*                                                                         *
-#*   Copyright (c) 2020 Dan Miel                                           *
-#*                                                                         *
-#*   This program is free software; you can redistribute it and/or modify  *
-#*   it under the terms of the GNU Lesser General Public License (LGPL)    *
-#*   the License, or (at your option) any later version.                   *
-#*   for detail see the LICENCE text file.                                 *
-#*                                                                         *
-#*   This program is distributed in the hope that it will be useful,       *
-#*   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
-#*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
-#*   GNU Library General Public License for more details.                  *
-#*                                                                         *
-#*   You should have received a copy of the GNU Library General Public     *
-#*   License along with this program; if not, write to the Free Software   *
-#*   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  *
-#*   USA                                                                   *
-#*                                                                         *
-#***************************************************************************
+# ***************************************************************************
+# *                                                                         *
+# *   Copyright (c) 2020 Dan Miel                                           *
+# *                                                                         *
+# *   This program is free software; you can redistribute it and/or modify  *
+# *   it under the terms of the GNU Lesser General Public License (LGPL)    *
+# *   the License, or (at your option) any later version.                   *
+# *   for detail see the LICENCE text file.                                 *
+# *                                                                         *
+# *   This program is distributed in the hope that it will be useful,       *
+# *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+# *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+# *   GNU Library General Public License for more details.                  *
+# *                                                                         *
+# *   You should have received a copy of the GNU Library General Public     *
+# *   License along with this program; if not, write to the Free Software   *
+# *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  *
+# *   USA                                                                   *
+# *                                                                         *
+# ***************************************************************************
 # This is to be used with A2plus Assembly WorkBench
 # Tries to find constraints that are conflicting with each other.
 
 
 import os
+from PySide import QtGui, QtCore
+# from PySide.QtGui import *
+
 import FreeCAD
 import FreeCADGui
-from PySide import QtGui, QtCore
-from PySide.QtGui import *
 import a2p_solversystem
 import a2p_constraintServices
 import CD_ConstraintViewer
 
 translate = FreeCAD.Qt.translate
 
+
 class globaluseclass:
     def __init__(self):
         self.checkingnum = 0
         self.roundto = 3
-        #self.labelexist = False
-        #self.movedconsts = []
-        #self.allErrors = {}
+        # self.labelexist = False
+        # self.movedconsts = []
+        # self.allErrors = {}
         self.errorList = []
         self.conflicterror = False
+
+
 g = globaluseclass()
 
 
@@ -53,7 +57,7 @@ class mApp(QtGui.QWidget):
         self.title = translate("A2plus", "Information")
         self.initUI(msg)
 
-    def initUI(self, msg, msgtype = 'ok'):
+    def initUI(self, msg, msgtype='ok'):
         self.setWindowTitle(self.title)
         self.setGeometry(100, 100, 320, 200)
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
@@ -70,6 +74,7 @@ class mApp(QtGui.QWidget):
 
         self.show()
 
+
 class formMain(QtGui.QMainWindow):
 
     def __init__(self, name):
@@ -81,8 +86,7 @@ class formMain(QtGui.QMainWindow):
         self.setStyleSheet("font:11pt arial MS")
 
         self.txtboxReport = QtGui.QTextEdit(self)
-        self.txtboxReport.setGeometry(5, 50, 650, 90) # xy, wh
-
+        self.txtboxReport.setGeometry(5, 50, 650, 90)  # x, y, w, h
 
         self.lblviewlabel = QtGui.QLabel(self)
         self.lblviewlabel.setText(translate("A2plus", "To view the constraints, press 'Open Viewer'"))
@@ -97,7 +101,7 @@ class formMain(QtGui.QMainWindow):
         self.btnOpenViewer.setFixedHeight(28)
         self.btnOpenViewer.setToolTip(translate("A2plus", "View the listed constraints in the the Constraint Viewer."))
         self.btnOpenViewer.setText(translate("A2plus", "Open Viewer"))
-        self.btnOpenViewer.clicked.connect(lambda:self.openViewer())
+        self.btnOpenViewer.clicked.connect(lambda: self.openViewer())
 
         self.btnCloseForm = QtGui.QPushButton(self)
         self.btnCloseForm.move(475, 5)
@@ -105,19 +109,18 @@ class formMain(QtGui.QMainWindow):
         self.btnCloseForm.setFixedHeight(28)
         self.btnCloseForm.setToolTip(translate("A2plus", "Close this form."))
         self.btnCloseForm.setText(translate("A2plus", "Close"))
-        self.btnCloseForm.clicked.connect(lambda:self.Closeme())
+        self.btnCloseForm.clicked.connect(lambda: self.Closeme())
 
     def openViewer(self):
         CD_ConstraintViewer.form1.loadtable(g.errorList)
-        #clist = []
-        #doc = FreeCAD.activeDocument()
-        #for (k, v) in g.allErrors.items():
+        # clist = []
+        # doc = FreeCAD.activeDocument()
+        # for (k, v) in g.allErrors.items():
         #    cobj = doc.getObject(k)
         #    clist.append(cobj)
 
-        #CD_ConstraintViewer.form1.show()
-        #CD_ConstraintViewer.form1.loadtable(clist)
-
+        # CD_ConstraintViewer.form1.show()
+        # CD_ConstraintViewer.form1.loadtable(clist)
 
     def resizeEvent(self, event):
         # resize table
@@ -136,7 +139,9 @@ class formMain(QtGui.QMainWindow):
         form1.Closeme()
         self.close()
 
+
 form1 = formMain('form1')
+
 
 class classCheckConstraints():
     def __init__(self):
@@ -144,6 +149,7 @@ class classCheckConstraints():
         self.dir_errors = []
         self.rigids = []
         self.floaters = []
+
     def startcheck(self):
         ''' Check for opened file '''
         if FreeCAD.activeDocument() is None:
@@ -157,7 +163,7 @@ class classCheckConstraints():
         ss.loadSystem(doc)
         ss.assignParentship(doc)
         rigids = ss.rigids
-        for e in rigids: # get rigid part
+        for e in rigids:  # get rigid part
             if e.disatanceFromFixed is None:
                 self.floaters.append(e.label)
             self.rigids.append(e.label)
@@ -172,18 +178,17 @@ class classCheckConstraints():
         self.checkformovement(constraints, True)
         if len(g.errorList) != 0:
             form1.openViewer()
-            #msg = ''
-            #for e in g.allErrors:
+            # msg = ''
+            # for e in g.allErrors:
             #    line = str(g.allErrors.get(e))
             #    msg = msg + line + '\n'
-            #form1.showme(msg)
+            # form1.showme(msg)
         else:
             FreeCAD.Console.PrintMessage("")
             FreeCAD.Console.PrintMessage(translate("A2plus", "No constraint errors found") + "\n")
         statusform.Closeme()
 
-
-    def checkformovement(self, constraintlist, putPartBack = True):
+    def checkformovement(self, constraintlist, putPartBack=True):
         doc = FreeCAD.activeDocument()
         g.errorList = []
         self.Bothpartsfixed = False
@@ -194,21 +199,20 @@ class classCheckConstraints():
             self.p2fix = False
             self.setfix = 0
             cobj = constraintlist[checkingnum]
-            statusform.setWindowTitle(translate("A2plus", "Checking ") + str(checkingnum) + translate("A2plus", " of ") + str(len(constraintlist)))
-            
+            statusform.setWindowTitle(translate("A2plus", "Checking {} of {}").format(str(checkingnum), str(len(constraintlist))))
 
             subobj1 = cobj.getPropertyByName('Object1')
             subobj2 = cobj.getPropertyByName('Object2')
-            part1 = doc.getObject(subobj1) # Save Position and fixed
+            part1 = doc.getObject(subobj1)  # Save Position and fixed
             part2 = doc.getObject(subobj2)
-            
+
             ''' Get if part is fixed '''
             if hasattr(part1, "fixedPosition"):
                 self.p1fix = part1.fixedPosition
             if hasattr(part2, "fixedPosition"):
                 self.p2fix = part2.fixedPosition
 
-            if cobj.Name in self.dir_errors: 
+            if cobj.Name in self.dir_errors:
                 errortype = 'Feature Missing'
                 self.addError(cobj, errortype)
                 continue
@@ -217,13 +221,14 @@ class classCheckConstraints():
                 """ If both are fixed report and skip solving"""
                 self.addError(cobj, 'Both fixed')
                 continue
-            
+
             if part1.Label in self.floaters and part2.Label in self.floaters:
                 # If both parts are in floaters list report as Floaters
-                self.addError(cobj,'Floating parts')
+                self.addError(cobj, 'Floating parts')
                 continue
-            if self.p1fix == False and self.p2fix == False:
-                """ If neither part is fixed, fix part 1"""
+
+            if self.p1fix is False and self.p2fix is False:
+                # If neither part is fixed, fix part 1
                 if part1.Label in self.rigids:
                     part1.fixedPosition = True
                     self.setfix = 1
@@ -238,7 +243,7 @@ class classCheckConstraints():
             preAnglePt1 = part1.Placement.Rotation.Angle
             preAnglePt2 = part2.Placement.Rotation.Angle
 
-            a2p_solversystem.solveConstraints(FreeCAD.activeDocument(), None, False, [cobj], showFailMessage = False) # solve a single constraint
+            a2p_solversystem.solveConstraints(FreeCAD.activeDocument(), None, False, [cobj], showFailMessage=False)  # solve a single constraint
             if self.setfix == 1:
                 part1.fixedPosition = self.p1fix
             if self.setfix == 2:
@@ -248,17 +253,16 @@ class classCheckConstraints():
             # Recording location after move
             postBasePt1 = part1.Placement.Base  # Round vectors to 4 places
             postBasePt2 = part2.Placement.Base
- 
+
             ''' Checking if part moved '''
             v1 = FreeCAD.Vector(rondlist(preBasePt1))
-            v2 = FreeCAD.Vector(rondlist(postBasePt1)) 
+            v2 = FreeCAD.Vector(rondlist(postBasePt1))
             v3 = FreeCAD.Vector(rondlist(preBasePt2))
             v4 = FreeCAD.Vector(rondlist(postBasePt2))
             if v1 != v2 or v3 != v4:
                 self.errortype = 'Conflict. '
                 self.addError(cobj, self.errortype)
             errortype = ''
-
 
             if putPartBack:
                 # Places part back in original location if putPartBack is True
@@ -268,19 +272,20 @@ class classCheckConstraints():
                 part2.Placement.Base = preBasePt2
                 part2.Placement.Rotation.Axis = preRotPt2
                 part2.Placement.Rotation.Angle = preAnglePt2
-            
 
     def addError(self, cobj, errortype):
-            g.errorList.append([cobj, errortype])
+        g.errorList.append([cobj, errortype])
 
     def getallconstraints(self):
         doc = FreeCAD.activeDocument()
         constraints = []
         for obj in doc.Objects:
             if 'ConstraintInfo' in obj.Content:
-                if not 'mirror' in obj.Name:
+                if 'mirror' not in obj.Name:
                     constraints.append(obj)
         return(constraints)
+
+
 CheckConstraints = classCheckConstraints()
 
 
@@ -291,21 +296,24 @@ class formReport(QtGui.QDialog):
         super(formReport, self).__init__()
         self.setWindowTitle(translate("A2plus", "Checking Constraints"))
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
-        self.setGeometry(300, 100, 300, 40) # xy , wh
-        self.setStyleSheet("font: 10pt arial MS") 
+        self.setGeometry(300, 100, 300, 40)  # x, y, w, h
+        self.setStyleSheet("font: 10pt arial MS")
 
     def showme(self, msg):
         self.setWindowTitle(msg)
         self.show()
+
     def Closeme(self):
         self.close()
 
     def closeEvent(self, event):
         self.close()
+
+
 statusform = formReport('statusform')
 
 
-def rondlist(list, inch = False):
+def rondlist(list, inch=False):
     x = list[0]
     y = list[1]
     z = list[2]
@@ -319,7 +327,7 @@ def rondlist(list, inch = False):
     return([x, y, z])
 
 
-def rondnum(num, mmorin = 'mm'):
+def rondnum(num, mmorin='mm'):
     # round a number to digits in global
     # left in mm for accuracy.
     rn = round(num, g.roundto)
@@ -327,10 +335,6 @@ def rondnum(num, mmorin = 'mm'):
         rn = rn / 25.4
     return(rn)
 
-
-toolTipText = \
-    translate("A2plus", "This checks all constraints. After checking it will list all constraints that it found problems with.") + "/n" +\
-    translate("A2plus", "The list can then be opened in the Constraint viewer.")
 
 class rnp_Constraint_Checker:
 
@@ -342,16 +346,16 @@ class rnp_Constraint_Checker:
 
     def Deactivated():
         pass
-        #"""This function is executed when the workbench is deactivated"""
-
+        # This function is executed when the workbench is deactivated
 
     def GetResources(self):
         mypath = os.path.dirname(__file__)
         return {
-             'Pixmap' : mypath + "/icons/CD_ConstraintChecker.svg",
-             'MenuText': translate("A2plus", "Checks constraints"),
-             'ToolTip': translate("A2plus", "Checks constraints")
+            'Pixmap': mypath + "/icons/CD_ConstraintChecker.svg",
+            'MenuText': translate("A2plus", "Checks constraints"),
+            'ToolTip': translate("A2plus", "This checks all constraints. After checking it will list all constraints that it found problems with.") + "\n" +
+            translate("A2plus", "The list can then be opened in the Constraint viewer.")
              }
 
+
 FreeCADGui.addCommand('rnp_Constraint_Checker', rnp_Constraint_Checker())
-#==============================================================================
