@@ -22,24 +22,31 @@
 #*                                                                         *
 #***************************************************************************
 
-import FreeCAD, FreeCADGui, Part
+import os
+import sys
+import math
+import copy
+
 from PySide import QtGui, QtCore
-import os, sys, math, copy
+
+import FreeCAD
+import FreeCADGui
+import Part
+
 from  FreeCAD import Base
+from a2plib import *
 from a2p_translateUtils import *
 from a2p_viewProviderProxies import *
-
-from a2plib import *
 from a2p_solversystem import solveConstraints
-import a2p_constraints, a2p_constraintDialog
+import a2p_constraints, a2p_ConstraintDialog
 
-#==============================================================================
+
 class a2p_PointIdentityConstraintCommand:
     def Activated(self):
         selection = FreeCADGui.Selection.getSelectionEx()
         
         c = a2p_constraints.PointIdentityConstraint(selection)
-        cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
+        cvp = a2p_ConstraintDialog.a2p_ConstraintValuePanel(
             c.constraintObject,
             'createConstraint'
             )
@@ -65,7 +72,7 @@ class a2p_PointOnLineConstraintCommand:
         selection = FreeCADGui.Selection.getSelectionEx()
         
         c = a2p_constraints.PointOnLineConstraint(selection)
-        cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
+        cvp = a2p_ConstraintDialog.a2p_ConstraintValuePanel(
             c.constraintObject,
             'createConstraint'
             )
@@ -91,7 +98,7 @@ class a2p_PointOnPlaneConstraintCommand:
         selection = FreeCADGui.Selection.getSelectionEx()
         
         c = a2p_constraints.PointOnPlaneConstraint(selection)
-        cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
+        cvp = a2p_ConstraintDialog.a2p_ConstraintValuePanel(
             c.constraintObject,
             'createConstraint'
             )
@@ -116,7 +123,7 @@ class a2p_SphericalSurfaceConstraintCommand:
         selection = FreeCADGui.Selection.getSelectionEx()
         
         c = a2p_constraints.SphericalConstraint(selection)
-        cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
+        cvp = a2p_ConstraintDialog.a2p_ConstraintValuePanel(
             c.constraintObject,
             'createConstraint'
             )
@@ -141,7 +148,7 @@ class a2p_CircularEdgeConnectionCommand:
         selection = FreeCADGui.Selection.getSelectionEx()
         
         c = a2p_constraints.CircularEdgeConstraint(selection)
-        cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
+        cvp = a2p_ConstraintDialog.a2p_ConstraintValuePanel(
             c.constraintObject,
             'createConstraint'
             )
@@ -166,7 +173,7 @@ class a2p_AxialConstraintCommand:
         selection = FreeCADGui.Selection.getSelectionEx()
         
         c = a2p_constraints.AxialConstraint(selection)
-        cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
+        cvp = a2p_ConstraintDialog.a2p_ConstraintValuePanel(
             c.constraintObject,
             'createConstraint'
             )
@@ -191,7 +198,7 @@ class a2p_AxisParallelConstraintCommand:
         selection = FreeCADGui.Selection.getSelectionEx()
         
         c = a2p_constraints.AxisParallelConstraint(selection)
-        cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
+        cvp = a2p_ConstraintDialog.a2p_ConstraintValuePanel(
             c.constraintObject,
             'createConstraint'
             )
@@ -216,7 +223,7 @@ class a2p_AxisPlaneParallelCommand:
         selection = FreeCADGui.Selection.getSelectionEx()
         
         c = a2p_constraints.AxisPlaneParallelConstraint(selection)
-        cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
+        cvp = a2p_ConstraintDialog.a2p_ConstraintValuePanel(
             c.constraintObject,
             'createConstraint'
             )
@@ -241,7 +248,7 @@ class a2p_AxisPlaneAngleCommand:
         selection = FreeCADGui.Selection.getSelectionEx()
         
         c = a2p_constraints.AxisPlaneAngleConstraint(selection)
-        cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
+        cvp = a2p_ConstraintDialog.a2p_ConstraintValuePanel(
             c.constraintObject,
             'createConstraint'
             )
@@ -266,7 +273,7 @@ class a2p_AxisPlaneNormalCommand:
         selection = FreeCADGui.Selection.getSelectionEx()
         
         c = a2p_constraints.AxisPlaneNormalConstraint(selection)
-        cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
+        cvp = a2p_ConstraintDialog.a2p_ConstraintValuePanel(
             c.constraintObject,
             'createConstraint'
             )
@@ -291,7 +298,7 @@ class a2p_PlanesParallelConstraintCommand:
         selection = FreeCADGui.Selection.getSelectionEx()
         
         c = a2p_constraints.PlanesParallelConstraint(selection)
-        cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
+        cvp = a2p_ConstraintDialog.a2p_ConstraintValuePanel(
             c.constraintObject,
             'createConstraint'
             )
@@ -316,7 +323,7 @@ class a2p_PlaneCoincidentConstraintCommand:
         selection = FreeCADGui.Selection.getSelectionEx()
         
         c = a2p_constraints.PlaneConstraint(selection)
-        cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
+        cvp = a2p_ConstraintDialog.a2p_ConstraintValuePanel(
             c.constraintObject,
             'createConstraint'
             )
@@ -341,7 +348,7 @@ class a2p_AngledPlanesConstraintCommand:
         selection = FreeCADGui.Selection.getSelectionEx()
         
         c = a2p_constraints.AngledPlanesConstraint(selection)
-        cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
+        cvp = a2p_ConstraintDialog.a2p_ConstraintValuePanel(
             c.constraintObject,
             'createConstraint'
             )
@@ -368,12 +375,11 @@ class a2p_CenterOfMassConstraintCommand:
         selection = FreeCADGui.Selection.getSelectionEx()
         
         c = a2p_constraints.CenterOfMassConstraint(selection)
-        cvp = a2p_constraintDialog.a2p_ConstraintValuePanel(
+        cvp = a2p_ConstraintDialog.a2p_ConstraintValuePanel(
             c.constraintObject,
             'createConstraint'
             )
         FreeCADGui.Selection.clearSelection()
-
 
     def IsActive(self):
         return a2p_constraints.CenterOfMassConstraint.isValidSelection(
@@ -387,6 +393,5 @@ class a2p_CenterOfMassConstraintCommand:
              'ToolTip' : a2p_constraints.CenterOfMassConstraint.getToolTip()
              }
 
+    
 FreeCADGui.addCommand('a2p_CenterOfMassConstraintCommand', a2p_CenterOfMassConstraintCommand())
-
-#==============================================================================
