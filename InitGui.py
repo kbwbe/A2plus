@@ -72,7 +72,7 @@ class A2plusWorkbench (Workbench):
         import a2p_solversystem
         import a2p_MuxAssembly
         import a2p_partinformation
-        import a2p_constraintDialog
+        import a2p_ConstraintDialog
         import a2p_constraintcommands
         import a2p_BoM # BoM == Bill of Materials == partslist
         import a2p_constraintServices
