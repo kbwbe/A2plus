@@ -1,32 +1,33 @@
-#***************************************************************************
-#*                                                                         *
-#*   Copyright (c) 2020 Dan Miel                                           *
-#*                                                                         *
-#*   This program is free software; you can redistribute it and/or modify  *
-#*   it under the terms of the GNU Lesser General Public License (LGPL)    *
-#*   the License, or (at your option) any later version.                   *
-#*   for detail see the LICENCE text file.                                 *
-#*                                                                         *
-#*   This program is distributed in the hope that it will be useful,       *
-#*   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
-#*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the          *
-#*   GNU Library General Public License for more details.                  *
-#*                                                                         *
-#*   You should have received a copy of the GNU Library General Public     *
-#*   License along with this program; if not, write to the Free Software   *
-#*   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307   *
-#*   USA                                                                   *
-#*                                                                         *
-#***************************************************************************
+# ***************************************************************************
+# *                                                                         *
+# *   Copyright (c) 2020 Dan Miel                                           *
+# *                                                                         *
+# *   This program is free software; you can redistribute it and/or modify  *
+# *   it under the terms of the GNU Lesser General Public License (LGPL)    *
+# *   the License, or (at your option) any later version.                   *
+# *   for detail see the LICENCE text file.                                 *
+# *                                                                         *
+# *   This program is distributed in the hope that it will be useful,       *
+# *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+# *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the          *
+# *   GNU Library General Public License for more details.                  *
+# *                                                                         *
+# *   You should have received a copy of the GNU Library General Public     *
+# *   License along with this program; if not, write to the Free Software   *
+# *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307   *
+# *   USA                                                                   *
+# *                                                                         *
+# ***************************************************************************
 # This is to be used with A2plus Assembly WorkBench
-#
 
-import FreeCAD
-import FreeCADGui
 # from PySide.QtGui import *
 from PySide import QtGui, QtCore
 
+import FreeCAD
+import FreeCADGui
+
 translate = FreeCAD.Qt.translate
+
 
 class formMain(QtGui.QMainWindow):
     def __init__(self, name):
@@ -41,18 +42,18 @@ class formMain(QtGui.QMainWindow):
                           [translate("A2plus", "Add Edge Labels"), translate("A2plus", "Add labels to all of the edges on a selected part")],
                           [translate("A2plus", "Add Vertex Labels"), translate("A2plus", "Add labels to all of the vertices on a selected part")],
                           [translate("A2plus", "Delete Labels"), translate("A2plus", "Delete all labels")],
-                          [translate("A2plus", "Close"), '']
+                          [translate("A2plus", "Close"), translate("A2plus", "Close this window")]
                           ]
-        self.btns=[]
+        self.btns = []
         BtnNum = 0
-        for row in range(0, len(self.btnLabels)) :
-            btny = 20 +(28*row)
-            self.btn = QtGui.QPushButton( str(self.btnLabels[row][0]), self)
+        for row in range(0, len(self.btnLabels)):
+            btny = 20 + (28*row)
+            self.btn = QtGui.QPushButton(str(self.btnLabels[row][0]), self)
             self.btn.move(5, btny)
             self.btn.setFixedWidth(250)
             self.btn.setFixedHeight(25)
             self.btn.setToolTip(self.btnLabels[row][1])
-            self.btn.released.connect(self.button_pushed) # pressed
+            self.btn.released.connect(self.button_pushed)  # pressed
             self.btns.append(self.btn)
             BtnNum = BtnNum + 1
 
@@ -70,7 +71,7 @@ class formMain(QtGui.QMainWindow):
             labels.deletelabels()
         if btext == translate("A2plus", "Close"):
             self.Closeme()
-            
+
         # Not present?
         if btext == 'Attach to':
             labels.attachto()
@@ -91,7 +92,9 @@ class formMain(QtGui.QMainWindow):
         form1.Closeme()
         self.close()
 
+
 form1 = formMain('form1')
+
 
 class classLabels():
     def __init__(self):
@@ -129,7 +132,6 @@ class classLabels():
             partLabel = self.makelabel(ent, feat+str(num+1), loc)
             self.labelGroup.addObject(partLabel)
 
-
     def makelabel(self, ent, name, loc):
         partLabel = FreeCAD.ActiveDocument.addObject("App::AnnotationLabel", "partLabel")
         partLabel.LabelText = name
@@ -139,8 +141,6 @@ class classLabels():
         partLabel.ViewObject.BackgroundColor = (1.0, 1.0, 0.0)
         partLabel.ViewObject.TextColor = (0.0, 0.0, 0.0)
         return(partLabel)
-
-
 
     def deletelabels(self):
         for obj in FreeCAD.ActiveDocument.Objects:
@@ -184,18 +184,20 @@ class classLabels():
             featname = sel.SubElementNames[0]
             ent = sel.SubObjects[0]
             self.getentloc(ent, featname)
+
+
 labels = classLabels()
 
 
 class mApp(QtGui.QWidget):
     ''' This message box was added to make this file a standalone file'''
     # for error messages
-    def __init__(self,msg):
+    def __init__(self, msg):
         super().__init__()
         self.initUI(msg)
 
-    def initUI(self,msg):
+    def initUI(self, msg):
         self.setGeometry(100, 100, 400, 300)
-        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)       
-        QtGui.QMessageBox.question(self, translate("A2plus", "Info"), msg, QtGui.QMessageBox.Ok|QtGui.QMessageBox.Ok)        
+        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+        QtGui.QMessageBox.question(self, translate("A2plus", "Info"), msg, QtGui.QMessageBox.Ok | QtGui.QMessageBox.Ok)
         self.show()
