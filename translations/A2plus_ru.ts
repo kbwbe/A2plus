@@ -1964,7 +1964,7 @@ See the help for more information.
     <message>
         <location filename="../a2p_solversystem.py" line="489"/>
         <source>REACHED  POS-ACCURACY :{}</source>
-        <translation>Достигнута ТОЧНОСТЬ ПОЗИЦИОНИРОВАНИЯ: {}</translation>
+        <translation>Достигнутая ТОЧНОСТЬ ПОЗИЦИОНИРОВАНИЯ: {}</translation>
     </message>
     <message>
         <location filename="../a2p_solversystem.py" line="490"/>
@@ -1974,7 +1974,7 @@ See the help for more information.
     <message>
         <location filename="../a2p_solversystem.py" line="491"/>
         <source>REACHED SPIN-ACCURACY :{}</source>
-        <translation>Достигнута ТОЧНОСТЬ ВРАЩЕНИЯ: {}</translation>
+        <translation>Достигнутая ТОЧНОСТЬ ВРАЩЕНИЯ: {}</translation>
     </message>
     <message>
         <location filename="../a2p_solversystem.py" line="492"/>
@@ -1989,7 +1989,7 @@ See the help for more information.
     <message>
         <location filename="../a2p_solversystem.py" line="506"/>
         <source>System solved using partial + recursive unfixing</source>
-        <translation>Система решена с использование частичного + рекурсивного ослабления</translation>
+        <translation>Система решена с использованием частичного + рекурсивного ослабления</translation>
     </message>
     <message>
         <location filename="../a2p_solversystem.py" line="516"/>
@@ -2036,7 +2036,7 @@ Please reselect in the table.</source>
     <message>
         <location filename="../a2p_partinformation.py" line="89"/>
         <source>Create a spreadsheet for ordering or logistics information</source>
-        <translation>Создать электронную таблицу для заказа или информации о логистике</translation>
+        <translation>Создать электронную таблицу с информацией для заказа или логистики</translation>
     </message>
     <message>
         <location filename="../a2p_partinformation.py" line="40"/>
@@ -2060,7 +2060,7 @@ by the parts list function of A2plus.
 
 Пожалуйста, заполните Вашу информацию.
 Эта электронная таблица будет прочитана
-функцией списка деталей A2plus.
+функцией  A2plus из списка деталей.
 </translation>
     </message>
     <message>
