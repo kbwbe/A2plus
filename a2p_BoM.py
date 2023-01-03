@@ -238,20 +238,20 @@ class a2p_CreatePartlist():
             'MenuText': translate("A2plus", "Create a spreadsheet with a parts list of this file"),
             'ToolTip': translate(
                 "A2plus", "Create a spreadsheet with a " + "\n" +
-                "parts list of this file." + "\n" +
+                "parts list of this file." + "\n\n" +
                 "This function will read out " + "\n" +
                 "the #PARTINFO# spreadsheet of " + "\n" +
                 "all involved parts of the " + "\n" +
                 "assembly and create a new " + "\n" +
                 "spreadsheet containing the " + "\n" +
-                "parts list." + "\n" +
+                "parts list." + "\n\n" +
                 "This button will open a dialog " + "\n" +
                 "with the Question:" + "\n" +
                 "- Iterate recursively over " + "\n" +
-                "     all subassenblies?" + "\n" +
+                "     all subassenblies?" + "\n\n" +
                 "Answer Yes:" + "\n" +
                 "All parts of all subassemblies are " + "\n" +
-                "collected to the partlist " + "\n" +
+                "collected to the partlist " + "\n\n" +
                 "Answer No:" + "\n" +
                 "Only the parts within the " + "\n" +
                 "recent assembly are collected.")
