@@ -1893,7 +1893,7 @@ class a2p_absPath_to_relPath_Command:
                                     )
             return
         assemblyPath = os.path.normpath(  os.path.split( os.path.normpath(doc.FileName) )[0])
-        importParts = [ob for ob in doc.Objects if "mportPart" in ob.Content]
+        importParts = [ob for ob in doc.Objects if "importPart" in ob.Content]
         for iPart in importParts:
             if (
                 iPart.sourceFile.startswith("./") or
