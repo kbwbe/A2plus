@@ -121,7 +121,7 @@ class a2p_reAdjustConstraintDirectionsCommand:
 
     def GetResources(self):
         return {
-            'Pixmap': a2plib.pathOfModule()+'/icons/a2p_ReAdjustConstraints.svg',
+            'Pixmap': a2plib.get_module_path()+'/icons/a2p_ReAdjustConstraints.svg',
             'MenuText': translate("A2plus_Constraints", "Re-adjust directions of all constraints"),
             'ToolTip': translate("A2plus_Constraints", "Re-adjust directions of all constraints to best fit")
             }
