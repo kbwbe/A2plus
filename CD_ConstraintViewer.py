@@ -244,7 +244,7 @@ class ShowPartProperties(QtGui.QWidget):
         if q.text() == translate("A2plus", "Open Help"):
             # File name may be translated, e.g. to "CD_Помощь для инструмента Диагностики.pdf" (this file must be present)
             pdf_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), translate("A2plus", "CD_Help for Diagnostic tools.pdf"))
-            # pdf_file = a2plib.pathOfModule() + "\CD_Help for Diagnostic tools.pdf"
+            # pdf_file = a2plib.get_module_path() + "\CD_Help for Diagnostic tools.pdf"
             # For Linux Mint 21 64-bit with XFCE
             if sys.platform in ['linux', 'linux2', 'darwin', 'cygwin']:
                 import webbrowser
