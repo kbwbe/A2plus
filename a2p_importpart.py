@@ -432,7 +432,7 @@ to the assembly
 class a2p_ImportShapeReferenceCommand():
 
     def GetResources(self):
-        return {'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_ShapeReference.svg',
+        return {'Pixmap'  : a2plib.get_module_path()+'/icons/a2p_ShapeReference.svg',
                 'Accel' : "Ctrl+Shift+A", # a default shortcut (optional)
                 'MenuText': translate("A2plus", "Add shapes from an external file"),
                 'ToolTip' : toolTip
@@ -628,7 +628,7 @@ active document objects
 class a2p_Restore_Transparency_Command():
 
     def GetResources(self):
-        return {'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_Restore_Transparency.svg',
+        return {'Pixmap'  : a2plib.get_module_path()+'/icons/a2p_Restore_Transparency.svg',
                 'Accel'   : "Shift+T", # a default shortcut (optional)
                 'MenuText': translate("A2plus", "Restore transparency to active document objects"),
                 'ToolTip' : toolTip
@@ -668,7 +668,7 @@ to the assembly
 class a2p_ImportPartCommand():
 
     def GetResources(self):
-        return {'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_ImportPart.svg',
+        return {'Pixmap'  : a2plib.get_module_path()+'/icons/a2p_ImportPart.svg',
                 'Accel'   : "Shift+A", # a default shortcut (optional)
                 'MenuText': translate("A2plus", "Add a part from an external file"),
                 'ToolTip' : toolTip
@@ -1013,7 +1013,7 @@ class a2p_DuplicatePartCommand:
 
     def GetResources(self):
         return {
-            'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_DuplicatePart.svg',
+            'Pixmap'  : a2plib.get_module_path()+'/icons/a2p_DuplicatePart.svg',
             'MenuText': translate("A2plus", "Create duplicate of a part"),
             'ToolTip' : toolTip
             }
@@ -1140,7 +1140,7 @@ class a2p_EditPartCommand:
 
     def GetResources(self):
         return {
-            'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_EditPart.svg',
+            'Pixmap'  : a2plib.get_module_path()+'/icons/a2p_EditPart.svg',
             'MenuText': translate("A2plus", "Edit an imported part (open linked FCStd file)"),
             'ToolTip' : toolTip
             }
@@ -1230,7 +1230,7 @@ class a2p_MovePartCommand:
 
     def GetResources(self):
         return {
-            'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_MovePart.svg',
+            'Pixmap'  : a2plib.get_module_path()+'/icons/a2p_MovePart.svg',
             'MenuText': translate("A2plus", "Move the selected part"),
             'ToolTip' : toolTip
             }
@@ -1350,7 +1350,7 @@ class a2p_MovePartUnderConstraints:
 
     def GetResources(self):
         return {
-            'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_MovePartUnderConstraints.svg',
+            'Pixmap'  : a2plib.get_module_path()+'/icons/a2p_MovePartUnderConstraints.svg',
             'MenuText': translate("A2plus", "Move the selected part under constraints"),
             'ToolTip' : toolTip
             }
@@ -1431,7 +1431,7 @@ class DeleteConnectionsCommand:
 
     def GetResources(self):
         return {
-            'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_DeleteConnections.svg',
+            'Pixmap'  : a2plib.get_module_path()+'/icons/a2p_DeleteConnections.svg',
             'MenuText': translate("A2plus", "Delete all constraints of selected parts"),
             'ToolTip' : toolTipText
             }
@@ -1482,7 +1482,7 @@ class ViewConnectionsCommand:
 
     def GetResources(self):
         return {
-            'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_ViewConnection.svg',
+            'Pixmap'  : a2plib.get_module_path()+'/icons/a2p_ViewConnection.svg',
             'MenuText': translate("A2plus", "Highlight both constrained parts"),
             'ToolTip' : toolTip
             }
@@ -1580,7 +1580,7 @@ class a2p_isolateCommand:
 
     def GetResources(self):
         return {
-            'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_Isolate_Element.svg',
+            'Pixmap'  : a2plib.get_module_path()+'/icons/a2p_Isolate_Element.svg',
             'MenuText': translate("A2plus", "Show only selected elements or all if none is selected"),
             'ToolTip' : toolTip
             }
@@ -1610,7 +1610,7 @@ class a2p_ToggleTransparencyCommand:
 
     def GetResources(self):
         return {
-            'Pixmap'   : a2plib.pathOfModule()+'/icons/a2p_ToggleTransparency.svg',
+            'Pixmap'   : a2plib.get_module_path()+'/icons/a2p_ToggleTransparency.svg',
             'MenuText' : translate("A2plus", "Toggle transparency of assembly"),
             'ToolTip'  : translate("A2plus", "Toggles transparency of assembly"),
             'Checkable': self.IsChecked()
@@ -1644,7 +1644,7 @@ class a2p_ToggleAutoSolveCommand:
 
     def GetResources(self):
         return {
-            'Pixmap'   : a2plib.pathOfModule()+'/icons/a2p_ToggleAutoSolve.svg',
+            'Pixmap'   : a2plib.get_module_path()+'/icons/a2p_ToggleAutoSolve.svg',
             'MenuText' : translate("A2plus", "Toggle auto solve"),
             'ToolTip'  : toolTipMessage,
             'Checkable': self.IsChecked()
@@ -1663,7 +1663,7 @@ class a2p_TogglePartialProcessingCommand:
 
     def GetResources(self):
         return {
-            'Pixmap'   : a2plib.pathOfModule()+'/icons/a2p_TogglePartial.svg',
+            'Pixmap'   : a2plib.get_module_path()+'/icons/a2p_TogglePartial.svg',
             'MenuText' : translate("A2plus", "Toggle partial processing"),
             'ToolTip'  : translate("A2plus", "Toggle partial processing"),
             'Checkable': self.IsChecked()
@@ -1688,7 +1688,7 @@ class a2p_repairTreeViewCommand:
 
     def GetResources(self):
         return {
-            'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_RepairTree.svg',
+            'Pixmap'  : a2plib.get_module_path()+'/icons/a2p_RepairTree.svg',
             'MenuText': translate("A2plus", "Repair the tree view if it is somehow damaged"),
             'ToolTip' : toolTipMessage
             }
@@ -1723,7 +1723,7 @@ class a2p_FlipConstraintDirectionCommand:
 
     def GetResources(self):
         return {
-            'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_FlipConstraint.svg',
+            'Pixmap'  : a2plib.get_module_path()+'/icons/a2p_FlipConstraint.svg',
             'MenuText': translate("A2plus", "Flip direction of last constraint"),
             'ToolTip' : toolTip
             }
@@ -1772,7 +1772,7 @@ class a2p_Show_Hierarchy_Command:
 
     def GetResources(self):
         return {
-            'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_Treeview.svg',
+            'Pixmap'  : a2plib.get_module_path()+'/icons/a2p_Treeview.svg',
             'MenuText': translate("A2plus", "Generate HTML file with detailed constraining structure"),
             'ToolTip' : translate("A2plus", "Generates HTML file with detailed constraining structure")
             }
@@ -1838,7 +1838,7 @@ class a2p_Show_PartLabels_Command:
 
     def GetResources(self):
         return {
-            'Pixmap'   : a2plib.pathOfModule()+'/icons/a2p_PartLabel.svg',
+            'Pixmap'   : a2plib.get_module_path()+'/icons/a2p_PartLabel.svg',
             'MenuText' : translate("A2plus", "Show part labels in 3D view"),
             'ToolTip'  : translate("A2plus", "Toggle showing part labels in 3D view"),
             'Checkable': False
@@ -1874,7 +1874,7 @@ class a2p_Show_DOF_info_Command:
 
     def GetResources(self):
         return {
-            'Pixmap'   : a2plib.pathOfModule()+'/icons/a2p_DOFs.svg',
+            'Pixmap'   : a2plib.get_module_path()+'/icons/a2p_DOFs.svg',
             'MenuText' : translate("A2plus", "Print detailed DOF information"),
             'ToolTip'  : translate("A2plus", "Toggle printing detailed DOF information"),
             'Checkable': False
@@ -1910,7 +1910,7 @@ class a2p_absPath_to_relPath_Command:
 
     def GetResources(self):
         return {
-            'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_SetRelativePathes.svg',
+            'Pixmap'  : a2plib.get_module_path()+'/icons/a2p_SetRelativePathes.svg',
             'MenuText': translate("A2plus", "Convert absolute paths of imported parts to relative ones"),
             'ToolTip' : translate("A2plus", "Converts absolute paths of imported parts to relative ones")
             }
@@ -1940,7 +1940,7 @@ class a2p_SaveAndExit_Command:
 
     def GetResources(self):
         return {
-            'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_Save_and_exit.svg',
+            'Pixmap'  : a2plib.get_module_path()+'/icons/a2p_Save_and_exit.svg',
             'MenuText': translate("A2plus", "Save and exit the active document"),
             'ToolTip' : translate("A2plus", "Save and exit the active document")
             }
