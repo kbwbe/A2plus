@@ -135,15 +135,59 @@ elif "LINUX" in tmp:
 else:
     OPERATING_SYSTEM = "OTHER"
 
+#------------------------------------------------------------------------------
+def get_module_path():
+    """
+    Function return A2p module path. It tested in FreeCAD 0.19 and 0.21 in Linux 64-bit:
+    
+    Not work in both FreeCAd versions (return different end of string in different FreeCAD versions):
+    print("os.path.dirname(): " + os.path.dirname(__file__))
+    
+    Work in both FreeCAd versions:
+    print("os.path.abspath(): " + os.path.abspath(__file__))
+    print("os.path.dirname(os.path.abspath(__file__)): " + os.path.dirname(os.path.abspath(__file__)))
+
+    # FreeCAD 0.19:
+    # os.path.dirname(): /home/user/.FreeCAD/Mod/A2plus
+
+    # os.path.abspath(): /home/user/.FreeCAD/Mod/A2plus/a2plib.py
+    # os.path.dirname(os.path.abspath(__file__)): /home/user/.FreeCAD/Mod/A2plus
+
+    # FreeCAD 0.21:
+    # os.path.dirname(): /home/user/.local/share/FreeCAD/Mod/A2plus/.
+
+    # os.path.abspath(): /home/user/.local/share/FreeCAD/Mod/A2plus/a2plib.py
+    # os.path.dirname(os.path.abspath(__file__)): /home/user/.local/share/FreeCAD/Mod/A2plus
+    """
+
+    s_path = os.path.dirname(os.path.abspath(__file__))
+    return s_path
 
 #------------------------------------------------------------------------------
 def getLanguagePath():
-    return os.path.join(os.path.dirname(os.path.dirname(__file__)),"translations")
+    """
+    Function return path for localization files. It tested in FreeCAD 0.19 and 0.21 in Linux 64-bit:
+
+    Work in both FreeCAd versions:
+    print("os.path.join(get_module_path(), 'translations'): " + os.path.join(get_module_path(), "translations"))
+
+    # FreeCAD 0.19:
+    # os.path.join(get_module_path(), 'translations'): /home/user/.FreeCAD/Mod/A2plus/translations
+
+    # FreeCAD 0.21:
+    # os.path.join(get_module_path(), 'translations'): /home/user/.local/share/FreeCAD/Mod/A2plus/translations
+    """
+
+    s_path = os.path.join(get_module_path(), "translations")
+    return s_path
 
 #------------------------------------------------------------------------------
 def getA2pVersion():
-    #A2plus_path = os.path.dirname(pathOfModule())
-    A2plus_path = pathOfModule()
+    """
+    Function return A2Plus version for storing in assembly file
+    """
+
+    A2plus_path = get_module_path()
     try:
         metadata = FreeCAD.Metadata(os.path.join(A2plus_path, 'package.xml'))
         return metadata.Version
@@ -586,10 +630,6 @@ def checkFileIsInProjectFolder(path):
         return True
     else:
         return False
-
-#------------------------------------------------------------------------------
-def pathOfModule():
-    return os.path.dirname(__file__)
 
 #------------------------------------------------------------------------------
 def Msg(tx):

@@ -109,7 +109,7 @@ Do you want to delete this constraint-pair?
                     
     def GetResources(self):
         return {
-            'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_SearchConstraintConflicts.svg',
+            'Pixmap'  : a2plib.get_module_path()+'/icons/a2p_SearchConstraintConflicts.svg',
             'MenuText': translate("A2plus_searchConstraintConflicts", "Identify conflicting constraints"),
             'ToolTip' : toolTipMessage
             }

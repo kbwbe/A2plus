@@ -158,7 +158,7 @@ within this workbench.
 class a2p_ConvertPartCommand():
 
     def GetResources(self):
-        return {'Pixmap'  : a2plib.pathOfModule()+'/icons/a2p_ConvertPart.svg',
+        return {'Pixmap'  : a2plib.get_module_path()+'/icons/a2p_ConvertPart.svg',
 #                'Accel'  : "Shift+C", # a default shortcut (optional)
                 'MenuText': translate("A2plus_convertPart", "Convert a part to A2plus"),
                 'ToolTip' : toolTip
