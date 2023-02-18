@@ -173,7 +173,7 @@ class classCheckConstraints():
             return()
 
         statusform.showme(translate("A2plus", "Checking constraints"))
-        self.dir_errors = a2p_constraintServices.redAdjustConstraintDirections(FreeCAD.activeDocument())
+        self.dir_errors = a2p_constraintServices.reAdjustConstraintDirections(FreeCAD.activeDocument())
         print(self.dir_errors)
         self.checkformovement(constraints, True)
         if len(g.errorList) != 0:
