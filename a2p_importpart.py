@@ -874,7 +874,7 @@ def updateImportedParts(doc, partial=False):
                     a2plib.copyObjectColors(obj,newObject)
 
     #repair constraint directions if for e.g. face-normals flipped around during updating of parts.
-    a2p_constraintServices.redAdjustConstraintDirections(doc)
+    a2p_constraintServices.reAdjustConstraintDirections(doc)
 
     mw = FreeCADGui.getMainWindow()
     mdi = mw.findChild(QtGui.QMdiArea)
