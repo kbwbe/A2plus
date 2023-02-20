@@ -32,7 +32,7 @@ import a2p_constraints
 translate = FreeCAD.Qt.translate
 
 
-def redAdjustConstraintDirections(doc):
+def reAdjustConstraintDirections(doc):
     """
     Recalculate value of property 'direction' and the sign of property 'offset'
     of all a2p-constraints of a document, in order to reach a solvable state if
@@ -86,15 +86,18 @@ def redAdjustConstraintDirections(doc):
     if len(unknown_constraints) > 0:
         # Print - All not Ok, we have problem
         print(translate(
-                        "A2plus_Constraints",
-                        "redAdjustConstraintDirections(): Found unknown constraints: {}"
-                        ).format(
-                        set(unknown_constraints)
-                         )
+            "A2plus_Constraints",
+            "reAdjustConstraintDirections(): Found unknown constraints: {}"
+            ).format(
+                set(unknown_constraints)
+                )
               )
     else:
         # Print - All Ok
-        print(translate("A2plus_Constraints", "A2plus: All constraints are recalculated."))
+        print(translate(
+            "A2plus_Constraints",
+            "reAdjustConstraintDirections(): All constraints are recalculated."
+            ))
 
     return(result)                  # Added for Constraint Diagnostic function
 
@@ -111,7 +114,7 @@ class a2p_reAdjustConstraintDirectionsCommand:
         if response == QtGui.QMessageBox.Yes:
             doc = FreeCAD.activeDocument()
             doc.openTransaction("Readjust constraint's directions")
-            redAdjustConstraintDirections(doc)
+            reAdjustConstraintDirections(doc)
             doc.commitTransaction()
 
     def IsActive(self):
