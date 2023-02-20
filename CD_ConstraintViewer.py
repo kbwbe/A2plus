@@ -521,7 +521,7 @@ class classconflictreport():
         if hasattr(part2, "fixedPosition"):
             self.p2fix = part2.fixedPosition
         if self.p1fix and self.p2fix:
-            mApp('Both parts are fixed.')
+            mApp(translate("A2plus", "Both parts are fixed."))
             return
         ''' if neither is fixed '''
         if self.p1fix is False and self.p2fix is False:
