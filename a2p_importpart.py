@@ -604,10 +604,10 @@ class a2p_ImportShapeReferenceCommand():
 
         return
 
-    def IsActive(self):
-        doc = FreeCAD.activeDocument()
-        if doc is None: return False
-        return True
+#    def IsActive(self):
+#        doc = FreeCAD.activeDocument()
+#        if doc is None: return False
+#        return True
 
     def GuiViewFit(self):
         FreeCADGui.SendMsgToActiveView("ViewFit")
@@ -744,10 +744,10 @@ class a2p_ImportPartCommand():
             self.timer.start( 200 ) #0.2 seconds
         return
 
-    def IsActive(self):
-        doc = FreeCAD.activeDocument()
-        if doc is None: return False
-        return True
+#    def IsActive(self):
+#        doc = FreeCAD.activeDocument()
+#        if doc is None: return False
+#        return True
 
     def GuiViewFit(self):
         FreeCADGui.SendMsgToActiveView("ViewFit")
