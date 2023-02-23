@@ -25,41 +25,46 @@
 __title__ = 'A2plus assembly Workbench - InitGui file'
 __author__ = 'kbwbe'
 
-
-import sys
+# import sys
 import FreeCAD
 import FreeCADGui
-translate = FreeCAD.Qt.translate
-QT_TRANSLATE_NOOP = FreeCAD.Qt.QT_TRANSLATE_NOOP
 
 import a2plib
 import a2p_Resources3
+
+translate = FreeCAD.Qt.translate
+QT_TRANSLATE_NOOP = FreeCAD.Qt.QT_TRANSLATE_NOOP
 
 
 class A2plusWorkbench (Workbench):
 
     def __init__(self):
-        translate = FreeCAD.Qt.translate
         import a2plib
+        translate = FreeCAD.Qt.translate
         self.__class__.Icon = a2plib.get_module_path() + "/icons/a2p_Workbench.svg"
         self.__class__.MenuText = 'A2plus'
         self.__class__.ToolTip = translate("A2plus", "An other assembly workbench for FreeCAD.")
 
     def Initialize(self):
+        # import sys
+        import a2plib
+        # import a2p_Resources3
+        # translate = FreeCAD.Qt.translate
+
+        # add translations functions
         translate = FreeCAD.Qt.translate
         QT_TRANSLATE_NOOP = FreeCAD.Qt.QT_TRANSLATE_NOOP
-
-        import sys
-        import a2plib
-        import a2p_Resources3
-        translate = FreeCAD.Qt.translate
 
         # add translations path
         FreeCADGui.addLanguagePath(a2plib.getLanguagePath())
         FreeCADGui.updateLocale()
 
         # print A2plus version
-        FreeCAD.Console.PrintMessage(translate("A2plus", "Initializing A2plus Workbench v{}").format(a2plib.getA2pVersion()) + ".\n")
+        FreeCAD.Console.PrintMessage(
+            translate(
+                "A2plus", "Initializing A2plus Workbench v{}"
+                ).format(a2plib.getA2pVersion()) + ".\n"
+            )
 
         # add icons path
         FreeCADGui.addIconPath(':/icons')
@@ -79,7 +84,7 @@ class A2plusWorkbench (Workbench):
         import CD_CheckConstraints
         import CD_OneButton
 
-        # Create list of commands for toolbar A2p_Part and menu A2plus
+        # Create list of commands for toolbar A2p_Part and menu
         partCommands = [
             'a2p_ImportPart',
             'a2p_ImportShapeReferenceCommand',
@@ -222,7 +227,7 @@ class A2plusWorkbench (Workbench):
 
         FreeCADGui.addPreferencePage(
             a2plib.get_module_path() +
-            '/GuiA2p/Resources/ui/a2p_prefs.ui','A2plus'
+            '/GuiA2p/Resources/ui/a2p_prefs.ui', 'A2plus'
             )
 
     def Activated(self):
@@ -236,7 +241,7 @@ class A2plusWorkbench (Workbench):
     def ContextMenu(self, recipient):
         import FreeCAD
         import FreeCADGui
-        selection = [s for s in FreeCADGui.Selection.getSelection() if s.Document == FreeCAD.ActiveDocument ]
+        selection = [s for s in FreeCADGui.Selection.getSelection() if s.Document == FreeCAD.ActiveDocument]
         if len(selection) == 1:
             obj = selection[0]
             if 'sourceFile' in obj.Content:
@@ -252,5 +257,5 @@ class A2plusWorkbench (Workbench):
                       ]
                     )
 
-                
+
 Gui.addWorkbench(A2plusWorkbench())
