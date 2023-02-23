@@ -109,17 +109,6 @@ class a2p_recursiveUpdateImportedPartsCommand:
         a2plib.setAutoSolve(True)  # makes no sense without autosolve = ON
         doc = FreeCAD.activeDocument()
 
-        if doc is None:
-            QtGui.QMessageBox.information(
-                    QtGui.QApplication.activeWindow(),
-                    translate("A2plus", "No active document found!"),
-                    translate(
-                        "A2plus",
-                        "Before recursive updating parts, you have to open an assembly file."
-                                )
-                        )
-            return
-
         fileName = doc.FileName
         workingDir, basicFileName = os.path.split(fileName)
 
