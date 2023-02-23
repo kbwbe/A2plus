@@ -917,6 +917,11 @@ class a2p_UpdateImportedPartsCommand:
             'ToolTip' : toolTip
             }
 
+    def IsActive(self):
+        doc = FreeCAD.activeDocument()
+        if doc is None: return False
+        return True
+
 FreeCADGui.addCommand('a2p_updateImportedParts', a2p_UpdateImportedPartsCommand())
 
 
