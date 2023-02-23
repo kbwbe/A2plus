@@ -222,5 +222,10 @@ class a2p_recursiveUpdateImportedPartsCommand:
                                 )
                 }
 
+    def IsActive(self):
+        doc = FreeCAD.activeDocument()
+        if doc is None: return False
+        return True
+
 
 FreeCADGui.addCommand('a2p_recursiveUpdateImportedPartsCommand', a2p_recursiveUpdateImportedPartsCommand())
