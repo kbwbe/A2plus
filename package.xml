@@ -14,6 +14,7 @@
     <workbench>
       <classname>A2plusWorkbench</classname>
       <subdirectory>./</subdirectory>
+      <tag>assembly</tag>
       <freecadmin>0.19</freecadmin>
     </workbench>
   </content>
