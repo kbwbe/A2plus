@@ -55,6 +55,8 @@ This phenomena is seen in many proprietary CAD solutions. Some work is being don
 
 ### Automatic Installation
 
+[![FreeCAD Addon manager status](https://img.shields.io/badge/FreeCAD%20addon%20manager-available-brightgreen)](https://github.com/FreeCAD/FreeCAD-addons)
+
 The recommended way to install A2plus is via FreeCAD's [Addon Manager](https://wiki.freecadweb.org/Addon_Manager) under the Tools → 'Addon Manager' dropdown menu.
 
 ### Manual Installation 
