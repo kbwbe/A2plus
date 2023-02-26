@@ -604,10 +604,10 @@ class a2p_ImportShapeReferenceCommand():
 
         return
 
-    def IsActive(self):
-        doc = FreeCAD.activeDocument()
-        if doc is None: return False
-        return True
+#    def IsActive(self):
+#        doc = FreeCAD.activeDocument()
+#        if doc is None: return False
+#        return True
 
     def GuiViewFit(self):
         FreeCADGui.SendMsgToActiveView("ViewFit")
@@ -744,10 +744,10 @@ class a2p_ImportPartCommand():
             self.timer.start( 200 ) #0.2 seconds
         return
 
-    def IsActive(self):
-        doc = FreeCAD.activeDocument()
-        if doc is None: return False
-        return True
+#    def IsActive(self):
+#        doc = FreeCAD.activeDocument()
+#        if doc is None: return False
+#        return True
 
     def GuiViewFit(self):
         FreeCADGui.SendMsgToActiveView("ViewFit")
@@ -758,26 +758,17 @@ FreeCADGui.addCommand('a2p_ImportPart',a2p_ImportPartCommand())
 #==============================================================================
 
 
-
-
 def updateImportedParts(doc, partial=False):
-    if doc is None:
-        QtGui.QMessageBox.information(
-                        QtGui.QApplication.activeWindow(),
-                        translate("A2plus", "No active document found!"),
-                        translate("A2plus", "Before updating parts, you have to open an assembly file.")
-                        )
-        return
 
     doc.openTransaction("updateImportParts")
     objectCache.cleanUp(doc)
-
 
     selectedObjects=[]
     selection = [s for s in FreeCADGui.Selection.getSelection()
                  if s.Document == FreeCAD.ActiveDocument and
                  (a2plib.isA2pPart(s) or a2plib.isA2pSketch(s))
                  ]
+
     if selection and len(selection)>0:
         if partial==True:
             response = QtGui.QMessageBox.Yes
@@ -805,7 +796,6 @@ def updateImportedParts(doc, partial=False):
             continue
 
         if hasattr(obj, 'sourceFile') and a2plib.to_str(obj.sourceFile) != a2plib.to_str('converted'):
-
 
             #repair data structures (perhaps an old Assembly2 import was found)
             if hasattr(obj,"Content") and 'importPart' in obj.Content: # be sure to have an assembly object
@@ -891,7 +881,6 @@ def updateImportedParts(doc, partial=False):
     doc.commitTransaction()
 
 
-
 toolTip = \
 translate("A2plus",
 '''
@@ -917,8 +906,12 @@ class a2p_UpdateImportedPartsCommand:
             'ToolTip' : toolTip
             }
 
-FreeCADGui.addCommand('a2p_updateImportedParts', a2p_UpdateImportedPartsCommand())
+    def IsActive(self):
+        doc = FreeCAD.activeDocument()
+        if doc is None: return False
+        return True
 
+FreeCADGui.addCommand('a2p_updateImportedParts', a2p_UpdateImportedPartsCommand())
 
 
 def duplicateImportedPart( part ):
@@ -1018,6 +1011,7 @@ class a2p_DuplicatePartCommand:
             'ToolTip' : toolTip
             }
 
+
 FreeCADGui.addCommand('a2p_duplicatePart', a2p_DuplicatePartCommand())
 
 
@@ -1042,6 +1036,7 @@ order to see the new shape
 within the assembly.
 '''
 )
+
 
 class a2p_EditPartCommand:
     def Activated(self):
@@ -1145,6 +1140,7 @@ class a2p_EditPartCommand:
             'ToolTip' : toolTip
             }
 
+    
 FreeCADGui.addCommand('a2p_editImportedPart', a2p_EditPartCommand())
 
 
@@ -1206,6 +1202,7 @@ of the assembly.
 '''
 )
 
+
 class a2p_MovePartCommand:
 
     def __init__(self):
@@ -1235,8 +1232,10 @@ class a2p_MovePartCommand:
             'ToolTip' : toolTip
             }
 
+    
 FreeCADGui.addCommand('a2p_movePart', a2p_MovePartCommand())
-#===============================================================================
+
+
 class ConstrainedPartsMover:
     def __init__(self, view):
         self.obj = None
