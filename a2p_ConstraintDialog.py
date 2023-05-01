@@ -1100,7 +1100,7 @@ class a2p_EditConstraintCommand:
         return {
             'Pixmap': ':/icons/a2p_EditConstraint.svg',
             'MenuText': translate("A2plus", "Edit selected constraint"),
-            'ToolTip': translate("A2plus", "Select a constraint in the" + "\n "
+            'ToolTip': translate("A2plus", "Select a constraint in the" + "\n"
                 "treeview and hit this button.")
              }
 

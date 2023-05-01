@@ -906,7 +906,7 @@ class AngledPlanesConstraint(BasicConstraint):
                           "The angle can be changed in the object editor." + "\n\n" +
                           "Avoid using angles equals to 0 and 180 degrees - you could" + "\n" +
                           "get strange results." + "\n" +
-                          "For that, is better to use planesParallel constraint."
+                          "For that, is better to use PlanesParallel constraint."
                           ) + "\n\n" +
                 translate("A2plus_Constraints",
                           "Button gets active after correct selection."
