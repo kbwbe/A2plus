@@ -543,7 +543,7 @@ class classsidefunctions():
     def swapselectedleg(self):
         # starts observer to select a new feature when replacing manually.
         if lastclc.column < 4 or lastclc.column > 5:
-            mApp(translate("A2plus", "Surfaces can only be replaced in columns\nPart1 feat or Part2 feat"))
+            mApp(translate("A2plus", "Surfaces can only be replaced in columns\n'Part1 feat' or 'Part2 feat'"))
             return
         if len(FreeCADGui.Selection.getSelectionEx()) == 0 and lastclc.text != 'None':
             mApp(translate("A2plus", "No feature has been selected"))
