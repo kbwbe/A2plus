@@ -140,7 +140,7 @@ montagem principal são listadas.
     <message>
         <location filename="../a2p_BoM.py" line="95"/>
         <source>BOM ERROR: Could not open sourcefile &apos;{}&apos;</source>
-        <translation>ERRO DA LISTA: não foi possível abrir o arquivo de origem &apos;{}&apos;</translation>
+        <translation>ERRO DA LISTA: não foi possível abrir o arquivo de origem '{}'</translation>
     </message>
     <message>
         <location filename="../a2p_BoM.py" line="204"/>
@@ -325,7 +325,7 @@ externo à montagem
     <message>
         <location filename="../a2p_recursiveUpdatePlanner.py" line="171"/>
         <source>A part can only be imported from a FreeCAD &apos;*.FCStd&apos; file</source>
-        <translation>Uma peça só pode ser importada de um arquivo FreeCAD &apos;* .FCStd&apos;</translation>
+        <translation>Uma peça só pode ser importada de um arquivo FreeCAD '* .FCStd'</translation>
     </message>
     <message>
         <location filename="../a2p_recursiveUpdatePlanner.py" line="171"/>
@@ -517,11 +517,11 @@ Selecione uma peça importada e clique neste botão.
 
 O arquivo FCStd apropriado, vinculado a esta peça será aberto e você pode modificar a peça aqui.
 
-Após editar e salvar, você deve usar a função &apos;atualizar peças importadas&apos; para ver o novo formato da peça dentro da montagem.
+Após editar e salvar, você deve usar a função 'atualizar peças importadas' para ver o novo formato da peça dentro da montagem.
 </translation>
     </message>
     <message>
-        <location filename="../CD_ConstraintViewer.py" line="71"/>
+        <location filename="../a2p_importpart.py" line="1056"/>
         <source>Information</source>
         <translation>Informação</translation>
     </message>
@@ -550,8 +550,8 @@ Após editar e salvar, você deve usar a função &apos;atualizar peças importa
         <source>Editing a STEP file as &apos;*.FCStd&apos; file.
 Please export the saved file as &apos;.step&apos;
 </source>
-        <translation>Editando um arquivo STEP como arquivo &apos;*.FCStd&apos;
-Exporte o arquivo salvo como &apos;.step&apos;
+        <translation>Editando um arquivo STEP como arquivo '*.FCStd'
+Exporte o arquivo salvo como '.step'
 </translation>
     </message>
     <message>
@@ -665,14 +665,14 @@ Após a confirmação, todas as restrições relacionadas são excluídas de uma
         <translation>Selecione exatamente 1 peça</translation>
     </message>
     <message>
-        <location filename="../CD_FeatureLabels.py" line="202"/>
+        <location filename="../a2p_importpart.py" line="1398"/>
         <source>Info</source>
         <translation>Info</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="1398"/>
         <source>No constraints refer to &apos;%s&apos;</source>
-        <translation>Nenhuma restrição refere-se a &apos;%s&apos;</translation>
+        <translation>Nenhuma restrição refere-se a '%s'</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="1403"/>
@@ -819,7 +819,7 @@ toggled between &apos;aligned&apos; and
         <translation>
 Inverta a direção da última restrição.
 
-Se a última restrição que foi definida tem uma propriedade &apos;direção&apos;, seu valor será alternado entre &apos;alinhado&apos; e &apos;oposto&apos; (alinhamento do eixo)
+Se a última restrição que foi definida tem uma propriedade 'direção', seu valor será alternado entre 'alinhado' e 'oposto' (alinhamento do eixo)
 </translation>
     </message>
     <message>
@@ -883,7 +883,7 @@ Se a última restrição que foi definida tem uma propriedade &apos;direção&ap
         <translation>Nenhum documento ativo encontrado!</translation>
     </message>
     <message>
-        <location filename="../a2p_MuxAssembly.py" line="327"/>
+        <location filename="../a2p_importpart.py" line="1889"/>
         <source>You have to open an assembly file first.</source>
         <translation>Você deve abrir um arquivo de montagem primeiro.</translation>
     </message>
@@ -1142,7 +1142,7 @@ montagem principal são listadas.
         <translation>Propriedades de restrição</translation>
     </message>
     <message>
-        <location filename="../CD_ConstraintViewer.py" line="403"/>
+        <location filename="../a2p_ConstraintDialog.py" line="97"/>
         <source>Direction</source>
         <translation>Direção</translation>
     </message>
@@ -1317,7 +1317,7 @@ Leia também as dicas de cada botão.
         <translation>Ferramentas de restrição</translation>
     </message>
     <message>
-        <location filename="../CD_ConstraintViewer.py" line="110"/>
+        <location filename="../a2p_ConstraintDialog.py" line="724"/>
         <source>Help</source>
         <translation>Ajuda</translation>
     </message>
@@ -1376,12 +1376,12 @@ aperte este botão
     <message>
         <location filename="../a2p_importpart.py" line="2137"/>
         <source>3D-Debug contained &apos;{}&apos; vectors</source>
-        <translation>3D-Debug continha vetores &apos;{}&apos;</translation>
+        <translation>3D-Debug continha vetores '{}'</translation>
     </message>
     <message>
         <location filename="../a2p_recursiveUpdatePlanner.py" line="68"/>
         <source>Did not update converted part &apos;{}&apos;</source>
-        <translation>Não atualizou a parte convertida &apos;{}&apos;</translation>
+        <translation>Não atualizou a parte convertida '{}'</translation>
     </message>
     <message>
         <location filename="../a2p_recursiveUpdatePlanner.py" line="101"/>
@@ -1423,12 +1423,12 @@ As submontagens também são atualizadas, se necessário.
     <message>
         <location filename="../a2p_recursiveUpdatePlanner.py" line="194"/>
         <source>A part can only be imported from a FreeCAD &apos;*.fcstd&apos; file</source>
-        <translation type="obsolete">Uma peça só pode ser importada de um arquivo FreeCAD &apos;* .fcstd&apos;</translation>
+        <translation type="obsolete">Uma peça só pode ser importada de um arquivo FreeCAD '* .fcstd'</translation>
     </message>
     <message>
         <location filename="../a2p_recursiveUpdatePlanner.py" line="205"/>
         <source>==== Assembly &apos;{}&apos; has been updated! =====</source>
-        <translation type="obsolete">==== A montagem &apos;{}&apos; foi atualizada! =====</translation>
+        <translation type="obsolete">==== A montagem '{}' foi atualizada! =====</translation>
     </message>
     <message>
         <location filename="../a2p_recursiveUpdatePlanner.py" line="198"/>
@@ -1438,7 +1438,7 @@ As submontagens também são atualizadas, se necessário.
     <message>
         <location filename="../a2p_solversystem.py" line="142"/>
         <source>Remove faulty constraint &apos;{}&apos;</source>
-        <translation>Remova a restrição defeituosa &apos;{}&apos;</translation>
+        <translation>Remova a restrição defeituosa '{}'</translation>
     </message>
     <message>
         <location filename="../a2p_solversystem.py" line="222"/>
@@ -1459,14 +1459,14 @@ As submontagens também são atualizadas, se necessário.
         <location filename="../a2p_solversystem.py" line="311"/>
         <source>There are &apos;{}&apos; dependencies
 </source>
-        <translation type="obsolete">Existem dependências &apos;{}&apos;
+        <translation type="obsolete">Existem dependências '{}'
 </translation>
     </message>
     <message>
         <location filename="../a2p_solversystem.py" line="386"/>
         <source>Writing visual hierarchy to: &apos;{}&apos;
 </source>
-        <translation type="obsolete">Escrevendo hierarquia visual para: &apos;{}&apos;
+        <translation type="obsolete">Escrevendo hierarquia visual para: '{}'
 </translation>
     </message>
     <message>
@@ -1549,7 +1549,7 @@ As peças destacadas não foram movidas. Elas não estão restritas (também nas
     <message>
         <location filename="../a2p_topomapper.py" line="501"/>
         <source>Import ignored invisible shape: &apos;{}&apos;</source>
-        <translation>Importar forma invisível ignorada: &apos;{}&apos;</translation>
+        <translation>Importar forma invisível ignorada: '{}'</translation>
     </message>
     <message>
         <location filename="../a2p_partinformation.py" line="59"/>
@@ -1584,7 +1584,7 @@ As peças destacadas não foram movidas. Elas não estão restritas (também nas
     <message>
         <location filename="../a2p_constraintDialog.py" line="205"/>
         <source>Flip sign between &apos;+&apos; and &apos;-&apos; in</source>
-        <translation type="obsolete">Inverter o sinal entre &apos;+&apos; e &apos;-&apos; em</translation>
+        <translation type="obsolete">Inverter o sinal entre '+' e '-' em</translation>
     </message>
     <message>
         <location filename="../a2p_BoM.py" line="239"/>
@@ -1636,22 +1636,22 @@ montagem recente são coletados.</translation>
     <message>
         <location filename="../a2p_ConstraintDialog.py" line="125"/>
         <source>Flip direction between &apos;aligned&apos; and &apos;opposed&apos;</source>
-        <translation>Inverta a direção entre &apos;alinhado&apos; e &apos;oposto&apos;</translation>
+        <translation>Inverta a direção entre 'alinhado' e 'oposto'</translation>
     </message>
     <message>
         <location filename="../a2p_ConstraintDialog.py" line="189"/>
         <source>Set 0 to &apos;Offset&apos; field</source>
-        <translation>Definir 0 para o campo &apos;Deslocamento&apos;</translation>
+        <translation>Definir 0 para o campo 'Deslocamento'</translation>
     </message>
     <message>
         <location filename="../a2p_ConstraintDialog.py" line="196"/>
         <source>Flip sign between &apos;+&apos; and &apos;-&apos; in &apos;Offset&apos; field</source>
-        <translation>Inverter o sinal entre &apos;+&apos; e &apos;-&apos; no campo &apos;Deslocamento&apos;</translation>
+        <translation>Inverter o sinal entre '+' e '-' no campo 'Deslocamento'</translation>
     </message>
     <message>
         <location filename="../a2p_ConstraintDialog.py" line="267"/>
         <source>Toggle between &apos;False&apos; and &apos;True&apos;</source>
-        <translation>Alternar entre &apos;Falso&apos; e &apos;Verdadeiro&apos;</translation>
+        <translation>Alternar entre 'Falso' e 'Verdadeiro'</translation>
     </message>
     <message>
         <location filename="../a2p_ConstraintDialog.py" line="743"/>
@@ -1688,7 +1688,7 @@ definir restrições</translation>
         <location filename="../a2p_ConstraintDialog.py" line="1103"/>
         <source>Select a constraint in the
  treeview and hit this button.</source>
-        <translation>Selecione uma restrição na
+        <translation type="obsolete">Selecione uma restrição na
   árvore e aperte este botão.</translation>
     </message>
     <message>
@@ -1709,12 +1709,12 @@ definir restrições</translation>
     <message>
         <location filename="../a2p_importpart.py" line="811"/>
         <source>Unable to find &apos;{}&apos;</source>
-        <translation>Incapaz de achar &apos;{}&apos;</translation>
+        <translation>Incapaz de achar '{}'</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="2105"/>
         <source>  Updating by SubElement-Map: &apos;{}&apos; =&gt; &apos;{}&apos;</source>
-        <translation>  Atualizando por SubElement-Map: &apos;{}&apos; =&gt; &apos;{}&apos;</translation>
+        <translation>  Atualizando por SubElement-Map: '{}' =&amp;gt; '{}'</translation>
     </message>
     <message>
         <location filename="../a2plib.py" line="1179"/>
@@ -1729,7 +1729,7 @@ definir restrições</translation>
     <message>
         <location filename="../a2p_MuxAssembly.py" line="313"/>
         <source>Union of Shapes passed. &apos;SimpleAssemblyShape&apos; are created.</source>
-        <translation>União das Formas aprovada. &apos;SimpleAssemblyShape&apos; foram criados.</translation>
+        <translation>União das Formas aprovada. 'SimpleAssemblyShape' foram criados.</translation>
     </message>
     <message>
         <location filename="../a2p_partinformation.py" line="40"/>
@@ -1770,7 +1770,7 @@ Por favor, preencha suas informações. Esta planilha será lida pela função d
     <message>
         <location filename="../a2p_recursiveUpdatePlanner.py" line="185"/>
         <source>Assembly &apos;{}&apos; has been updated!</source>
-        <translation>A montagem &apos;{}&apos; foi atualizada!</translation>
+        <translation>A montagem '{}' foi atualizada!</translation>
     </message>
     <message>
         <location filename="../a2p_recursiveUpdatePlanner.py" line="199"/>
@@ -1804,7 +1804,7 @@ se necessário também.</translation>
     <message>
         <location filename="../a2p_rigid.py" line="520"/>
         <source>Current Rigid = &apos;{}&apos;</source>
-        <translation>Atualmente Rígido = &apos;{}&apos;</translation>
+        <translation>Atualmente Rígido = '{}'</translation>
     </message>
     <message>
         <location filename="../a2p_rigid.py" line="522"/>
@@ -1839,12 +1839,12 @@ se necessário também.</translation>
     <message>
         <location filename="../a2p_simpleXMLreader.py" line="248"/>
         <source>file &apos;{}&apos; does not exist!</source>
-        <translation>arquivo &apos;{}&apos; não existe!</translation>
+        <translation>arquivo '{}' não existe!</translation>
     </message>
     <message>
         <location filename="../a2p_simpleXMLreader.py" line="253"/>
         <source>file &apos;{}&apos; is no FCStd file!</source>
-        <translation>arquivo &apos;{}&apos; não é um arquivo FCStd!</translation>
+        <translation>arquivo '{}' não é um arquivo FCStd!</translation>
     </message>
     <message>
         <location filename="../a2p_solversystem.py" line="273"/>
@@ -1874,7 +1874,7 @@ se necessário também.</translation>
     <message>
         <location filename="../a2p_solversystem.py" line="388"/>
         <source>Writing visual hierarchy to: &apos;{}&apos;</source>
-        <translation>Escrevendo hierarquia visual para: &apos;{}&apos;</translation>
+        <translation>Escrevendo hierarquia visual para: '{}'</translation>
     </message>
     <message>
         <location filename="../a2p_solversystem.py" line="396"/>
@@ -2009,7 +2009,7 @@ se necessário também.</translation>
     <message>
         <location filename="../CD_CheckConstraints.py" line="92"/>
         <source>To view the constraints, press &apos;Open Viewer&apos;</source>
-        <translation>Para visualizar as restrições, pressione &apos;Abrir visualizador&apos;</translation>
+        <translation>Para visualizar as restrições, pressione 'Abrir visualizador'</translation>
     </message>
     <message>
         <location filename="../CD_CheckConstraints.py" line="102"/>
@@ -2289,7 +2289,7 @@ Selecione uma ou mais restrições e tente novamente.</translation>
         <location filename="../CD_ConstraintViewer.py" line="546"/>
         <source>Surfaces can only be replaced in columns
 Part1 feat or Part2 feat</source>
-        <translation>As superfícies só podem ser substituídas em colunas
+        <translation type="obsolete">As superfícies só podem ser substituídas em colunas
 Part1 feat or Part2 feat</translation>
     </message>
     <message>
@@ -2439,6 +2439,18 @@ Você deve abrir um arquivo de montagem primeiro.</translation>
         <location filename="../InitGui.py" line="63"/>
         <source>Initializing A2plus Workbench v{}</source>
         <translation>Inciando Bancada de Trabalho A2Plus v{}</translation>
+    </message>
+    <message>
+        <location filename="../CD_ConstraintViewer.py" line="546"/>
+        <source>Surfaces can only be replaced in columns
+&apos;Part1 feat&apos; or &apos;Part2 feat&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../a2p_ConstraintDialog.py" line="1103"/>
+        <source>Select a constraint in the
+treeview and hit this button.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2799,7 +2811,7 @@ The angle can be changed in the object editor.
 Avoid using angles equals to 0 and 180 degrees - you could
 get strange results.
 For that, is better to use planesParallel constraint.</source>
-        <translation>Criar a restrição de planos angulares
+        <translation type="obsolete">Criar a restrição de planos angulares
 
 Selecione:
 1) Um plano (em uma peça)
@@ -2807,7 +2819,7 @@ Selecione:
 
 Depois de definir essa restrição no início, o real
 ângulo entre ambos os planos é calculado e
-armazenado na entrada &apos;ângulo&apos; no editor de objetos.
+armazenado na entrada 'ângulo' no editor de objetos.
 
 O ângulo pode ser alterado no editor de objetos.
 
@@ -2831,6 +2843,25 @@ Selecione:
 2) Uma face ou aresta fechada (em outra peça)
 
 É possível alterar o deslocamento no editor de objetos.</translation>
+    </message>
+    <message>
+        <location filename="../a2p_constraints.py" line="898"/>
+        <source>Create the Angled-Planes constraint (AngledPlanes)
+
+Select:
+1) A plane (on a part)
+2) A plane (on another part)
+
+After setting this constraint at first the actual
+angle between both planes is been calculated and
+stored to entry &apos;angle&apos; in object editor.
+
+The angle can be changed in the object editor.
+
+Avoid using angles equals to 0 and 180 degrees - you could
+get strange results.
+For that, is better to use PlanesParallel constraint.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3646,7 +3677,7 @@ As submontagens também são atualizadas, se necessário.
     <message>
         <location filename="../a2p_recursiveUpdatePlanner.py" line="195"/>
         <source>A part can only be imported from a FreeCAD &apos;*.fcstd&apos; file</source>
-        <translation type="obsolete">Uma peça só pode ser importada de um arquivo FreeCAD &apos;* .fcstd&apos;</translation>
+        <translation type="obsolete">Uma peça só pode ser importada de um arquivo FreeCAD '* .fcstd'</translation>
     </message>
     <message>
         <location filename="../a2p_recursiveUpdatePlanner.py" line="217"/>

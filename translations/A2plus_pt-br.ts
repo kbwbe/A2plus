@@ -521,7 +521,7 @@ Após editar e salvar, você deve usar a função &apos;atualizar peças importa
 </translation>
     </message>
     <message>
-        <location filename="../CD_ConstraintViewer.py" line="71"/>
+        <location filename="../a2p_importpart.py" line="1056"/>
         <source>Information</source>
         <translation>Informação</translation>
     </message>
@@ -665,7 +665,7 @@ Após a confirmação, todas as restrições relacionadas são excluídas de uma
         <translation>Selecione exatamente 1 peça</translation>
     </message>
     <message>
-        <location filename="../CD_FeatureLabels.py" line="202"/>
+        <location filename="../a2p_importpart.py" line="1398"/>
         <source>Info</source>
         <translation>Info</translation>
     </message>
@@ -883,7 +883,7 @@ Se a última restrição que foi definida tem uma propriedade &apos;direção&ap
         <translation>Nenhum documento ativo encontrado!</translation>
     </message>
     <message>
-        <location filename="../a2p_MuxAssembly.py" line="327"/>
+        <location filename="../a2p_importpart.py" line="1889"/>
         <source>You have to open an assembly file first.</source>
         <translation>Você deve abrir um arquivo de montagem primeiro.</translation>
     </message>
@@ -1142,7 +1142,7 @@ montagem principal são listadas.
         <translation>Propriedades de restrição</translation>
     </message>
     <message>
-        <location filename="../CD_ConstraintViewer.py" line="403"/>
+        <location filename="../a2p_ConstraintDialog.py" line="97"/>
         <source>Direction</source>
         <translation>Direção</translation>
     </message>
@@ -1317,7 +1317,7 @@ Leia também as dicas de cada botão.
         <translation>Ferramentas de restrição</translation>
     </message>
     <message>
-        <location filename="../CD_ConstraintViewer.py" line="110"/>
+        <location filename="../a2p_ConstraintDialog.py" line="724"/>
         <source>Help</source>
         <translation>Ajuda</translation>
     </message>
@@ -1688,7 +1688,7 @@ definir restrições</translation>
         <location filename="../a2p_ConstraintDialog.py" line="1103"/>
         <source>Select a constraint in the
  treeview and hit this button.</source>
-        <translation>Selecione uma restrição na
+        <translation type="obsolete">Selecione uma restrição na
   árvore e aperte este botão.</translation>
     </message>
     <message>
@@ -1714,7 +1714,7 @@ definir restrições</translation>
     <message>
         <location filename="../a2p_importpart.py" line="2105"/>
         <source>  Updating by SubElement-Map: &apos;{}&apos; =&gt; &apos;{}&apos;</source>
-        <translation>  Atualizando por SubElement-Map: &apos;{}&apos; =&gt; &apos;{}&apos;</translation>
+        <translation>  Atualizando por SubElement-Map: &apos;{}&apos; =&amp;gt; &apos;{}&apos;</translation>
     </message>
     <message>
         <location filename="../a2plib.py" line="1179"/>
@@ -2289,7 +2289,7 @@ Selecione uma ou mais restrições e tente novamente.</translation>
         <location filename="../CD_ConstraintViewer.py" line="546"/>
         <source>Surfaces can only be replaced in columns
 Part1 feat or Part2 feat</source>
-        <translation>As superfícies só podem ser substituídas em colunas
+        <translation type="obsolete">As superfícies só podem ser substituídas em colunas
 Part1 feat or Part2 feat</translation>
     </message>
     <message>
@@ -2439,6 +2439,19 @@ Você deve abrir um arquivo de montagem primeiro.</translation>
         <location filename="../InitGui.py" line="63"/>
         <source>Initializing A2plus Workbench v{}</source>
         <translation>Inciando Bancada de Trabalho A2Plus v{}</translation>
+    </message>
+    <message>
+        <location filename="../CD_ConstraintViewer.py" line="546"/>
+        <source>Surfaces can only be replaced in columns
+&apos;Part1 feat&apos; or &apos;Part2 feat&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../a2p_ConstraintDialog.py" line="1103"/>
+        <source>Select a constraint in the
+treeview and hit this button.</source>
+        <translation>Selecione uma restrição na 
+árvore e aperte este botão.</translation>
     </message>
 </context>
 <context>
@@ -2799,7 +2812,7 @@ The angle can be changed in the object editor.
 Avoid using angles equals to 0 and 180 degrees - you could
 get strange results.
 For that, is better to use planesParallel constraint.</source>
-        <translation>Criar a restrição de planos angulares
+        <translation type="obsolete">Criar a restrição de planos angulares
 
 Selecione:
 1) Um plano (em uma peça)
@@ -2831,6 +2844,25 @@ Selecione:
 2) Uma face ou aresta fechada (em outra peça)
 
 É possível alterar o deslocamento no editor de objetos.</translation>
+    </message>
+    <message>
+        <location filename="../a2p_constraints.py" line="898"/>
+        <source>Create the Angled-Planes constraint (AngledPlanes)
+
+Select:
+1) A plane (on a part)
+2) A plane (on another part)
+
+After setting this constraint at first the actual
+angle between both planes is been calculated and
+stored to entry &apos;angle&apos; in object editor.
+
+The angle can be changed in the object editor.
+
+Avoid using angles equals to 0 and 180 degrees - you could
+get strange results.
+For that, is better to use PlanesParallel constraint.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
