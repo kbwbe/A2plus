@@ -30,7 +30,7 @@ import copy
 import platform
 from a2p_translateUtils import *
 import a2plib
-from a2p_MuxAssembly import muxAssemblyWithTopoNames
+from a2p_MuxAssembly import mux_assembly_with_topo_names
 import a2p_solversystem
 from a2plib import getRelativePathesEnabled
 import a2p_importedPart_class
@@ -208,7 +208,7 @@ def importPartFromFile(
         _doc,
         filename,
         extractSingleShape = False, # load only a single user defined shape from file
-        desiredShapeLabel = None,
+        desired_shape_label = None,
         importToCache = False,
         cacheKey = ""
         ):
@@ -280,7 +280,7 @@ def importPartFromFile(
     dc = DataContainer()
 
     if extractSingleShape:
-        if desiredShapeLabel is None: # ask for a shape label
+        if desired_shape_label is None: # ask for a shape label
             for io in importableObjects:
                 labelList.append(io.Label)
             dialog = a2p_shapeExtractDialog(
@@ -297,7 +297,7 @@ def importPartFromFile(
                     )
                 return
         else: # use existent shape label
-            dc.tx = desiredShapeLabel
+            dc.tx = desired_shape_label
 
     #-------------------------------------------
     # Discover whether we are importing a subassembly or a single part
@@ -358,15 +358,15 @@ def importPartFromFile(
     if subAssemblyImport:
         if extractSingleShape:
             newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = \
-                muxAssemblyWithTopoNames(importDoc,desiredShapeLabel = dc.tx)
+                mux_assembly_with_topo_names(importDoc,desired_shape_label = dc.tx)
         else:
             newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = \
-                muxAssemblyWithTopoNames(importDoc)
+                mux_assembly_with_topo_names(importDoc)
     else:
         # TopoMapper manages import of non A2p-Files. It generates the shapes and appropriate topo names...
         if extractSingleShape:
             newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = \
-                topoMapper.createTopoNames(desiredShapeLabel = dc.tx)
+                topoMapper.createTopoNames(desired_shape_label = dc.tx)
         else:
             newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = \
                 topoMapper.createTopoNames()
@@ -562,7 +562,7 @@ class a2p_ImportShapeReferenceCommand():
         selectedObjects = dc.tx
         importedObjectsList = []
         for so in selectedObjects:
-            importedObject = importPartFromFile(doc, filename, extractSingleShape=True, desiredShapeLabel = so)
+            importedObject = importPartFromFile(doc, filename, extractSingleShape=True, desired_shape_label = so)
 
             if not importedObject:
                 a2plib.Msg(translate("A2plus", "Imported Object is empty/none") + "\n")
@@ -837,7 +837,7 @@ def updateImportedParts(doc, partial=False):
                                 importToCache=True,
                                 cacheKey = cacheKey,
                                 extractSingleShape = True,
-                                desiredShapeLabel = obj.sourcePart
+                                desired_shape_label = obj.sourcePart
                                 ) # the version is now in the cache
                         else:
                             importPartFromFile(

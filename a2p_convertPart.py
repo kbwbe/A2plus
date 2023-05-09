@@ -22,20 +22,21 @@
 #*                                                                         *
 #***************************************************************************
 
-import FreeCADGui
-import FreeCAD
-from PySide import QtGui
 import copy
 import time
-from a2p_translateUtils import *
+from PySide import QtGui
+
+import FreeCAD
+import FreeCADGui
+
 import a2plib
-from a2p_MuxAssembly import createTopoInfo
+
+from a2p_translateUtils import *
+# from a2p_MuxAssembly import create_topo_info
 from a2p_importedPart_class import Proxy_importPart
 from a2p_importedPart_class import Proxy_convertPart # for compat.
 from a2p_importedPart_class import ImportedPartViewProviderProxy # for compat.
-
 from a2p_topomapper import TopoMapper
-
 
 
 def updateConvertedPart(doc, obj):
@@ -169,11 +170,10 @@ class a2p_ConvertPartCommand():
         selection = FreeCADGui.Selection.getSelection()
         for s in selection:
             if s.ViewObject.Visibility == False:
-                msg = translate("A2plus_convertPart","Please select only visible parts!")
                 QtGui.QMessageBox.information(
                     QtGui.QApplication.activeWindow(),
                     translate("A2plus_convertPart","Conversion Aborted"),
-                    msg
+                    translate("A2plus_convertPart","Please select only visible parts!")
                     )
                 return
         for s in selection:
@@ -190,9 +190,9 @@ class a2p_ConvertPartCommand():
         for s in selection:
             if a2plib.isA2pPart(s): return False
             if (
-                    not s.isDerivedFrom("Part::Feature") and
-                    not s.Name.startswith('Sketch')
-                    ):
+                not s.isDerivedFrom("Part::Feature") and
+                not s.Name.startswith('Sketch')
+                ):
                 return False
         return True
 

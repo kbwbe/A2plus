@@ -22,142 +22,155 @@
 # *                                                                         *
 # ***************************************************************************
 
-import os
-import copy
+# import os
+# import copy
+# from random import choice, random
+# import numpy
 import time
-import numpy
-from PySide import QtGui
-from random import random, choice
 
 import FreeCAD
-from FreeCAD import Base
+# from FreeCAD import Base
 import FreeCADGui
 import Part
 
+from PySide import QtGui
+
 import a2plib
-from a2plib import *
-from a2p_translateUtils import *
-from a2p_importedPart_class import Proxy_muxAssemblyObj  # for compat
+# from a2plib import *
+# from a2p_importedPart_class import Proxy_muxAssemblyObj  # for compat
+# from a2p_translateUtils import *
+
+from pivy import coin
+
+translate = FreeCAD.Qt.translate
 
 
-def createTopoInfo(obj):  # used during converting an object to a2p object
-    muxInfo = []
+def create_topo_info(obj):  # used during converting an object to a2p object
+    mux_info = []
     if not a2plib.getUseTopoNaming():
-        return muxInfo
-    #
-    # Assembly works with topoNaming!
+        return mux_info
+
+    # Assembly works with topo_naming!
     for i in range(0, len(obj.Shape.Vertexes)):
-        newName = "".join(('V;', str(i+1), ';', obj.Name, ';'))
-        muxInfo.append(newName)
+        new_name = "".join(('V;', str(i+1), ';', obj.Name, ';'))
+        mux_info.append(new_name)
     for i in range(0, len(obj.Shape.Edges)):
-        newName = "".join(('E;', str(i+1), ';', obj.Name, ';'))
-        muxInfo.append(newName)
+        new_name = "".join(('E;', str(i+1), ';', obj.Name, ';'))
+        mux_info.append(new_name)
     for i in range(0, len(obj.Shape.Faces)):
-        newName = "".join(('F;', str(i+1), ';', obj.Name, ';'))
-        muxInfo.append(newName)
-    return muxInfo
+        new_name = "".join(('F;', str(i+1), ';', obj.Name, ';'))
+        mux_info.append(new_name)
+    return mux_info
 
 
-def makePlacedShape(obj):
+def make_placed_shape(obj):
     '''return a copy of obj.Shape with proper placement applied'''
-    tempShape = obj.Shape.copy()
-    plmGlobal = obj.Placement
+    temp_shape = obj.Shape.copy()
+    plm_global = obj.Placement
     try:
-        plmGlobal = obj.getGlobalPlacement()
+        plm_global = obj.getGlobalPlacement()
     except ValueError:
         pass
-    tempShape.Placement = plmGlobal
-    return tempShape
+    temp_shape.Placement = plm_global
+    return temp_shape
 
 
-def muxAssemblyWithTopoNames(doc, desiredShapeLabel=None):
+def mux_assembly_with_topo_names(doc, desired_shape_label=None):
     """
     Mux an a2p assembly.
 
     combines all the a2p objects in the doc into one shape
-    and populates muxinfo with a description of an edge or face.
+    and populates mux_info with a description of an edge or face.
     these descriptions are used later to retrieve the edges or faces...
     """
     faces = []
-    faceColors = []
-    muxInfo = []  # List of keys, not used at moment...
+    face_colors = []
+    mux_info = []  # List of keys, not used at moment...
 
-    visibleObjects = [obj for obj in doc.Objects
-                      if hasattr(obj, 'ViewObject') and obj.ViewObject.isVisible()
-                      and hasattr(obj, 'Shape') and len(obj.Shape.Faces) > 0
-                      and hasattr(obj, 'muxInfo') and
-                      a2plib.isGlobalVisible(obj)
-                      ]
+    visible_objects = [
+        obj for obj in doc.Objects
+        if hasattr(obj, 'ViewObject') and obj.ViewObject.isVisible()
+        and hasattr(obj, 'Shape') and len(obj.Shape.Faces) > 0
+        and hasattr(obj, 'mux_info') and a2plib.isGlobalVisible(obj)
+        ]
 
-    if desiredShapeLabel:  # is not None..
+    if desired_shape_label:  # is not None..
         tmp = []
-        for ob in visibleObjects:
-            if ob.Label == desiredShapeLabel:
+        for ob in visible_objects:
+            if ob.Label == desired_shape_label:
                 tmp.append(ob)
                 break
-        visibleObjects = tmp
+        visible_objects = tmp
 
     transparency = 0
     shape_list = []
-    for obj in visibleObjects:
-        extendNames = False
-        if a2plib.getUseTopoNaming() and len(obj.muxInfo) > 0:  # Subelement-Strings existieren schon...
-            extendNames = True
+    for obj in visible_objects:
+        extend_names = False
+        # Subelement-Strings existieren schon...
+        if a2plib.getUseTopoNaming() and len(obj.mux_info) > 0:
+            extend_names = True
             #
-            vertexNames = []
-            edgeNames = []
-            faceNames = []
+            vertex_names = []
+            edge_names = []
+            face_names = []
             #
-            for item in obj.muxInfo:
+            for item in obj.mux_info:
                 if item[0] == 'V':
-                    vertexNames.append(item)
+                    vertex_names.append(item)
                 if item[0] == 'E':
-                    edgeNames.append(item)
+                    edge_names.append(item)
                 if item[0] == 'F':
-                    faceNames.append(item)
+                    face_names.append(item)
 
         if a2plib.getUseTopoNaming():
             for i in range(0, len(obj.Shape.Vertexes)):
-                if extendNames:
-                    newName = "".join((vertexNames[i], obj.Name, ';'))
-                    muxInfo.append(newName)
+                if extend_names:
+                    new_name = "".join((vertex_names[i], obj.Name, ';'))
+                    # mux_info.append(new_name)
                 else:
-                    newName = "".join(('V;', str(i+1), ';', obj.Name, ';'))
-                    muxInfo.append(newName)
-            for i in range(0, len(obj.Shape.Edges)):
-                if extendNames:
-                    newName = "".join((edgeNames[i], obj.Name, ';'))
-                    muxInfo.append(newName)
-                else:
-                    newName = "".join(('E;', str(i+1), ';', obj.Name, ';'))
-                    muxInfo.append(newName)
+                    new_name = "".join(('V;', str(i+1), ';', obj.Name, ';'))
+                    # mux_info.append(new_name)
+                mux_info.append(new_name)
 
-        # Save Computing time, store this before the for..enumerate loop later...
-        needDiffuseColorExtension = (len(obj.ViewObject.DiffuseColor) < len(obj.Shape.Faces))
-        shapeCol = obj.ViewObject.ShapeColor
-        diffuseCol = obj.ViewObject.DiffuseColor
-        tempShape = makePlacedShape(obj)
+            for i in range(0, len(obj.Shape.Edges)):
+                if extend_names:
+                    new_name = "".join((edge_names[i], obj.Name, ';'))
+                    # mux_info.append(new_name)
+                else:
+                    new_name = "".join(('E;', str(i+1), ';', obj.Name, ';'))
+                    # mux_info.append(new_name)
+                mux_info.append(new_name)
+
+        # Save Computing time, store this before 'for'..enumerate loop later...
+        need_diffuse_color_extension = (
+            len(obj.ViewObject.DiffuseColor) < len(obj.Shape.Faces)
+            )
+        shape_col = obj.ViewObject.ShapeColor
+        diffuse_col = obj.ViewObject.DiffuseColor
+        temp_shape = make_placed_shape(obj)
         transparency = obj.ViewObject.Transparency
         shape_list.append(obj.Shape)
 
         # now start the loop with use of the stored values..(much faster)
-        topoNaming = a2plib.getUseTopoNaming()
-        diffuseElement = makeDiffuseElement(shapeCol, transparency)
-        for i in range(0, len(tempShape.Faces)):
-            if topoNaming:
-                if extendNames:
-                    newName = "".join((faceNames[i], obj.Name, ';'))
-                    muxInfo.append(newName)
+        topo_naming = a2plib.getUseTopoNaming()
+        diffuse_element = a2plib.makeDiffuseElement(shape_col, transparency)
+        for i in range(0, len(temp_shape.Faces)):
+            if topo_naming:
+                if extend_names:
+                    new_name = "".join((face_names[i], obj.Name, ';'))
+                    # mux_info.append(new_name)
                 else:
-                    newName = "".join(('F;', str(i+1), ';', obj.Name, ';'))
-                    muxInfo.append(newName)
-            if needDiffuseColorExtension:
-                faceColors.append(diffuseElement)
+                    new_name = "".join(('F;', str(i+1), ';', obj.Name, ';'))
+                    # mux_info.append(new_name)
+                mux_info.append(new_name)
 
-        if not needDiffuseColorExtension:
-            faceColors.extend(diffuseCol)
+            if need_diffuse_color_extension:
+                face_colors.append(diffuse_element)
 
-        faces.extend(tempShape.Faces)
+        if not need_diffuse_color_extension:
+            face_colors.extend(diffuse_col)
+
+        faces.extend(temp_shape.Faces)
 
     # if len(faces) == 1:
     #     shell = Part.makeShell([faces])
@@ -174,27 +187,34 @@ def muxAssemblyWithTopoNames(doc, desiredShapeLabel=None):
             else:
                 solid = Part.Solid(shape_list[0])
         else:
-            solid = Part.Solid(shell)  # This does not work if shell includes spherical faces. FC-Bug ??
+            # This does not work if shell includes spherical faces. FC-Bug ??
+            solid = Part.Solid(shell)
             # Fall back to shell if some faces are missing..
             if len(shell.Faces) != len(solid.Faces):
                 solid = shell
     except ValueError:
         # keeping a shell if solid is failing
-        FreeCAD.Console.PrintWarning(translate("A2plus", "Union of Shapes FAILED") + "\n")
+        FreeCAD.Console.PrintWarning(
+            translate("A2plus", "Union of Shapes FAILED") + "\n"
+            )
         solid = shell
 
     # transparency could change to different values depending
     # on the order of imported objects
     # now set it to a default value
-    # faceColors still contains the per face transparency values
+    # face_colors still contains the per face transparency values
     transparency = 0
-    return muxInfo, solid, faceColors, transparency
+    return mux_info, solid, face_colors, transparency
 
 
 class SimpleAssemblyShape:
     def __init__(self, obj):
-        obj.addProperty("App::PropertyString", "type").type = 'SimpleAssemblyShape'
-        obj.addProperty("App::PropertyFloat", "timeOfGenerating").timeOfGenerating = time.time()
+        obj.addProperty(
+            "App::PropertyString", "type"
+            ).type = 'SimpleAssemblyShape'
+        obj.addProperty(
+            "App::PropertyFloat", "timeOfGenerating"
+            ).timeOfGenerating = time.time()
         obj.Proxy = self
 
     def onChanged(self, fp, prop):
@@ -218,7 +238,7 @@ class ViewProviderSimpleAssemblyShape:
         return None
 
     def getIcon(self):
-        return a2plib.path_a2p + '/icons/SimpleAssemblyShape.svg'
+        return a2plib.get_module_path() + '/icons/SimpleAssemblyShape.svg'
 
     def attach(self, obj):
         default = coin.SoGroup()
@@ -227,7 +247,7 @@ class ViewProviderSimpleAssemblyShape:
         self.Object = obj.Object
 
     def getDisplayModes(self, obj):
-        "Return a list of display modes."
+        '''Return a list of display modes'''
         modes = []
         modes.append("Shaded")
         modes.append("Wireframe")
@@ -235,48 +255,34 @@ class ViewProviderSimpleAssemblyShape:
         return modes
 
     def getDefaultDisplayMode(self):
-        "Return the name of the default display mode. It must be defined in getDisplayModes."
+        '''Return the name of the default display mode.
+        It must be defined in getDisplayModes.'''
         return "Flat Lines"
 
     def setDisplayMode(self, mode):
         return mode
 
-toolTip = \
-translate("A2plus",
-'''
-Create or refresh a simple shape
-of the complete Assembly.
-
-All parts within the assembly
-are combined to a single shape.
-This shape can be used e.g. for the
-techdraw module or 3D printing.
-
-The created shape can be found
-in the treeview. By default it
-is invisible at first time.
-'''
-          )
-
 
 def createOrUpdateSimpleAssemblyShape(doc):
-    visibleImportObjects = [obj for obj in doc.Objects
-                           if 'importPart' in obj.Content
-                           and hasattr(obj, 'ViewObject')
-                           and obj.ViewObject.isVisible()
-                           and hasattr(obj, 'Shape')
-                           and len(obj.Shape.Faces) > 0
-                            ]
+    visibleImportObjects = [
+        obj for obj in doc.Objects
+        if 'importPart' in obj.Content
+        and hasattr(obj, 'ViewObject')
+        and obj.ViewObject.isVisible()
+        and hasattr(obj, 'Shape')
+        and len(obj.Shape.Faces) > 0
+        ]
 
     if len(visibleImportObjects) == 0:
         QtGui.QMessageBox.critical(
-                                   QtGui.QApplication.activeWindow(),
-                                   translate("A2plus", "Cannot create SimpleAssemblyShape"),
-                                   translate("A2plus", "No visible ImportParts found")
-                                   )
+            QtGui.QApplication.activeWindow(),
+            translate("A2plus", "Cannot create SimpleAssemblyShape"),
+            translate("A2plus", "No visible ImportParts found")
+             )
         return
 
     sas = doc.getObject('SimpleAssemblyShape')
+
     if sas is None:
         sas = doc.addObject("Part::FeaturePython", "SimpleAssemblyShape")
         SimpleAssemblyShape(sas)
@@ -284,6 +290,7 @@ def createOrUpdateSimpleAssemblyShape(doc):
         ViewProviderSimpleAssemblyShape(sas.ViewObject)
     faces = []
     shape_list = []
+
     for obj in visibleImportObjects:
         faces = faces + obj.Shape.Faces
         shape_list.append(obj.Shape)
@@ -300,35 +307,60 @@ def createOrUpdateSimpleAssemblyShape(doc):
             else:
                 solid = Part.Solid(shape_list[0])
         else:
-            solid = Part.Solid(shell)  # This does not work if shell includes spherical faces. FC-Bug ??
+            # This does not work if shell includes spherical faces. FC-Bug ??
+            solid = Part.Solid(shell)
             # Fall back to shell if faces are misiing
             if len(shell.Faces) != len(solid.Faces):
                 solid = shell
     except ValueError:
         # keeping a shell if solid is failing
-        FreeCAD.Console.PrintWarning(translate("A2plus", "Union of Shapes FAILED") + "\n")
+        FreeCAD.Console.PrintWarning(
+            translate("A2plus", "Union of Shapes FAILED") + "\n"
+             )
         solid = shell
     sas.Shape = solid  # shell
     sas.ViewObject.Visibility = False
-    FreeCAD.Console.PrintMessage(translate("A2plus", "Union of Shapes passed. 'SimpleAssemblyShape' are created.") + "\n")
+    FreeCAD.Console.PrintMessage(
+        translate(
+            "A2plus",
+            "Union of Shapes passed. 'SimpleAssemblyShape' are created."
+             ) + "\n"
+         )
 
 
 class a2p_SimpleAssemblyShapeCommand():
 
     def GetResources(self):
-        import a2plib
-        return {'Pixmap'  : a2plib.path_a2p + '/icons/a2p_SimpleAssemblyShape.svg',
-                'MenuText': translate("A2plus", "Create or refresh simple shape of complete assembly"),
-                'ToolTip' : toolTip
+        return {
+                'Pixmap': a2plib.get_module_path() +
+                '/icons/a2p_SimpleAssemblyShape.svg',
+                'MenuText': translate(
+                    "A2plus",
+                    "Create or refresh simple shape of complete assembly"
+                    ),
+                'ToolTip': translate(
+                    "A2plus",
+                    "Create or refresh a simple shape" + "\n"
+                    "of the complete Assembly." + "\n\n"
+                    "All parts within the assembly" + "\n"
+                    "are combined to a single shape." + "\n"
+                    "This shape can be used e.g. for the" + "\n"
+                    "techdraw module or 3D printing." + "\n\n"
+                    "The created shape can be found" + "\n"
+                    "in the treeview. By default it" + "\n"
+                    "is invisible at first time."
+                    )
                 }
 
     def Activated(self):
         if FreeCAD.activeDocument() is None:
-            QtGui.QMessageBox.information(QtGui.QApplication.activeWindow(),
-                                        translate("A2plus", "No active document found!"),
-                                        translate("A2plus", "You have to open an assembly file first.")
-                                          )
+            QtGui.QMessageBox.information(
+                QtGui.QApplication.activeWindow(),
+                translate("A2plus", "No active document found!"),
+                translate("A2plus", "You have to open an assembly file first.")
+                 )
             return
+
         doc = FreeCAD.ActiveDocument
         createOrUpdateSimpleAssemblyShape(doc)
         doc.recompute()
@@ -336,4 +368,8 @@ class a2p_SimpleAssemblyShapeCommand():
     def IsActive(self):
         return True
 
-FreeCADGui.addCommand('a2p_SimpleAssemblyShapeCommand', a2p_SimpleAssemblyShapeCommand())
+
+FreeCADGui.addCommand(
+    'a2p_SimpleAssemblyShapeCommand',
+    a2p_SimpleAssemblyShapeCommand()
+    )
