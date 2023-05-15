@@ -539,13 +539,13 @@ class TopoMapper(object):
         else:
             return ob
 
-    def createTopoNames(self, desiredShapeLabel = None):
+    def createTopoNames(self, desired_shape_label = None):
         """
         creates a combined shell of all toplevel objects and
         assigns toponames to its geometry if toponaming is
         enabled.
         """
-        if desiredShapeLabel is not None:
+        if desired_shape_label is not None:
             allowSketches = True
         else:
             allowSketches = False
@@ -553,13 +553,13 @@ class TopoMapper(object):
         self.detectPartDesignDocument()
         self.getTopLevelObjects(allowSketches)
         
-        # filter topLevelShapes if there is a desiredShapeLabel 
+        # filter topLevelShapes if there is a desired_shape_label 
         # means: extract only one desired shape out of whole file...
-        if desiredShapeLabel: #is not None
+        if desired_shape_label: #is not None
             tmp = []
             for objName in self.topLevelShapes:
                 o = self.doc.getObject(objName)
-                if o.Label == desiredShapeLabel:
+                if o.Label == desired_shape_label:
                     tmp.append(o.Name)
             self.topLevelShapes = tmp
         
