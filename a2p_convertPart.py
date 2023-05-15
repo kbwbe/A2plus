@@ -50,7 +50,7 @@ def updateConvertedPart(doc, obj):
     topoMapper = TopoMapper(doc) # imports the objects and creates toponames if wanted
     baseObject.ViewObject.Visibility = True #the topomapper ignores invisible shapes
     obj.muxInfo, obj.Shape, obj.ViewObject.DiffuseColor, obj.ViewObject.Transparency = \
-        topoMapper.createTopoNames(desiredShapeLabel = baseObject.Label)
+        topoMapper.createTopoNames(desired_shape_label = baseObject.Label)
     baseObject.ViewObject.Visibility = False #set baseObject invisible again.
     obj.Placement = savedPlacement
 
@@ -108,7 +108,7 @@ def convertToImportedPart(doc, obj):
     #-------------------------------------------
     topoMapper = TopoMapper(doc)
     newObj.muxInfo, newObj.Shape, newObj.ViewObject.DiffuseColor, newObj.ViewObject.Transparency = \
-        topoMapper.createTopoNames(desiredShapeLabel = obj.Label)
+        topoMapper.createTopoNames(desired_shape_label = obj.Label)
 
     for p in obj.ViewObject.PropertiesList:
         if hasattr(obj.ViewObject, p) and p not in [
