@@ -224,9 +224,7 @@ class a2p_CreatePartlist():
             ss.set('B' + str(idx + 2), str(partListEntries[k][0]))
             values = partListEntries[k][1]
             for j, tx in enumerate(values):  # all strings inside values are unicode!
-                # ss.set needs 2. argument as unicode for py3 and utf-8 string for py2!!!
-                tx2 = tx  # preserve unicode
-                ss.set(chr(idx3 + 2 + j) + str(idx + 2), tx2)
+                ss.set(chr(idx3 + 2 + j) + str(idx + 2), tx.replace('&apos;',''))
 
         # recompute to finish...
         doc.recompute()
