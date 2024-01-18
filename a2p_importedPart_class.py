@@ -82,7 +82,13 @@ class Proxy_importPart:
     def __getstate__(self):
         return None
 
-    def __setstate__(self,state):
+    def __setstate__(self, state):
+        return None
+
+    def dumps(self):
+        return None
+
+    def loads(self, state):
         return None
 
     def execute(self, obj):
@@ -161,6 +167,12 @@ class ImportedPartViewProviderProxy:
         return None
 
     def __setstate__(self, state):
+        return None
+
+    def dumps(self):
+        return None
+
+    def loads(self, state):
         return None
 
     def attach(self, vobj):
