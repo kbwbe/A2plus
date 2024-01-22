@@ -87,6 +87,12 @@ class VP_LCS_Group(object):
 
     def __setstate__(self,state):
         return None
+    
+    def dumps(self):
+        return None
+    
+    def loads(self):
+        return None
 
 #==============================================================================
 def getListOfLCS(targetDoc,sourceDoc):

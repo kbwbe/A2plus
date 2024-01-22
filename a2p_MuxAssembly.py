@@ -69,6 +69,12 @@ class ViewProviderSimpleAssemblyShape:
 
     def __setstate__(self, state):
         return None
+    
+    def dumps(self):
+        return None
+    
+    def loads(self):
+        return None
 
     def getIcon(self):
         return a2plib.path_a2p + '/icons/SimpleAssemblyShape.svg'
