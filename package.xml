@@ -5,7 +5,7 @@
   <version>0.4.62</version>
   <date>2022-01-24</date>
   <maintainer email="kbwbe@gmx.de">kbwbe</maintainer>
-  <license file="LICENSE">LGPLv2.1</license>
+  <license file="LICENSE">LGPL-2.1-or-later</license>
   <url type="repository" branch="master">https://github.com/kbwbe/A2plus</url>
   <url type="bugtracker">https://github.com/kbwbe/A2plus/issues</url>
   <icon>icons/a2p_Workbench.svg</icon>
