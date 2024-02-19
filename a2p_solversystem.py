@@ -136,7 +136,7 @@ class SolverSystem():
             FreeCAD.Console.PrintMessage(translate("A2plus", "Remove faulty constraint '{}'").format(fc.Label) + "\n")
             doc.removeObject(fc.Name)
 
-    def loadSystem(self,doc, matelist=None):
+    def loadSystem(self, doc, matelist=None):
         self.clear()
         self.doc = doc
         self.status = "loading"
@@ -146,85 +146,54 @@ class SolverSystem():
         self.convergencyCounter = 0
         self.lastPositionError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
         self.lastAxisError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
-        #
-        self.constraints = []
-        constraints =[]             # temporary list
-        if matelist is not None:        # Transfer matelist to the temp list
-            for obj in matelist:
-                if 'ConstraintInfo' in obj.Content:
-                    constraints.append(obj)
-        else:
-            # if there is not a list of my mates get the list from the doc
-            constraints = [ obj for obj in doc.Objects if 'ConstraintInfo' in obj.Content]
-        # check for Suppressed mates here and transfer mates to self.constraints
-        for obj in constraints:
-            if hasattr(obj,'Suppressed'):
-                #if the mate is suppressed do not add it
-                if obj.Suppressed == False:
-                    self.constraints.append(obj)
-        #
-        # Extract all the objectnames which are affected by constraints..
-        self.objectNames = []
-        for c in self.constraints:
-            for attr in ['Object1','Object2']:
-                objectName = getattr(c, attr, None)
-                if objectName is not None and not objectName in self.objectNames:
-                    self.objectNames.append( objectName )
-        #
-        # create a Rigid() dataStructure for each of these objectnames...
+
+        # Extract constraints from matelist or document
+        self.constraints = [obj for obj in (matelist if matelist is not None else doc.Objects) if 'ConstraintInfo' in obj.Content]
+
+        # Filter out suppressed constraints
+        self.constraints = [obj for obj in self.constraints if not hasattr(obj, 'Suppressed') or not obj.Suppressed]
+
+        # Extract object names affected by constraints
+        self.objectNames = list(set(getattr(c, attr) for c in self.constraints for attr in ['Object1', 'Object2'] if hasattr(c, attr)))
+
+        # Create Rigid objects for each object name
+        self.rigids = []
         for o in self.objectNames:
             ob1 = doc.getObject(o)
-            if hasattr(ob1, "fixedPosition"):
-                fx = ob1.fixedPosition
-            else:
-                fx = False
-            if hasattr(ob1, "debugmode"):
-                debugMode = ob1.debugmode
-            else:
-                debugMode = False
-            rig = Rigid(
-                o,
-                ob1.Label,
-                fx,
-                ob1.Placement,
-                debugMode
-                )
+            fx = ob1.fixedPosition if hasattr(ob1, "fixedPosition") else False
+            debugMode = ob1.debugmode if hasattr(ob1, "debugmode") else False
+            rig = Rigid(o, ob1.Label, fx, ob1.Placement, debugMode)
             rig.spinCenter = ob1.Shape.BoundBox.Center
             self.rigids.append(rig)
-        #
-        # link constraints to rigids using dependencies
+
+        # Link constraints to rigids using dependencies
         deleteList = [] # a list to collect broken constraints
         for c in self.constraints:
             rigid1 = self.getRigid(c.Object1)
             rigid2 = self.getRigid(c.Object2)
 
             # create and update list of constrained rigids
-            if rigid2 is not None and not rigid2 in rigid1.linkedRigids: rigid1.linkedRigids.append(rigid2);
-            if rigid1 is not None and not rigid1 in rigid2.linkedRigids: rigid2.linkedRigids.append(rigid1);
+            if rigid1 and rigid2:
+                if rigid2 not in rigid1.linkedRigids:
+                    rigid1.linkedRigids.append(rigid2)
+                if rigid1 not in rigid2.linkedRigids:
+                    rigid2.linkedRigids.append(rigid1)
 
-            try:
-                Dependency.Create(doc, c, self, rigid1, rigid2)
-            except:
-                self.status = "loadingDependencyError"
-                deleteList.append(c)
-
+                try:
+                    Dependency.Create(doc, c, self, rigid1, rigid2)
+                except:
+                    self.status = "loadingDependencyError"
+                    deleteList.append(c)
 
         for rig in self.rigids:
             rig.hierarchyLinkedRigids.extend(rig.linkedRigids)
 
-        if len(deleteList) > 0:
+        # Handle broken constraints
+        if deleteList:
             msg = translate("A2plus", "The following constraints are broken:") + "\n"
-            for c in deleteList:
-                msg += "{}\n".format(c.Label)
+            msg += "\n".join(c.Label for c in deleteList) + "\n"
             msg += translate("A2plus", "Do you want to delete them?")
-
-            flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
-            response = QtGui.QMessageBox.critical(
-                QtGui.QApplication.activeWindow(),
-                translate("A2plus", "Delete broken constraints?"),
-                msg,
-                flags
-                )
+            response = QtGui.QMessageBox.critical(QtGui.QApplication.activeWindow(), translate("A2plus", "Delete broken constraints?"), msg, QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No)
             if response == QtGui.QMessageBox.Yes:
                 for c in deleteList:
                     a2plib.removeConstraint(c)
@@ -232,10 +201,12 @@ class SolverSystem():
         if self.status == "loadingDependencyError":
             return
 
+        # Calculate spin center and reference points' bounding box size for each rigid
         for rig in self.rigids:
             rig.calcSpinCenter()
             rig.calcRefPointsBoundBoxSize()
 
+        # Retrieve DOF information
         self.retrieveDOFInfo() # function only once used here at this place in whole program
         self.status = "loaded"
 
