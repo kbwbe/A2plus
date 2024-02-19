@@ -374,13 +374,11 @@ class SolverSystem():
         f.write("</html>")
         f.close()
 
-    def calcMoveData(self,doc):
-        for rig in self.rigids:
-            rig.calcMoveData(doc, self)
+    def calcMoveData(self, doc):
+        [rig.calcMoveData(doc, self) for rig in self.rigids]
 
     def prepareRestart(self):
-        for rig in self.rigids:
-            rig.prepareRestart()
+        [rig.prepareRestart() for rig in self.rigids]
         self.partialSolverCurrentStage = PARTIAL_SOLVE_STAGE1
 
     def detectUnmovedParts(self):
