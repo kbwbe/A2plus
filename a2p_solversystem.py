@@ -383,13 +383,7 @@ class SolverSystem():
 
     def detectUnmovedParts(self):
         doc = FreeCAD.activeDocument()
-        self.unmovedParts = []
-        for rig in self.rigids:
-            if rig.fixed: continue
-            if not rig.moved:
-                self.unmovedParts.append(
-                    doc.getObject(rig.objectName)
-                    )
+        self.unmovedParts = [doc.getObject(rig.objectName) for rig in self.rigids if not rig.fixed and not rig.moved]
 
     def solveAccuracySteps(self, doc, matelist=None):
         self.level_of_accuracy = 1
