@@ -527,13 +527,24 @@ def fit_rotation_axis_to_surface1(surface, n_u=3, n_v=3):
         # Convert axis direction and position to FreeCAD vectors and return
         return numpyVecToFC(axis_dir), numpyVecToFC(axis_pos), error
 #------------------------------------------------------------------------------
-def fit_plane_to_surface1( surface, n_u=3, n_v=3 ):
-    uv = sum( [ [ (u,v) for u in numpy.linspace(0,1,n_u)] for v in numpy.linspace(0,1,n_v) ], [] )
-    P = [ surface.value(u,v) for u,v in uv ] #positions at u,v points
-    N = [ numpy.cross( *surface.tangent(u,v) ) for u,v in uv ]
-    plane_norm = sum(N) / len(N) #planes normal, averaging done to reduce error
+def fit_plane_to_surface1(surface, n_u=3, n_v=3):
+    # Generate points on the surface grid
+    uv = [(u, v) for u in numpy.linspace(0, 1, n_u) for v in numpy.linspace(0, 1, n_v)]
+
+    # Compute positions and normals at grid points
+    P = [surface.value(u, v) for u, v in uv]  # Positions at u,v points
+    N = [numpy.cross(*surface.tangent(u, v)) for u, v in uv]  # Normals at u,v points
+
+    # Compute average plane normal
+    plane_norm = numpy.mean(N, axis=0)
+
+    # Choose an arbitrary point on the surface as the plane position
     plane_pos = P[0]
-    error = sum([ abs( numpy.dot(p - plane_pos, plane_norm) ) for p in P ])
+
+    # Compute error as the sum of dot products of each point with the plane normal
+    error = sum(abs(numpy.dot(p - plane_pos, plane_norm)) for p in P)
+
+    # Convert plane normal and position to FreeCAD vectors and return along with error
     return numpyVecToFC(plane_norm), numpyVecToFC(plane_pos), error
 #------------------------------------------------------------------------------
 def isLine(param):
