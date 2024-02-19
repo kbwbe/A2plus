@@ -281,10 +281,13 @@ class SolverSystem():
 
             for linkedRig in rig.linkedRigids:
                 deps = [dep for dep in rig.dependencies if dep.dependedRigid == linkedRig]
+                #be sure pointconstraints are at the end of the list
                 point_deps = [dep for dep in deps if dep.isPointConstraint]
                 non_point_deps = [dep for dep in deps if not dep.isPointConstraint]
+                #add at the end the point constraints
                 deps_per_linked_rigids[linkedRig] = non_point_deps + point_deps
 
+            #dofPOSPerLinkedRigid is a dict where for each
             for linkedRig, deps in deps_per_linked_rigids.items():
                 linkedRig.pointConstraints = []
                 dof_pos = linkedRig.posDOF
@@ -294,7 +297,10 @@ class SolverSystem():
                 rig.dofPOSPerLinkedRigids[linkedRig] = dof_pos
                 rig.dofROTPerLinkedRigids[linkedRig] = dof_rot
 
-
+            #ok each rigid has a dict for each linked objects,
+            #so we now know the list of linked objects and which
+            #dof rot and pos both limits.
+            
 
     # TODO: maybe instead of traversing from the root every time, save a list of objects on current distance
     # and use them to propagate next distance to their children
