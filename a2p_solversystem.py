@@ -442,39 +442,33 @@ class SolverSystem():
 
         return systemSolved
 
-    def solveSystem(self,doc,matelist=None, showFailMessage=True):
+    def solveSystem(self, doc, matelist=None, showFailMessage=True):
         if not a2plib.SIMULATION_STATE:
             Msg("===== " + translate("A2plus", "Start Solving System") + " =====\n")
 
-        systemSolved = self.solveAccuracySteps(doc,matelist)
+        systemSolved = self.solveAccuracySteps(doc, matelist)
         if self.status == "loadingDependencyError":
             return systemSolved
+
         if systemSolved:
             self.status = "solved"
             if not a2plib.SIMULATION_STATE:
                 Msg("===== " + translate("A2plus", "System solved using partial + recursive unfixing") + " =====\n")
                 self.checkForUnmovedParts()
         else:
-            if a2plib.SIMULATION_STATE == True:
+            if a2plib.SIMULATION_STATE:
                 self.status = "unsolved"
                 return systemSolved
-
             else: # a2plib.SIMULATION_STATE == False
                 self.status = "unsolved"
-                if showFailMessage == True:
+                if showFailMessage:
                     Msg("===== " + translate("A2plus", "Could not solve system") + " =====\n")
-                    msg = \
-translate("A2plus",
-'''
-Constraints inconsistent. Cannot solve System.
-Please run the conflict finder tool!
-'''
-)
+                    msg = translate("A2plus", "Constraints inconsistent. Cannot solve System.\nPlease run the conflict finder tool!")
                     QtGui.QMessageBox.information(
                         QtGui.QApplication.activeWindow(),
                         translate("A2plus", "Constraint mismatch"),
                         msg
-                        )
+                    )
                 return systemSolved
 
     def checkForUnmovedParts(self):
