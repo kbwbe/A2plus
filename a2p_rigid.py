@@ -457,19 +457,20 @@ class Rigid():
         return False
 
     def isFullyConstrainedByFixedRigids(self):
-        _dofPos = a2p_libDOF.initPosDOF
-        _dofRot = a2p_libDOF.initRotDOF
+        """
+        Check if the rigid is fully constrained by fixed rigids.
+        """
         self.reorderDependencies()
-        if len(self.dependencies) > 0:
-            for dep in self.dependencies:
-                if dep.dependedRigid.tempfixed:
-                    _dofPos, _dofRot = dep.calcDOF(_dofPos,_dofRot, self.pointConstraints)
+        if self.dependencies:
+            posDOF = []
+            rotDOF = []
+            for dependency in self.dependencies:
+                if dependency.dependedRigid.tempfixed:
+                    posDOF, rotDOF = dependency.calcDOF(posDOF, rotDOF, self.pointConstraints)
         else:
             return False
-        if len(_dofPos) + len(_dofRot):
-            return False
-        else:
-            return True
+
+        return not posDOF and not rotDOF
 
     def linkedTempFixedDOF(self):
         #pointConstraints = []
