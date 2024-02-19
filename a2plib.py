@@ -1046,46 +1046,45 @@ def getPlaneNormal(surface):
 #------------------------------------------------------------------------------
 def getAxis(obj, subElementName):
     axis = None
-    
-    # Check if subElementName starts with 'Face'
     if subElementName.startswith('Face'):
         face = getObjectFaceFromName(obj, subElementName)
         surface = face.Surface
-        
-        # Check if surface has 'Axis' attribute
-        if hasattr(surface, 'Axis'):
+        if hasattr(surface,'Axis'):
             axis = surface.Axis
-        elif isinstance(surface, SurfaceOfRevolution):
+        elif str(surface).startswith('<SurfaceOfRevolution'):
             axis = face.Edges[0].Curve.Axis
-        elif isinstance(surface, BSplineSurface):
-            # Fit plane to surface and extract axis
-            axis1, pos, error = fit_plane_to_surface1(surface)
+        elif str(surface).startswith('<BSplineSurface'):
+            axis1,pos,error = fit_plane_to_surface1(surface)
             error_normalized = error / face.BoundBox.DiagonalLength
-            if error_normalized < 10**-6:  # Good plane fit
+            if error_normalized < 10**-6: #then good plane fit
                 axis = axis1
             axis_fitted, center, error = fit_rotation_axis_to_surface1(face.Surface)
             if axis_fitted is not None:
                 error_normalized = error / face.BoundBox.DiagonalLength
-                if error_normalized < 10**-6:  # Good rotation_axis fix
+                if error_normalized < 10**-6: #then good rotation_axis fix
                     axis = axis_fitted
 
-    # Check if subElementName starts with 'Edge'
     elif subElementName.startswith('Edge'):
         edge = getObjectEdgeFromName(obj, subElementName)
         if isLine(edge.Curve):
             axis = edge.Curve.tangent(0)[0]
-        elif hasattr(edge.Curve, 'Axis'):  # Circular curve
-            axis = edge.Curve.Axis
+        elif hasattr( edge.Curve, 'Axis'): #circular curve
+            axis =  edge.Curve.Axis
         else:
             BSpline = edge.Curve.toBSpline()
             arcs = BSpline.toBiArcs(10**-6)
-            if all(isinstance(a, Line) for a in arcs):
+            if all( hasattr(a,'Center') for a in arcs ):
+                centers = numpy.array([a.Center for a in arcs])
+                sigma = numpy.std( centers, axis=0 )
+                if max(sigma) < 10**-6: #then circular curve
+                    axis = arcs[0].Axis
+            if all(isLine(a) for a in arcs):
                 lines = arcs
-                D = numpy.array([L.tangent(0)[0] for L in lines])  # Directions
-                if numpy.std(D, axis=0).max() < 10**-9:  # Linear curve
+                D = numpy.array([L.tangent(0)[0] for L in lines]) #D(irections)
+                if numpy.std( D, axis=0 ).max() < 10**-9: #then linear curve
                     axis = numpyVecToFC(D[0])
 
-    return axis
+    return axis # may be none!
 #------------------------------------------------------------------------------
 def unTouchA2pObjects():
     doc = FreeCAD.activeDocument()
