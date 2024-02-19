@@ -124,23 +124,17 @@ class SolverSystem():
         """
         Remove constraints where referenced objects do not exist anymore.
         """
-        constraints = [ obj for obj in doc.Objects if 'ConstraintInfo' in obj.Content]
+        constraints = [obj for obj in doc.Objects if hasattr(obj, 'Content') and 'ConstraintInfo' in obj.Content]
 
         faultyConstraintList = []
         for c in constraints:
-            constraintOK = True
-            for attr in ['Object1','Object2']:
-                objectName = getattr(c, attr, None)
-                o = doc.getObject(objectName)
-                if o is None:
-                    constraintOK = False
-            if not constraintOK:
+            objectNames = [getattr(c, attr, None) for attr in ['Object1', 'Object2']]
+            if any(doc.getObject(name) is None for name in objectNames):
                 faultyConstraintList.append(c)
 
-        if len(faultyConstraintList) > 0:
-            for fc in faultyConstraintList:
-                FreeCAD.Console.PrintMessage(translate("A2plus", "Remove faulty constraint '{}'").format(fc.Label) + "\n")
-                doc.removeObject(fc.Name)
+        for fc in faultyConstraintList:
+            FreeCAD.Console.PrintMessage(translate("A2plus", "Remove faulty constraint '{}'").format(fc.Label) + "\n")
+            doc.removeObject(fc.Name)
 
     def loadSystem(self,doc, matelist=None):
         self.clear()
