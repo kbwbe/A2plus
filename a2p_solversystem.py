@@ -617,7 +617,7 @@ class SolverSystem():
 
     def solutionToParts(self,doc):
         for rig in self.rigids:
-            rig.applySolution(doc, self);
+            rig.applySolution(doc, self)
 
 #------------------------------------------------------------------------------
 def solveConstraints( doc, cache=None, useTransaction = True, matelist=None, showFailMessage=True):
