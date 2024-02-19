@@ -566,52 +566,43 @@ to a fixed part!
         self.stepCount = 0
         workList = []
 
-        if a2plib.SIMULATION_STATE == True:
-            # Solve complete System at once if simulation is running
+        if a2plib.SIMULATION_STATE or not a2plib.PARTIAL_PROCESSING_ENABLED:
+            # Solve complete System at once if simulation is running or partial processing is disabled
             workList = self.rigids
             solutionFound = self.calculateWorkList(doc, workList)
-            if not solutionFound: return False
-            return True
-        elif a2plib.PARTIAL_PROCESSING_ENABLED == False:
-            # Solve complete System at once
-            workList = self.rigids
-            solutionFound = self.calculateWorkList(doc, workList)
-            if not solutionFound: return False
-            return True
-        else:
-            # Normal partial solving if no simulation is running
-            # load initial worklist with all fixed parts...
-            for rig in self.rigids:
-                if rig.fixed:
-                    workList.append(rig);
-            #self.printList("Initial-Worklist", workList)
+            return solutionFound
 
-            while True:
-                addList = []
-                newRigFound = False
+        # Normal partial solving if no simulation is running and partial processing is enabled
+        # Load initial worklist with all fixed parts
+        workList.extend(rig for rig in self.rigids if rig.fixed)
+
+        while True:
+            addList = set()
+            newRigFound = False
+            
+            for rig in workList:
+                for linkedRig in rig.linkedRigids:
+                    if linkedRig not in workList and rig.isFullyConstrainedByRigid(linkedRig):
+                        addList.add(linkedRig)
+                        newRigFound = True
+                        break
+            
+            if not newRigFound:
                 for rig in workList:
-                    for linkedRig in rig.linkedRigids:
-                        if linkedRig in workList: continue
-                        if rig.isFullyConstrainedByRigid(linkedRig):
-                            addList.append(linkedRig)
-                            newRigFound = True
-                            break
-                if not newRigFound:
-                    for rig in workList:
-                        addList.extend(rig.getCandidates())
-                addList = set(addList)
-                #self.printList("AddList", addList)
-                if len(addList) > 0:
-                    workList.extend(addList)
-                    solutionFound = self.calculateWorkList(doc, workList)
-                    if not solutionFound: return False
-                else:
-                    break
+                    addList.update(rig.getCandidates())
 
-                if a2plib.SOLVER_ONESTEP > 2:
-                    break
+            if addList:
+                workList.extend(addList)
+                solutionFound = self.calculateWorkList(doc, workList)
+                if not solutionFound:
+                    return False
+            else:
+                break
 
-            return True
+            if a2plib.SOLVER_ONESTEP > 2:
+                break
+            
+        return True
 
     def calculateWorkList(self, doc, workList):
         reqPosAccuracy = self.mySOLVER_POS_ACCURACY
