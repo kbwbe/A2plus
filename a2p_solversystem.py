@@ -213,69 +213,60 @@ class SolverSystem():
     def DOF_info_to_console(self):
         doc = FreeCAD.activeDocument()
 
+        # Clear existing dofLabels object group if it exists
         dofGroup = doc.getObject("dofLabels")
-        if dofGroup is None:
-            dofGroup=doc.addObject("App::DocumentObjectGroup", "dofLabels")
-        else:
-            for lbl in dofGroup.Group:
-                doc.removeObject(lbl.Name)
-            doc.removeObject("dofLabels")
-            dofGroup=doc.addObject("App::DocumentObjectGroup", "dofLabels")
+        if dofGroup is not None:
+            doc.removeObject(dofGroup.Name)
 
-        self.loadSystem( doc )
+        # Create a new dofLabels object group
+        dofGroup = doc.addObject("App::DocumentObjectGroup", "dofLabels")
 
-        # look for unconstrained objects and label them
-        solverObjectNames = []
-        for rig in self.rigids:
-            solverObjectNames.append(rig.objectName)
-        shapeObs = a2plib.filterShapeObs(doc.Objects)
-        for so in shapeObs:
-            if so.Name not in solverObjectNames:
-                ob = doc.getObject(so.Name)
-                if ob.ViewObject.Visibility == True:
-                    bbCenter = ob.Shape.BoundBox.Center
-                    dofLabel = doc.addObject("App::AnnotationLabel","dofLabel")
-                    dofLabel.LabelText = translate("A2plus", "FREE")
-                    dofLabel.BasePosition.x = bbCenter.x
-                    dofLabel.BasePosition.y = bbCenter.y
-                    dofLabel.BasePosition.z = bbCenter.z
-                    #
-                    dofLabel.ViewObject.BackgroundColor = a2plib.BLUE
-                    dofLabel.ViewObject.TextColor = a2plib.WHITE
-                    dofGroup.addObject(dofLabel)
+        # Load system and retrieve DOF information
+        self.loadSystem(doc)
+        self.retrieveDOFInfo()
 
+        # Get object names affected by constraints
+        solverObjectNames = {rig.objectName for rig in self.rigids}
 
-        numdep = 0
-        self.retrieveDOFInfo() #function only once used here at this place in whole program
-        for rig in self.rigids:
-            dofCount = rig.currentDOF()
-            ob = doc.getObject(rig.objectName)
-            if ob.ViewObject.Visibility == True:
-                bbCenter = ob.Shape.BoundBox.Center
-                dofLabel = doc.addObject("App::AnnotationLabel","dofLabel")
-                if rig.fixed:
-                    dofLabel.LabelText = translate("A2plus", "Fixed")
-                else:
-                    dofLabel.LabelText = translate("A2plus", "DOFs: {}").format(dofCount)
-                dofLabel.BasePosition.x = bbCenter.x
-                dofLabel.BasePosition.y = bbCenter.y
-                dofLabel.BasePosition.z = bbCenter.z
-
-                if rig.fixed:
-                    dofLabel.ViewObject.BackgroundColor = a2plib.RED
-                    dofLabel.ViewObject.TextColor = a2plib.BLACK
-                elif dofCount == 0:
-                    dofLabel.ViewObject.BackgroundColor = a2plib.RED
-                    dofLabel.ViewObject.TextColor = a2plib.BLACK
-                elif dofCount < 6:
-                    dofLabel.ViewObject.BackgroundColor = a2plib.YELLOW
-                    dofLabel.ViewObject.TextColor = a2plib.BLACK
+        # Look for unconstrained objects and label them
+        for obj in a2plib.filterShapeObs(doc.Objects):
+            if obj.Name not in solverObjectNames and obj.ViewObject.Visibility:
+                bbCenter = obj.Shape.BoundBox.Center
+                dofLabel = doc.addObject("App::AnnotationLabel", "dofLabel")
+                dofLabel.LabelText = translate("A2plus", "FREE")
+                dofLabel.BasePosition = bbCenter
+                dofLabel.ViewObject.BackgroundColor = a2plib.BLUE
+                dofLabel.ViewObject.TextColor = a2plib.WHITE
                 dofGroup.addObject(dofLabel)
 
+        numdep = sum(rig.countDependencies() for rig in self.rigids)
+        Msg(translate("A2plus", "There are {:.0f} dependencies").format(numdep / 2) + "\n")
 
-            rig.beautyDOFPrint()
-            numdep+=rig.countDependencies()
-        Msg(translate("A2plus", "There are {:.0f} dependencies").format(numdep/2) + "\n")
+        # Label rigids based on their DOF count
+        for rig in self.rigids:
+            if rig.fixed:
+                label_text = translate("A2plus", "Fixed")
+                bg_color = a2plib.RED
+            else:
+                dofCount = rig.currentDOF()
+                label_text = translate("A2plus", "DOFs: {}").format(dofCount)
+                if dofCount == 0:
+                    bg_color = a2plib.RED
+                elif dofCount < 6:
+                    bg_color = a2plib.YELLOW
+                else:
+                    bg_color = None
+
+            if bg_color is not None:
+                ob = doc.getObject(rig.objectName)
+                if ob.ViewObject.Visibility:
+                    bbCenter = ob.Shape.BoundBox.Center
+                    dofLabel = doc.addObject("App::AnnotationLabel", "dofLabel")
+                    dofLabel.LabelText = label_text
+                    dofLabel.BasePosition = bbCenter
+                    dofLabel.ViewObject.BackgroundColor = bg_color
+                    dofLabel.ViewObject.TextColor = a2plib.BLACK
+                    dofGroup.addObject(dofLabel)
 
     def retrieveDOFInfo(self):
         """
