@@ -975,58 +975,66 @@ def removeConstraint( constraint ):
 def getPos(obj, subElementName):
     pos = None
 
+    # Check if the subElementName starts with 'Face'
     if subElementName.startswith('Face'):
         face = getObjectFaceFromName(obj, subElementName)
         surface = face.Surface
-        if str(surface) == '<Plane object>':
-            pos = getObjectFaceFromName(obj, subElementName).Faces[0].BoundBox.Center
-            # axial constraint for Planes
-            # pos = surface.Position
-        elif str(surface) == "<Cylinder object>":
+
+        # Check the type of surface and determine the position accordingly
+        if isinstance(surface, Part.Plane):  # Check if the surface is a Plane
+            pos = face.Faces[0].BoundBox.Center  # Get the center of the bounding box
+        elif isinstance(surface, Part.Cylinder):
             pos = surface.Center
-        elif all( hasattr(surface,a) for a in ['Axis','Center','Radius'] ):
+        elif all(hasattr(surface, a) for a in ['Axis', 'Center', 'Radius']):
             pos = surface.Center
         elif str(surface).startswith('<SurfaceOfRevolution'):
-            pos = getObjectFaceFromName(obj, subElementName).Edges[0].Curve.Center
+            pos = face.Edges[0].Curve.Center
         elif str(surface).startswith('<BSplineSurface'):
-            axis,pos1,error = fit_plane_to_surface1(surface)
+            # Fit a plane to the surface and get the position
+            axis, pos1, error = fit_plane_to_surface1(surface)
             error_normalized = error / face.BoundBox.DiagonalLength
-            if error_normalized < 10**-6: #then good plane fit
+            if error_normalized < 10 ** -6:  # Check if the fit is good
                 pos = pos1
+
+            # Fit a rotation axis to the surface
             axis, center, error = fit_rotation_axis_to_surface1(face.Surface)
             if axis is not None:
                 error_normalized = error / face.BoundBox.DiagonalLength
-                if error_normalized < 10**-6: #then good rotation_axis fix
+                if error_normalized < 10 ** -6:  # Check if the rotation axis fit is good
                     pos = center
 
+    # Check if the subElementName starts with 'Edge'
     elif subElementName.startswith('Edge'):
         edge = getObjectEdgeFromName(obj, subElementName)
-        if isLine(edge.Curve):
+
+        # Check the type of curve and determine the position accordingly
+        if isLine(edge.Curve):  # Check if the curve is a straight line
             if appVersionStr() <= "000.016":
                 pos = edge.Curve.StartPoint
             else:
                 pos = edge.firstVertex(True).Point
-        elif hasattr( edge.Curve, 'Center'): #circular curve
+        elif hasattr(edge.Curve, 'Center'):  # Check if the curve is circular
             pos = edge.Curve.Center
         else:
             BSpline = edge.Curve.toBSpline()
-            arcs = BSpline.toBiArcs(10**-6)
-            if all( hasattr(a,'Center') for a in arcs ):
+            arcs = BSpline.toBiArcs(10 ** -6)
+            if all(hasattr(a, 'Center') for a in arcs):
                 centers = numpy.array([a.Center for a in arcs])
-                sigma = numpy.std( centers, axis=0 )
-                if max(sigma) < 10**-6: #then circular curve
+                sigma = numpy.std(centers, axis=0)
+                if max(sigma) < 10 ** -6:  # Check if the curve is circular
                     pos = numpyVecToFC(centers[0])
+
             if all(isLine(a) for a in arcs):
                 lines = arcs
-                D = numpy.array([L.tangent(0)[0] for L in lines]) #D(irections)
-                if numpy.std( D, axis=0 ).max() < 10**-9: #then linear curve
+                D = numpy.array([L.tangent(0)[0] for L in lines])  # Directions
+                if numpy.std(D, axis=0).max() < 10 ** -9:  # Check if the curve is linear
                     pos = lines[0].value(0)
 
-
+    # Check if the subElementName starts with 'Vertex'
     elif subElementName.startswith('Vertex'):
         pos = getObjectVertexFromName(obj, subElementName).Point
 
-    return pos # maybe none !!
+    return pos  # Return the calculated position
 #------------------------------------------------------------------------------
 def getPlaneNormal(surface):
     axis = None
