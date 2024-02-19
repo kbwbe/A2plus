@@ -225,13 +225,11 @@ class Rigid():
         newSpinCenter = Base.Vector(self.spinCenter)
         countRefPoints = 0
         for dep in self.dependencies:
-            if dep.Enabled:
-                if dep.refPoint is not None:
-                    newSpinCenter = newSpinCenter.add(dep.refPoint)
-                    countRefPoints += 1
+            if dep.Enabled and dep.refPoint is not None:
+                newSpinCenter += dep.refPoint
+                countRefPoints += 1
         if countRefPoints > 0:
-            newSpinCenter.multiply(1.0/countRefPoints)
-            self.spinCenter = newSpinCenter
+            self.spinCenter = newSpinCenter / countRefPoints
 
     def calcSpinCenter(self):
         newSpinCenter = Base.Vector(0,0,0)
