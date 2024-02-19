@@ -428,22 +428,23 @@ class Rigid():
 
     def currentDOF(self):
         """
-        update whole DOF of the rigid (useful for animation and get the number
+        Update whole DOF of the rigid (useful for animation and get the number
         useful to determine if an object is fully constrained.
         """
         self.pointConstraints = []
-        _dofPos = a2p_libDOF.initPosDOF
-        _dofRot = a2p_libDOF.initRotDOF
+        _dofPos = []
+        _dofRot = []
         self.reorderDependencies()
-        if not self.fixed:
-            if len(self.dependencies) > 0:
-                for x in self.dependencies:
-                    _dofPos, _dofRot = x.calcDOF(_dofPos,_dofRot, self.pointConstraints)
-        else:
-            _dofPos, _dofRot = [] , []
+        
+        if not self.fixed and self.dependencies:
+            for dependency in self.dependencies:
+                posDOF, rotDOF = dependency.calcDOF([], [], self.pointConstraints)
+                _dofPos.extend(posDOF)
+                _dofRot.extend(rotDOF)
+
         self.posDOF = _dofPos
         self.rotDOF = _dofRot
-        self.currentDOFCount = len(self.posDOF) + len(self.rotDOF)
+        self.currentDOFCount = len(_dofPos) + len(_dofRot)
         return self.currentDOFCount
 
     def isFullyConstrainedByRigid(self,rig):
