@@ -277,36 +277,22 @@ class SolverSystem():
         then for each linked object compile a dict where each linked object has its dof rotation
         """
         for rig in self.rigids:
-
-            #if not rig.tempfixed:  #skip already fixed objs
+            deps_per_linked_rigids = {}
 
             for linkedRig in rig.linkedRigids:
-                tmplinkedDeps = []
-                tmpLinkedPointDeps = []
-                for dep in rig.dependencies:
-                    if linkedRig==dep.dependedRigid:
-                        #be sure pointconstraints are at the end of the list
-                        if dep.isPointConstraint :
-                            tmpLinkedPointDeps.append(dep)
-                        else:
-                            tmplinkedDeps.append(dep)
-                #add at the end the point constraints
-                tmplinkedDeps.extend(tmpLinkedPointDeps)
-                rig.depsPerLinkedRigids[linkedRig] = tmplinkedDeps
+                deps = [dep for dep in rig.dependencies if dep.dependedRigid == linkedRig]
+                point_deps = [dep for dep in deps if dep.isPointConstraint]
+                non_point_deps = [dep for dep in deps if not dep.isPointConstraint]
+                deps_per_linked_rigids[linkedRig] = non_point_deps + point_deps
 
-            #dofPOSPerLinkedRigid is a dict where for each
-            for linkedRig in rig.depsPerLinkedRigids.keys():
+            for linkedRig, deps in deps_per_linked_rigids.items():
                 linkedRig.pointConstraints = []
-                _dofPos = linkedRig.posDOF
-                _dofRot = linkedRig.rotDOF
-                for dep in rig.depsPerLinkedRigids[linkedRig]:
-                    _dofPos, _dofRot = dep.calcDOF(_dofPos,_dofRot, linkedRig.pointConstraints)
-                rig.dofPOSPerLinkedRigids[linkedRig] = _dofPos
-                rig.dofROTPerLinkedRigids[linkedRig] = _dofRot
-
-            #ok each rigid has a dict for each linked objects,
-            #so we now know the list of linked objects and which
-            #dof rot and pos both limits.
+                dof_pos = linkedRig.posDOF
+                dof_rot = linkedRig.rotDOF
+                for dep in deps:
+                    dof_pos, dof_rot = dep.calcDOF(dof_pos, dof_rot, linkedRig.pointConstraints)
+                rig.dofPOSPerLinkedRigids[linkedRig] = dof_pos
+                rig.dofROTPerLinkedRigids[linkedRig] = dof_rot
 
 
 
