@@ -674,30 +674,36 @@ def drawSphere(center, color):
     sphere.ViewObject.ShapeColor = color
     doc.recompute()
 #------------------------------------------------------------------------------
-def drawVector(fromPoint,toPoint, color):
-    if fromPoint == toPoint: return
+def drawVector(fromPoint, toPoint, color):
+    # Check if the fromPoint and toPoint are the same
+    if fromPoint.isEqual(toPoint):
+        return
+
     doc = FreeCAD.ActiveDocument
 
-    l = Part.LineSegment()
-    l.StartPoint = fromPoint
-    l.EndPoint = toPoint
-    line = doc.addObject("Part::Feature","Line")
+    # Create a line segment
+    l = Part.LineSegment(fromPoint, toPoint)
+    line = doc.addObject("Part::Feature", "Line")
     line.Shape = l.toShape()
     line.ViewObject.LineColor = color
     line.ViewObject.LineWidth = 1
 
-    c = Part.makeCone(0,1,4)
-    cone = doc.addObject("Part::Feature","ArrowHead")
+    # Create an arrowhead (cone)
+    c = Part.makeCone(0, 1, 4)
+    cone = doc.addObject("Part::Feature", "ArrowHead")
     cone.Shape = c
     cone.ViewObject.ShapeColor = color
-    #
-    mov = Base.Vector(0,0,0)
-    zAxis = Base.Vector(0,0,-1)
-    rot = FreeCAD.Rotation(zAxis,toPoint.sub(fromPoint))
-    cent = Base.Vector(0,0,0)
-    conePlacement = FreeCAD.Placement(mov,rot,cent)
+
+    # Calculate rotation for the arrowhead to point towards 'toPoint'
+    zAxis = Base.Vector(0, 0, -1)
+    rot = FreeCAD.Rotation(zAxis, toPoint.sub(fromPoint))
+
+    # Place the arrowhead at 'toPoint'
+    conePlacement = FreeCAD.Placement(Base.Vector(0, 0, 0), rot, Base.Vector(0, 0, 0))
     cone.Placement = conePlacement.multiply(cone.Placement)
     cone.Placement.move(toPoint)
+
+    # Update the document
     doc.recompute()
 #------------------------------------------------------------------------------
 def findUnusedObjectName(base, counterStart=1, fmt='%03i', document=None):
