@@ -112,8 +112,8 @@ class Rigid():
 
     def prepareRestart(self):
         self.tempfixed = self.fixed
-        for d in self.dependencies:
-            d.disable()
+        for dep in self.dependencies:
+            dep.disable()
 
     def countDependencies(self):
         return len(self.dependencies)
