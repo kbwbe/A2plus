@@ -126,14 +126,13 @@ class Rigid():
     # The function should be called in a loop with increased distance until it return False
     def assignParentship(self, distance):
         # Current rigid was already set, pass the call to childrens
+        haveMore = False
+        
         if self.disatanceFromFixed < distance:
-            haveMore = False
             for rig in self.childRigids:
-                if rig.assignParentship(distance):
-                    haveMore = True
-            return haveMore
+                haveMore = rig.assignParentship(distance)
         elif self.disatanceFromFixed == distance:
-            while len(self.hierarchyLinkedRigids) > 0:
+            while self.hierarchyLinkedRigids:
                 rig = self.hierarchyLinkedRigids[0]
                 # Got to a new rigid, set current as it's father
                 if rig.disatanceFromFixed is None:
@@ -141,7 +140,7 @@ class Rigid():
                     self.childRigids.append(rig)
                     rig.hierarchyLinkedRigids.remove(self)
                     self.hierarchyLinkedRigids.remove(rig)
-                    rig.disatanceFromFixed = distance+1
+                    rig.disatanceFromFixed = distance + 1
                 # That child was already assigned by another (and closer to fixed) father
                 # Leave only child relationship, but don't add current as a father
                 else:
@@ -149,8 +148,9 @@ class Rigid():
                     rig.hierarchyLinkedRigids.remove(self)
                     self.hierarchyLinkedRigids.remove(rig)
 
-            if len(self.childRigids) + len(self.hierarchyLinkedRigids) > 0: return True
-            else: return False
+            haveMore = len(self.childRigids) + len(self.hierarchyLinkedRigids) > 0
+
+        return haveMore
 
     def printHierarchy(self, level):
         Msg((level*3)*" ")
