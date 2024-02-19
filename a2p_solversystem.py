@@ -553,78 +553,58 @@ class SolverSystem():
 
         for rig in workList:
             rig.enableDependencies(workList)
-        for rig in workList:
             rig.calcSpinBasicDataDepsEnabled()
 
         self.lastPositionError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
         self.lastAxisError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
         self.convergencyCounter = 0
-
         calcCount = 0
-        goodAccuracy = False
-        while not goodAccuracy:
-            maxPosError = 0.0
-            maxAxisError = 0.0
-            maxSingleAxisError = 0.0
 
+        while True:
+            maxPosError = maxAxisError = maxSingleAxisError = 0.0
             calcCount += 1
             self.stepCount += 1
             self.convergencyCounter += 1
-            # First calculate all the movement vectors
+
+            # Calculate all movement vectors
             for w in workList:
                 w.moved = True
                 w.calcMoveData(doc, self)
-                if w.maxPosError > maxPosError:
-                    maxPosError = w.maxPosError
-                if w.maxAxisError > maxAxisError:
-                    maxAxisError = w.maxAxisError
-                if w.maxSingleAxisError > maxSingleAxisError:
-                    maxSingleAxisError = w.maxSingleAxisError
+                maxPosError = max(maxPosError, w.maxPosError)
+                maxAxisError = max(maxAxisError, w.maxAxisError)
+                maxSingleAxisError = max(maxSingleAxisError, w.maxSingleAxisError)
 
             # Perform the move
             for w in workList:
                 w.move(doc)
 
-            # The accuracy is good, apply the solution to FreeCAD's objects
-            if (maxPosError <= reqPosAccuracy and   # relevant check
+            # Check accuracy and apply solution
+            if (maxPosError <= reqPosAccuracy and # relevant check
                 maxAxisError <= reqSpinAccuracy and # relevant check
-                maxSingleAxisError <= reqSpinAccuracy * 10  # additional check for insolvable assemblies
-                                                            # sometimes spin can be solved but singleAxis not..
-                ) or (a2plib.SOLVER_ONESTEP > 0):
-                # The accuracy is good, we're done here
-                goodAccuracy = True
-                # Mark the rigids as tempfixed and add its constrained rigids to pending list to be processed next
+                maxSingleAxisError <= reqSpinAccuracy * 10) or (a2plib.SOLVER_ONESTEP > 0): # additional check for insolvable assemblies
+                # The accuracy is good, we're done here                                     # sometimes spin can be solved but singleAxis not..
+
                 for r in workList:
                     r.applySolution(doc, self)
                     r.tempfixed = True
+                return True
 
+            # Check for convergence
             if self.convergencyCounter > SOLVER_STEPS_CONVERGENCY_CHECK:
-                if (
-                    maxPosError  >= SOLVER_CONVERGENCY_FACTOR * self.lastPositionError or
-                    maxAxisError >= SOLVER_CONVERGENCY_FACTOR * self.lastAxisError
-                    ):
-                    foundRigidToUnfix = False
-                    # search for unsolved dependencies...
+                if maxPosError >= SOLVER_CONVERGENCY_FACTOR * self.lastPositionError or maxAxisError >= SOLVER_CONVERGENCY_FACTOR * self.lastAxisError:
                     for rig in workList:
-                        if rig.fixed or rig.tempfixed: continue
-                        #if rig.maxAxisError >= maxAxisError or rig.maxPosError >= maxPosError:
+                        if rig.fixed or rig.tempfixed:
+                            continue
                         if rig.maxAxisError > reqSpinAccuracy or rig.maxPosError > reqPosAccuracy:
                             for r in rig.linkedRigids:
                                 if r.tempfixed and not r.fixed:
                                     r.tempfixed = False
-                                    #Msg("unfixed Rigid {}\n".format(r.label))
-                                    foundRigidToUnfix = True
-
-                    if foundRigidToUnfix:
-                        self.lastPositionError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
-                        self.lastAxisError = SOLVER_CONVERGENCY_ERROR_INIT_VALUE
-                        self.convergencyCounter = 0
-                        continue
-                    else:
-                        Msg('\n')
-                        Msg('convergency-conter: {}\n'.format(self.convergencyCounter))
-                        Msg(translate("A2plus", "Calculation stopped, no convergency anymore!") + "\n")
-                        return False
+                                    break
+                            else:
+                                Msg('\n')
+                                Msg('convergency-conter: {}\n'.format(self.convergencyCounter))
+                                Msg(translate("A2plus", "Calculation stopped, no convergency anymore!") + "\n")
+                                return False
 
                 self.lastPositionError = maxPosError
                 self.lastAxisError = maxAxisError
@@ -634,7 +614,6 @@ class SolverSystem():
             if self.stepCount > SOLVER_MAXSTEPS:
                 Msg(translate("A2plus", "Reached max calculations count: {}").format(SOLVER_MAXSTEPS) + "\n")
                 return False
-        return True
 
     def solutionToParts(self,doc):
         for rig in self.rigids:
