@@ -179,10 +179,7 @@ class Rigid():
         else: return False
 
     def areAllParentTempFixed(self):
-        for rig in self.linkedRigids:
-            if not rig.tempfixed:
-                return False
-        return True
+        return all(rig.tempfixed for rig in self.linkedRigids)
 
     def applyPlacementStep(self, pl):
         self.placement = pl.multiply(self.placement)
