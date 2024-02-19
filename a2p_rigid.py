@@ -473,18 +473,20 @@ class Rigid():
         return not posDOF and not rotDOF
 
     def linkedTempFixedDOF(self):
-        #pointConstraints = []
-        _dofPos = a2p_libDOF.initPosDOF
-        _dofRot = a2p_libDOF.initRotDOF
+        """
+        Calculate the number of degrees of freedom (DOFs) constrained by temporary fixed rigids.
+        """
         self.reorderDependencies()
-        if not self.tempfixed:
-            if len(self.dependencies) > 0:
-                for x in self.dependencies:
-                    if x.dependedRigid.tempfixed:
-                        _dofPos, _dofRot = x.calcDOF(_dofPos,_dofRot, self.pointConstraints)
+        if not self.tempfixed and self.dependencies:
+            posDOF = []
+            rotDOF = []
+            for dependency in self.dependencies:
+                if dependency.dependedRigid.tempfixed:
+                    posDOF, rotDOF = dependency.calcDOF(posDOF, rotDOF, self.pointConstraints)
         else:
-            _dofPos, _dofRot = [] , []
-        return len(_dofPos) + len(_dofRot)
+            return 0
+
+        return len(posDOF) + len(rotDOF)
 
     def reorderDependencies(self):
         """
