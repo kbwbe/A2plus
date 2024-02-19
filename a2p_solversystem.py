@@ -473,31 +473,31 @@ class SolverSystem():
 
     def checkForUnmovedParts(self):
         """
-        If there are parts, which are constrained but have no
-        constraint path to a fixed part, the solver will
-        ignore them and they are not moved.
+        If there are parts constrained but have no
+        constraint path to a fixed part, the solver
+        ignores them and they are not moved.
         This function detects this and signals it to the user.
         """
-        if len(self.unmovedParts) != 0:
+        if self.unmovedParts:
             FreeCADGui.Selection.clearSelection()
             for obj in self.unmovedParts:
                 FreeCADGui.Selection.addSelection(obj)
-                msg = translate("A2plus",
-'''
-The highlighted parts were not moved. They are
-not constrained (also over constraint chains)
-to a fixed part!
-''')
-            if a2plib.SHOW_WARNING_FLOATING_PARTS: #dialog is not needet during conflict finding
+            msg = translate("A2plus",
+                '''
+                The highlighted parts were not moved. They are
+                not constrained (also over constraint chains)
+                to a fixed part!
+                ''')
+            if a2plib.SHOW_WARNING_FLOATING_PARTS:
                 QtGui.QMessageBox.information(
                     QtGui.QApplication.activeWindow(),
                     translate("A2plus", "Could not move some parts"),
                     msg
-                    )
+                )
             else:
-                print ('')
-                print (msg) # during conflict finding do a print to console output
-                print ('')
+                print('')
+                print(msg)  # Print to console output during conflict finding
+                print('')
 
     def printList(self, name, l):
         Msg("{} = (".format(name))
