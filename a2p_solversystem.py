@@ -445,45 +445,48 @@ class SolverSystem():
                     doc.getObject(rig.objectName)
                     )
 
-    def solveAccuracySteps(self,doc, matelist=None):
-        self.level_of_accuracy=1
-        self.mySOLVER_POS_ACCURACY = self.getSolverControlData()[self.level_of_accuracy][0]
-        self.mySOLVER_SPIN_ACCURACY = self.getSolverControlData()[self.level_of_accuracy][1]
+    def solveAccuracySteps(self, doc, matelist=None):
+        self.level_of_accuracy = 1
+        solver_control_data = self.getSolverControlData()
+        self.mySOLVER_POS_ACCURACY = solver_control_data[self.level_of_accuracy][0]
+        self.mySOLVER_SPIN_ACCURACY = solver_control_data[self.level_of_accuracy][1]
 
         self.loadSystem(doc, matelist)
         if self.status == "loadingDependencyError":
-            return
+            return False
+
         self.assignParentship(doc)
+        
         while True:
             systemSolved = self.calculateChain(doc)
+            
             if self.level_of_accuracy == 1:
                 self.detectUnmovedParts()   # do only once here. It can fail at higher accuracy levels
                                             # where not a final solution is required.
+                
             if a2plib.SOLVER_ONESTEP > 0:
                 systemSolved = True
                 break
+
             if systemSolved:
-                self.level_of_accuracy+=1
-                if self.level_of_accuracy > len(self.getSolverControlData()):
+                self.level_of_accuracy += 1
+                if self.level_of_accuracy > len(solver_control_data):
                     self.solutionToParts(doc)
                     break
-                self.mySOLVER_POS_ACCURACY = self.getSolverControlData()[self.level_of_accuracy][0]
-                self.mySOLVER_SPIN_ACCURACY = self.getSolverControlData()[self.level_of_accuracy][1]
+                    
+                self.mySOLVER_POS_ACCURACY = solver_control_data[self.level_of_accuracy][0]
+                self.mySOLVER_SPIN_ACCURACY = solver_control_data[self.level_of_accuracy][1]
                 self.loadSystem(doc, matelist)
             else:
-                completeSolvingRequired = self.getSolverControlData()[self.level_of_accuracy][2]
-                if not completeSolvingRequired: systemSolved = True
+                complete_solving_required = solver_control_data[self.level_of_accuracy][2]
+                if not complete_solving_required:
+                    systemSolved = True
                 break
-        self.maxAxisError = 0.0
-        self.maxSingleAxisError = 0.0
-        self.maxPosError = 0.0
-        for rig in self.rigids:
-            if rig.maxPosError > self.maxPosError:
-                self.maxPosError = rig.maxPosError
-            if rig.maxAxisError > self.maxAxisError:
-                self.maxAxisError = rig.maxAxisError
-            if rig.maxSingleAxisError > self.maxSingleAxisError:
-                self.maxSingleAxisError = rig.maxSingleAxisError
+        
+        self.maxAxisError = max(rig.maxAxisError for rig in self.rigids)
+        self.maxSingleAxisError = max(rig.maxSingleAxisError for rig in self.rigids)
+        self.maxPosError = max(rig.maxPosError for rig in self.rigids)
+
         if not a2plib.SIMULATION_STATE:
             Msg(translate("A2plus", "TARGET   POS-ACCURACY :{}").format(self.mySOLVER_POS_ACCURACY) + "\n")
             Msg(translate("A2plus", "REACHED  POS-ACCURACY :{}").format(self.maxPosError) + "\n")
