@@ -397,45 +397,37 @@ class Rigid():
             if axisErr > self.maxAxisError:
                 self.maxAxisError = axisErr
 
-
-
-    def move(self,doc):
-        if self.tempfixed or self.fixed: return
-        #
+    def move(self, doc):
+        if self.tempfixed or self.fixed:
+            return
         #Linear moving of a rigid
-        moveDist = Base.Vector(0,0,0)
-        if self.moveVectorSum is not None:
+        moveDist = Base.Vector(0, 0, 0)
+        if self.moveVectorSum:
             moveDist = Base.Vector(self.moveVectorSum)
             moveDist.multiply(WEIGHT_LINEAR_MOVE) # stabilize computation, adjust if needed...
-            if self.debugMode == True:
-                a2plib.drawDebugVectorAt(self.spinCenter, moveDist, a2plib.BLUE)
-        #
+
         #Rotate the rigid...
         center = None
         rotation = None
-        if (self.spin is not None and self.spin.Length != 0.0 and self.countSpinVectors != 0):
+        if self.spin and self.spin.Length != 0.0 and self.countSpinVectors != 0:
             savedSpin = copy.copy(self.spin)
-            spinAngle = self.spin.Length / self.countSpinVectors
-            if spinAngle>15.0: spinAngle=15.0 # do not accept more degrees
+            spinAngle = min(self.spin.Length / self.countSpinVectors, 15.0)  # Limit the spin angle to 15 degrees
             try:
-                spinStep = spinAngle/(SPINSTEP_DIVISOR) #it was 250.0
+                spinStep = spinAngle / SPINSTEP_DIVISOR #it was 250.0
                 self.spin.multiply(1.0e12)
                 self.spin.normalize()
                 rotation = FreeCAD.Rotation(self.spin, spinStep)
                 center = self.spinCenter
-                if self.debugMode == True:
-                    a2plib.drawDebugVectorAt(center, savedSpin, a2plib.RED)
-            except:
-                pass
+            except Exception as e:
+                print("Error occurred during rotation calculation:", e)
 
         if center is not None and rotation is not None:
-            pl = FreeCAD.Placement(moveDist,rotation,center)
+            pl = FreeCAD.Placement(moveDist, rotation, center)
             self.applyPlacementStep(pl)
-        else:
-            if moveDist.Length > 1e-8:
-                pl = FreeCAD.Placement()
-                pl.move(moveDist)
-                self.applyPlacementStep(pl)
+        elif moveDist.Length > 1e-8:
+            pl = FreeCAD.Placement()
+            pl.move(moveDist)
+            self.applyPlacementStep(pl)
 
     def currentDOF(self):
         """
