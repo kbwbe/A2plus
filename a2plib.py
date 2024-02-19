@@ -469,48 +469,62 @@ def numpyVecToFC(nv):
     assert len(nv) == 3
     return Base.Vector(nv[0],nv[1],nv[2])
 #------------------------------------------------------------------------------
-def fit_rotation_axis_to_surface1( surface, n_u=3, n_v=3 ):
-    'should work for cylinders and possibly cones (depending on the u,v mapping)'
-    uv = sum( [ [ (u,v) for u in numpy.linspace(0,1,n_u)] for v in numpy.linspace(0,1,n_v) ], [] )
-    P = [ numpy.array(surface.value(u,v)) for u,v in uv ] #positions at u,v points
-    N = [ numpy.cross( *surface.tangent(u,v) ) for u,v in uv ]
+def fit_rotation_axis_to_surface1(surface, n_u=3, n_v=3):
+    # Generate points on the surface grid
+    uv = [(u, v) for u in numpy.linspace(0, 1, n_u) for v in numpy.linspace(0, 1, n_v)]
+
+    # Compute positions and normals at grid points
+    P = [numpy.array(surface.value(u, v)) for u, v in uv]
+    N = [numpy.cross(*surface.tangent(u, v)) for u, v in uv]
+
+    # Find intersections of normals
     intersections = []
-    for i in range(len(N)-1):
-        for j in range(i+1,len(N)):
-            # based on the distance_between_axes( p1, u1, p2, u2) function,
-            if 1 - abs(numpy.dot( N[i], N[j])) < 10**-6:
-                continue #ignore parallel case
-            p1_x, p1_y, p1_z = P[i]
-            u1_x, u1_y, u1_z = N[i]
-            p2_x, p2_y, p2_z = P[j]
-            u2_x, u2_y, u2_z = N[j]
-            t1_t1_coef = u1_x**2 + u1_y**2 + u1_z**2 #should equal 1
-            t1_t2_coef = -2*u1_x*u2_x - 2*u1_y*u2_y - 2*u1_z*u2_z # collect( expand(d_sqrd), [t1*t2] )
-            t2_t2_coef = u2_x**2 + u2_y**2 + u2_z**2 #should equal 1 too
-            t1_coef    = 2*p1_x*u1_x + 2*p1_y*u1_y + 2*p1_z*u1_z - 2*p2_x*u1_x - 2*p2_y*u1_y - 2*p2_z*u1_z
-            t2_coef    =-2*p1_x*u2_x - 2*p1_y*u2_y - 2*p1_z*u2_z + 2*p2_x*u2_x + 2*p2_y*u2_y + 2*p2_z*u2_z
-            A = numpy.array([ [ 2*t1_t1_coef , t1_t2_coef ] , [ t1_t2_coef, 2*t2_t2_coef ] ])
-            b = numpy.array([ t1_coef, t2_coef])
+
+    # Iterate over pairs of normals
+    for i in range(len(N) - 1):
+        for j in range(i + 1, len(N)):
+            # Ignore parallel cases
+            if 1 - abs(numpy.dot(N[i], N[j])) < 10 ** -6:
+                continue
+
+            # Define points and normals of the two surfaces
+            p1, u1 = P[i], N[i]
+            p2, u2 = P[j], N[j]
+
+            # Solve linear system to find intersection points
+            A = numpy.array([[2 * numpy.dot(u1, u1), -2 * numpy.dot(u1, u2)],
+                              [-2 * numpy.dot(u1, u2), 2 * numpy.dot(u2, u2)]])
+            b = numpy.array([2 * numpy.dot(u1, p1 - p2), 2 * numpy.dot(u2, p2 - p1)])
+
             try:
-                t1, t2 = numpy.linalg.solve(A,-b)
+                # Solve the system for t1 and t2
+                t1, t2 = numpy.linalg.solve(A, -b)
+
+                # Calculate intersection points
+                pos_t1, pos_t2 = p1 + u1 * t1, p2 + u2 * t2
+                intersections.extend([pos_t1, pos_t2])
             except numpy.linalg.LinAlgError:
-                continue #print('distance_between_axes, failed to solve problem due to LinAlgError, using numerical solver instead')
-            pos_t1 = P[i] + numpy.array(N[i])*t1
-            pos_t2 = P[j] + N[j]*t2
-            intersections.append( pos_t1 )
-            intersections.append( pos_t2 )
+                continue
+
+    # If there are fewer than 2 intersection points, return None
     if len(intersections) < 2:
         error = numpy.inf
         return None, None, error
-    else: #fit vector to intersection points; http://mathforum.org/library/drmath/view/69103.html
+    else:
+        # Compute centroid and create matrix for fitting
         X = numpy.array(intersections)
-        centroid = numpy.mean(X,axis=0)
-        M = numpy.array([i - centroid for i in intersections ])
-        A = numpy.dot(M.transpose(), M)
-        U,s,V = numpy.linalg.svd(A)    #numpy docs: s : (..., K) The singular values for every matrix, sorted in descending order.
-        axis_pos = centroid
-        axis_dir = V[0]
-        error = s[1] #dont know if this will work
+        centroid = numpy.mean(X, axis=0)
+        M = X - centroid
+        A = M.T @ M
+
+        # Perform singular value decomposition (SVD)
+        _, s, V = numpy.linalg.svd(A)
+
+        # Extract axis position and direction from SVD results
+        axis_pos, axis_dir = centroid, V[0]
+        error = s[1]  # Second singular value represents error
+
+        # Convert axis direction and position to FreeCAD vectors and return
         return numpyVecToFC(axis_dir), numpyVecToFC(axis_pos), error
 #------------------------------------------------------------------------------
 def fit_plane_to_surface1( surface, n_u=3, n_v=3 ):
