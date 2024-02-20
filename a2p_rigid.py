@@ -558,3 +558,13 @@ class Rigid():
                 Msg(u"        {}\n".format(dep) )
             Msg(translate("A2plus", "        DOF Position free with this rigid = {}").format( len(self.dofPOSPerLinkedRigids[rig])) + "\n")
             Msg(translate("A2plus", "        DOF Rotation free with this rigid = {}").format( len(self.dofROTPerLinkedRigids[rig])) + "\n")
+            
+    def resetState(self, workList):
+        # Reset the state of the system
+        for rig in workList:
+            rig.reset()  # Implement a reset method in the Rigid class to reset its state
+
+    def reset(self):
+        # Reset the state of the Rigid object
+        # Implement the necessary reset logic here
+        pass

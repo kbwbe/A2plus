@@ -53,7 +53,7 @@ translate = FreeCAD.Qt.translate
 SOLVER_POS_ACCURACY = 1.0e-1  # gets to smaller values during solving
 SOLVER_SPIN_ACCURACY = 1.0e-1 # gets to smaller values during solving
 
-SOLVER_STEPS_CONVERGENCY_CHECK = 150 #200
+SOLVER_STEPS_CONVERGENCY_CHECK = 500 #200
 SOLVER_CONVERGENCY_FACTOR = 0.99
 SOLVER_CONVERGENCY_ERROR_INIT_VALUE = 1.0e+20
 
@@ -94,6 +94,11 @@ class SolverSystem():
         self.constraints = []
         self.objectNames = []
         self.partialSolverCurrentStage = PARTIAL_SOLVE_STAGE1
+        
+    def resetState(self, workList):
+        # Reset the state of the system
+        for rig in workList:
+            rig.reset()  # Implement a reset method in the Rigid class to reset its state
 
     def getSolverControlData(self):
         if a2plib.SIMULATION_STATE:
@@ -585,10 +590,10 @@ class SolverSystem():
                 w.move(doc)
 
             # Check accuracy and apply solution
-            if (maxPosError <= reqPosAccuracy and # relevant check
-                maxAxisError <= reqSpinAccuracy and # relevant check
-                maxSingleAxisError <= reqSpinAccuracy * 10) or (a2plib.SOLVER_ONESTEP > 0): # additional check for insolvable assemblies
-                # The accuracy is good, we're done here                                     # sometimes spin can be solved but singleAxis not..
+            if (maxPosError <= reqPosAccuracy and
+                maxAxisError <= reqSpinAccuracy and
+                maxSingleAxisError <= reqSpinAccuracy * 10) or (a2plib.SOLVER_ONESTEP > 0):
+                # The accuracy is good, we're done here
 
                 for r in workList:
                     r.applySolution(doc, self)
@@ -610,12 +615,14 @@ class SolverSystem():
                                 Msg('\n')
                                 Msg('convergency-conter: {}\n'.format(self.convergencyCounter))
                                 Msg(translate("A2plus", "Calculation stopped, no convergency anymore!") + "\n")
-                                return False
-
-                self.lastPositionError = maxPosError
-                self.lastAxisError = maxAxisError
-                self.maxSingleAxisError = maxSingleAxisError
-                self.convergencyCounter = 0
+                                # Attempt recovery
+                                self.resetState(workList)  # Reset the state of the system
+                                break  # Exit the loop and retry
+                else:
+                    self.lastPositionError = maxPosError
+                    self.lastAxisError = maxAxisError
+                    self.maxSingleAxisError = maxSingleAxisError
+                    self.convergencyCounter = 0
 
             if self.stepCount > SOLVER_MAXSTEPS:
                 Msg(translate("A2plus", "Reached max calculations count: {}").format(SOLVER_MAXSTEPS) + "\n")
