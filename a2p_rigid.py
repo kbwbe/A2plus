@@ -248,31 +248,39 @@ class Rigid():
             self.spinCenter = totalRefPoint / len(refPoints)
 
     def calcSpinBasicDataDepsEnabled(self):
-        newSpinCenter = Base.Vector(0,0,0)
+        """
+        Calculate the spin center and reference points bounding box size based on the enabled dependencies.
+
+        This method iterates over the enabled dependencies, calculates the spin center based on their reference points,
+        and determines the size of the bounding box enclosing all reference points.
+
+        Returns:
+            None
+        """
+        # Initialize variables
+        newSpinCenter = Base.Vector(0, 0, 0)
         countRefPoints = 0
-        xmin = 0
-        xmax = 0
-        ymin = 0
-        ymax = 0
-        zmin = 0
-        zmax = 0
+        refPoints = []  # Collect reference points for bounding box calculation
+
+        # Iterate over enabled dependencies
         for dep in self.dependencies:
             if dep.Enabled:
-                newSpinCenter = newSpinCenter.add(dep.refPoint)
+                # Accumulate reference points and count
+                newSpinCenter += dep.refPoint
                 countRefPoints += 1
-                if dep.refPoint.x < xmin: xmin=dep.refPoint.x
-                if dep.refPoint.x > xmax: xmax=dep.refPoint.x
-                if dep.refPoint.y < ymin: ymin=dep.refPoint.y
-                if dep.refPoint.y > ymax: ymax=dep.refPoint.y
-                if dep.refPoint.z < zmin: zmin=dep.refPoint.z
-                if dep.refPoint.z > zmax: zmax=dep.refPoint.z
-        vmin = Base.Vector(xmin,ymin,zmin)
-        vmax = Base.Vector(xmax,ymax,zmax)
-        self.refPointsBoundBoxSize = vmax.sub(vmin).Length
+                refPoints.append(dep.refPoint)
 
+        # Calculate the spin center if there are any reference points
         if countRefPoints > 0:
-            newSpinCenter.multiply(1.0/countRefPoints)
+            newSpinCenter.multiply(1.0 / countRefPoints)
             self.spinCenter = newSpinCenter
+
+            # Calculate bounding box size
+            minPoint = Base.Vector(min(refPoints, key=lambda p: p.x).x, min(refPoints, key=lambda p: p.y).y,
+                                min(refPoints, key=lambda p: p.z).z)
+            maxPoint = Base.Vector(max(refPoints, key=lambda p: p.x).x, max(refPoints, key=lambda p: p.y).y,
+                                max(refPoints, key=lambda p: p.z).z)
+            self.refPointsBoundBoxSize = maxPoint.sub(minPoint).Length
 
     def calcRefPointsBoundBoxSizeDepsEnabled(self):
         xmin = 0
