@@ -427,10 +427,16 @@ class SolverSystem():
                     systemSolved = True
                 break
         
-        # Update maximum errors
-        self.maxAxisError = max(rig.maxAxisError for rig in self.rigids)
-        self.maxSingleAxisError = max(rig.maxSingleAxisError for rig in self.rigids)
-        self.maxPosError = max(rig.maxPosError for rig in self.rigids)
+        if self.rigids:
+            # Update maximum errors
+            self.maxAxisError = max(rig.maxAxisError for rig in self.rigids)
+            self.maxSingleAxisError = max(rig.maxSingleAxisError for rig in self.rigids)
+            self.maxPosError = max(rig.maxPosError for rig in self.rigids)
+        else:
+            # Handle the case when self.rigids is empty
+            self.maxAxisError = 0
+            self.maxSingleAxisError = 0
+            self.maxPosError = 0
 
         # Print accuracy information if not in simulation state
         if not a2plib.SIMULATION_STATE:
