@@ -433,33 +433,38 @@ class Rigid():
         self.maxAxisError = self.spin.Length
 
     def move(self, doc):
+        """
+        Move the rigid object according to its current movement and rotation parameters.
+
+        Args:
+            doc: The FreeCAD document.
+        """
+        # Check if the rigid is temporarily fixed or fully fixed
         if self.tempfixed or self.fixed:
             return
-        #Linear moving of a rigid
-        moveDist = Base.Vector(0, 0, 0)
-        if self.moveVectorSum:
-            moveDist = Base.Vector(self.moveVectorSum)
-            moveDist.multiply(WEIGHT_LINEAR_MOVE) # stabilize computation, adjust if needed...
 
-        #Rotate the rigid...
-        center = None
-        rotation = None
+        # Linear movement of the rigid
+        moveDist = Base.Vector(self.moveVectorSum) * WEIGHT_LINEAR_MOVE if self.moveVectorSum else Base.Vector(0, 0, 0)
+
+        # Rotate the rigid if spin information is available
         if self.spin and self.spin.Length != 0.0 and self.countSpinVectors != 0:
-            savedSpin = copy.copy(self.spin)
             spinAngle = min(self.spin.Length / self.countSpinVectors, 15.0)  # Limit the spin angle to 15 degrees
             try:
-                spinStep = spinAngle / SPINSTEP_DIVISOR #it was 250.0
+                spinStep = spinAngle / SPINSTEP_DIVISOR  # It was 250.0
                 self.spin.multiply(1.0e12)
                 self.spin.normalize()
                 rotation = FreeCAD.Rotation(self.spin, spinStep)
                 center = self.spinCenter
             except Exception as e:
                 print("Error occurred during rotation calculation:", e)
+            else:
+                # Apply the rotation
+                pl = FreeCAD.Placement(moveDist, rotation, center)
+                self.applyPlacementStep(pl)
+                return
 
-        if center is not None and rotation is not None:
-            pl = FreeCAD.Placement(moveDist, rotation, center)
-            self.applyPlacementStep(pl)
-        elif moveDist.Length > 1e-8:
+        # Apply linear movement if rotation is not required
+        if moveDist.Length > 1e-8:
             pl = FreeCAD.Placement()
             pl.move(moveDist)
             self.applyPlacementStep(pl)
