@@ -315,20 +315,34 @@ class Rigid():
 
 
     def calcRefPointsBoundBoxSize(self):
-        xmin = 0
-        xmax = 0
-        ymin = 0
-        ymax = 0
-        zmin = 0
-        zmax = 0
+        """
+        Calculate the size of the bounding box enclosing all reference points.
+
+        This method iterates over all dependencies and determines the bounding box size based on their reference points.
+
+        Returns:
+            None
+        """
+        # Initialize min and max values with the first dependency's reference point
+        first_dep = next(iter(self.dependencies), None)
+        if first_dep is None:
+            return  # No dependencies, exit early
+        xmin = xmax = first_dep.refPoint.x
+        ymin = ymax = first_dep.refPoint.y
+        zmin = zmax = first_dep.refPoint.z
+
+        # Iterate over all dependencies starting from the second one
         for dep in self.dependencies:
-            if dep.refPoint.x < xmin: xmin=dep.refPoint.x
-            if dep.refPoint.x > xmax: xmax=dep.refPoint.x
-            if dep.refPoint.y < ymin: ymin=dep.refPoint.y
-            if dep.refPoint.y > ymax: ymax=dep.refPoint.y
-            if dep.refPoint.z < zmin: zmin=dep.refPoint.z
-            if dep.refPoint.z > zmax: zmax=dep.refPoint.z
-        self.refPointsBoundBoxSize = math.sqrt( (xmax-xmin)**2 + (ymax-ymin)**2 + (zmax-zmin)**2 )
+            # Update min and max values for each axis
+            xmin = min(xmin, dep.refPoint.x)
+            xmax = max(xmax, dep.refPoint.x)
+            ymin = min(ymin, dep.refPoint.y)
+            ymax = max(ymax, dep.refPoint.y)
+            zmin = min(zmin, dep.refPoint.z)
+            zmax = max(zmax, dep.refPoint.z)
+
+        # Calculate bounding box size using Euclidean distance formula
+        self.refPointsBoundBoxSize = math.sqrt((xmax - xmin) ** 2 + (ymax - ymin) ** 2 + (zmax - zmin) ** 2)
 
     def calcMoveData(self, doc, solver):
         if self.tempfixed or self.fixed:
