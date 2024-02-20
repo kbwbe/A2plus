@@ -229,14 +229,23 @@ class Rigid():
             self.spinCenter = newSpinCenter / countRefPoints
 
     def calcSpinCenter(self):
-        newSpinCenter = Base.Vector(0, 0, 0)
-        countRefPoints = 0
-        for dep in self.dependencies:
-            if dep.refPoint is not None:
-                newSpinCenter += dep.refPoint
-                countRefPoints += 1
-        if countRefPoints > 0:
-            self.spinCenter = newSpinCenter / countRefPoints
+        """
+        Calculate the center for rotation (spin center) based on the reference points of dependencies.
+
+        This method iterates over the dependencies and calculates the spin center based on the available reference points.
+
+        Returns:
+            None
+        """
+        # Initialize variables
+        refPoints = [dep.refPoint for dep in self.dependencies if dep.refPoint is not None]
+
+        # Check if there are any valid reference points
+        if refPoints:
+            # Calculate the sum of all reference points
+            totalRefPoint = sum(refPoints, Base.Vector(0, 0, 0))
+            # Calculate the average by dividing the sum by the number of reference points
+            self.spinCenter = totalRefPoint / len(refPoints)
 
     def calcSpinBasicDataDepsEnabled(self):
         newSpinCenter = Base.Vector(0,0,0)
