@@ -26,6 +26,7 @@ import FreeCAD, FreeCADGui
 from PySide import QtGui
 #from a2p_translateUtils import *
 import a2plib
+import cProfile
 from a2plib import (
     path_a2p,
     Msg,
@@ -406,6 +407,7 @@ class SolverSystem():
         # Iteratively refine accuracy level until convergence or maximum level
         while True:
             # Calculate chain and check if the system is solved
+            # self.profile_calculateChain(doc)
             systemSolved = self.calculateChain(doc)
             
             # Detect unmoved parts if accuracy level is 1
@@ -516,6 +518,13 @@ class SolverSystem():
             Msg( "{} ".format(e.label) )
         Msg("):\n")
 
+    def profile_calculateChain(self,doc):
+        profiler = cProfile.Profile()
+        profiler.enable()
+        self.calculateChain(doc)
+        profiler.disable()
+        profiler.print_stats()
+    
     def calculateChain(self, doc):
         self.stepCount = 0
         workList = []
