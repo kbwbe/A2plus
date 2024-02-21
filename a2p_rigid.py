@@ -82,6 +82,8 @@ class Rigid():
         self.tempfixed = fixed
         self.moved = False
         self.placement = placement
+        # Cached state attributes
+        self.initialPlacement = placement
         self.debugMode = debugMode
         self.savedPlacement = placement
         self.dependencies = []
@@ -121,6 +123,12 @@ class Rigid():
     def enableDependencies(self, workList):
         for dep in self.dependencies:
             dep.enable(workList)
+            
+    def updateCachedState(self, newPlacement):
+        """
+        Update the cached state of the rigid with the new placement.
+        """
+        self.initialPlacement = newPlacement
 
     # The function only sets parentship for childrens that are distant+1 from fixed rigid
     # The function should be called in a loop with increased distance until it return False
