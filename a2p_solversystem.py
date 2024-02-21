@@ -546,6 +546,9 @@ class SolverSystem():
                     addList.update(rig.getCandidates())
 
             if addList:
+                # Update cached state for rigids being added to the work list
+                for rig in addList:
+                    rig.updateCachedState(rig.placement)
                 workList.extend(addList)
                 solutionFound = self.calculateWorkList(doc, workList)
                 if not solutionFound:
