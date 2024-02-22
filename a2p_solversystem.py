@@ -39,7 +39,6 @@ from a2p_dependencies import Dependency
 from a2p_rigid import Rigid
 
 SOLVER_MAXSTEPS = 50000
-MAX_CONVERGENCY_COUNTER = 50000  # Define the maximum number of convergency attempts allowed
 translate = FreeCAD.Qt.translate
 
 # SOLVER_CONTROLDATA has been replaced by SolverSystem.getSolverControlData()
@@ -625,15 +624,12 @@ class SolverSystem():
                                     r.tempfixed = False
                                     break
                             else:
-                                if self.convergencyCounter == 0:
-                                    Msg('\n')
-                                    Msg('convergency-conter: {}\n'.format(self.convergencyCounter))
-                                    Msg(translate("A2plus", "Calculation stopped, no convergency anymore!") + "\n")
+                                Msg('\n')
+                                Msg('convergency-conter: {}\n'.format(self.convergencyCounter))
+                                Msg(translate("A2plus", "Calculation stopped, no convergency anymore!") + "\n")
                                 # Attempt recovery
                                 self.resetState(workList)  # Reset the state of the system
-                                self.convergencyCounter += 1
-                                if self.convergencyCounter >= MAX_CONVERGENCY_COUNTER:
-                                    break  # Exit the loop to prevent excessive attempts
+                                break  # Exit the loop and retry
                 else:
                     self.lastPositionError = maxPosError
                     self.lastAxisError = maxAxisError
