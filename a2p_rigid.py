@@ -82,6 +82,8 @@ class Rigid():
         self.tempfixed = fixed
         self.moved = False
         self.placement = placement
+        # Cached state attributes
+        self.initialPlacement = placement
         self.debugMode = debugMode
         self.savedPlacement = placement
         self.dependencies = []
@@ -398,7 +400,11 @@ class Rigid():
             axisErr = self.spin.Length
             if axisErr > self.maxAxisError : self.maxAxisError = axisErr
 
-
+    def updateCachedState(self, newPlacement):
+        """
+        Update the cached state of the rigid with the new placement.
+        """
+        self.initialPlacement = newPlacement
 
     def move(self,doc):
         if self.tempfixed or self.fixed: return

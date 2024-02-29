@@ -53,7 +53,7 @@ translate = FreeCAD.Qt.translate
 SOLVER_POS_ACCURACY = 1.0e-1  # gets to smaller values during solving
 SOLVER_SPIN_ACCURACY = 1.0e-1 # gets to smaller values during solving
 
-SOLVER_STEPS_CONVERGENCY_CHECK = 150 #200
+SOLVER_STEPS_CONVERGENCY_CHECK = 2000 #200
 SOLVER_CONVERGENCY_FACTOR = 0.99
 SOLVER_CONVERGENCY_ERROR_INIT_VALUE = 1.0e+20
 
@@ -85,6 +85,8 @@ class SolverSystem():
         self.maxAxisError = 0.0
         self.maxSingleAxisError = 0.0
         self.unmovedParts = []
+        # Initialize cache dictionary to store positions of rigids and their solutions
+        self.rigid_positions_cache = {}
 
     def clear(self):
         for r in self.rigids:
@@ -563,55 +565,51 @@ to a fixed part!
         Msg("):\n")
 
     def calculateChain(self, doc):
+        # Initialize step count and work list
         self.stepCount = 0
         workList = []
 
-        if a2plib.SIMULATION_STATE == True:
-            # Solve complete System at once if simulation is running
+        if a2plib.SIMULATION_STATE or not a2plib.PARTIAL_PROCESSING_ENABLED:
+            # Solve complete system at once if simulation is running or partial processing is disabled
             workList = self.rigids
-            solutionFound = self.calculateWorkList(doc, workList)
-            if not solutionFound: return False
-            return True
-        elif a2plib.PARTIAL_PROCESSING_ENABLED == False:
-            # Solve complete System at once
-            workList = self.rigids
-            solutionFound = self.calculateWorkList(doc, workList)
-            if not solutionFound: return False
-            return True
-        else:
-            # Normal partial solving if no simulation is running
-            # load initial worklist with all fixed parts...
-            for rig in self.rigids:
-                if rig.fixed:
-                    workList.append(rig);
-            #self.printList("Initial-Worklist", workList)
+            return self.calculateWorkList(doc, workList)
 
-            while True:
-                addList = []
-                newRigFound = False
+        # Normal partial solving if no simulation is running and partial processing is enabled
+        # Load initial worklist with all fixed parts
+        workList.extend(rig for rig in self.rigids if rig.fixed)
+
+        while True:
+            addList = set()
+            newRigFound = False
+            
+            # Check linked rigids for possible additions to the work list
+            for rig in workList:
+                for linkedRig in rig.linkedRigids:
+                    if linkedRig not in workList and rig.isFullyConstrainedByRigid(linkedRig):
+                        addList.add(linkedRig)
+                        newRigFound = True
+                        break
+            
+            if not newRigFound:
+                # If no new rigids found, consider candidates for addition to the work list
                 for rig in workList:
-                    for linkedRig in rig.linkedRigids:
-                        if linkedRig in workList: continue
-                        if rig.isFullyConstrainedByRigid(linkedRig):
-                            addList.append(linkedRig)
-                            newRigFound = True
-                            break
-                if not newRigFound:
-                    for rig in workList:
-                        addList.extend(rig.getCandidates())
-                addList = set(addList)
-                #self.printList("AddList", addList)
-                if len(addList) > 0:
-                    workList.extend(addList)
-                    solutionFound = self.calculateWorkList(doc, workList)
-                    if not solutionFound: return False
-                else:
-                    break
+                    addList.update(rig.getCandidates())
 
-                if a2plib.SOLVER_ONESTEP > 2:
-                    break
+            if addList:
+                # Update cached state for rigids being added to the work list
+                for rig in addList:
+                    rig.updateCachedState(rig.placement)
+                workList.extend(addList)
+                solutionFound = self.calculateWorkList(doc, workList)
+                if not solutionFound:
+                    return False
+            else:
+                break
 
-            return True
+            if a2plib.SOLVER_ONESTEP > 2:
+                break
+            
+        return True
 
     def calculateWorkList(self, doc, workList):
         reqPosAccuracy = self.mySOLVER_POS_ACCURACY
@@ -628,6 +626,12 @@ to a fixed part!
 
         calcCount = 0
         goodAccuracy = False
+        pos_error_check=True
+        maxAxisError_check=True
+        maxSingleAxisError_check=True
+        pos_error_save=[]
+        axis_error_save=[]
+        single_axis_error_save=[]
         while not goodAccuracy:
             maxPosError = 0.0
             maxAxisError = 0.0
@@ -659,6 +663,7 @@ to a fixed part!
                 ) or (a2plib.SOLVER_ONESTEP > 0):
                 # The accuracy is good, we're done here
                 goodAccuracy = True
+
                 # Mark the rigids as tempfixed and add its constrained rigids to pending list to be processed next
                 for r in workList:
                     r.applySolution(doc, self)
@@ -689,8 +694,8 @@ to a fixed part!
                     else:
                         Msg('\n')
                         Msg('convergency-conter: {}\n'.format(self.convergencyCounter))
-                        Msg(translate("A2plus", "Calculation stopped, no convergency anymore!") + "\n")
-                        return False
+                        Msg(translate("A2plus", "No convergency anymore, retrying") + "\n")
+                        pass
 
                 self.lastPositionError = maxPosError
                 self.lastAxisError = maxAxisError
