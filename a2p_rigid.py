@@ -310,7 +310,7 @@ class Rigid():
         depMoveVectors = []             #all moveVectors
         depRefPoints_Spin = []          #refPoints, relevant for spin generation...
         depMoveVectors_Spin = []        #depMoveVectors, relevant for spin generation...
-        #
+        # Initialize error variables
         self.maxPosError = 0.0
         self.maxAxisError = 0.0         # SpinError is an average of all single spins
         self.maxSingleAxisError = 0.0   # avoid average, to detect unsolvable assemblies
@@ -336,32 +336,31 @@ class Rigid():
             # Calculate max move error
             if moveVector.Length > self.maxPosError: self.maxPosError = moveVector.Length
 
-            # Accomulate all the movements for later average calculations
-            self.moveVectorSum = self.moveVectorSum.add(moveVector)
+            # Calculate max move error
+            move_length = moveVector.Length
+            if move_length > self.maxPosError:
+                self.maxPosError = move_length
 
-        # Calculate the average of all the movements
-        if len(depMoveVectors) > 0:
-            self.moveVectorSum = self.moveVectorSum.multiply(1.0/len(depMoveVectors))
+            # Accumulate all movements for later average calculations
+            self.moveVectorSum += moveVector
 
+        # Calculate the average of all movements
+        num_vectors = len(depMoveVectors)
+        if num_vectors > 0:
+            self.moveVectorSum *= (1.0 / num_vectors)
 
         #compute rotation caused by refPoint-attractions
         if len(depMoveVectors_Spin) >= 2:
-            #FIXME
-            self.spin = Base.Vector(0,0,0)
-            tmpSpinCenter = depRefPoints_Spin[0] # assume rigid spinning around first depRefPoint
+            self.spin = Base.Vector(0, 0, 0)
+            tmpSpinCenter = depRefPoints_Spin[0]
 
-            # Eliminate the offset of depRefPoint[0] from all depMoveVectors
-            offsetVector = Base.Vector(depMoveVectors_Spin[0]) # make a copy
-            for i in range(0, len(depMoveVectors_Spin)):
-                depMoveVectors_Spin[i] = depMoveVectors_Spin[i].sub(offsetVector)
+            for i in range(1, len(depRefPoints_Spin)):
+                vec1 = depRefPoints_Spin[i] - tmpSpinCenter
+                vec2 = depMoveVectors_Spin[i]
+                axis = vec1.cross(vec2)
+                axis_length = axis.Length
 
-            for i in range(1, len(depRefPoints_Spin)): # do not use index 0, rigid is assumed spinning around this point
-                try:
-                    vec1 = depRefPoints_Spin[i].sub(tmpSpinCenter) # 'aka Radius'
-                    #if vec1.Length < 1e-6: continue
-                    vec2 = depMoveVectors_Spin[i] # 'aka Force'
-                    axis = vec1.cross(vec2) #torque-vector
-
+                if axis_length > 0:
                     vec1.normalize()
                     vec1.multiply(self.refPointsBoundBoxSize)
                     vec3 = vec1.add(vec2)
@@ -370,13 +369,9 @@ class Rigid():
                     if beta > self.maxSingleAxisError:
                         self.maxSingleAxisError = beta
 
-                    axis.multiply(1.0e6)
-                    axis.normalize()
-                    axis.multiply(beta*WEIGHT_REFPOINT_ROTATION) #here use degrees
-                    self.spin = self.spin.add(axis)
+                    axis *= (beta * WEIGHT_REFPOINT_ROTATION) / axis_length
+                    self.spin += axis
                     self.countSpinVectors += 1
-                except:
-                    pass #numerical exception above, no spin !
 
         #compute rotation caused by axis' of the dependencies //FIXME (align,opposed,none)
         if len(self.dependencies) > 0:
