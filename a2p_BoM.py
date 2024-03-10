@@ -128,10 +128,9 @@ def createPartList(
             # #########################################################
             # add dimensions from the overall bounding box of the file
             # in the last 3 fields before the filename
-            bb = FreeCAD.BoundBox();
             dc = FreeCAD.openDocument(linkedSource)
-            for object in (dc.findObjects("Part::Feature")):
-                   bb.add( object.Shape.BoundBox )
+            op = Part.makeCompound([i.Shape for i in dc.findObjects("Part::Feature") if i.ViewObject.Visibility and not i.TypeId == "PartDesign::Plane"])
+            bb = op.BoundBox
             partInformation[-2] = str(bb.ZLength)
             partInformation[-3] = str(bb.YLength)
             partInformation[-4] = str(bb.XLength)
