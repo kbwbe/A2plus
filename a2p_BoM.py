@@ -135,7 +135,7 @@ def createPartList(
             partInformation[-2] = str(bb.ZLength)
             partInformation[-3] = str(bb.YLength)
             partInformation[-4] = str(bb.XLength)
-            FreeCAD.closeDocument(dc.Label)
+            FreeCAD.closeDocument(dc.Name)
             # #########################################################
 
             # put information to dict and count usage of sourcefiles..
