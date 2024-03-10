@@ -156,6 +156,7 @@ class A2plusWorkbench (Workbench):
             'a2p_repairTreeViewCommand',
             'a2p_CreatePartInformationSheet_Command',
             'a2p_CreatePartlist',
+            'a2p_CreateCutListOptimizerPartlist'
             ]
 
         # Create list of commands for toolbar A2p_Diagnostics
