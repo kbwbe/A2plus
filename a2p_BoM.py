@@ -125,6 +125,19 @@ def createPartList(
             # last entry of partinformations is reserved for filename
             partInformation[-1] = os.path.split(linkedSource)[1]  # without complete path...
 
+            # #########################################################
+            # add dimensions from the overall bounding box of the file
+            # in the last 3 fields before the filename
+            bb = FreeCAD.BoundBox();
+            dc = FreeCAD.openDocument(linkedSource)
+            for object in (dc.findObjects("Part::Feature")):
+                   bb.add( object.Shape.BoundBox )
+            partInformation[-2] = str(bb.ZLength)
+            partInformation[-3] = str(bb.YLength)
+            partInformation[-4] = str(bb.XLength)
+            FreeCAD.closeDocument(dc.Label)
+            # #########################################################
+
             # put information to dict and count usage of sourcefiles..
             entry = partListEntries.get(linkedSource, None)
             if entry is None:

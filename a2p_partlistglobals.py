@@ -38,5 +38,11 @@ PARTLIST_COLUMN_NAMES = [
     translate("A2p_BoM", "SUPPLIER"),
     translate("A2p_BoM", "SUPP.IDENTNO"),
     translate("A2p_BoM", "SUPP.DESCRIPTION"),
+    translate("A2p_BoM", "SUPP.URL"),
+    translate("A2p_BoM", "SUPP.PRICE"),
+    translate("A2p_BoM", "SUPP.PRICEUNIT"),
+    translate("A2p_BoM", "(DIMENSION X)"),
+    translate("A2p_BoM", "(DIMENSION Y)"),
+    translate("A2p_BoM", "(DIMENSION Z)"),
     translate("A2p_BoM", "(FILENAME)")
     ]
