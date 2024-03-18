@@ -1316,7 +1316,7 @@ class ConstrainedPartsMover:
 toolTip = \
 translate("A2plus",
 '''
-Move the a part under rule of constraints.
+Move a part under rule of constraints.
 
 1) Hit this button
 2) Click a part and it is glued to the cursor and can be moved
@@ -1629,7 +1629,7 @@ after a constraint has been edited
 
 If automatic solving is disabled
 you have to start it manually
-by hitting the solvebutton
+by hitting the solve button
 '''
 )
 
@@ -1972,7 +1972,7 @@ class a2p_MigrateProxiesCommand():
         flags = QtGui.QMessageBox.StandardButton.Yes | QtGui.QMessageBox.StandardButton.No
         response = QtGui.QMessageBox.information(
             QtGui.QApplication.activeWindow(),
-            translate("A2plus", "Migrate proxies of importedParts to recent version"),
+            translate("A2plus", "Migrate proxies of imported Parts to recent version"),
             translate("A2plus", "Make sure you have a backup of your files. Proceed?"),
             flags
             )
