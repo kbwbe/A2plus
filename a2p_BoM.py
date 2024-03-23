@@ -330,21 +330,7 @@ class a2p_CreatePartlist():
         # Write Column headers to spreadsheet
         ss.set('A1', translate("A2p_BoM", "POS"))
         ss.set('B1', translate("A2p_BoM", "QTY"))
-        idx1 = ord('C')
-        idx2 = idx1 + len(PARTLIST_COLUMN_NAMES)
-        i = 0
-        for c in range(idx1, idx2):
-            ss.set(chr(c) + "1", PARTLIST_COLUMN_NAMES[i])
-            i += 1
-        # Set the background color of the column headers
-        ss.setBackground('A1:' + chr(idx2 - 1) + '1',
-                         (0.000000, 1.000000, 0.000000, 1.000000))
-        # Set the columnwith to proper values
-        ss.setColumnWidth('A', 40)
-        i = 0
-        for c in range(idx1, idx2):
-            ss.setColumnWidth(chr(c), 150)
-            i += 1
+        self.CreateColumnHeadersInSpreadsheet(ss, PARTLIST_COLUMN_NAMES, 'C')
         # fill entries for partsList...
         idx3 = ord('A')
         for idx, k in enumerate(partListEntries.keys()):
@@ -384,6 +370,28 @@ class a2p_CreatePartlist():
                 "Only the parts within the " + "\n" +
                 "recent assembly are collected.")
         }
+
+    def CreateColumnHeadersInSpreadsheet(self, ss, columnHeaders, startColumn):
+        """
+        Creates the column headers in the given spreadsheet (`ss`) starting in the column `startColumn`.
+        The column headers are specified in the array `columnHeaders`.
+        """
+        # Write Column headers to spreadsheet
+        idx1 = ord(startColumn)
+        idx2 = idx1 + len(columnHeaders)
+        i = 0
+        for c in range(idx1, idx2):
+            ss.set(chr(c) + "1", columnHeaders[i])
+            i += 1
+        # Set the background color of the column headers
+        ss.setBackground('A1:' + chr(idx2 - 1) + '1',
+                         (0.000000, 1.000000, 0.000000, 1.000000))
+        # Set the columnwith to proper values
+        ss.setColumnWidth('A', 40)
+        i = 0
+        for c in range(idx1, idx2):
+            ss.setColumnWidth(chr(c), 150)
+            i += 1
 
 
 class a2p_CreateCutListOptimizerPartlist(a2p_CreatePartlist):
@@ -452,7 +460,8 @@ class a2p_CreateCutListOptimizerPartlist(a2p_CreatePartlist):
         else:
             self.clearPartList()
 
-        self.CreateColumnHeadersInSpreadsheet(ss)
+        self.CreateColumnHeadersInSpreadsheet(
+            ss, CLO_PARTLIST_COLUMN_NAMES, 'A')
 
         self.FillPartsListEntries(ss, partListEntries)
 
@@ -485,28 +494,6 @@ class a2p_CreateCutListOptimizerPartlist(a2p_CreatePartlist):
                 "Only the parts within the " + "\n" +
                 "recent assembly are collected.")
         }
-
-    def CreateColumnHeadersInSpreadsheet(self, ss):
-        """
-        Length,Width,Qty,Material,Label,Enabled
-        200,300,3,DEFAULT_MATERIAL,200×300,true
-        """
-        # Write Column headers to spreadsheet
-        idx1 = ord('A')
-        idx2 = idx1 + len(CLO_PARTLIST_COLUMN_NAMES)
-        i = 0
-        for c in range(idx1, idx2):
-            ss.set(chr(c) + "1", CLO_PARTLIST_COLUMN_NAMES[i])
-            i += 1
-        # Set the background color of the column headers
-        ss.setBackground('A1:' + chr(idx2 - 1) + '1',
-                         (0.000000, 1.000000, 0.000000, 1.000000))
-        # Set the columnwith to proper values
-        ss.setColumnWidth('A', 40)
-        i = 0
-        for c in range(idx1, idx2):
-            ss.setColumnWidth(chr(c), 150)
-            i += 1
 
     def FillPartsListEntries(self, ss, partListEntries):
         # [2, ['*', '*', '75.0', '45.0', '1050.0', 'LongBeam.FCStd']]
