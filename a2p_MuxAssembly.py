@@ -256,7 +256,7 @@ of the complete Assembly.
 All parts within the assembly
 are combined to a single shape.
 This shape can be used e.g. for the
-techdraw module or 3D printing.
+TechDraw module or 3D printing.
 
 The created shape can be found
 in the treeview. By default it
@@ -278,7 +278,7 @@ def createOrUpdateSimpleAssemblyShape(doc):
         QtGui.QMessageBox.critical(
                                    QtGui.QApplication.activeWindow(),
                                    translate("A2plus", "Cannot create SimpleAssemblyShape"),
-                                   translate("A2plus", "No visible ImportParts found")
+                                   translate("A2plus", "No visible Import Parts found")
                                    )
         return
 
