@@ -35,6 +35,9 @@ import a2p_Resources3
 translate = FreeCAD.Qt.translate
 QT_TRANSLATE_NOOP = FreeCAD.Qt.QT_TRANSLATE_NOOP
 
+# add translations path
+FreeCADGui.addLanguagePath(a2plib.getLanguagePath())
+FreeCADGui.updateLocale()
 
 class A2plusWorkbench (Workbench):
 
@@ -54,10 +57,6 @@ class A2plusWorkbench (Workbench):
         # add translations functions
         translate = FreeCAD.Qt.translate
         QT_TRANSLATE_NOOP = FreeCAD.Qt.QT_TRANSLATE_NOOP
-
-        # add translations path
-        FreeCADGui.addLanguagePath(a2plib.getLanguagePath())
-        FreeCADGui.updateLocale()
 
         # print A2plus version
         FreeCAD.Console.PrintMessage(
