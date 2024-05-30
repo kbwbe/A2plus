@@ -617,19 +617,33 @@ class TopoMapper(object):
                         for c in range(0,count): # add colors to multiple representations of linkedObject
                             faceColors.extend(diffuseCol)
                 else: # no link is involved...
-                    needDiffuseExtension = ( len(ob.ViewObject.DiffuseColor) < len(ob.Shape.Faces) )
-                    shapeCol = ob.ViewObject.ShapeColor
-                    diffuseCol = ob.ViewObject.DiffuseColor
-                    transparency = ob.ViewObject.Transparency
-                    shape_list.append(ob.Shape)
-                    if needDiffuseExtension:
+                    if hasattr(ob.ViewObject, "ShapeColor") and hasattr(ob.ViewObject,"DiffuseColor"):
+                        needDiffuseExtension = ( len(ob.ViewObject.DiffuseColor) < len(ob.Shape.Faces) )
+                        shapeCol = ob.ViewObject.ShapeColor
+                        diffuseCol = ob.ViewObject.DiffuseColor
+                        transparency = ob.ViewObject.Transparency
+                        shape_list.append(ob.Shape)
+                        if needDiffuseExtension:
+                            diffuseElement = a2plib.makeDiffuseElement(shapeCol,transparency)
+                            for i in range(0,len(tempShape.Faces)):
+                                faceColors.append(diffuseElement)
+                        else:
+                            faceColors.extend(diffuseCol)
+                    elif hasattr(ob.ViewObject, "ShapeColor"):
+                        shapeCol = ob.ViewObject.ShapeColor
+                        transparency = ob.Color[3]
+                        shape_list.append(ob.Shape)
                         diffuseElement = a2plib.makeDiffuseElement(shapeCol,transparency)
                         for i in range(0,len(tempShape.Faces)):
                             faceColors.append(diffuseElement)
                     else:
-                        faceColors.extend(diffuseCol) #let python libs extend faceColors, much faster
-                        
-    
+                        shapeCol = ob.Color
+                        transparency = ob.Color[3]
+                        shape_list.append(ob.Shape)
+                        diffuseElement = a2plib.makeDiffuseElement(shapeCol,transparency)
+                        for i in range(0,len(tempShape.Faces)):
+                            faceColors.append(diffuseElement)
+
             shell = Part.makeShell(faces)
             try:
                 if a2plib.getUseSolidUnion():
