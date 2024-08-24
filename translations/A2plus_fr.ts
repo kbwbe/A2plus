@@ -62,7 +62,7 @@ recent assembly are collected.
     <message>
         <location filename="../a2p_bom.py" line="178"/>
         <source>You have to open a FCStd file first.</source>
-        <translation type="obsolete">Il faut d&apos;abord ouvrir un fichier FCStd.</translation>
+        <translation type="obsolete">Il faut d'abord ouvrir un fichier FCStd.</translation>
     </message>
     <message>
         <location filename="../a2p_bom.py" line="187"/>
@@ -82,7 +82,7 @@ recent assembly are collected.
     <message>
         <location filename="../a2p_bom.py" line="190"/>
         <source>You have to save the assembly file first.</source>
-        <translation type="obsolete">Vous devez d&apos;abord enregistrer le fichier de l&apos;assemblage.</translation>
+        <translation type="obsolete">Vous devez d'abord enregistrer le fichier de l'assemblage.</translation>
     </message>
     <message>
         <location filename="../a2p_bom.py" line="199"/>
@@ -105,52 +105,52 @@ recent assembly are collected.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_partlistglobals.py" line="36"/>
+        <location filename="../a2p_partlistglobals.py" line="43"/>
         <source>IDENTNO</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_partlistglobals.py" line="37"/>
+        <location filename="../a2p_partlistglobals.py" line="44"/>
         <source>DESCRIPTION</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_partlistglobals.py" line="38"/>
+        <location filename="../a2p_partlistglobals.py" line="45"/>
         <source>SUPPLIER</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_partlistglobals.py" line="39"/>
+        <location filename="../a2p_partlistglobals.py" line="46"/>
         <source>SUPP.IDENTNO</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_partlistglobals.py" line="40"/>
+        <location filename="../a2p_partlistglobals.py" line="47"/>
         <source>SUPP.DESCRIPTION</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_partlistglobals.py" line="41"/>
+        <location filename="../a2p_partlistglobals.py" line="48"/>
         <source>(FILENAME)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_BoM.py" line="95"/>
+        <location filename="../a2p_BoM.py" line="214"/>
         <source>BOM ERROR: Could not open sourcefile &apos;{}&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_BoM.py" line="204"/>
+        <location filename="../a2p_BoM.py" line="331"/>
         <source>POS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_BoM.py" line="205"/>
+        <location filename="../a2p_BoM.py" line="332"/>
         <source>QTY</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_BoM.py" line="233"/>
+        <location filename="../a2p_BoM.py" line="346"/>
         <source>#PARTSLIST# spreadsheet has been created</source>
         <translation type="unfinished"></translation>
     </message>
@@ -159,11 +159,51 @@ recent assembly are collected.
         <source>#PARTINFO# spreadsheet has been created</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../a2p_BoM.py" line="470"/>
+        <source>#PARTSLIST_CutListOptimizer# spreadsheet has been created</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../a2p_partlistglobals.py" line="34"/>
+        <source>CLO_PARTSLIST</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../a2p_partlistglobals.py" line="52"/>
+        <source>Length</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../a2p_partlistglobals.py" line="53"/>
+        <source>Width</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../a2p_partlistglobals.py" line="54"/>
+        <source>Qty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../a2p_partlistglobals.py" line="55"/>
+        <source>Material</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../a2p_partlistglobals.py" line="56"/>
+        <source>Label</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../a2p_partlistglobals.py" line="57"/>
+        <source>Enabled</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>A2plus</name>
     <message>
-        <location filename="../CD_A2plusupdater.py" line="105"/>
+        <location filename="../CD_A2plusupdater.py" line="123"/>
         <source>Updating Assembly.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -173,13 +213,8 @@ recent assembly are collected.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../CD_A2plusupdater.py" line="616"/>
+        <location filename="../CD_A2plusupdater.py" line="634"/>
         <source>Showing editing part</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../CD_A2plusupdater.py" line="643"/>
-        <source>Updates parts from the A2plus program that has been modified</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -238,7 +273,7 @@ to the assembly
     <message>
         <location filename="../a2p_importpart.py" line="437"/>
         <source>Add shapes from an external file</source>
-        <translation>Ajouter des formes à partir d&apos;un fichier extérieur</translation>
+        <translation>Ajouter des formes à partir d'un fichier extérieur</translation>
     </message>
     <message>
         <location filename="../a2p_recursiveUpdatePlanner.py" line="171"/>
@@ -283,19 +318,19 @@ Add a part from an external file
 to the assembly
 </source>
         <translation>
-Ajoute une partie d&apos;un fichier externe
-à l&apos;assemblage
+Ajoute une partie d'un fichier externe
+à l'assemblage
 </translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="673"/>
         <source>Add a part from an external file</source>
-        <translation>Ajouter une pièce d&apos;un fichier externe</translation>
+        <translation>Ajouter une pièce d'un fichier externe</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="679"/>
         <source>First create an empty file and save it under desired name</source>
-        <translation>Créez d&apos;abord un fichier vide et sauvegardez-le sous le nom souhaité</translation>
+        <translation>Créez d'abord un fichier vide et sauvegardez-le sous le nom souhaité</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="687"/>
@@ -325,7 +360,7 @@ Ajoute une partie d&apos;un fichier externe
     <message>
         <location filename="../a2p_importpart.py" line="717"/>
         <source>Import Error</source>
-        <translation>Erreur d&apos;import</translation>
+        <translation>Erreur d'import</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="728"/>
@@ -382,7 +417,7 @@ this function.)
     <message>
         <location filename="../a2p_importpart.py" line="905"/>
         <source>Update parts imported into the assembly</source>
-        <translation>Mettre à jour les pièces importées dans l&apos;assembleur</translation>
+        <translation>Mettre à jour les pièces importées dans l'assembleur</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="956"/>
@@ -416,7 +451,7 @@ multiple times.
     <message>
         <location filename="../a2p_importpart.py" line="1010"/>
         <source>Create duplicate of a part</source>
-        <translation>Créer un dupliqué d&apos;une pièce</translation>
+        <translation>Créer un dupliqué d'une pièce</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="1020"/>
@@ -450,7 +485,7 @@ this part at this place.
 
 After editing and saving,
 you have to use the function
-&apos;update imported parts&apos; in
+'update imported parts' in
 order to see the new shape
 within the assembly.
 </translation>
@@ -485,8 +520,8 @@ within the assembly.
         <source>Editing a STEP file as &apos;*.FCStd&apos; file.
 Please export the saved file as &apos;.step&apos;
 </source>
-        <translation type="unfinished">Editing a STEP file as &apos;*.FCStd&apos; file
-Please export the saved file as &apos;.step&apos;
+        <translation type="unfinished">Editing a STEP file as '*.FCStd' file
+Please export the saved file as '.step'
 </translation>
     </message>
     <message>
@@ -527,12 +562,12 @@ of the assembly.
     <message>
         <location filename="../a2p_importpart.py" line="1273"/>
         <source>Animation problem detected</source>
-        <translation>Problème d&apos;animation détectée</translation>
+        <translation>Problème d'animation détectée</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="1273"/>
         <source>Use system undo if necessary.</source>
-        <translation>Utilisez le système d&apos;annulation si nécessaire.</translation>
+        <translation>Utilisez le système d'annulation si nécessaire.</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="1290"/>
@@ -553,7 +588,7 @@ Move the a part under rule of constraints.
 2) Click a part and it is glued to the cursor and can be moved
 3) Click again (or press ESC) and the command terminates
 </source>
-        <translation type="unfinished">
+        <translation type="obsolete">
 Move the a part under rule of constraints.
 
 1) Hit this button
@@ -633,7 +668,7 @@ at once.
     <message>
         <location filename="../a2p_importpart.py" line="1415"/>
         <source>Deleting part&apos;s constraints</source>
-        <translation type="unfinished">Deleting part&apos;s constraints</translation>
+        <translation type="unfinished">Deleting part's constraints</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="1434"/>
@@ -711,12 +746,12 @@ will be made visible again.
     <message>
         <location filename="../a2p_importpart.py" line="1613"/>
         <source>Toggle transparency of assembly</source>
-        <translation>Activer/désactiver la transparence de l&apos;assembly</translation>
+        <translation>Activer/désactiver la transparence de l'assembly</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="1614"/>
         <source>Toggles transparency of assembly</source>
-        <translation>Active la transparence de l&apos;assemblage</translation>
+        <translation>Active la transparence de l'assemblage</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="1622"/>
@@ -731,7 +766,7 @@ If automatic solving is disabled
 you have to start it manually
 by hitting the solvebutton
 </source>
-        <translation type="unfinished">
+        <translation type="obsolete">
 Toggle AutoSolve
 
 By pressing this button you can
@@ -779,9 +814,9 @@ Flip direction of last constraint.
 
 If the last constraint, which has
 been defined, has a property
-&apos;direction&apos;, its value will be
-toggled between &apos;aligned&apos; and
-&apos;opposed&apos; (alignment of axis)
+'direction', its value will be
+toggled between 'aligned' and
+'opposed' (alignment of axis)
 </translation>
     </message>
     <message>
@@ -840,7 +875,7 @@ toggled between &apos;aligned&apos; and
         <translation type="unfinished">Toggle printing detailed DOF information</translation>
     </message>
     <message>
-        <location filename="../a2p_solversystem.py" line="713"/>
+        <location filename="../a2p_solversystem.py" line="718"/>
         <source>No active document found!</source>
         <translation type="unfinished">No active document found!</translation>
     </message>
@@ -900,7 +935,7 @@ assembly file.
     <message>
         <location filename="../a2p_importpart.py" line="1973"/>
         <source>Migrate proxies of importedParts to recent version</source>
-        <translation type="unfinished">Migrate proxies of importedParts to recent version</translation>
+        <translation type="obsolete">Migrate proxies of importedParts to recent version</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="1973"/>
@@ -952,7 +987,7 @@ Clean up solver debug output from 3D view
         <translation>Nettoyer la sortie de débogage du solveur en 3D</translation>
     </message>
     <message>
-        <location filename="../a2p_MuxAssembly.py" line="245"/>
+        <location filename="../a2p_MuxAssembly.py" line="251"/>
         <source>
 Create or refresh a simple shape
 of the complete Assembly.
@@ -966,7 +1001,7 @@ The created shape can be found
 in the treeview. By default it
 is invisible at first time.
 </source>
-        <translation type="unfinished">
+        <translation type="obsolete">
 Create or refresh a simple shape
 of the complete Assembly.
 
@@ -981,14 +1016,14 @@ is invisible at first time.
 </translation>
     </message>
     <message>
-        <location filename="../a2p_MuxAssembly.py" line="272"/>
+        <location filename="../a2p_MuxAssembly.py" line="278"/>
         <source>Cannot create SimpleAssemblyShape</source>
         <translation type="unfinished">Impossible de créer la forme SimpleAssemblyShape</translation>
     </message>
     <message>
-        <location filename="../a2p_MuxAssembly.py" line="272"/>
+        <location filename="../a2p_MuxAssembly.py" line="278"/>
         <source>No visible ImportParts found</source>
-        <translation type="unfinished">Aucune partie visible trouvée</translation>
+        <translation type="obsolete">Aucune partie visible trouvée</translation>
     </message>
     <message>
         <location filename="../a2p_topomapper.py" line="648"/>
@@ -996,9 +1031,9 @@ is invisible at first time.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_MuxAssembly.py" line="321"/>
+        <location filename="../a2p_MuxAssembly.py" line="327"/>
         <source>Create or refresh simple shape of complete assembly</source>
-        <translation type="unfinished">Créer ou actualiser la forme simple de l&apos;assemblage</translation>
+        <translation type="unfinished">Créer ou actualiser la forme simple de l'assemblage</translation>
     </message>
     <message>
         <location filename="../a2p_bom.py" line="137"/>
@@ -1052,32 +1087,32 @@ recent assembly are collected.
 </translation>
     </message>
     <message>
-        <location filename="../a2p_BoM.py" line="165"/>
+        <location filename="../a2p_BoM.py" line="421"/>
         <source>Please save before generating a parts list! Save now?</source>
         <translation type="unfinished">Veuillez enregistrer avant de générer une liste de pièces! Enregistrez maintenant?</translation>
     </message>
     <message>
-        <location filename="../a2p_BoM.py" line="166"/>
+        <location filename="../a2p_BoM.py" line="423"/>
         <source>Save document?</source>
         <translation type="unfinished">Enregistrer ce document ?</translation>
     </message>
     <message>
-        <location filename="../a2p_BoM.py" line="168"/>
+        <location filename="../a2p_BoM.py" line="426"/>
         <source>Parts list generation aborted!</source>
         <translation type="unfinished">Génération de la liste des pièces annulée !</translation>
     </message>
     <message>
-        <location filename="../a2p_BoM.py" line="168"/>
+        <location filename="../a2p_BoM.py" line="426"/>
         <source>You have to save the assembly file first.</source>
-        <translation type="unfinished">Vous devez d&apos;abord enregistrer le fichier de l&apos;assemblage.</translation>
+        <translation type="unfinished">Vous devez d'abord enregistrer le fichier de l'assemblage.</translation>
     </message>
     <message>
-        <location filename="../a2p_BoM.py" line="178"/>
+        <location filename="../a2p_BoM.py" line="436"/>
         <source>Do you want to iterate recursively over all included subassemblies?</source>
         <translation type="unfinished">Do you want to iterate recursively over all included subassemblies?</translation>
     </message>
     <message>
-        <location filename="../a2p_BoM.py" line="238"/>
+        <location filename="../a2p_BoM.py" line="352"/>
         <source>Create a spreadsheet with a parts list of this file</source>
         <translation>Créer une feuille de calcul avec une liste des parties de ce fichier</translation>
     </message>
@@ -1187,7 +1222,7 @@ recent assembly are collected.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_solversystem.py" line="747"/>
+        <location filename="../a2p_solversystem.py" line="752"/>
         <source>Solve constraints</source>
         <translation>Résoudre des contraintes</translation>
     </message>
@@ -1209,7 +1244,7 @@ recent assembly are collected.
     <message>
         <location filename="../a2p_ConstraintDialog.py" line="505"/>
         <source>Constraint does not exist anymore</source>
-        <translation>La contrainte n&apos;existe pas</translation>
+        <translation>La contrainte n'existe pas</translation>
     </message>
     <message>
         <location filename="../a2p_ConstraintDialog.py" line="505"/>
@@ -1301,7 +1336,7 @@ treeview and hit this button
         <translation type="obsolete">
 Modifier la contrainte sélectionnée
 
-Sélectionnez une contrainte dans l&apos;arborescence
+Sélectionnez une contrainte dans l'arborescence
 et cliquez sur ce bout
 </translation>
     </message>
@@ -1313,7 +1348,7 @@ et cliquez sur ce bout
     <message>
         <location filename="../a2p_ConstraintDialog.py" line="1069"/>
         <source>Please select exact one constraint first.</source>
-        <translation>Veuillez d&apos;abord sélectionner une contrainte exact.</translation>
+        <translation>Veuillez d'abord sélectionner une contrainte exact.</translation>
     </message>
     <message>
         <location filename="../a2p_ConstraintDialog.py" line="1102"/>
@@ -1371,7 +1406,7 @@ if necessary, too.
     <message>
         <location filename="../a2p_recursiveUpdatePlanner.py" line="194"/>
         <source>A part can only be imported from a FreeCAD &apos;*.fcstd&apos; file</source>
-        <translation type="obsolete">A part can only be imported from a FreeCAD &apos;*.fcstd&apos; file</translation>
+        <translation type="obsolete">A part can only be imported from a FreeCAD '*.fcstd' file</translation>
     </message>
     <message>
         <location filename="../a2p_recursiveUpdatePlanner.py" line="198"/>
@@ -1379,27 +1414,27 @@ if necessary, too.
         <translation>Mettre à jour les importations en récursif</translation>
     </message>
     <message>
-        <location filename="../a2p_solversystem.py" line="142"/>
+        <location filename="../a2p_solversystem.py" line="144"/>
         <source>Remove faulty constraint &apos;{}&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_solversystem.py" line="222"/>
+        <location filename="../a2p_solversystem.py" line="224"/>
         <source>The following constraints are broken:</source>
         <translation>Les contraintes suivantes sont brisées :</translation>
     </message>
     <message>
-        <location filename="../a2p_solversystem.py" line="225"/>
+        <location filename="../a2p_solversystem.py" line="227"/>
         <source>Do you want to delete them?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_solversystem.py" line="228"/>
+        <location filename="../a2p_solversystem.py" line="230"/>
         <source>Delete broken constraints?</source>
         <translation>Supprimer les contraintes brisées?</translation>
     </message>
     <message>
-        <location filename="../a2p_solversystem.py" line="518"/>
+        <location filename="../a2p_solversystem.py" line="520"/>
         <source>
 Constraints inconsistent. Cannot solve System.
 Please run the conflict finder tool!
@@ -1407,12 +1442,12 @@ Please run the conflict finder tool!
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_solversystem.py" line="524"/>
+        <location filename="../a2p_solversystem.py" line="526"/>
         <source>Constraint mismatch</source>
         <translation>Discordance de contrainte</translation>
     </message>
     <message>
-        <location filename="../a2p_solversystem.py" line="542"/>
+        <location filename="../a2p_solversystem.py" line="544"/>
         <source>
 The highlighted parts were not moved. They are
 not constrained (also over constraint chains)
@@ -1425,17 +1460,17 @@ to a fixed part!
 </translation>
     </message>
     <message>
-        <location filename="../a2p_solversystem.py" line="549"/>
+        <location filename="../a2p_solversystem.py" line="551"/>
         <source>Could not move some parts</source>
         <translation>Impossible de déplacer des pièces</translation>
     </message>
     <message>
-        <location filename="../a2p_solversystem.py" line="713"/>
+        <location filename="../a2p_solversystem.py" line="718"/>
         <source>Before running solver, you have to open an assembly file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_solversystem.py" line="748"/>
+        <location filename="../a2p_solversystem.py" line="753"/>
         <source>Solves constraints</source>
         <translation type="unfinished">Résolution des contraintes</translation>
     </message>
@@ -1447,71 +1482,41 @@ to a fixed part!
     <message>
         <location filename="../a2p_partinformation.py" line="59"/>
         <source>You have to open a FCStd file first.</source>
-        <translation type="unfinished">Il faut d&apos;abord ouvrir un fichier FCStd.</translation>
+        <translation type="unfinished">Il faut d'abord ouvrir un fichier FCStd.</translation>
     </message>
     <message>
-        <location filename="../CD_A2plusupdater.py" line="81"/>
-        <source>A file must be selected to start this selector.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../CD_A2plusupdater.py" line="81"/>
-        <source>Please open a file and try again.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../CD_A2plusupdater.py" line="99"/>
-        <source>No parts were selected to update.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../CD_A2plusupdater.py" line="102"/>
-        <source>Select one part and try again.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../CD_A2plusupdater.py" line="102"/>
-        <source>I have limited the number of parts that can be updated to 1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../CD_A2plusupdater.py" line="159"/>
+        <location filename="../CD_A2plusupdater.py" line="177"/>
         <source>Update complete.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../CD_A2plusupdater.py" line="159"/>
+        <location filename="../CD_A2plusupdater.py" line="177"/>
         <source>All surfaces found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../CD_A2plusupdater.py" line="160"/>
+        <location filename="../CD_A2plusupdater.py" line="178"/>
         <source>Update complete:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../CD_A2plusupdater.py" line="161"/>
+        <location filename="../CD_A2plusupdater.py" line="179"/>
         <source>Total constraints - {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../CD_A2plusupdater.py" line="162"/>
+        <location filename="../CD_A2plusupdater.py" line="180"/>
         <source>Repaired constraints - {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../CD_A2plusupdater.py" line="163"/>
+        <location filename="../CD_A2plusupdater.py" line="181"/>
         <source>Features not found - {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../CD_A2plusupdater.py" line="609"/>
+        <location filename="../CD_A2plusupdater.py" line="627"/>
         <source>Status</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../CD_A2plusupdater.py" line="644"/>
-        <source>Updates the A2plus.assembly when parts are modified. To update the assembly, select the part that you have modified and press the icon. When the update has finished run the A2plus solver to vereify if there are broken constraints. This is an attempt to reduce the number of broken constraints causedwhen modifying a part from FreeCAD A2plus assembly program. This records theconstraints mating surfaces immediately before the update and tries toreconnect them after the update. If this fails you can undo this update by using the undo buttonand running the standard A2plus updater.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1927,17 +1932,17 @@ You must open an assembly file first.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../InitGui.py" line="46"/>
+        <location filename="../InitGui.py" line="49"/>
         <source>An other assembly workbench for FreeCAD.</source>
         <translation type="unfinished">An other assembly workbench for FreeCAD.</translation>
     </message>
     <message>
-        <location filename="../InitGui.py" line="63"/>
+        <location filename="../InitGui.py" line="62"/>
         <source>Initializing A2plus Workbench v{}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_BoM.py" line="239"/>
+        <location filename="../a2p_BoM.py" line="353"/>
         <source>Create a spreadsheet with a 
 parts list of this file.
 
@@ -2012,7 +2017,7 @@ treeview and hit this button.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_MuxAssembly.py" line="313"/>
+        <location filename="../a2p_MuxAssembly.py" line="319"/>
         <source>Union of Shapes passed. &apos;SimpleAssemblyShape&apos; are created.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2104,32 +2109,32 @@ if necessary, too.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_rigid.py" line="520"/>
+        <location filename="../a2p_rigid.py" line="521"/>
         <source>Current Rigid = &apos;{}&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_rigid.py" line="522"/>
+        <location filename="../a2p_rigid.py" line="523"/>
         <source>    is Fixed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_rigid.py" line="524"/>
+        <location filename="../a2p_rigid.py" line="525"/>
         <source>    is not Fixed and has {} DegreesOfFreedom</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_rigid.py" line="526"/>
+        <location filename="../a2p_rigid.py" line="527"/>
         <source>    Depends on Rigid = {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_rigid.py" line="529"/>
+        <location filename="../a2p_rigid.py" line="530"/>
         <source>        DOF Position free with this rigid = {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_rigid.py" line="530"/>
+        <location filename="../a2p_rigid.py" line="531"/>
         <source>        DOF Rotation free with this rigid = {}</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2149,97 +2154,92 @@ if necessary, too.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_solversystem.py" line="273"/>
+        <location filename="../a2p_solversystem.py" line="275"/>
         <source>FREE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_solversystem.py" line="292"/>
+        <location filename="../a2p_solversystem.py" line="294"/>
         <source>Fixed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_solversystem.py" line="294"/>
+        <location filename="../a2p_solversystem.py" line="296"/>
         <source>DOFs: {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_solversystem.py" line="313"/>
+        <location filename="../a2p_solversystem.py" line="315"/>
         <source>There are {:.0f} dependencies</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_solversystem.py" line="372"/>
+        <location filename="../a2p_solversystem.py" line="374"/>
         <source>Hierarchy:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_solversystem.py" line="388"/>
+        <location filename="../a2p_solversystem.py" line="390"/>
         <source>Writing visual hierarchy to: &apos;{}&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_solversystem.py" line="396"/>
+        <location filename="../a2p_solversystem.py" line="398"/>
         <source>A2P assembly hierarchy visualization</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_solversystem.py" line="414"/>
+        <location filename="../a2p_solversystem.py" line="416"/>
         <source>FIXED</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_solversystem.py" line="488"/>
+        <location filename="../a2p_solversystem.py" line="490"/>
         <source>TARGET   POS-ACCURACY :{}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_solversystem.py" line="489"/>
+        <location filename="../a2p_solversystem.py" line="491"/>
         <source>REACHED  POS-ACCURACY :{}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_solversystem.py" line="490"/>
+        <location filename="../a2p_solversystem.py" line="492"/>
         <source>TARGET  SPIN-ACCURACY :{}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_solversystem.py" line="491"/>
+        <location filename="../a2p_solversystem.py" line="493"/>
         <source>REACHED SPIN-ACCURACY :{}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_solversystem.py" line="492"/>
+        <location filename="../a2p_solversystem.py" line="494"/>
         <source>SA      SPIN-ACCURACY :{}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_solversystem.py" line="498"/>
+        <location filename="../a2p_solversystem.py" line="500"/>
         <source>Start Solving System</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_solversystem.py" line="506"/>
+        <location filename="../a2p_solversystem.py" line="508"/>
         <source>System solved using partial + recursive unfixing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_solversystem.py" line="516"/>
+        <location filename="../a2p_solversystem.py" line="518"/>
         <source>Could not solve system</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_solversystem.py" line="692"/>
-        <source>Calculation stopped, no convergency anymore!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../a2p_solversystem.py" line="701"/>
+        <location filename="../a2p_solversystem.py" line="706"/>
         <source>Reached max calculations count: {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../a2p_solversystem.py" line="755"/>
+        <location filename="../a2p_solversystem.py" line="760"/>
         <source>Starting solveConstraints latest script...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2252,6 +2252,131 @@ if necessary, too.</source>
         <location filename="../a2plib.py" line="1182"/>
         <source>Constraints of missing parts removed!</source>
         <translation>Contraintes des pièces manquantes retirées !</translation>
+    </message>
+    <message>
+        <location filename="../a2p_BoM.py" line="476"/>
+        <source>Create a spreadsheet with a parts list for https://cutlistoptimizer.com/ of this file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../a2p_BoM.py" line="477"/>
+        <source>Create a spreadsheet with a 
+parts list https://cutlistoptimizer.com/ of this file.
+
+This function will read out 
+the #PARTINFO# spreadsheet of 
+all involved parts of the 
+assembly and create a new 
+spreadsheet containing the 
+parts list.
+
+This button will open a dialog 
+with the Question:
+- Iterate recursively over 
+     all subassenblies?
+
+Answer Yes:
+All parts of all subassemblies are 
+collected to the partlist 
+
+Answer No:
+Only the parts within the 
+recent assembly are collected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../a2p_solversystem.py" line="697"/>
+        <source>No convergency anymore, retrying</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CD_A2plusupdater.py" line="81"/>
+        <source>A file must be selected to start this selector.
+Please open a file and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CD_A2plusupdater.py" line="105"/>
+        <source>No parts were selected to update.
+Select one part and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CD_A2plusupdater.py" line="114"/>
+        <source>I have limited the number of parts that can be updated to 1.
+Select one part and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CD_A2plusupdater.py" line="661"/>
+        <source>Updates parts from the A2plus workbench that has been modified</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CD_A2plusupdater.py" line="662"/>
+        <source>Updates the A2plus assembly when parts are modified.
+To update the assembly, select the part that you have modified and press the icon.
+When the update has finished run the A2plus solver to verify if there are broken constraints.
+This is an attempt to reduce the number of broken constraints caused
+when modifying a part from FreeCAD A2plus assembly workbench. This records the
+constraints mating surfaces immediately before the update and tries to
+reconnect them after the update.
+If this fails you can undo this update by using the undo button
+and running the standard A2plus updater.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../a2p_MuxAssembly.py" line="251"/>
+        <source>
+Create or refresh a simple shape
+of the complete Assembly.
+
+All parts within the assembly
+are combined to a single shape.
+This shape can be used e.g. for the
+TechDraw module or 3D printing.
+
+The created shape can be found
+in the treeview. By default it
+is invisible at first time.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../a2p_MuxAssembly.py" line="278"/>
+        <source>No visible Import Parts found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../a2p_importpart.py" line="1317"/>
+        <source>
+Move a part under rule of constraints.
+
+1) Hit this button
+2) Click a part and it is glued to the cursor and can be moved
+3) Click again (or press ESC) and the command terminates
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../a2p_importpart.py" line="1622"/>
+        <source>
+Toggle AutoSolve
+
+By pressing this button you can
+enable or disable automatic solving
+after a constraint has been edited
+
+If automatic solving is disabled
+you have to start it manually
+by hitting the solve button
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../a2p_importpart.py" line="1973"/>
+        <source>Migrate proxies of imported Parts to recent version</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2339,12 +2464,12 @@ if necessary, too.</source>
     <message>
         <location filename="../a2p_constraintServices.py" line="108"/>
         <source>Recalculate direction of constraints</source>
-        <translation>Recalculer l&apos;orientation des contraintes</translation>
+        <translation>Recalculer l'orientation des contraintes</translation>
     </message>
     <message>
         <location filename="../a2p_constraintServices.py" line="108"/>
         <source>Do you really want to recalculate the directions of all constraints?</source>
-        <translation>Voulez-vous vraiment recalculer les directions de toutes les contraintes&#xa0;?</translation>
+        <translation>Voulez-vous vraiment recalculer les directions de toutes les contraintes ?</translation>
     </message>
     <message>
         <location filename="../a2p_constraintServices.py" line="128"/>
@@ -2583,17 +2708,17 @@ is invisible at first time.
     <message>
         <location filename="../a2p_MuxAssembly.py" line="308"/>
         <source>Create or refresh simple shape of complete assembly</source>
-        <translation type="obsolete">Créer ou actualiser la forme simple de l&apos;assemblage</translation>
+        <translation type="obsolete">Créer ou actualiser la forme simple de l'assemblage</translation>
     </message>
     <message>
         <location filename="../a2p_MuxAssembly.py" line="314"/>
         <source>No active document found!</source>
-        <translation type="obsolete">Aucun document actif n&apos;a été trouvé!</translation>
+        <translation type="obsolete">Aucun document actif n'a été trouvé!</translation>
     </message>
     <message>
         <location filename="../a2p_MuxAssembly.py" line="314"/>
         <source>You have to open an assembly file first.</source>
-        <translation type="obsolete">Vous devez d&apos;abord ouvrir un fichier assemblé.</translation>
+        <translation type="obsolete">Vous devez d'abord ouvrir un fichier assemblé.</translation>
     </message>
 </context>
 <context>
@@ -2629,7 +2754,7 @@ is invisible at first time.
     <message>
         <location filename="../a2p_constraintDialog.py" line="501"/>
         <source>Constraint does not exist anymore</source>
-        <translation type="obsolete">La contrainte n&apos;existe pas</translation>
+        <translation type="obsolete">La contrainte n'existe pas</translation>
     </message>
     <message>
         <location filename="../a2p_constraintDialog.py" line="501"/>
@@ -2721,7 +2846,7 @@ treeview and hit this button
         <translation type="obsolete">
 Modifier la contrainte sélectionnée
 
-Sélectionnez une contrainte dans l&apos;arborescence
+Sélectionnez une contrainte dans l'arborescence
 et cliquez sur ce bout
 </translation>
     </message>
@@ -2733,7 +2858,7 @@ et cliquez sur ce bout
     <message>
         <location filename="../a2p_constraintDialog.py" line="1108"/>
         <source>Please select exact one constraint first.</source>
-        <translation type="obsolete">Veuillez d&apos;abord sélectionner une contrainte exact.</translation>
+        <translation type="obsolete">Veuillez d'abord sélectionner une contrainte exact.</translation>
     </message>
     <message>
         <location filename="../a2p_constraintDialog.py" line="1140"/>
@@ -2746,7 +2871,7 @@ et cliquez sur ce bout
     <message>
         <location filename="../a2p_constraintServices.py" line="89"/>
         <source>Recalculate direction of constraints</source>
-        <translation type="obsolete">Recalculer l&apos;orientation des contraintes</translation>
+        <translation type="obsolete">Recalculer l'orientation des contraintes</translation>
     </message>
     <message>
         <location filename="../a2p_constraintServices.py" line="89"/>
@@ -2829,7 +2954,7 @@ et cliquez sur ce bout
     <message>
         <location filename="../a2p_constraintcommands.py" line="359"/>
         <source>Add angledPlanes constraint</source>
-        <translation type="obsolete">Ajouter une contrainte d&apos;angledPlanes</translation>
+        <translation type="obsolete">Ajouter une contrainte d'angledPlanes</translation>
     </message>
     <message>
         <location filename="../a2p_constraintcommands.py" line="386"/>
@@ -2882,7 +3007,7 @@ Select:
 2) A linear/circular edge, or a cylindrical face (on another part)
 
 If the circular edge is selected,
-it&apos;s axis will be taken as line definition.
+it's axis will be taken as line definition.
 
 Button gets active after correct selection.
 </translation>
@@ -2973,14 +3098,14 @@ Button gets active after correct selection.
         <translation type="obsolete">
 Create the parallel-axis constraint (axisParallel)
 
-Axis&apos; will only rotate to be parallel, but will not
+Axis' will only rotate to be parallel, but will not
 be moved to be coincident.
 
 Select:
 1) A linear/circular edge, or cylindrical face (on a part)
 2) A linear/circular edge, or cylindrical face (on another part)
 
-If using circular edge, it&apos;s axis will be taken as line.
+If using circular edge, it's axis will be taken as line.
 
 Button gets active after correct selection.
 </translation>
@@ -3183,7 +3308,7 @@ Select:
 1) A spherical surface, or a vertex (on a part)
 2) A spherical surface, or a vertex (on another part)
 
-When selecting a circle, it&apos;s center is used as a vertex.
+When selecting a circle, it's center is used as a vertex.
 
 Button gets active after correct selection.
 </translation>
@@ -3243,7 +3368,7 @@ Après la conversion, des contraintes peuvent être
 appliquées. Vous pouvez également dupliquer la partie convertie.
 
 Pour éditer une pièce convertie, appuyez sur le bouton 
-d&apos;édition et suivez les instructions affichées à l&apos;écran.
+d'édition et suivez les instructions affichées à l'écran.
 
 Cette fonction est utile si vous souhaitez utiliser 
 par ex. fixations dans cet établi.</translation>
@@ -3312,7 +3437,7 @@ by the parts list function of A2plus.
     <message>
         <location filename="../a2p_partinformation.py" line="59"/>
         <source>You have to open a FCStd file first.</source>
-        <translation type="obsolete">Il faut d&apos;abord ouvrir un fichier FCStd.</translation>
+        <translation type="obsolete">Il faut d'abord ouvrir un fichier FCStd.</translation>
     </message>
     <message>
         <location filename="../a2p_partinformation.py" line="89"/>
@@ -3368,7 +3493,7 @@ if necessary, too.
     <message>
         <location filename="../a2p_recursiveUpdatePlanner.py" line="195"/>
         <source>A part can only be imported from a FreeCAD &apos;*.fcstd&apos; file</source>
-        <translation type="obsolete">A part can only be imported from a FreeCAD &apos;*.fcstd&apos; file</translation>
+        <translation type="obsolete">A part can only be imported from a FreeCAD '*.fcstd' file</translation>
     </message>
     <message>
         <location filename="../a2p_recursiveUpdatePlanner.py" line="217"/>
@@ -3517,22 +3642,22 @@ to a fixed part!
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="38"/>
         <source>User interface settings</source>
-        <translation>Paramètres de l&apos;interface utilisateur</translation>
+        <translation>Paramètres de l'interface utilisateur</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="53"/>
         <source>Adds a creation button for every constraint type to the toolbar</source>
-        <translation>Ajoute un bouton de création pour chaque type de contrainte à la barre d&apos;outils</translation>
+        <translation>Ajoute un bouton de création pour chaque type de contrainte à la barre d'outils</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="56"/>
         <source>Show constraints in toolbar</source>
-        <translation>Afficher les contraintes dans la barre d&apos;outils</translation>
+        <translation>Afficher les contraintes dans la barre d'outils</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="72"/>
         <source>Use native file manager of your OS</source>
-        <translation>Utilisez le gestionnaire de fichiers natif de votre système d&apos;exploitation</translation>
+        <translation>Utilisez le gestionnaire de fichiers natif de votre système d'exploitation</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="107"/>
@@ -3543,8 +3668,8 @@ to a fixed part!
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="122"/>
         <source>All parts of the assembly will be opened in FreeCAD to be
 reconstructed using values from spreadsheets</source>
-        <translation>Toutes les pièces de l&apos;assemblage seront ouvertes dans FreeCAD 
-pour être reconstruites à l&apos;aide des valeurs des feuilles de calcul</translation>
+        <translation>Toutes les pièces de l'assemblage seront ouvertes dans FreeCAD 
+pour être reconstruites à l'aide des valeurs des feuilles de calcul</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="126"/>
@@ -3569,10 +3694,10 @@ pour les mettre à jour</translation>
 are written into &quot;mux Info&quot; property. When the parts are
 later updated the properties &quot;Sub Elementx&quot; of the constraints
 will be updated according to the &quot;mux Info&quot; topology.</source>
-        <translation>Lors de l&apos;importation de pièces dans l&apos;assemblage, les noms 
-topologiques sont écrits dans la propriété &quot;mux Info&quot;. Lors 
-de la mise à jour ultérieure des pièces, les propriétés &quot;Sub Elementx&quot; 
-des contraintes seront mises à jour en fonction de la topologie &quot;mux Info&quot;.</translation>
+        <translation>Lors de l'importation de pièces dans l'assemblage, les noms 
+topologiques sont écrits dans la propriété &amp;quot;mux Info&amp;quot;. Lors 
+de la mise à jour ultérieure des pièces, les propriétés &amp;quot;Sub Elementx&amp;quot; 
+des contraintes seront mises à jour en fonction de la topologie &amp;quot;mux Info&amp;quot;.</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="162"/>
@@ -3600,7 +3725,7 @@ subassemblies. Otherwise you can break the assembly.</source>
         <translation>Les formes de référence/construction invisibles seront masquées.
 Remarque : Aucune contrainte ne doit être connectée aux formes 
 de référence/construction dans les sous-assemblages supérieurs 
-ou autres. Sinon, vous pouvez casser l&apos;assemblage.</translation>
+ou autres. Sinon, vous pouvez casser l'assemblage.</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="199"/>
@@ -3615,7 +3740,7 @@ ou autres. Sinon, vous pouvez casser l&apos;assemblage.</translation>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="215"/>
         <source>Use solid union for importing parts and subassemblies (experimental)</source>
-        <translation>Utiliser l&apos;union solide pour importer des pièces et des sous-assemblages (expérimental)</translation>
+        <translation>Utiliser l'union solide pour importer des pièces et des sous-assemblages (expérimental)</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="244"/>
@@ -3640,7 +3765,7 @@ ou autres. Sinon, vous pouvez casser l&apos;assemblage.</translation>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="291"/>
         <source>All files are in this project folder:</source>
-        <translation>Tous les fichiers sont dans ce dossier de projet&#xa0;:</translation>
+        <translation>Tous les fichiers sont dans ce dossier de projet :</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="348"/>
@@ -3662,7 +3787,7 @@ ou autres. Sinon, vous pouvez casser l&apos;assemblage.</translation>
         <source>Solver tries to move all parts at once
 in direction to a fixed part</source>
         <translation>Le solveur essaie de déplacer toutes les pièces 
-à la fois dans la direction d&apos;une pièce fixe</translation>
+à la fois dans la direction d'une pièce fixe</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="414"/>
@@ -3703,7 +3828,7 @@ from imported parts.
 Note: For WB PartDesign it work for Body only.</source>
         <translation>Utilisez les paramètres de couleur et de 
 transparence des pièces importées.
-Remarque&#xa0;: pour WB PartDesign, cela ne fonctionne que pour le corps.</translation>
+Remarque : pour WB PartDesign, cela ne fonctionne que pour le corps.</translation>
     </message>
 </context>
 <context>

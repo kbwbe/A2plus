@@ -55,14 +55,14 @@ f.close()
 #        )
 #    )
 os.system(
-    'pyside-rcc -py3 -o a2p_Resources3.py {}'.format(
+    'rcc -o a2p_Resources3.py -g python {}'.format(
         qrc_filename
-        )
     )
+)
 
 os.system(
-    'pyside-lupdate *.py -ts translations/A2plus.ts -verbose'
-    )
+    'pyside2-lupdate *.py -ts translations/A2plus.ts -verbose'
+)
 '''
 os.system(
     'lrelease "translations/A2plus.ts"'

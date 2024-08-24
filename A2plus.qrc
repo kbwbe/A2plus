@@ -2,8 +2,8 @@
     <qresource prefix="/">
         <file>icons/a2p_SetRelativePathes.svg</file>
         <file>icons/a2p_CenterOfMassConstraint.svg</file>
-        <file>icons/a2p_RecursiveUpdate.svg</file>        
-        <file>icons/a2p_Asm.svg</file>        
+        <file>icons/a2p_RecursiveUpdate.svg</file>
+        <file>icons/a2p_Asm.svg</file>
         <file>icons/a2p_Obj.svg</file>
         <file>icons/a2p_EditConstraint.svg</file>
         <file>icons/a2p_DefineConstraints.svg</file>
@@ -30,6 +30,7 @@
         <file>icons/a2p_PartialProcessing.svg</file>
         <file>icons/a2p_PartsInfo.svg</file>
         <file>icons/a2p_PartsList.svg</file>
+        <file>icons/a2p_PartsList_CutListOptimizer.svg</file>
         <file>icons/a2p_Pause.svg</file>
         <file>icons/a2p_PlaneCoincidentConstraint.svg</file>
         <file>icons/a2p_PlanesParallelConstraint.svg</file>
