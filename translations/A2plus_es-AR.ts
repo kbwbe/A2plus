@@ -4,7 +4,7 @@
 <context>
     <name>A2p_BoM</name>
     <message>
-        <location filename="../a2p_BoM.py" line="95"/>
+        <location filename="../a2p_BoM.py" line="214"/>
         <source>BOM ERROR: Could not open sourcefile &apos;{}&apos;</source>
         <translation>ERROR DE BOM: No se pudo abrir el archivo fuente '{}'</translation>
     </message>
@@ -14,17 +14,17 @@
         <translation>LISTA DE PARTES</translation>
     </message>
     <message>
-        <location filename="../a2p_BoM.py" line="204"/>
+        <location filename="../a2p_BoM.py" line="331"/>
         <source>POS</source>
         <translation>POS</translation>
     </message>
     <message>
-        <location filename="../a2p_BoM.py" line="205"/>
+        <location filename="../a2p_BoM.py" line="332"/>
         <source>QTY</source>
         <translation>CANTIDAD</translation>
     </message>
     <message>
-        <location filename="../a2p_BoM.py" line="231"/>
+        <location filename="../a2p_BoM.py" line="346"/>
         <source>#PARTSLIST# spreadsheet has been created</source>
         <translation>La hoja de cálculo # LISTA DE PARTES # ha sido creada</translation>
     </message>
@@ -39,34 +39,74 @@
         <translation>INFORMACIÓN DE PARTES</translation>
     </message>
     <message>
-        <location filename="../a2p_partlistglobals.py" line="36"/>
+        <location filename="../a2p_partlistglobals.py" line="43"/>
         <source>IDENTNO</source>
         <translation>NÚMERO DE IDENTIFICACIÓN</translation>
     </message>
     <message>
-        <location filename="../a2p_partlistglobals.py" line="37"/>
+        <location filename="../a2p_partlistglobals.py" line="44"/>
         <source>DESCRIPTION</source>
         <translation>DESCRIPCIÓN</translation>
     </message>
     <message>
-        <location filename="../a2p_partlistglobals.py" line="38"/>
+        <location filename="../a2p_partlistglobals.py" line="45"/>
         <source>SUPPLIER</source>
         <translation>PROVEEDOR</translation>
     </message>
     <message>
-        <location filename="../a2p_partlistglobals.py" line="39"/>
+        <location filename="../a2p_partlistglobals.py" line="46"/>
         <source>SUPP.IDENTNO</source>
         <translation>NO.IDENTIFICACIÓN DE PROVEEDOR</translation>
     </message>
     <message>
-        <location filename="../a2p_partlistglobals.py" line="40"/>
+        <location filename="../a2p_partlistglobals.py" line="47"/>
         <source>SUPP.DESCRIPTION</source>
         <translation>DESCRIPCIÓN DE PROVEEDOR</translation>
     </message>
     <message>
-        <location filename="../a2p_partlistglobals.py" line="41"/>
+        <location filename="../a2p_partlistglobals.py" line="48"/>
         <source>(FILENAME)</source>
         <translation>(NOMBRE DE ARCHIVO)</translation>
+    </message>
+    <message>
+        <location filename="../a2p_BoM.py" line="470"/>
+        <source>#PARTSLIST_CutListOptimizer# spreadsheet has been created</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../a2p_partlistglobals.py" line="34"/>
+        <source>CLO_PARTSLIST</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../a2p_partlistglobals.py" line="52"/>
+        <source>Length</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../a2p_partlistglobals.py" line="53"/>
+        <source>Width</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../a2p_partlistglobals.py" line="54"/>
+        <source>Qty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../a2p_partlistglobals.py" line="55"/>
+        <source>Material</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../a2p_partlistglobals.py" line="56"/>
+        <source>Label</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../a2p_partlistglobals.py" line="57"/>
+        <source>Enabled</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -82,37 +122,37 @@
         <translation>Primero tiene que abrir un archivo FCStd.</translation>
     </message>
     <message>
-        <location filename="../a2p_BoM.py" line="165"/>
+        <location filename="../a2p_BoM.py" line="421"/>
         <source>Please save before generating a parts list! Save now?</source>
         <translation>¡Por favor, guarde antes de generar una lista de partes! ¿Guardar ahora?</translation>
     </message>
     <message>
-        <location filename="../a2p_BoM.py" line="166"/>
+        <location filename="../a2p_BoM.py" line="423"/>
         <source>Save document?</source>
         <translation>¿Guardar documento?</translation>
     </message>
     <message>
-        <location filename="../a2p_BoM.py" line="168"/>
+        <location filename="../a2p_BoM.py" line="426"/>
         <source>Parts list generation aborted!</source>
         <translation>¡Generación de la lista de partes abortada!</translation>
     </message>
     <message>
-        <location filename="../a2p_BoM.py" line="168"/>
+        <location filename="../a2p_BoM.py" line="426"/>
         <source>You have to save the assembly file first.</source>
         <translation>Primero tiene que guardar el archivo de ensamblaje.</translation>
     </message>
     <message>
-        <location filename="../a2p_BoM.py" line="178"/>
+        <location filename="../a2p_BoM.py" line="436"/>
         <source>Do you want to iterate recursively over all included subassemblies?</source>
         <translation>¿Quiere iterar recursivamente sobre todos los subensamblajes incluidos?</translation>
     </message>
     <message>
-        <location filename="../a2p_BoM.py" line="236"/>
+        <location filename="../a2p_BoM.py" line="352"/>
         <source>Create a spreadsheet with a parts list of this file</source>
         <translation>Crear una hoja de cálculo con una lista de partes de este archivo</translation>
     </message>
     <message>
-        <location filename="../a2p_BoM.py" line="237"/>
+        <location filename="../a2p_BoM.py" line="353"/>
         <source>Create a spreadsheet with a 
 parts list of this file.
 
@@ -211,7 +251,7 @@ ensamblaje reciente son colectadas.</translation>
         <translation>Propiedades de restricción</translation>
     </message>
     <message>
-        <location filename="../CD_ConstraintViewer.py" line="403"/>
+        <location filename="../a2p_ConstraintDialog.py" line="97"/>
         <source>Direction</source>
         <translation>Dirección</translation>
     </message>
@@ -383,7 +423,7 @@ vista de árbol y presione este botón.</translation>
         <translation>¿Salir y eliminar nueva restricción?</translation>
     </message>
     <message>
-        <location filename="../CD_ConstraintViewer.py" line="71"/>
+        <location filename="../a2p_importpart.py" line="1056"/>
         <source>Information</source>
         <translation>Información</translation>
     </message>
@@ -417,7 +457,7 @@ herramientas de cada botón.</translation>
         <translation>Herramientas de restricción</translation>
     </message>
     <message>
-        <location filename="../CD_ConstraintViewer.py" line="110"/>
+        <location filename="../a2p_ConstraintDialog.py" line="724"/>
         <source>Help</source>
         <translation>Ayuda</translation>
     </message>
@@ -689,7 +729,7 @@ pulse este botón. Se creará un
 duplicado y puede ser colocado
 en algún lugar por el ratón.
 
-Mantenga pulsado &quot;Shift&quot; para hacer
+Mantenga pulsado &amp;quot;Shift&amp;quot; para hacer
 esto varias veces.
 </translation>
     </message>
@@ -765,7 +805,7 @@ Por favor, exporte el archivo guardado como '.step'
 </translation>
     </message>
     <message>
-        <location filename="../CD_FeatureLabels.py" line="202"/>
+        <location filename="../a2p_importpart.py" line="1398"/>
         <source>Info</source>
         <translation>Información</translation>
     </message>
@@ -997,7 +1037,7 @@ se harán visibles de nuevo.
 </translation>
     </message>
     <message>
-        <location filename="../a2p_MuxAssembly.py" line="333"/>
+        <location filename="../a2p_importpart.py" line="1889"/>
         <source>You have to open an assembly file first.</source>
         <translation>Primero tiene que abrir un archivo de ensamblaje.</translation>
     </message>
@@ -1243,7 +1283,7 @@ archivo de ensamblaje.
     <message>
         <location filename="../a2p_importpart.py" line="2105"/>
         <source>  Updating by SubElement-Map: &apos;{}&apos; =&gt; &apos;{}&apos;</source>
-        <translation>  Actualizando mapeo de subelementos: '{}' =&gt; '{}'</translation>
+        <translation>  Actualizando mapeo de subelementos: '{}' =&amp;gt; '{}'</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="2120"/>
@@ -2267,6 +2307,37 @@ Debe abrir un archivo de ensamblaje primero.</translation>
         <source>Initializing A2plus Workbench v{}</source>
         <translation>Inicializando entorno de trabajo A2plus v{}</translation>
     </message>
+    <message>
+        <location filename="../a2p_BoM.py" line="476"/>
+        <source>Create a spreadsheet with a parts list for https://cutlistoptimizer.com/ of this file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../a2p_BoM.py" line="477"/>
+        <source>Create a spreadsheet with a 
+parts list https://cutlistoptimizer.com/ of this file.
+
+This function will read out 
+the #PARTINFO# spreadsheet of 
+all involved parts of the 
+assembly and create a new 
+spreadsheet containing the 
+parts list.
+
+This button will open a dialog 
+with the Question:
+- Iterate recursively over 
+     all subassenblies?
+
+Answer Yes:
+All parts of all subassemblies are 
+collected to the partlist 
+
+Answer No:
+Only the parts within the 
+recent assembly are collected.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>A2plus_Constraints</name>
@@ -2840,9 +2911,9 @@ are written into &quot;mux Info&quot; property. When the parts are
 later updated the properties &quot;Sub Elementx&quot; of the constraints
 will be updated according to the &quot;mux Info&quot; topology.</source>
         <translation>Mientras se importan partes al ensamblaje, los nombres topológicos
-se escriben en la propiedad &quot;mux Info&quot;. Cuando las partes son
-actualizadas más tarde las propiedades &quot;Sub Elementx&quot; de las restricciones
-se actualizarán de acuerdo con la topología &quot;mux Info&quot;.</translation>
+se escriben en la propiedad &amp;quot;mux Info&amp;quot;. Cuando las partes son
+actualizadas más tarde las propiedades &amp;quot;Sub Elementx&amp;quot; de las restricciones
+se actualizarán de acuerdo con la topología &amp;quot;mux Info&amp;quot;.</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="162"/>
@@ -2939,7 +3010,7 @@ en la dirección a una pieza fija</translation>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="414"/>
         <source>Use &quot;magnetic&quot; solver, solving all parts at once (for dynamical assemblies)</source>
-        <translation>Usar solucionador &quot;magnético&quot;, resolviendo todas las partes a la vez (para ensamblajes dinámicos)</translation>
+        <translation>Usar solucionador &amp;quot;magnético&amp;quot;, resolviendo todas las partes a la vez (para ensamblajes dinámicos)</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="427"/>
@@ -2973,27 +3044,27 @@ y así sucesivamente.</translation>
 <context>
     <name>Workbench</name>
     <message>
-        <location filename="../InitGui.py" line="205"/>
+        <location filename="../InitGui.py" line="206"/>
         <source>Constraint</source>
         <translation>Restricción</translation>
     </message>
     <message>
-        <location filename="../InitGui.py" line="209"/>
+        <location filename="../InitGui.py" line="210"/>
         <source>Solver</source>
         <translation>Solucionador</translation>
     </message>
     <message>
-        <location filename="../InitGui.py" line="213"/>
+        <location filename="../InitGui.py" line="214"/>
         <source>View</source>
         <translation>Ver</translation>
     </message>
     <message>
-        <location filename="../InitGui.py" line="218"/>
+        <location filename="../InitGui.py" line="219"/>
         <source>Misc</source>
         <translation>Miscelánea</translation>
     </message>
     <message>
-        <location filename="../InitGui.py" line="222"/>
+        <location filename="../InitGui.py" line="223"/>
         <source>Diagnostic</source>
         <translation>Diagnóstico</translation>
     </message>

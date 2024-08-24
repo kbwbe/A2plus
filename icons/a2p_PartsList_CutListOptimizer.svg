@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="64"
+   height="64"
+   id="svg3085"
+   version="1.1"
+   viewBox="0 0 33.92 33.92"
+   sodipodi:docname="a2p_PartsList_CutListOptimizer.svg"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <sodipodi:namedview
+     id="namedview26"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     inkscape:zoom="11.234375"
+     inkscape:cx="32"
+     inkscape:cy="32"
+     inkscape:window-width="1920"
+     inkscape:window-height="1019"
+     inkscape:window-x="0"
+     inkscape:window-y="450"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg3085" />
+  <defs
+     id="defs3087" />
+  <metadata
+     id="metadata3090">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="g19212">
+    <path
+       style="fill:#7986cb;stroke:#7986cb;stroke-width:0.06625"
+       d="M 2.5175,18.450625 V 13.84625 H 17.15875 31.800001 V 18.450625 23.055 H 17.15875 2.5175 Z"
+       id="path31248" />
+    <text
+       id="text3017"
+       y="21.321827"
+       x="9.7990274"
+       style="font-style:normal;font-weight:bold;line-height:0%;font-family:sans-serif;-inkscape-font-specification:'Sans Bold';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       xml:space="preserve"><tspan
+         style="font-size:8px;line-height:1.25;font-family:sans-serif"
+         y="21.321827"
+         x="9.7990274"
+         id="tspan3019">List</tspan></text>
+  </g>
+  <rect
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.114158;stroke-linecap:butt;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     id="rect3018-3-6"
+     width="1.2970899"
+     height="32.02499"
+     x="12.454873"
+     y="-33.182068"
+     transform="rotate(90)" />
+  <g
+     id="g19207">
+    <g
+       id="g846">
+      <path
+         style="fill:#7986cb;stroke:#7986cb;stroke-width:0.06625"
+         d="M 2.5175,28.189375 V 24.57875 h 14.64125 14.641251 v 3.610625 3.610626 H 17.15875 2.5175 Z"
+         id="path31920" />
+    </g>
+    <text
+       id="text3100"
+       y="29.157679"
+       x="3.8673439"
+       style="font-style:normal;font-weight:bold;font-size:3.18px;line-height:0;font-family:sans-serif;-inkscape-font-specification:'Sans Bold';text-align:start;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none"
+       xml:space="preserve"><tspan
+         style="font-size:3.18px;line-height:0.85;font-family:sans-serif;text-align:start;text-anchor:start"
+         id="tspan88473"
+         x="3.8673439"
+         y="29.157679">CutList Optimizer</tspan></text>
+  </g>
+  <g
+     id="g19217">
+    <path
+       style="fill:#7986cb;stroke:#7986cb;stroke-width:0.06625"
+       d="M 2.5175,7.42 V 2.45125 H 17.15875 31.800001 V 7.42 12.38875 H 17.15875 2.5175 Z"
+       id="path31684" />
+    <text
+       id="text3013"
+       y="10.384195"
+       x="7.0197306"
+       style="font-style:normal;font-weight:bold;line-height:0%;font-family:sans-serif;-inkscape-font-specification:'Sans Bold';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       xml:space="preserve"><tspan
+         style="font-size:8px;line-height:1.25;font-family:sans-serif"
+         y="10.384195"
+         x="7.0197306"
+         id="tspan3015">Parts</tspan></text>
+  </g>
+  <rect
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.114158;stroke-linecap:butt;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     id="rect3018"
+     width="1.2970899"
+     height="32.02499"
+     x="1.1570787"
+     y="1.157079" />
+  <rect
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.114158;stroke-linecap:butt;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     id="rect3018-5"
+     width="1.2970899"
+     height="32.02499"
+     x="31.857079"
+     y="1.156829" />
+  <rect
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.114158;stroke-linecap:butt;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     id="rect3018-3"
+     width="1.2970899"
+     height="32.02499"
+     x="1.0735911"
+     y="-33.182068"
+     transform="rotate(90)" />
+  <rect
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.114158;stroke-linecap:butt;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     id="rect3018-3-6-9"
+     width="1.2970895"
+     height="32.02499"
+     x="23.161982"
+     y="-33.179169"
+     transform="rotate(90)" />
+  <rect
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.113921;stroke-linecap:butt;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     id="rect3018-3-6-9-2"
+     width="1.2973273"
+     height="31.885889"
+     x="31.89406"
+     y="-33.042847"
+     transform="rotate(90)" />
+</svg>

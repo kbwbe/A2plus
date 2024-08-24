@@ -29,8 +29,15 @@ PARTINFORMATION_SHEET_LABEL = "#" + translate("A2p_BoM", "PARTINFO") + "#"
 BOM_SHEET_NAME = "_PARTSLIST_"
 BOM_SHEET_LABEL = "#" + translate("A2p_BoM", "PARTSLIST") + "#"
 
+# CutListOptimizer BillOfMaterials...
+CLO_BOM_SHEET_NAME = "_PARTSLIST_CUT-LIST-OPTIMIZER_"
+CLO_BOM_SHEET_LABEL = "#" + translate("A2p_BoM", "CLO_PARTSLIST") + "#"
+
 BOM_MAX_COLS = 10
 BOM_MAX_LENGTH = 150
+
+CLO_BOM_MAX_COLS = 10
+CLO_BOM_MAX_LENGTH = BOM_MAX_LENGTH
 
 PARTLIST_COLUMN_NAMES = [
     translate("A2p_BoM", "IDENTNO"),
@@ -39,4 +46,13 @@ PARTLIST_COLUMN_NAMES = [
     translate("A2p_BoM", "SUPP.IDENTNO"),
     translate("A2p_BoM", "SUPP.DESCRIPTION"),
     translate("A2p_BoM", "(FILENAME)")
-    ]
+]
+
+CLO_PARTLIST_COLUMN_NAMES = [
+    translate("A2p_BoM", "Length"),
+    translate("A2p_BoM", "Width"),
+    translate("A2p_BoM", "Qty"),
+    translate("A2p_BoM", "Material"),
+    translate("A2p_BoM", "Label"),
+    translate("A2p_BoM", "Enabled")
+]
