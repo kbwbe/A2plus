@@ -30,7 +30,12 @@ import FreeCAD
 import FreeCADGui
 
 import a2plib
-import a2p_Resources3
+# Need to determine if we are on a system using PySide2 or PySide6
+try:
+    import PySide6 # try Qt6 first
+    import a2p_Resources3_Qt6
+except ImportError:
+    import a2p_Resources3
 
 translate = FreeCAD.Qt.translate
 QT_TRANSLATE_NOOP = FreeCAD.Qt.QT_TRANSLATE_NOOP
