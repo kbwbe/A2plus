@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>691</width>
-    <height>793</height>
+    <width>680</width>
+    <height>825</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,456 +19,397 @@
   <property name="windowTitle">
    <string>A2plus settings</string>
   </property>
-  <widget class="QGroupBox" name="groupBox_4">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>430</y>
-     <width>690</width>
-     <height>81</height>
-    </rect>
-   </property>
-   <property name="sizePolicy">
-    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-     <horstretch>0</horstretch>
-     <verstretch>0</verstretch>
-    </sizepolicy>
-   </property>
-   <property name="title">
-    <string>User interface settings</string>
-   </property>
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>30</y>
-      <width>661</width>
-      <height>50</height>
-     </rect>
-    </property>
-    <layout class="QFormLayout" name="formLayout_3">
-     <item row="0" column="0">
-      <widget class="Gui::PrefCheckBox" name="checkBox_6">
-       <property name="toolTip">
-        <string>Adds a creation button for every constraint type to the toolbar</string>
-       </property>
-       <property name="text">
-        <string>Show constraints in toolbar</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-       <property name="prefEntry" stdset="0">
-        <cstring>showConstraintsOnToolbar</cstring>
-       </property>
-       <property name="prefPath" stdset="0">
-        <cstring>Mod/A2plus</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="Gui::PrefCheckBox" name="checkBox_10">
-       <property name="text">
-        <string>Use native file manager of your OS</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-       <property name="prefEntry" stdset="0">
-        <cstring>useNativeFileManager</cstring>
-       </property>
-       <property name="prefPath" stdset="0">
-        <cstring>Mod/A2plus</cstring>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-  </widget>
-  <widget class="QGroupBox" name="groupBox_3">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>220</y>
-     <width>690</width>
-     <height>201</height>
-    </rect>
-   </property>
-   <property name="sizePolicy">
-    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-     <horstretch>0</horstretch>
-     <verstretch>0</verstretch>
-    </sizepolicy>
-   </property>
-   <property name="toolTip">
-    <string/>
-   </property>
-   <property name="title">
-    <string>Behavior when updating imported parts</string>
-   </property>
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>22</x>
-      <y>21</y>
-      <width>661</width>
-      <height>158</height>
-     </rect>
-    </property>
-    <layout class="QFormLayout" name="formLayout">
-     <item row="0" column="0">
-      <widget class="Gui::PrefCheckBox" name="checkBox_4">
-       <property name="toolTip">
-        <string>All parts of the assembly will be opened in FreeCAD to be
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="3" column="0">
+    <widget class="QGroupBox" name="groupBox_4">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title">
+      <string>User interface settings</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <widget class="Gui::PrefCheckBox" name="checkBox_6">
+        <property name="toolTip">
+         <string>Adds a creation button for every constraint type to the toolbar</string>
+        </property>
+        <property name="text">
+         <string>Show constraints in toolbar</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>showConstraintsOnToolbar</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Mod/A2plus</cstring>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Gui::PrefCheckBox" name="checkBox_10">
+        <property name="text">
+         <string>Use native file manager of your OS</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>useNativeFileManager</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Mod/A2plus</cstring>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QGroupBox" name="groupBox_3">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="toolTip">
+      <string/>
+     </property>
+     <property name="title">
+      <string>Behavior when updating imported parts</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="Gui::PrefCheckBox" name="checkBox_4">
+        <property name="toolTip">
+         <string>All parts of the assembly will be opened in FreeCAD to be
 reconstructed using values from spreadsheets</string>
-       </property>
-       <property name="text">
-        <string>Recalculate imported parts before updating them (experimental)</string>
-       </property>
-       <property name="prefEntry" stdset="0">
-        <cstring>recalculateImportedParts</cstring>
-       </property>
-       <property name="prefPath" stdset="0">
-        <cstring>Mod/A2plus</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="Gui::PrefCheckBox" name="checkBox_5">
-       <property name="toolTip">
-        <string>Opens all subassemblies recursively
+        </property>
+        <property name="text">
+         <string>Recalculate imported parts before updating them (experimental)</string>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>recalculateImportedParts</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Mod/A2plus</cstring>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Gui::PrefCheckBox" name="checkBox_5">
+        <property name="toolTip">
+         <string>Opens all subassemblies recursively
 to update them</string>
-       </property>
-       <property name="text">
-        <string>Enable recursive update of imported parts</string>
-       </property>
-       <property name="prefEntry" stdset="0">
-        <cstring>enableRecursiveUpdate</cstring>
-       </property>
-       <property name="prefPath" stdset="0">
-        <cstring>Mod/A2plus</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="Gui::PrefCheckBox" name="checkBox_2">
-       <property name="toolTip">
-        <string>While importing parts to the assembly, the topological names
+        </property>
+        <property name="text">
+         <string>Enable recursive update of imported parts</string>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>enableRecursiveUpdate</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Mod/A2plus</cstring>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Gui::PrefCheckBox" name="checkBox_2">
+        <property name="toolTip">
+         <string>While importing parts to the assembly, the topological names
 are written into &quot;mux Info&quot; property. When the parts are
 later updated the properties &quot;Sub Elementx&quot; of the constraints
 will be updated according to the &quot;mux Info&quot; topology.</string>
-       </property>
-       <property name="text">
-        <string>Use experimental topological naming</string>
-       </property>
-       <property name="prefEntry" stdset="0">
-        <cstring>useTopoNaming</cstring>
-       </property>
-       <property name="prefPath" stdset="0">
-        <cstring>Mod/A2plus</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="Gui::PrefCheckBox" name="checkBox_7">
-       <property name="toolTip">
-        <string>Use color and transparency settings
+        </property>
+        <property name="text">
+         <string>Use experimental topological naming</string>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>useTopoNaming</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Mod/A2plus</cstring>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Gui::PrefCheckBox" name="checkBox_7">
+        <property name="toolTip">
+         <string>Use color and transparency settings
 from imported parts.
 Note: For WB PartDesign it work for Body only.</string>
-       </property>
-       <property name="text">
-        <string>Inherit per face color and transparency from parts and subassemblies (experimental)</string>
-       </property>
-       <property name="prefEntry" stdset="0">
-        <cstring>usePerFaceTransparency</cstring>
-       </property>
-       <property name="prefPath" stdset="0">
-        <cstring>Mod/A2plus</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0">
-      <widget class="Gui::PrefCheckBox" name="checkBox_8">
-       <property name="toolTip">
-        <string>Invisible datum/construction shapes will be hidden.
+        </property>
+        <property name="text">
+         <string>Inherit per face color and transparency from parts and subassemblies (experimental)</string>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>usePerFaceTransparency</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Mod/A2plus</cstring>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Gui::PrefCheckBox" name="checkBox_8">
+        <property name="toolTip">
+         <string>Invisible datum/construction shapes will be hidden.
 Note: No constraints must be connected to
 datum/construction shapes in higher or other
 subassemblies. Otherwise you can break the assembly.</string>
-       </property>
-       <property name="statusTip">
-        <string>All imported parts will directly be put together as union.</string>
-       </property>
-       <property name="text">
-        <string>Do not import invisible shapes (for expert users)</string>
-       </property>
-       <property name="prefEntry" stdset="0">
-        <cstring>doNotImportInvisibleShapes</cstring>
-       </property>
-       <property name="prefPath" stdset="0">
-        <cstring>Mod/A2plus</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="0">
-      <widget class="Gui::PrefCheckBox" name="checkBox_9">
-       <property name="text">
-        <string>Use solid union for importing parts and subassemblies (experimental)</string>
-       </property>
-       <property name="prefEntry" stdset="0">
-        <cstring>useSolidUnion</cstring>
-       </property>
-       <property name="prefPath" stdset="0">
-        <cstring>Mod/A2plus</cstring>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-  </widget>
-  <widget class="QGroupBox" name="groupBox_6">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>540</y>
-     <width>690</width>
-     <height>141</height>
-    </rect>
-   </property>
-   <property name="sizePolicy">
-    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-     <horstretch>0</horstretch>
-     <verstretch>0</verstretch>
-    </sizepolicy>
-   </property>
-   <property name="title">
-    <string>Storage of files</string>
-   </property>
-   <widget class="QWidget" name="verticalLayoutWidget_5">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>20</y>
-      <width>661</width>
-      <height>111</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout_6">
-     <item>
-      <widget class="Gui::PrefRadioButton" name="radioButton_3">
-       <property name="text">
-        <string>Use relative paths for imported parts</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-       <property name="prefEntry" stdset="0">
-        <cstring>useRelativePathes</cstring>
-       </property>
-       <property name="prefPath" stdset="0">
-        <cstring>Mod/A2plus</cstring>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="Gui::PrefRadioButton" name="radioButton_4">
-       <property name="text">
-        <string>Use absolute paths for imported parts</string>
-       </property>
-       <property name="prefEntry" stdset="0">
-        <cstring>useAbsolutePathes</cstring>
-       </property>
-       <property name="prefPath" stdset="0">
-        <cstring>Mod/A2plus</cstring>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="Gui::PrefRadioButton" name="radioButton_5">
-       <property name="toolTip">
-        <string>Specify the project folder in the field below</string>
-       </property>
-       <property name="text">
-        <string>All files are in this project folder:</string>
-       </property>
-       <property name="prefEntry" stdset="0">
-        <cstring>useProjectFolder</cstring>
-       </property>
-       <property name="prefPath" stdset="0">
-        <cstring>Mod/A2plus</cstring>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="Gui::PrefFileChooser" name="fileChooser" native="true">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>350</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>400</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="prefEntry" stdset="0">
-        <cstring>projectFolder</cstring>
-       </property>
-       <property name="prefPath" stdset="0">
-        <cstring>Mod/A2plus</cstring>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-  </widget>
-  <widget class="QGroupBox" name="groupBox_2">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>140</y>
-     <width>690</width>
-     <height>61</height>
-    </rect>
-   </property>
-   <property name="sizePolicy">
-    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-     <horstretch>0</horstretch>
-     <verstretch>0</verstretch>
-    </sizepolicy>
-   </property>
-   <property name="title">
-    <string>Default solver behavior</string>
-   </property>
-   <widget class="Gui::PrefCheckBox" name="checkBox">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>30</y>
-      <width>661</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Solve automatically if a constraint property is changed</string>
-    </property>
-    <property name="checked">
-     <bool>true</bool>
-    </property>
-    <property name="prefEntry" stdset="0">
-     <cstring>autoSolve</cstring>
-    </property>
-    <property name="prefPath" stdset="0">
-     <cstring>Mod/A2plus</cstring>
-    </property>
-   </widget>
-  </widget>
-  <widget class="QGroupBox" name="groupBox">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>10</y>
-     <width>690</width>
-     <height>111</height>
-    </rect>
-   </property>
-   <property name="sizePolicy">
-    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-     <horstretch>0</horstretch>
-     <verstretch>0</verstretch>
-    </sizepolicy>
-   </property>
-   <property name="title">
-    <string>Default solving method</string>
-   </property>
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>21</x>
-      <y>21</y>
-      <width>661</width>
-      <height>77</height>
-     </rect>
-    </property>
-    <layout class="QFormLayout" name="formLayout_2">
-     <item row="1" column="0">
-      <widget class="Gui::PrefRadioButton" name="radioButton_2">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="toolTip">
-        <string>Solver tries to move all parts at once
-in direction to a fixed part</string>
-       </property>
-       <property name="text">
-        <string>Use &quot;magnetic&quot; solver, solving all parts at once (for dynamical assemblies)</string>
-       </property>
-       <property name="prefEntry" stdset="0">
-        <cstring>useMagneticSolver</cstring>
-       </property>
-       <property name="prefPath" stdset="0">
-        <cstring>Mod/A2plus</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="Gui::PrefCheckBox" name="checkBox_3">
-       <property name="toolTip">
-        <string>All parts will be fixed to the positions
-where they were created</string>
-       </property>
-       <property name="text">
-        <string>Force fixed position to all imports</string>
-       </property>
-       <property name="prefEntry" stdset="0">
-        <cstring>forceFixedPosition</cstring>
-       </property>
-       <property name="prefPath" stdset="0">
-        <cstring>Mod/A2plus</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0" colspan="2">
-      <widget class="Gui::PrefRadioButton" name="radioButton">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="toolTip">
-        <string>Solver begins with a fixed part and a part constrained to it.
+        </property>
+        <property name="statusTip">
+         <string>All imported parts will directly be put together as union.</string>
+        </property>
+        <property name="text">
+         <string>Do not import invisible shapes (for expert users)</string>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>doNotImportInvisibleShapes</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Mod/A2plus</cstring>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Gui::PrefCheckBox" name="checkBox_9">
+        <property name="text">
+         <string>Use solid union for importing parts and subassemblies (experimental)</string>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>useSolidUnion</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Mod/A2plus</cstring>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QGroupBox" name="groupBox_5">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title">
+      <string>Storage of files</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_5">
+      <item>
+       <widget class="Gui::PrefRadioButton" name="radioButton_3">
+        <property name="text">
+         <string>Use relative paths for imported parts</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>useRelativePathes</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Mod/A2plus</cstring>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Gui::PrefRadioButton" name="radioButton_4">
+        <property name="text">
+         <string>Use absolute paths for imported parts</string>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>useAbsolutePathes</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Mod/A2plus</cstring>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Gui::PrefRadioButton" name="radioButton_5">
+        <property name="toolTip">
+         <string>Specify the project folder in the field below</string>
+        </property>
+        <property name="text">
+         <string>All files are in this project folder:</string>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>useProjectFolder</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Mod/A2plus</cstring>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Gui::PrefFileChooser" name="fileChooser">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>350</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>400</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>projectFolder</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Mod/A2plus</cstring>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title">
+      <string>Default solving method</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="Gui::PrefRadioButton" name="radioButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>Solver begins with a fixed part and a part constrained to it.
 All other parts are not calculated. If a solution could be
 found, the next constrained part is added for the
 calculation and so on.</string>
-       </property>
-       <property name="text">
-        <string>Use solving of partial systems (recommended for static assemblies)</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-       <property name="prefEntry" stdset="0">
-        <cstring>usePartialSolver</cstring>
-       </property>
-       <property name="prefPath" stdset="0">
-        <cstring>Mod/A2plus</cstring>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-  </widget>
+        </property>
+        <property name="text">
+         <string>Use solving of partial systems (recommended for static assemblies)</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>usePartialSolver</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Mod/A2plus</cstring>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Gui::PrefRadioButton" name="radioButton_2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>Solver tries to move all parts at once
+in direction to a fixed part</string>
+        </property>
+        <property name="text">
+         <string>Use &quot;magnetic&quot; solver, solving all parts at once (for dynamical assemblies)</string>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>useMagneticSolver</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Mod/A2plus</cstring>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Gui::PrefCheckBox" name="checkBox_3">
+        <property name="toolTip">
+         <string>All parts will be fixed to the positions
+where they were created</string>
+        </property>
+        <property name="text">
+         <string>Force fixed position to all imports</string>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>forceFixedPosition</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Mod/A2plus</cstring>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title">
+      <string>Default solver behavior</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="Gui::PrefCheckBox" name="checkBox">
+        <property name="text">
+         <string>Solve automatically if a constraint property is changed</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>autoSolve</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Mod/A2plus</cstring>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
