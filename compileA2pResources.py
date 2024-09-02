@@ -60,9 +60,16 @@ os.system(
     )
 )
 
-os.system(
-    'pyside2-lupdate *.py -ts translations/A2plus.ts -verbose'
-)
+# Need to determine if we are on a system using PySide2 or PySide6
+try:
+    import PySide6 # try Qt6 first
+    os.system(
+        'pyside6-lupdate *.py -ts translations/A2plus.ts -verbose'
+    )
+except ImportError:
+    os.system(
+        'pyside2-lupdate *.py -ts translations/A2plus.ts -verbose'
+    )
 '''
 os.system(
     'lrelease "translations/A2plus.ts"'

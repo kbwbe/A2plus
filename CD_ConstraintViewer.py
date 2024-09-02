@@ -25,7 +25,11 @@
 import os
 import sys
 import subprocess
-from PySide import QtCore, QtGui, QtUiTools
+from PySide import QtCore, QtGui
+try:
+    from PySide import QtUiTools
+except ImportError:
+    pass
 
 import FreeCAD
 import FreeCADGui
