@@ -6,7 +6,7 @@
     <message>
         <location filename="../a2p_BoM.py" line="214"/>
         <source>BOM ERROR: Could not open sourcefile &apos;{}&apos;</source>
-        <translation>ERROR DE BOM: No se pudo abrir el archivo fuente '{}'</translation>
+        <translation>ERROR DE BOM: No se pudo abrir el archivo fuente &apos;{}&apos;</translation>
     </message>
     <message>
         <location filename="../a2p_partlistglobals.py" line="30"/>
@@ -71,42 +71,42 @@
     <message>
         <location filename="../a2p_BoM.py" line="470"/>
         <source>#PARTSLIST_CutListOptimizer# spreadsheet has been created</source>
-        <translation type="unfinished"></translation>
+        <translation>La hoja de cálculo #PARTSLIST_CutListOptimizer# ha sido creada</translation>
     </message>
     <message>
         <location filename="../a2p_partlistglobals.py" line="34"/>
         <source>CLO_PARTSLIST</source>
-        <translation type="unfinished"></translation>
+        <translation>CLO_LISTADEPARTES</translation>
     </message>
     <message>
         <location filename="../a2p_partlistglobals.py" line="52"/>
         <source>Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Longitud</translation>
     </message>
     <message>
         <location filename="../a2p_partlistglobals.py" line="53"/>
         <source>Width</source>
-        <translation type="unfinished"></translation>
+        <translation>Ancho</translation>
     </message>
     <message>
         <location filename="../a2p_partlistglobals.py" line="54"/>
         <source>Qty</source>
-        <translation type="unfinished"></translation>
+        <translation>Cantidad</translation>
     </message>
     <message>
         <location filename="../a2p_partlistglobals.py" line="55"/>
         <source>Material</source>
-        <translation type="unfinished"></translation>
+        <translation>Material</translation>
     </message>
     <message>
         <location filename="../a2p_partlistglobals.py" line="56"/>
         <source>Label</source>
-        <translation type="unfinished"></translation>
+        <translation>Etiqueta</translation>
     </message>
     <message>
         <location filename="../a2p_partlistglobals.py" line="57"/>
         <source>Enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Habilitado</translation>
     </message>
 </context>
 <context>
@@ -273,7 +273,7 @@ ensamblaje reciente son colectadas.</translation>
     <message>
         <location filename="../a2p_ConstraintDialog.py" line="125"/>
         <source>Flip direction between &apos;aligned&apos; and &apos;opposed&apos;</source>
-        <translation>Invertir dirección entre 'alineado' y 'opuesto'</translation>
+        <translation>Invertir dirección entre &apos;alineado&apos; y &apos;opuesto&apos;</translation>
     </message>
     <message>
         <location filename="../a2p_ConstraintDialog.py" line="126"/>
@@ -288,7 +288,7 @@ ensamblaje reciente son colectadas.</translation>
     <message>
         <location filename="../a2p_ConstraintDialog.py" line="189"/>
         <source>Set 0 to &apos;Offset&apos; field</source>
-        <translation>Establecer 0 en campo 'Offset'</translation>
+        <translation>Establecer 0 en campo &apos;Offset&apos;</translation>
     </message>
     <message>
         <location filename="../a2p_ConstraintDialog.py" line="190"/>
@@ -298,7 +298,7 @@ ensamblaje reciente son colectadas.</translation>
     <message>
         <location filename="../a2p_ConstraintDialog.py" line="196"/>
         <source>Flip sign between &apos;+&apos; and &apos;-&apos; in &apos;Offset&apos; field</source>
-        <translation>Voltear signo entre '+' y '-' en el campo 'Offset'</translation>
+        <translation>Voltear signo entre &apos;+&apos; y &apos;-&apos; en el campo &apos;Offset&apos;</translation>
     </message>
     <message>
         <location filename="../a2p_ConstraintDialog.py" line="199"/>
@@ -353,7 +353,7 @@ ensamblaje reciente son colectadas.</translation>
     <message>
         <location filename="../a2p_ConstraintDialog.py" line="267"/>
         <source>Toggle between &apos;False&apos; and &apos;True&apos;</source>
-        <translation>Alternar entre 'Falso' y 'Verdadero'</translation>
+        <translation>Alternar entre &apos;Falso&apos; y &apos;Verdadero&apos;</translation>
     </message>
     <message>
         <location filename="../a2p_ConstraintDialog.py" line="268"/>
@@ -541,7 +541,7 @@ definir restricciones</translation>
     <message>
         <location filename="../a2p_recursiveUpdatePlanner.py" line="171"/>
         <source>A part can only be imported from a FreeCAD &apos;*.FCStd&apos; file</source>
-        <translation>Una parte sólo puede importarse de un archivo de FreeCAD '*.FCStd'</translation>
+        <translation>Una parte sólo puede importarse de un archivo de FreeCAD &apos;*.FCStd&apos;</translation>
     </message>
     <message>
         <location filename="../a2p_recursiveUpdatePlanner.py" line="171"/>
@@ -676,7 +676,7 @@ al ensamblaje
     <message>
         <location filename="../a2p_importpart.py" line="811"/>
         <source>Unable to find &apos;{}&apos;</source>
-        <translation>No se puede encontrar '{}'</translation>
+        <translation>No se puede encontrar &apos;{}&apos;</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="885"/>
@@ -729,7 +729,7 @@ pulse este botón. Se creará un
 duplicado y puede ser colocado
 en algún lugar por el ratón.
 
-Mantenga pulsado &amp;quot;Shift&amp;quot; para hacer
+Mantenga pulsado &quot;Shift&quot; para hacer
 esto varias veces.
 </translation>
     </message>
@@ -770,7 +770,7 @@ esta parte en este lugar.
 
 Después de editar y guardar,
 tiene que utilizar la función
-'actualizar las piezas importadas'
+&apos;actualizar las piezas importadas&apos;
 para poder ver la nueva forma
 en el ensamblaje.
 </translation>
@@ -800,8 +800,8 @@ en el ensamblaje.
         <source>Editing a STEP file as &apos;*.FCStd&apos; file.
 Please export the saved file as &apos;.step&apos;
 </source>
-        <translation>Editando un archivo STEP como archivo '*.FCStd'.
-Por favor, exporte el archivo guardado como '.step'
+        <translation>Editando un archivo STEP como archivo &apos;*.FCStd&apos;.
+Por favor, exporte el archivo guardado como &apos;.step&apos;
 </translation>
     </message>
     <message>
@@ -949,7 +949,7 @@ a la vez.
     <message>
         <location filename="../a2p_importpart.py" line="1398"/>
         <source>No constraints refer to &apos;%s&apos;</source>
-        <translation>No constraints refer to '%s'</translation>
+        <translation>No constraints refer to &apos;%s&apos;</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="1403"/>
@@ -1142,9 +1142,9 @@ Invertir dirección de la última restricción.
 
 Si la última restricción, que ha
 sido definida, tiene una propiedad
-'dirección', su valor estará
-alternado entre 'alineado' y
-'opuesto' (alineación del eje)
+&apos;dirección&apos;, su valor estará
+alternado entre &apos;alineado&apos; y
+&apos;opuesto&apos; (alineación del eje)
 </translation>
     </message>
     <message>
@@ -1283,7 +1283,7 @@ archivo de ensamblaje.
     <message>
         <location filename="../a2p_importpart.py" line="2105"/>
         <source>  Updating by SubElement-Map: &apos;{}&apos; =&gt; &apos;{}&apos;</source>
-        <translation>  Actualizando mapeo de subelementos: '{}' =&amp;gt; '{}'</translation>
+        <translation>  Actualizando mapeo de subelementos: &apos;{}&apos; =&gt; &apos;{}&apos;</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="2120"/>
@@ -1303,7 +1303,7 @@ archivo de ensamblaje.
     <message>
         <location filename="../a2p_importpart.py" line="2137"/>
         <source>3D-Debug contained &apos;{}&apos; vectors</source>
-        <translation>Debug 3D contenido '{}' vectores</translation>
+        <translation>Debug 3D contenido &apos;{}&apos; vectores</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="2147"/>
@@ -1321,7 +1321,7 @@ archivo de ensamblaje.
         <translation>¡Restricciones de partes faltantes eliminadas!</translation>
     </message>
     <message>
-        <location filename="../a2p_topomapper.py" line="648"/>
+        <location filename="../a2p_topomapper.py" line="662"/>
         <source>Union of Shapes FAILED</source>
         <translation>Unión de formas FALLÓ</translation>
     </message>
@@ -1401,7 +1401,7 @@ es invisible la primera vez.
     <message>
         <location filename="../a2p_MuxAssembly.py" line="319"/>
         <source>Union of Shapes passed. &apos;SimpleAssemblyShape&apos; are created.</source>
-        <translation>Unión de formas pasó. 'FormaEnsamblajeSimple' es creada.</translation>
+        <translation>Unión de formas pasó. &apos;FormaEnsamblajeSimple&apos; es creada.</translation>
     </message>
     <message>
         <location filename="../a2p_MuxAssembly.py" line="327"/>
@@ -1446,7 +1446,7 @@ por la función de la lista de partes de A2plus.
     <message>
         <location filename="../a2p_recursiveUpdatePlanner.py" line="68"/>
         <source>Did not update converted part &apos;{}&apos;</source>
-        <translation>No se actualizó parte convertida '{}'</translation>
+        <translation>No se actualizó parte convertida &apos;{}&apos;</translation>
     </message>
     <message>
         <location filename="../a2p_recursiveUpdatePlanner.py" line="123"/>
@@ -1461,7 +1461,7 @@ por la función de la lista de partes de A2plus.
     <message>
         <location filename="../a2p_recursiveUpdatePlanner.py" line="185"/>
         <source>Assembly &apos;{}&apos; has been updated!</source>
-        <translation>¡El ensamblaje '{}' ha sido actualizado!</translation>
+        <translation>¡El ensamblaje &apos;{}&apos; ha sido actualizado!</translation>
     </message>
     <message>
         <location filename="../a2p_recursiveUpdatePlanner.py" line="198"/>
@@ -1501,7 +1501,7 @@ actualizados, de ser necesario.</translation>
     <message>
         <location filename="../a2p_rigid.py" line="521"/>
         <source>Current Rigid = &apos;{}&apos;</source>
-        <translation>Rígido actual = '{}'</translation>
+        <translation>Rígido actual = &apos;{}&apos;</translation>
     </message>
     <message>
         <location filename="../a2p_rigid.py" line="523"/>
@@ -1536,17 +1536,17 @@ actualizados, de ser necesario.</translation>
     <message>
         <location filename="../a2p_simpleXMLreader.py" line="248"/>
         <source>file &apos;{}&apos; does not exist!</source>
-        <translation>¡el archivo '{}' no existe!</translation>
+        <translation>¡el archivo &apos;{}&apos; no existe!</translation>
     </message>
     <message>
         <location filename="../a2p_simpleXMLreader.py" line="253"/>
         <source>file &apos;{}&apos; is no FCStd file!</source>
-        <translation>¡el archivo '{}' no es un archivo FCStd!</translation>
+        <translation>¡el archivo &apos;{}&apos; no es un archivo FCStd!</translation>
     </message>
     <message>
         <location filename="../a2p_solversystem.py" line="144"/>
         <source>Remove faulty constraint &apos;{}&apos;</source>
-        <translation>Eliminar restricción defectuosa '{}'</translation>
+        <translation>Eliminar restricción defectuosa &apos;{}&apos;</translation>
     </message>
     <message>
         <location filename="../a2p_solversystem.py" line="224"/>
@@ -1591,7 +1591,7 @@ actualizados, de ser necesario.</translation>
     <message>
         <location filename="../a2p_solversystem.py" line="390"/>
         <source>Writing visual hierarchy to: &apos;{}&apos;</source>
-        <translation>Escribiendo jerarquía visual a '{}'</translation>
+        <translation>Escribiendo jerarquía visual a &apos;{}&apos;</translation>
     </message>
     <message>
         <location filename="../a2p_solversystem.py" line="398"/>
@@ -1710,7 +1710,7 @@ a una parte fija!
     <message>
         <location filename="../a2p_topomapper.py" line="501"/>
         <source>Import ignored invisible shape: &apos;{}&apos;</source>
-        <translation>Importar forma invisible ignorada: '{}'</translation>
+        <translation>Importar forma invisible ignorada: &apos;{}&apos;</translation>
     </message>
     <message>
         <location filename="../CD_A2plusupdater.py" line="81"/>
@@ -1796,7 +1796,7 @@ Seleccione una parte e intente de nuevo.</translation>
     <message>
         <location filename="../CD_A2plusupdater.py" line="643"/>
         <source>Updates parts from the A2plus program that has been modified</source>
-        <translation type="obsolete">Actualizar partes del entorno de trabajo A2plus que ha sido modificadas</translation>
+        <translation type="obsolete">Actualizar partes del banco de trabajo A2plus que ha sido modificadas</translation>
     </message>
     <message>
         <location filename="../CD_A2plusupdater.py" line="644"/>
@@ -1805,7 +1805,7 @@ Seleccione una parte e intente de nuevo.</translation>
 Para actualizar el ensamblaje, seleccione la parte que ha modificado y presione el icono.
 Cuando la actualización haya terminado, ejecute el solucionador A2plus para verificar si hay restricciones rotas.
 Este es un intento de reducir el número de restricciones rotas causadas
-al modificar una parte del entorno de trabajo de ensamblaje Freecad A2plus. Esto registra las
+al modificar una parte del banco de trabajo de ensamblaje Freecad A2plus. Esto registra las
 restricciones de las superficies emparejadas inmediatamente antes de la actualización e intenta
 reconectarlos después de la actualización.
 Si esto falla, puede deshacer esta actualización utilizando el botón deshacer
@@ -1826,7 +1826,7 @@ and running the standard A2plus updater.</source>
 Para actualizar el ensamblaje, seleccione la parte que ha modificado y presione el icono.
 Cuando la actualización haya terminado, ejecute el solucionador A2plus para verificar si hay restricciones rotas.
 Este es un intento de reducir el número de restricciones rotas causadas
-al modificar una parte del entorno de trabajo de ensamblaje Freecad A2plus. Esto registra las
+al modificar una parte del banco de trabajo de ensamblaje Freecad A2plus. Esto registra las
 restricciones de las superficies emparejadas inmediatamente antes de la actualización e intenta
 reconectarlos después de la actualización.
 Si esto falla, puede deshacer esta actualización utilizando el botón deshacer
@@ -1850,7 +1850,7 @@ y ejecutar el actualizador de A2plus estándar.</translation>
     <message>
         <location filename="../CD_A2plusupdater.py" line="661"/>
         <source>Updates parts from the A2plus workbench that has been modified</source>
-        <translation>Actualizar partes del entorno de trabajo A2plus que ha sido modificadas</translation>
+        <translation>Actualizar partes del banco de trabajo A2plus que ha sido modificadas</translation>
     </message>
     <message>
         <location filename="../CD_A2plusupdater.py" line="662"/>
@@ -1867,7 +1867,7 @@ and running the standard A2plus updater.</source>
 Para actualizar el ensamblaje, seleccione la parte que ha modificado y presione el icono.
 Cuando la actualización haya terminado, ejecute el solucionador A2plus para verificar si hay restricciones rotas.
 Este es un intento de reducir el número de restricciones rotas causadas
-al modificar una parte del entorno de trabajo de ensamblaje Freecad A2plus. Esto registra las
+al modificar una parte del banco de trabajo de ensamblaje Freecad A2plus. Esto registra las
 restricciones de las superficies emparejadas inmediatamente antes de la actualización e intenta
 reconectarlos después de la actualización.
 Si esto falla, puede deshacer esta actualización utilizando el botón deshacer
@@ -1876,7 +1876,7 @@ y ejecutar el actualizador de A2plus estándar.</translation>
     <message>
         <location filename="../CD_CheckConstraints.py" line="92"/>
         <source>To view the constraints, press &apos;Open Viewer&apos;</source>
-        <translation>Para ver las restricciones, presione 'Abrir visor'</translation>
+        <translation>Para ver las restricciones, presione &apos;Abrir visor&apos;</translation>
     </message>
     <message>
         <location filename="../CD_CheckConstraints.py" line="102"/>
@@ -2157,7 +2157,7 @@ Seleccione una o más restricciones e intente de nuevo.</translation>
         <source>Surfaces can only be replaced in columns
 &apos;Part1 feat&apos; or &apos;Part2 feat&apos;</source>
         <translation>Las superficies solo se pueden reemplazar en columnas
-'Part1 Feat' o 'Part2 feat'</translation>
+&apos;Part1 Feat&apos; o &apos;Part2 feat&apos;</translation>
     </message>
     <message>
         <location filename="../CD_ConstraintViewer.py" line="549"/>
@@ -2300,17 +2300,17 @@ Debe abrir un archivo de ensamblaje primero.</translation>
     <message>
         <location filename="../InitGui.py" line="49"/>
         <source>An other assembly workbench for FreeCAD.</source>
-        <translation>Otro entorno de trabajo de ensamblaje para FreeCAD.</translation>
+        <translation>Otro banco de trabajo de ensamblaje para FreeCAD.</translation>
     </message>
     <message>
         <location filename="../InitGui.py" line="62"/>
         <source>Initializing A2plus Workbench v{}</source>
-        <translation>Inicializando entorno de trabajo A2plus v{}</translation>
+        <translation>Inicializando banco de trabajo A2plus v{}</translation>
     </message>
     <message>
         <location filename="../a2p_BoM.py" line="476"/>
         <source>Create a spreadsheet with a parts list for https://cutlistoptimizer.com/ of this file</source>
-        <translation type="unfinished"></translation>
+        <translation>Crear una hoja de cálculo con una lista de partes para https://cutlistoptimizer.com/ de este archivo</translation>
     </message>
     <message>
         <location filename="../a2p_BoM.py" line="477"/>
@@ -2336,7 +2336,28 @@ collected to the partlist
 Answer No:
 Only the parts within the 
 recent assembly are collected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Crear una hoja de cálculo con un
+lista de partes para https://cutlistoptimizer.com/ de este archivo.
+
+Esta función leerá
+la hoja de cálculo de #PARTINFO# de
+todas las partes involucradas del
+ensamblaje y creará una nueva
+hoja de cálculo que contiene la
+lista de partes.
+
+Este botón abrirá un cuadro de diálogo
+con la pregunta:
+¿Iterar recursivamente sobre
+     todos los subensamblajes?
+
+Respuesta Sí:
+Todas las partes de todos los subensamblajess son
+recolectadas a la lista de partes.
+
+Respuesta No:
+Solo las partes dentro del
+ensamblaje reciente se recogen.</translation>
     </message>
 </context>
 <context>
@@ -2359,7 +2380,7 @@ recent assembly are collected.</source>
     <message>
         <location filename="../a2p_ConstraintCommands.py" line="142"/>
         <source>Add SphereCenterIdent constraint</source>
-        <translation>Agregar restricción SphereCenterIdent</translation>
+        <translation>Agregar restricción EsferaCentroIdentidad</translation>
     </message>
     <message>
         <location filename="../a2p_ConstraintCommands.py" line="168"/>
@@ -2700,7 +2721,7 @@ Seleccione:
 
 Después de establecer esta restricción al principio, el
 ángulo entre ambos planos se ha calculado y
-almacenado en la entrada 'ángulo' en el editor de objetos.
+almacenado en la entrada &apos;ángulo&apos; en el editor de objetos.
 
 El ángulo se puede cambiar en el editor de objetos.
 
@@ -2766,7 +2787,7 @@ las instrucciones que se muestran en la pantalla.
 
 Esta función es útil, si
 desea usar, por ejemplo, elementos de 
-sujeción dentro de este entorno de trabajo.
+sujeción dentro de este banco de trabajo.
 </translation>
     </message>
     <message>
@@ -2911,9 +2932,9 @@ are written into &quot;mux Info&quot; property. When the parts are
 later updated the properties &quot;Sub Elementx&quot; of the constraints
 will be updated according to the &quot;mux Info&quot; topology.</source>
         <translation>Mientras se importan partes al ensamblaje, los nombres topológicos
-se escriben en la propiedad &amp;quot;mux Info&amp;quot;. Cuando las partes son
-actualizadas más tarde las propiedades &amp;quot;Sub Elementx&amp;quot; de las restricciones
-se actualizarán de acuerdo con la topología &amp;quot;mux Info&amp;quot;.</translation>
+se escriben en la propiedad &quot;mux Info&quot;. Cuando las partes son
+actualizadas más tarde las propiedades &quot;Sub Elementx&quot; de las restricciones
+se actualizarán de acuerdo con la topología &quot;mux Info&quot;.</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="162"/>
@@ -2927,7 +2948,7 @@ from imported parts.
 Note: For WB PartDesign it work for Body only.</source>
         <translation>Usar ajustes de color y transparencia
 de las partes importadas.
-Nota: Para el entorno de trabajo PartDesign, solo funciona para Cuerpo.</translation>
+Nota: Para el banco de trabajo PartDesign, solo funciona para Cuerpo.</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="180"/>
@@ -3010,7 +3031,7 @@ en la dirección a una pieza fija</translation>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="414"/>
         <source>Use &quot;magnetic&quot; solver, solving all parts at once (for dynamical assemblies)</source>
-        <translation>Usar solucionador &amp;quot;magnético&amp;quot;, resolviendo todas las partes a la vez (para ensamblajes dinámicos)</translation>
+        <translation>Usar solucionador &quot;magnético&quot;, resolviendo todas las partes a la vez (para ensamblajes dinámicos)</translation>
     </message>
     <message>
         <location filename="../GuiA2p/Resources/ui/a2p_prefs.ui" line="427"/>
