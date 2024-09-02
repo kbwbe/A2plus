@@ -26,9 +26,11 @@ for mating features after the part is replaced in the assembly.
 """
 
 import os
-#from PySide import QtUiTools
-#from PySide.QtGui import *
-from PySide import QtGui, QtCore, QtUiTools
+from PySide import QtCore, QtGui
+try:
+    from PySide import QtUiTools
+except ImportError:
+    pass
 
 import FreeCAD
 import FreeCADGui
