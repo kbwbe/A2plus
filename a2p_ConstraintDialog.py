@@ -897,11 +897,17 @@ class a2p_ConstraintCollection(QtGui.QWidget):
 def getMoveDistToStoredPosition(widg):
     if CONSTRAINT_DIALOG_STORED_POSITION == QtCore.QPoint(-1, -1):
         mw = FreeCADGui.getMainWindow()
-        fcFrame = QtGui.QDesktopWidget.geometry(mw)
-        x = fcFrame.x()
-        y = fcFrame.y()
-        width = fcFrame.width()
-        height = fcFrame.height()
+        if hasattr(QtGui, "QScreen"):
+            width = mw.frameGeometry().width()
+            height = mw.frameGeometry().height()
+            x = mw.frameGeometry().x()
+            y = mw.frameGeometry().y()
+        else:
+            fcFrame = QtGui.QDesktopWidget.geometry(mw)
+            x = fcFrame.x()
+            y = fcFrame.y()
+            width = fcFrame.width()
+            height = fcFrame.height()
 
         centerX = x + width/2
         centerY = y + height/2
