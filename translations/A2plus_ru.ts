@@ -71,7 +71,7 @@
     <message>
         <location filename="../a2p_BoM.py" line="470"/>
         <source>#PARTSLIST_CutListOptimizer# spreadsheet has been created</source>
-        <translation type="unfinished"></translation>
+        <translation>Была создана электронная таблица #PARTSLIST_CutListOptimizer#</translation>
     </message>
     <message>
         <location filename="../a2p_partlistglobals.py" line="34"/>
@@ -81,32 +81,32 @@
     <message>
         <location filename="../a2p_partlistglobals.py" line="52"/>
         <source>Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Длина</translation>
     </message>
     <message>
         <location filename="../a2p_partlistglobals.py" line="53"/>
         <source>Width</source>
-        <translation type="unfinished"></translation>
+        <translation>Ширина</translation>
     </message>
     <message>
         <location filename="../a2p_partlistglobals.py" line="54"/>
         <source>Qty</source>
-        <translation type="unfinished"></translation>
+        <translation>Кол-во</translation>
     </message>
     <message>
         <location filename="../a2p_partlistglobals.py" line="55"/>
         <source>Material</source>
-        <translation type="unfinished"></translation>
+        <translation>Материал</translation>
     </message>
     <message>
         <location filename="../a2p_partlistglobals.py" line="56"/>
         <source>Label</source>
-        <translation type="unfinished"></translation>
+        <translation>Метка</translation>
     </message>
     <message>
         <location filename="../a2p_partlistglobals.py" line="57"/>
         <source>Enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Разрешено</translation>
     </message>
 </context>
 <context>
