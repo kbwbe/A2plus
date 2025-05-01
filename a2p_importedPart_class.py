@@ -94,7 +94,7 @@ class Proxy_importPart:
     def dumps(self):
         return None
     
-    def loads(self):
+    def loads(self, state=None):
         return None
     
     def execute(self, obj):
@@ -169,7 +169,7 @@ class ImportedPartViewProviderProxy:
     def dumps(self):
         return None
     
-    def loads(self):
+    def loads(self, state=None ):
         return None
     
     def attach(self, vobj):

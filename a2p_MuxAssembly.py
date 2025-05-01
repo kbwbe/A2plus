@@ -73,7 +73,7 @@ class ViewProviderSimpleAssemblyShape:
     def dumps(self):
         return None
     
-    def loads(self):
+    def loads(self, state=None):
         return None
 
     def getIcon(self):
