@@ -26,6 +26,7 @@
 
 import os
 import sys
+import subprocess
 
 
 # ==============================================================================
@@ -35,23 +36,31 @@ import sys
 # ==============================================================================
 def create_ts():
 
-    print("1. Scan UI file for strings")
+    print("1. Scan UI file for strings:")
     os.system("lupdate ../GuiA2p/Resources/ui/*.ui -ts uifiles.ts")
 
-    print("2. Scan .py files for strings")
-    os.system("pylupdate5 -verbose ../*.py -ts pyfiles.ts")
+    print("2. Scan .py files for strings:")
+    status, result = subprocess.getstatusoutput("pylupdate6 -V")
 
-    print("3. Combine both scans above")
+    if status == 127:
+        print("\033[31m'pylupdate6' not found. May be you need run:\033[0m")
+        print("apt install pyqt6-dev-tools")
+        quit()
+    else:
+        os.system("pylupdate6 ../*.py --ts pyfiles.ts")
+
+    print("3. Combine both scans above:")
     os.system(
         "lconvert -i uifiles.ts pyfiles.ts -o A2plus.ts -sort-contexts -no-obsolete -verbose"
         )
+    print("    Content from uifiles.ts & pyfiles.ts > A2plus.ts")
 
-    print("4. Remove temporary files")
+    print("4. Remove temporary files:")
     os.system("rm uifiles.ts")
-    print("                          uifiles.ts")
+    print("    uifiles.ts")
     os.system("rm pyfiles.ts")
-    print("                          pyfiles.ts")
-    print("5. You have fresh A2plus.ts file now")
+    print("    pyfiles.ts")
+    print("You have fresh A2plus.ts file now!")
 
 
 # ==============================================================================
@@ -72,8 +81,15 @@ def merge_ts():
 # ==============================================================================
 def update_ts():
 
-    os.system("pylupdate5 -verbose ../GuiA2p/Resources/ui/*.ui ../*.py -ts *.ts")
-    print("You have fresh all A2plus_*.ts files now")
+    status, result = subprocess.getstatusoutput("pylupdate6 -V")
+
+    if status == 127:
+        print("\033[31m'pylupdate6' not found. May be you need run:\033[0m")
+        print("apt install pyqt6-dev-tools")
+        quit()
+    else:
+        os.system("pylupdate6 ../GuiA2p/Resources/ui/*.ui ../*.py --ts ../*.ts")
+        print("You have fresh all A2plus_*.ts files now")
 
 
 par = ''
