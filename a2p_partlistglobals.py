@@ -39,11 +39,28 @@ except:
     BOM_MAX_LENGTH = 150
     
     
-    PARTLIST_COLUMN_NAMES = [
+    '''    
+        PARTLIST_COLUMN_NAMES = [
         u'IDENTNO',
         u'DESCRIPTION',
         u'SUPPLIER',
         u'SUPP.IDENTNO',
         u'SUPP.DESCRIPTION',
+        u'(FILENAME)'
+        ]
+    '''
+
+    PARTLIST_COLUMN_NAMES = [
+        u'IDENTNO',
+        u'BESCHREIBUNG',
+        u'LIEFERANT',
+        u'BESTELLNUMMER',
+        u'BESCHREIBUNG/LIEF.',
+        u'ROHMATERIAL',
+        u'DIMENSION',
+        u'DXF',
+        u'PDF',
+        u'STP',
+        u'BEMERKUNG',
         u'(FILENAME)'
         ]
