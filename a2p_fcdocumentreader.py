@@ -89,7 +89,7 @@ class A2p_xmldoc_PropertySheet(A2p_xmldoc_Property):
             try:
                 cellDict[ce.attrib['address']] = ce.attrib['content']
             except:
-                pass # no content attribute, perhaps backgroundcolor or somethin else...
+                pass # no content attribute, perhaps backgroundcolor or something else
         return cellDict
 
 #------------------------------------------------------------------------------

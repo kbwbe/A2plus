@@ -124,10 +124,10 @@ class Rigid():
         for dep in self.dependencies:
             dep.enable(workList)
 
-    # The function only sets parentship for childrens that are distant+1 from fixed rigid
+    # The function only sets parentship for children that are distant+1 from fixed rigid
     # The function should be called in a loop with increased distance until it return False
     def assignParentship(self, distance):
-        # Current rigid was already set, pass the call to childrens
+        # Current rigid was already set, pass the call to children
         if self.disatanceFromFixed < distance:
             haveMore = False
             for rig in self.childRigids:
@@ -173,7 +173,7 @@ class Rigid():
             # No children
             if len(self.childRigids) == 0: return False
             else:
-                # There are some childrens, add with the matching distance
+                # There are some children, add with the matching distance
                 for rig in self.childRigids:
                     if rig.disatanceFromFixed == distance:
                         addList.append(rig)

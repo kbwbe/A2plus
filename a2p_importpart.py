@@ -465,7 +465,7 @@ class a2p_ImportShapeReferenceCommand():
             translate("A2plus", "Select FreeCAD document to import part from")
             )
         # set option "DontUseNativeDialog"=True, as native Filedialog shows
-        # misbehavior on Unbuntu 18.04 LTS. It works case sensitively, what is not wanted...
+        # misbehavior on Ubuntu 18.04 LTS. It works case sensitively, what is not wanted...
         if a2plib.getNativeFileManagerUsage():
             dialog.setOption(QtGui.QFileDialog.DontUseNativeDialog, False)
         else:
@@ -701,7 +701,7 @@ class a2p_ImportPartCommand():
             translate("A2plus", "Select FreeCAD document to import part from")
             )
         # set option "DontUseNativeDialog"=True, as native Filedialog shows
-        # misbehavior on Unbuntu 18.04 LTS. It works case sensitively, what is not wanted...
+        # misbehavior on Ubuntu 18.04 LTS. It works case sensitively, what is not wanted...
         if a2plib.getNativeFileManagerUsage():
             dialog.setOption(QtGui.QFileDialog.DontUseNativeDialog, False)
         else:

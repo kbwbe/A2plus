@@ -174,7 +174,7 @@ Current Features like shown in the workbench's toolbar:
     Choices: direction (aligned, opposed) +Flip, offset
   - Add an angle-between-planes {angledPlanes constraint} -
     Selected planes make the latter object to be rotated by your edited 'angle' value.
-    Keep the angle between aprox. 0.1° and 179.9° and use planesParallel for 0° and 180°.
+    Keep the angle between approx. 0.1° and 179.9° and use planesParallel for 0° and 180°.
 
 * Edit selected constraint - 
   Select a constraint in the treeview and hit this button to edit it's properties

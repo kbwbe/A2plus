@@ -280,7 +280,7 @@ class ShowPartProperties(QtGui.QWidget):
         self.showme()
         ConstraintList = []
         try:
-            test = str(len(TempList[0]))  # if this fail array is only one collumn
+            test = str(len(TempList[0]))  # if this fail array is only one column
             ConstraintList = TempList
         except:
             for e in TempList:            # Add second column to array if needed
