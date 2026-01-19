@@ -242,7 +242,7 @@ def drawDebugVectorAt(position,direction,rgbColor):
 #------------------------------------------------------------------------------
 def isGlobalVisible(ob):
     """
-    Part containers do not propagate visibility to all its childs.
+    Part containers do not propagate visibility to all its children.
 
     This function checks, whether at least one Part container is invisible in tree
     upwards direction.
