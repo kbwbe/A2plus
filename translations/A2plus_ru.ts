@@ -816,7 +816,7 @@ should save and reopen your
 assembly file.
 </source>
         <translation>
-Перенос прокси импортированных деталей
+Перенос с обновлением импортированных деталей
 
 Очень старые сборки A2plus не отображают
 правильные значки для импортированных
@@ -824,7 +824,7 @@ assembly file.
 
 С помощью этой функции Вы можете перевести
 ViewProviders старых импортированных
-деталей в недавнее состояние.
+деталей в свежее состояние.
 
 После запуска этой функции Вы должны
 сохранить и снова открыть файл сборки.
@@ -833,7 +833,7 @@ ViewProviders старых импортированных
     <message>
         <location filename="../a2p_importpart.py" line="1973"/>
         <source>Migrate proxies of importedParts to recent version</source>
-        <translation type="obsolete">Перенос прокси импортированных деталей в последнюю версию</translation>
+        <translation type="obsolete">Перенос с обновлением импортированных деталей до последней версии</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="1973"/>
@@ -843,7 +843,7 @@ ViewProviders старых импортированных
     <message>
         <location filename="../a2p_importpart.py" line="1996"/>
         <source>The proxies have been migrated.</source>
-        <translation>Прокси были перенесены.</translation>
+        <translation>Детали были перенесены и обновлены.</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="1996"/>
@@ -853,7 +853,7 @@ ViewProviders старых импортированных
     <message>
         <location filename="../a2p_importpart.py" line="2007"/>
         <source>Migrate proxies of imported parts</source>
-        <translation>Перенос прокси импортированных деталей</translation>
+        <translation>Перенос с обновлением импортированных деталей</translation>
     </message>
     <message>
         <location filename="../a2p_importpart.py" line="2120"/>
@@ -873,7 +873,7 @@ ViewProviders старых импортированных
     <message>
         <location filename="../a2p_importpart.py" line="2147"/>
         <source>Clean up solver debug output from 3D view</source>
-        <translation>Очистить выходные данные отладки решателя из 3D-вида</translation>
+        <translation>Очистить выходные данные после отладки решателя из 3D-вида</translation>
     </message>
     <message>
         <location filename="../a2p_MuxAssembly.py" line="251"/>
@@ -1350,7 +1350,7 @@ to a fixed part!
     <message>
         <location filename="../CD_FeatureLabels.py" line="63"/>
         <source>Add Face Labels</source>
-        <translation>Добавить метки Граней</translation>
+        <translation>Добавить Метки Граней</translation>
     </message>
     <message>
         <location filename="../CD_FeatureLabels.py" line="41"/>
@@ -1360,7 +1360,7 @@ to a fixed part!
     <message>
         <location filename="../CD_FeatureLabels.py" line="65"/>
         <source>Add Edge Labels</source>
-        <translation>Добавить метки Кромок</translation>
+        <translation>Добавить Метки Кромок</translation>
     </message>
     <message>
         <location filename="../CD_FeatureLabels.py" line="42"/>
@@ -1370,7 +1370,7 @@ to a fixed part!
     <message>
         <location filename="../CD_FeatureLabels.py" line="67"/>
         <source>Add Vertex Labels</source>
-        <translation>Добавить метки Вершин</translation>
+        <translation>Добавить Метки Вершин</translation>
     </message>
     <message>
         <location filename="../CD_FeatureLabels.py" line="43"/>
@@ -1445,7 +1445,7 @@ to a fixed part!
     <message>
         <location filename="../a2p_rigid.py" line="525"/>
         <source>    is not Fixed and has {} DegreesOfFreedom</source>
-        <translation>    не фиксированный и имеет СтепенейСвободы {}</translation>
+        <translation>    не фиксированный и имеет Степеней Свободы - {}</translation>
     </message>
     <message>
         <location filename="../a2p_rigid.py" line="527"/>
@@ -1455,12 +1455,12 @@ to a fixed part!
     <message>
         <location filename="../a2p_rigid.py" line="530"/>
         <source>        DOF Position free with this rigid = {}</source>
-        <translation>        СтепениСвободы Положения с этим rigid = {}</translation>
+        <translation>        Степени Свободы Положения с этим rigid = {}</translation>
     </message>
     <message>
         <location filename="../a2p_rigid.py" line="531"/>
         <source>        DOF Rotation free with this rigid = {}</source>
-        <translation>        СтепениСвободы Вращения с этим rigid = {}</translation>
+        <translation>        Степени Свободы Вращения с этим rigid = {}</translation>
     </message>
     <message>
         <location filename="../CD_OneButton.py" line="96"/>
@@ -1625,7 +1625,7 @@ for the select row in table.</source>
     <message>
         <location filename="../CD_ConstraintViewer.py" line="197"/>
         <source>Std Solver</source>
-        <translation>Станд.Решатель</translation>
+        <translation>Станд. Решатель</translation>
     </message>
     <message>
         <location filename="../CD_ConstraintViewer.py" line="159"/>
@@ -1766,7 +1766,7 @@ Select one or more constraints and try again.</source>
     <message>
         <location filename="../a2p_solversystem.py" line="296"/>
         <source>DOFs: {}</source>
-        <translation>СтепСв: {}</translation>
+        <translation>Степ.Св: {}</translation>
     </message>
     <message>
         <location filename="../a2p_solversystem.py" line="374"/>
@@ -2245,47 +2245,47 @@ by hitting the solve button
     <message>
         <location filename="../a2p_ConstraintCommands.py" line="168"/>
         <source>Add CircularEdge constraint</source>
-        <translation>Добавить ограничение CircularEdge</translation>
+        <translation>Добавить ограничение CircularEdge (Кромки Окружностей)</translation>
     </message>
     <message>
         <location filename="../a2p_ConstraintCommands.py" line="194"/>
         <source>Add AxisCoincident constraint</source>
-        <translation>Добавить ограничение AxisCoincident (Соосность)</translation>
+        <translation>Добавить ограничение AxisCoincident (Соосность осей)</translation>
     </message>
     <message>
         <location filename="../a2p_ConstraintCommands.py" line="220"/>
         <source>Add AxisParallel constraint</source>
-        <translation>Добавить ограничение AxisParallel (Параллельность осей)</translation>
+        <translation>Добавить ограничение AxisParallel (Параллельность Осей)</translation>
     </message>
     <message>
         <location filename="../a2p_ConstraintCommands.py" line="246"/>
         <source>Add AxisPlaneParallel constraint</source>
-        <translation>Добавить ограничение AxisPlaneParallel</translation>
+        <translation>Добавить ограничение AxisPlaneParallel (Ось и Плоскость Параллельны)</translation>
     </message>
     <message>
         <location filename="../a2p_ConstraintCommands.py" line="272"/>
         <source>Add AxisPlaneAngle constraint</source>
-        <translation>Добавить ограничение AxisPlaneAngle</translation>
+        <translation>Добавить ограничение AxisPlaneAngle (Ось под Углом к Плоскости)</translation>
     </message>
     <message>
         <location filename="../a2p_ConstraintCommands.py" line="298"/>
         <source>Add AxisPlaneNormal constraint</source>
-        <translation>Добавить ограничение AxisPlaneNormal</translation>
+        <translation>Добавить ограничение AxisPlaneNormal (Ось перпендикулярна Плоскости)</translation>
     </message>
     <message>
         <location filename="../a2p_ConstraintCommands.py" line="324"/>
         <source>Add PlanesParallel constraint</source>
-        <translation>Добавить ограничение PlanesParallel (Параллельность плоскостей)</translation>
+        <translation>Добавить ограничение PlanesParallel (Плоскости параллельны)</translation>
     </message>
     <message>
         <location filename="../a2p_ConstraintCommands.py" line="350"/>
         <source>Add PlaneCoincident constraint</source>
-        <translation>Добавить ограничение PaneCoincident</translation>
+        <translation>Добавить ограничение PlaneCoincident (Совпадение Плоскостей)</translation>
     </message>
     <message>
         <location filename="../a2p_ConstraintCommands.py" line="376"/>
         <source>Add AngledPlanes constraint</source>
-        <translation>Добавить ограничение AngledPlanes</translation>
+        <translation>Добавить ограничение AngledPlanes (Плоскости под Углом)</translation>
     </message>
     <message>
         <location filename="../a2p_ConstraintCommands.py" line="402"/>
@@ -2552,7 +2552,7 @@ Select:
 2) A plane (on another part)
 
 It is possible to change the offset in object editor.</source>
-        <translation>Создать ограничение Совпадение Плоскости (PlaneCoincident)
+        <translation>Создать ограничение Совпадение Плоскостей (PlaneCoincident)
 
 Выберите:
 1) Плоскость (на детали)
@@ -2634,7 +2634,7 @@ within this workbench.
 </source>
         <translation>
 Преобразовать деталь, созданную
-с помощью другого верстака в
+с помощью другого верстака, в
 полнофункциональную деталь A2plus.
 
 После преобразования можно
