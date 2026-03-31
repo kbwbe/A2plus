@@ -377,6 +377,15 @@ def filterShapeObs(_list, allowSketches=False):
             if ob.Name.startswith("Sketch"):
                 lst.append(ob)
                 continue
+        # Exclude any objects from assembly workbench, as they are not real shapes and cause problems with the solver.
+        # This includes built-in Assembly objects and their children, including Body, Boolean
+        if ob.TypeId.startswith("Assembly::"):
+            #filter out the built-in Assembly objects
+            continue
+        if ob.Parents and any( p[0].TypeId.startswith("Assembly::") for p in ob.Parents):
+            #filter out objects which are children of built-in Assembly objects
+            continue
+
         if (
             #Following object now have App::GeoFeatureGroupExtension in FC0.19
             #prevent them from being filtered out.
